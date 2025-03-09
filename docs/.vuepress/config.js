@@ -5,20 +5,20 @@ import {version} from '../../package.json'
 
 export default defineUserConfig({
     lang: 'zh-CN',
-    title: 'dify',
-    description: 'dify-doc',
-    base: '/dify/',
+    title: 'dify-spring-boot-starter',
+    description: 'dify-spring-boot-starter-doc',
+    base: '/dify-spring-boot-starter/',
     locales: {
         // 键名是该语言所属的子路径
         // 作为特例，默认语言可以使用 '/' 作为其路径。
         '/': {
             lang: 'zh-CN',
-            title: 'dify',
+            title: 'dify-spring-boot-starter',
             description: 'dify springboot 实现'
         },
         '/en/': {
             lang: 'en-US',
-            title: 'dify',
+            title: 'dify-spring-boot-starter',
             description: 'dify springboot realization'
         }
     },
