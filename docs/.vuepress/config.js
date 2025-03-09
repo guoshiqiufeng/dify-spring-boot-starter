@@ -113,7 +113,7 @@ export default defineUserConfig({
                         children: [
                             {
                                 text: '更新日志',
-                                link: 'https://github.com/guoshiqiufeng/dify/releases',
+                                link: 'https://github.com/guoshiqiufeng/dify-spring-boot-starter/releases',
                             }
                         ]
                     }
@@ -198,14 +198,14 @@ export default defineUserConfig({
                         children: [
                             {
                                 text: 'Changelog',
-                                link: 'https://github.com/guoshiqiufeng/dify/releases',
+                                link: 'https://github.com/guoshiqiufeng/dify-spring-boot-starter/releases',
                             }
                         ]
                     }
                 ]
             },
         },
-        repo: "https://github.com/guoshiqiufeng/dify"
+        repo: "https://github.com/guoshiqiufeng/dify-spring-boot-starter"
     }),
     plugins: []
 })
