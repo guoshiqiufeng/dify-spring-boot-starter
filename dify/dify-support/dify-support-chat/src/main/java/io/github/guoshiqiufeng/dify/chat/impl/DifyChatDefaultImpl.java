@@ -1,0 +1,463 @@
+/*
+ * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.github.guoshiqiufeng.dify.chat.impl;
+
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.guoshiqiufeng.dify.chat.DifyChat;
+import io.github.guoshiqiufeng.dify.chat.constant.ChatUriConstant;
+import io.github.guoshiqiufeng.dify.chat.dto.request.*;
+import io.github.guoshiqiufeng.dify.chat.dto.response.AppParametersResponseVO;
+import io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendResponse;
+import io.github.guoshiqiufeng.dify.chat.dto.response.DifyTextVO;
+import io.github.guoshiqiufeng.dify.chat.dto.response.MessageConversationsResponse;
+import io.github.guoshiqiufeng.dify.chat.exception.DiftChatException;
+import io.github.guoshiqiufeng.dify.chat.exception.DiftChatExceptionEnum;
+import io.github.guoshiqiufeng.dify.chat.utils.WebClientUtil;
+import io.github.guoshiqiufeng.dify.core.config.DifyServerProperties;
+import io.github.guoshiqiufeng.dify.core.enums.ResponseModeEnum;
+import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
+import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
+import io.github.guoshiqiufeng.dify.core.pojo.request.ChatMessageVO;
+import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Flux;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 默认实现
+ *
+ * @author yanghq
+ * @version 1.0
+ * @since 2025/3/4 10:21
+ */
+@Slf4j
+public class DifyChatDefaultImpl implements DifyChat {
+
+    private final DifyServerProperties difyServerProperties;
+    private final ObjectMapper objectMapper;
+
+    public DifyChatDefaultImpl(DifyServerProperties difyServerProperties, ObjectMapper objectMapper) {
+        this.difyServerProperties = difyServerProperties;
+        this.objectMapper = objectMapper;
+    }
+
+    /**
+     * 发送消息
+     */
+    @Override
+    public ChatMessageSendResponse send(ChatMessageSendRequest sendRequest) {
+        // 请求地址 url + /v1/chat-messages
+        String url = difyServerProperties.getUrl() + ChatUriConstant.V1_CHAT_MESSAGES_URI;
+
+        // 请求体
+        String body = builderChatMessageBody(ResponseModeEnum.blocking, sendRequest);
+        // 使用 WebClient 发送 POST 请求
+        WebClient webClient = getWebClient(sendRequest.getApiKey());
+
+        return webClient.post()
+                .uri(url)
+                .bodyValue(body)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(ChatMessageSendResponse.class)
+                .block();
+    }
+
+    private String builderChatMessageBody(ResponseModeEnum responseMode, ChatMessageSendRequest sendRequest) {
+        ChatMessageVO chatMessage = new ChatMessageVO();
+        chatMessage.setResponseMode(responseMode);
+        chatMessage.setUser(sendRequest.getUserId());
+        chatMessage.setQuery(sendRequest.getContent());
+        chatMessage.setConversationId(sendRequest.getConversationId());
+        List<ChatMessageSendRequest.ChatMessageFile> files = sendRequest.getFiles();
+        if (!CollectionUtils.isEmpty(files)) {
+            files = files.stream().peek(f -> {
+                f.setType("image");
+                f.setTransferMethod("remote_url");
+            }).toList();
+            chatMessage.setFiles(BeanUtil.copyToList(files, ChatMessageVO.ChatMessageFile.class));
+        }
+        chatMessage.setInputs(sendRequest.getInputs());
+
+        String body = null;
+        try {
+            body = objectMapper.writeValueAsString(chatMessage);
+        } catch (JsonProcessingException e) {
+            throw new DiftChatException(DiftChatExceptionEnum.DIFY_DATA_PARSING_FAILURE);
+        }
+        return body;
+    }
+
+    /**
+     * 发送消息获取消息流
+     */
+    @Override
+    public Flux<ChatMessageSendResponse> sendChatMessageStream(ChatMessageSendRequest sendRequest) {
+        // 请求地址 url + /v1/chat-messages 请求方式 POST , stream 流
+        String url = difyServerProperties.getUrl() + ChatUriConstant.V1_CHAT_MESSAGES_URI;
+
+        String body = builderChatMessageBody(ResponseModeEnum.streaming, sendRequest);
+
+        // 使用 WebClient 发送 POST 请求
+        WebClient webClient = getWebClient(sendRequest.getApiKey());
+
+        return webClient.post()
+                .uri(url)
+                .bodyValue(body)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
+                .bodyToFlux(ChatMessageSendResponse.class)
+                .doOnError(e -> log.error("Error while sending chat message: {}", e.getMessage()));
+    }
+
+    @Override
+    public void stopMessagesStream(String apiKey, String taskId, String userId) {
+        String url = difyServerProperties.getUrl() + ChatUriConstant.V1_CHAT_MESSAGES_URI + "/{}/stop";
+        url = StrUtil.format(url, taskId);
+
+        // 使用 WebClient 发送 POST 请求
+        WebClient webClient = getWebClient(apiKey);
+
+        Map<String, Object> params = new HashMap<>(2);
+        params.put("user", userId);
+
+        try {
+            String body = objectMapper.writeValueAsString(params);
+
+            webClient.post()
+                    .uri(url)
+                    .bodyValue(body)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
+                    .toBodilessEntity()  // 如果不需要响应体
+                    .block();  // 转为同步调用
+
+        } catch (WebClientResponseException e) {
+            log.error("Error while stop chat message: {}", e.getMessage());
+            throw new DiftChatException(DiftChatExceptionEnum.DIFY_API_ERROR);
+        } catch (JsonProcessingException e) {
+            log.error("Error while serializing request body: {}", e.getMessage());
+            throw new DiftChatException(DiftChatExceptionEnum.DIFY_DATA_PARSING_FAILURE);
+        }
+    }
+
+    /**
+     * 获取会话列表
+     */
+    @Override
+    public DifyPageResult<MessageConversationsResponse> conversations(MessageConversationsRequest request) {
+        String url = difyServerProperties.getUrl() + ChatUriConstant.V1_CONVERSATIONS_URI;
+
+        if (StrUtil.isEmpty(request.getSortBy())) {
+            request.setSortBy("-updated_at");
+        }
+        if (request.getLimit() == null) {
+            request.setLimit(20);
+        }
+
+        try {
+            // 使用 WebClient 发送 GET 请求
+            WebClient webClient = getWebClient(request.getApiKey());
+
+            return webClient.get()
+                    .uri(url + "?user={user}&last_id={lastId}&limit={limit}&sort_by={sortBy}",
+                            request.getUserId(),
+                            request.getLastId(),
+                            request.getLimit(),
+                            request.getSortBy())
+                    .retrieve()
+                    .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
+                    .bodyToMono(new ParameterizedTypeReference<DifyPageResult<MessageConversationsResponse>>() {
+                    })
+                    .block();  // 转为同步调用
+
+        } catch (WebClientResponseException e) {
+            log.error("Error while getting conversations: {}", e.getMessage());
+            throw new DiftChatException(DiftChatExceptionEnum.DIFY_API_ERROR);
+        }
+    }
+
+    /**
+     * 获取消息列表
+     */
+    @Override
+    public DifyPageResult<MessagesResponseVO> messages(MessagesRequest request) {
+        String url = difyServerProperties.getUrl() + ChatUriConstant.V1_MESSAGES_URI;
+
+        if (request.getLimit() == null) {
+            request.setLimit(20);
+        }
+
+        try {
+            // 使用 WebClient 发送 GET 请求
+            WebClient webClient = getWebClient(request.getApiKey());
+
+            return webClient.get()
+                    .uri(url + "?conversation_id={conversationId}&user={user}&first_id={lastId}&limit={limit}",
+                            request.getConversationId(),
+                            request.getUserId(),
+                            request.getFirstId(),
+                            request.getLimit())
+                    .retrieve()
+                    .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
+                    .bodyToMono(new ParameterizedTypeReference<DifyPageResult<MessagesResponseVO>>() {
+                    })
+                    .block();  // 转为同步调用
+
+        } catch (WebClientResponseException e) {
+            log.error("messages error: {}", e.getMessage());
+            throw new DiftChatException(DiftChatExceptionEnum.DIFY_API_ERROR);
+        }
+    }
+
+    /**
+     * 获取消息建议
+     */
+    @Override
+    public List<String> messagesSuggested(String messageId, String apiKey, String userId) {
+        String url = difyServerProperties.getUrl() + ChatUriConstant.V1_MESSAGES_URI + "/{}/suggested";
+        url = StrUtil.format(url, messageId);
+
+        try {
+            // 使用 WebClient 发送 GET 请求
+            WebClient webClient = getWebClient(apiKey);
+
+            DifyResult<List<String>> difyResult = webClient.get()
+                    .uri(url + "?user={user}",
+                            userId)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
+                    .bodyToMono(new ParameterizedTypeReference<DifyResult<List<String>>>() {
+                    })
+                    .onErrorResume(e -> {
+                        log.error("Error while getting conversations: {}", e.getMessage());
+                        return null;
+                    })
+                    .block();// 转为同步调用
+            return difyResult != null ? difyResult.getData() : List.of();
+
+        } catch (WebClientResponseException e) {
+            log.error("messagesSuggested error: {}", e.getMessage());
+            throw new DiftChatException(DiftChatExceptionEnum.DIFY_API_ERROR);
+        }
+    }
+
+    /**
+     * 删除会话
+     */
+    @Override
+    public void deleteConversation(String conversationId, String apiKey, String userId) {
+        String url = difyServerProperties.getUrl() + ChatUriConstant.V1_CONVERSATIONS_URI + "/{}";
+        url = StrUtil.format(url, conversationId);
+
+        // 使用 WebClient 发送 Delete 请求
+        WebClient webClient = getWebClient(apiKey);
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("user", userId);
+
+        try {
+            String body = objectMapper.writeValueAsString(params);
+
+            webClient.method(HttpMethod.DELETE)
+                    .uri(url)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(body)
+                    .retrieve()
+                    .toBodilessEntity()  // 如果不需要响应体
+                    .block();  // 转为同步调用
+
+        } catch (WebClientResponseException | JsonProcessingException e) {
+            log.error("deleteConversation error: {}", e.getMessage());
+            throw new DiftChatException(DiftChatExceptionEnum.DELETE_ERROR);
+        }
+    }
+
+    /**
+     * 获取WebClient
+     *
+     * @param apiKey API密钥，用于身份验证
+     * @return WebClient
+     */
+    private static WebClient getWebClient(String apiKey) {
+        return WebClient.builder()
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+    }
+
+    /**
+     * 获取应用参数
+     */
+    @Override
+    public AppParametersResponseVO parameters(String apiKey) {
+        String url = difyServerProperties.getUrl() + ChatUriConstant.V1_PARAMETERS_URI;
+
+        try {
+            // 使用 WebClient 发送 GET 请求
+            WebClient webClient = getWebClient(apiKey);
+
+            // 转为同步调用
+            return webClient.get()
+                    .uri(url)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
+                    .bodyToMono(new ParameterizedTypeReference<AppParametersResponseVO>() {
+                    })
+                    .onErrorResume(e -> {
+                        log.error("Error while getting conversations: {}", e.getMessage());
+                        return null;
+                    })
+                    .block();
+
+        } catch (WebClientResponseException e) {
+            log.error("parameters error: {}", e.getMessage());
+            throw new DiftChatException(DiftChatExceptionEnum.DIFY_API_ERROR);
+        }
+
+    }
+
+    @Override
+    public void textToAudio(TextToAudioRequest request, HttpServletResponse response) {
+        String url = difyServerProperties.getUrl() + ChatUriConstant.V1_TEXT_TO_AUDIO_URI;
+
+        try {
+            // 使用 WebClient 发送 POST 请求
+            WebClient webClient = WebClient.builder()
+                    .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
+                    .build();
+
+            // 构建请求体
+            Map<String, String> requestBody = new HashMap<>();
+            requestBody.put("user", request.getUserId());
+            requestBody.put("text", request.getText());
+            requestBody.put("message_id", request.getMessageId());
+
+            // 获取响应，包括headers和body
+            WebClient.ResponseSpec responseSpec = webClient.post()
+                    .uri(url)
+                    .bodyValue(requestBody)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction);
+
+            // 获取响应头和数据
+            byte[] audioData = responseSpec.toEntity(byte[].class)
+                    .mapNotNull(responseEntity -> {
+                        // 设置 Content-Type
+                        String type = responseEntity.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
+                        response.setContentType(type != null ? type : "audio/mpeg");
+
+                        // 获取并设置 Content-Disposition
+                        String contentDisposition = responseEntity.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION);
+                        if (contentDisposition != null) {
+                            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, contentDisposition);
+                        } else {
+                            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=audio.mp3");
+                        }
+
+                        return responseEntity.getBody();
+                    })
+                    .block();
+
+            if (audioData != null) {
+                response.getOutputStream().write(audioData);
+                response.getOutputStream().flush();
+            }
+
+        } catch (IOException | WebClientResponseException e) {
+            log.error("textToAudio error: {}", e.getMessage());
+            throw new DiftChatException(DiftChatExceptionEnum.DIFY_API_ERROR);
+        }
+    }
+
+    @Override
+    public DifyTextVO audioToText(AudioToTextRequest request) {
+        String url = difyServerProperties.getUrl() + ChatUriConstant.V1_AUDIO_TO_TEXT_URI;
+
+        try {
+            // 使用 WebClient 发送 POST 请求
+            WebClient webClient = WebClient.builder()
+                    .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
+                    .build();
+
+            // 构建 MultipartData 请求
+            MultipartFile file = request.getFile();
+
+            return webClient.post()
+                    .uri(url)
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .body(BodyInserters.fromMultipartData(
+                            new LinkedMultiValueMap<>() {{
+                                add("file", new MultipartInputStreamFileResource(
+                                        file.getInputStream(),
+                                        file.getOriginalFilename()
+                                ));
+                            }}
+                    ))
+                    .retrieve()
+                    .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
+                    .bodyToMono(DifyTextVO.class)
+                    .block();
+
+        } catch (IOException | WebClientResponseException e) {
+            log.error("audioToText error: {}", e.getMessage());
+            throw new DiftChatException(DiftChatExceptionEnum.DIFY_API_ERROR);
+        }
+    }
+
+    /**
+     * 处理 MultipartFile
+     */
+    private static class MultipartInputStreamFileResource extends InputStreamResource {
+        private final String filename;
+
+        public MultipartInputStreamFileResource(InputStream inputStream, String filename) {
+            super(inputStream);
+            this.filename = filename;
+        }
+
+        @Override
+        public String getFilename() {
+            return this.filename;
+        }
+
+        @Override
+        public long contentLength() {
+            return -1; // 表示长度未知
+        }
+    }
+}

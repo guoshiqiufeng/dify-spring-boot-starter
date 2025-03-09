@@ -1,0 +1,31 @@
+buildscript {
+    repositories {
+        maven { url "https://maven.aliyun.com/repository/public" }
+        maven { url "https://maven.aliyun.com/repository/gradle-plugin" }
+        mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+
+    dependencies {
+        //noinspection DifferentKotlinGradleVersion
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.21"
+        classpath "gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.16.1"
+        classpath "io.freefair.gradle:lombok-plugin:8.10"
+        classpath "io.spring.gradle:dependency-management-plugin:1.1.6"
+    }
+}
+
+rootProject.name = 'root'
+
+include 'dify'
+include 'dify:dify-core'
+
+include 'dify:dify-support'
+include 'dify:dify-support:dify-support-chat'
+include 'dify:dify-support:dify-support-server'
+
+include 'dify:dify-spring-boot-starter'
+
+include 'bom'
+include 'bom:dify-bom'
+

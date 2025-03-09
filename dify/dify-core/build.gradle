@@ -1,0 +1,9 @@
+dependencies {
+    api "org.slf4j:slf4j-api"
+    api "com.fasterxml.jackson.core:jackson-annotations"
+
+    annotationProcessor "org.springframework.boot:spring-boot-starter-actuator"
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+}

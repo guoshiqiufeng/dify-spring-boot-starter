@@ -1,0 +1,81 @@
+name: docs
+
+on:
+  # 每当 push 到 main 分支时触发部署
+  #  push:
+  #    branches: [ main ]
+  # 手动触发部署
+  workflow_dispatch:
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # “最近更新时间” 等 git 日志相关信息，需要拉取全部提交记录
+          fetch-depth: 0
+
+      - name: Init VuePress
+        run: |
+          APP_VERSION=$(grep 'APP_VERSION' gradle.properties | awk -F'=' '{print $2}' | tr -d '[:space:]')
+          echo '{
+             "name": "dify-doc",
+             "version": "'"$APP_VERSION"'",
+             "description": "dify doc",
+             "main": "index.js",
+             "scripts": {
+               "docs:dev": "vuepress dev docs",
+               "docs:build": "vuepress build docs"
+             },
+             "repository": {
+               "type": "git",
+               "url": "git+https://github.com/guoshiqiufeng/dify.git"
+             },
+             "keywords": [
+               "spring-cloud-stream",
+               "dify"
+             ],
+             "author": "guoshiqiufeng",
+             "license": "MIT",
+             "bugs": {
+               "url": "https://github.com/guoshiqiufeng/dify/issues"
+             },
+             "homepage": "https://github.com/guoshiqiufeng/dify#readme",
+             "devDependencies": {
+               "@vuepress/client": "^2.0.0-rc.0",
+               "@vuepress/plugin-docsearch": "^2.0.0-rc.3",
+               "sass-embedded": "^1.78.0",
+               "vue": "^3.3.8",
+               "vuepress": "^2.0.0-rc.0"
+             },
+             "dependencies": {
+               "@vuepress/bundler-vite": "^2.0.0-rc.2",
+               "@vuepress/theme-default": "^2.0.0-rc.0"
+             }
+           }' > package.json
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          # 选择要使用的 node 版本
+          node-version: 20
+
+      - name: Build VuePress site
+        run: |
+          npm install
+          npm run docs:build
+
+      # 查看 workflow 的文档来获取更多信息
+      # @see https://github.com/crazy-max/ghaction-github-pages
+      - name: Deploy to GitHub Pages
+        uses: crazy-max/ghaction-github-pages@v4
+        with:
+          # 部署到 gh-pages 分支
+          target_branch: gh-pages
+          # 部署目录为 VuePress 的默认输出目录
+          build_dir: docs/.vuepress/dist
+        env:
+          # @see https://docs.github.com/cn/actions/reference/authentication-in-a-workflow#about-the-github_token-secret
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

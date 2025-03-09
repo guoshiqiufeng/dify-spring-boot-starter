@@ -1,0 +1,218 @@
+import java.time.LocalDateTime
+
+allprojects {
+    group APP_GROUP
+    version APP_VERSION
+}
+
+apply from: 'ext.gradle'
+
+description = "Provide springboot starter for dify to simplify development."
+
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'signing'
+    apply plugin: 'maven-publish'
+    apply plugin: "io.freefair.lombok"
+    apply plugin: 'com.github.hierynomus.license'
+    apply plugin: "io.spring.dependency-management"
+
+    sourceCompatibility = "${javaVersion}"
+    targetCompatibility = "${javaVersion}"
+
+    lombok {
+        version = "1.18.30"
+    }
+
+    compileJava {
+        options.release = 17
+    }
+
+    compileTestJava {
+        options.release = 17
+    }
+
+    repositories {
+        mavenLocal()
+        maven { url "https://maven.aliyun.com/repository/public" }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        mavenCentral()
+    }
+
+    def onlyPom = project.name == "dify-bom"
+
+    if (!onlyPom) {
+        dependencyManagement {
+            imports {
+                mavenBom "org.springframework.boot:spring-boot-dependencies:${springBoot3Version}"
+            }
+            dependencies {
+
+            }
+        }
+    }
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+        options.warnings = false
+        options.deprecation = true
+        options.compilerArgs += ["-parameters"]
+    }
+
+    tasks.withType(GenerateModuleMetadata) {
+        enabled = false
+    }
+
+    jar {
+        into("META-INF/") {
+            from rootProject.file("LICENSE")
+        }
+        into("META-INF/maven/$project.group/$project.name") {
+            from { generatePomFileForMavenJavaPublication }
+            rename ".*", "pom.xml"
+        }
+        afterEvaluate {
+            manifest {
+                attributes 'Implementation-Title': archiveBaseName
+                attributes 'Implementation-Version': archiveVersion
+                attributes 'Built-Gradle': gradle.gradleVersion
+                attributes 'Bundle-DocURL': 'https://guoshiqiufeng.github.io/dify-spring-boot-starter'
+                attributes 'Build-OS': System.getProperty("os.name")
+                attributes 'Built-By': System.getProperty("user.name")
+                attributes 'Build-Jdk': System.getProperty("java.version")
+                attributes 'Build-Timestamp': LocalDateTime.now().format("yyyy-MM-dd HH:mm:ss")
+                attributes 'Automatic-Module-Name': "${project.group}.${project.name.replaceAll("-", ".")}"
+            }
+        }
+    }
+
+    license {
+        encoding = "UTF-8"
+        header = rootProject.file("header.txt")
+        includes(["**/*.java", "**/*.kt"])
+        mapping {
+            java = "SLASHSTAR_STYLE"
+            kt = "SLASHSTAR_STYLE"
+        }
+        ignoreFailures = true
+        ext.year = Calendar.getInstance().get(Calendar.YEAR)
+    }
+
+    task sourcesJar(type: Jar) {
+        archiveClassifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    javadoc {
+        // Check for syntax during linting. 'none' doesn't seem to work in suppressing
+        // all linting warnings all the time (see/link references most notably).
+        options.addStringOption("Xdoclint:syntax", "-quiet")
+
+        // Suppress warnings due to cross-module @see and @link references.
+        // Note that global 'api' task does display all warnings, and
+        // checks for 'reference' on top of 'syntax'.
+        logging.captureStandardError LogLevel.INFO
+        logging.captureStandardOutput LogLevel.INFO  // suppress "## warnings" message
+
+        afterEvaluate {
+            configure(options) {
+                encoding "UTF-8"
+                charSet 'UTF-8'
+                author true
+                version true
+                failOnError false
+                links "https://docs.oracle.com/javase/8/docs/api"
+            }
+        }
+    }
+
+    test {
+        dependsOn("cleanTest", "generatePomFileForMavenJavaPublication")
+        useJUnitPlatform()
+    }
+
+    task javadocJar(type: Jar) {
+        archiveClassifier = 'javadoc'
+        from javadoc
+    }
+
+    tasks.whenTaskAdded { task ->
+        if (task.name.contains('signMavenJavaPublication') && project.hasProperty('signing.secretKeyRingFile')) {
+            task.enabled = new File(project.property('signing.secretKeyRingFile') as String).isFile()
+        }
+    }
+
+    publishing {
+        repositories {
+            maven {
+                def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+
+                credentials {
+                    if (project.hasProperty('storedUsername') && project.hasProperty('storedPassword')) {
+                        username project.storedUsername
+                        password project.storedPassword
+                    }
+                }
+            }
+        }
+        publications {
+            mavenJava(MavenPublication) {
+                if (!onlyPom) {
+                    from components.java
+                    artifact sourcesJar
+                    artifact javadocJar
+                }
+                pom {
+                    name = artifactId
+                    description = 'Provide springboot starter for dify to simplify development'
+                    if (onlyPom) {
+                        packaging 'pom'
+                    } else {
+                        packaging 'jar'
+                    }
+                    url = 'https://github.com/guoshiqiufeng/dify-spring-boot-starter'
+
+                    scm {
+                        connection = 'scm:git@github.com:guoshiqiufeng/dify-spring-boot-starter.git'
+                        developerConnection = 'scm:git@github.com:guoshiqiufeng/dify-spring-boot-starter.git'
+                        url = 'https://github.com/guoshiqiufeng/dify-spring-boot-starter'
+                    }
+
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id = 'fubluesky'
+                            name = 'yanghq'
+                            email = 'fubluesky@foxmail.com'
+                        }
+                    }
+
+                    withXml {
+                        def root = asNode()
+                        root.dependencies.'*'.findAll {
+                            def d = it
+                            d.scope.text() == 'runtime' && project.configurations.findByName("implementation").allDependencies.find { dep ->
+                                dep.name == it.artifactId.text()
+                            }.each() {
+                                d.scope*.value = 'compile'
+                                d.appendNode('optional', true)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        signing {
+            sign publishing.publications.mavenJava
+        }
+    }
+}

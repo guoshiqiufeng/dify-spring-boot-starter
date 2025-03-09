@@ -1,0 +1,15 @@
+ext {
+    configuration = [
+            javaVersion = JavaVersion.VERSION_21
+    ]
+
+    libraries = [
+            springBoot3Version = '3.4.3',
+            hutoolVersion = '5.8.36',
+    ]
+
+    lib = [
+            "hutool-core": "cn.hutool:hutool-core:${hutoolVersion}",
+            "hutool-json": "cn.hutool:hutool-json:${hutoolVersion}"
+    ]
+}
