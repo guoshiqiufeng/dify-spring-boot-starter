@@ -32,7 +32,7 @@ public class RenameConversationRequest extends BaseChatRequest implements Serial
     private static final long serialVersionUID = 3291175701376858324L;
 
     /**
-     *
+     * 会话ID，标识需要重命名的会话
      */
     private String conversationId;
 
@@ -42,7 +42,7 @@ public class RenameConversationRequest extends BaseChatRequest implements Serial
     private String name;
 
     /**
-     * 会话ID，标识需要重命名的会话
+     * 自动生成标题，默认 false
      */
     private Boolean autoGenerate = false;
 }

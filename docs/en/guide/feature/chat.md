@@ -13,9 +13,9 @@ receiving, session management, voice conversion and other core functions. All in
 authentication.
 Use the `DifyChat` interface instance.
 
-## Interface List
+## 1. Message
 
-### 1. Send a message
+### 1.1 Send a message
 
 #### Method
 
@@ -49,7 +49,7 @@ ChatMessageSendResponse
 | id             | String | id                  |
 | answer         | String | answer              |
 
-### 2. Send Streaming Messages
+### 1.2 Send Streaming Messages
 
 #### Method
 
@@ -65,7 +65,7 @@ Same as the Send Message interface
 
 Returns a stream of messages, each of which is formatted in the same way as the send message response
 
-### 3. Termination message flow
+### 1.3 Termination message flow
 
 #### Method
 
@@ -81,7 +81,73 @@ void stopMessagesStream(String apiKey, String taskId, String userId);
 | taskId         | String | Yes      | taskId      |
 | userId         | String | Yes      | userId      |
 
-### 4. Get session list
+### 1.4 Message Feedback
+
+#### Method
+
+```java
+MessageFeedbackResponse messageFeedback(MessageFeedbackRequest messageFeedbackRequest);
+```
+
+#### Request Parameters
+
+| Parameter name | Type   | Required | Description                           |
+|----------------|--------|----------|---------------------------------------|
+| apiKey         | String | Yes      | apiKey                                |
+| userId         | String | Yes      | userId                                |
+| messageId      | String | Yes      | messageId                             |
+| rating         | Rating | Yes      | rating                                |
+| content        | String | Yes      | Message Feedback Specific Information |
+
+#### Response parameter
+
+MessageFeedbackResponse
+
+| Parameter name | Type   | Description          |
+|----------------|--------|----------------------|
+| result         | String | Fixed return success |
+
+### 1.5 Getting a list of messages
+
+#### Method
+
+```java
+DifyPageResult<MessagesResponseVO> messages(MessagesRequest request);
+```
+
+#### Request Parameters
+
+| Parameter name | Type    | Required | Description                             |
+|----------------|---------|----------|-----------------------------------------|
+| apiKey         | String  | Yes      | apiKey                                  |
+| userId         | String  | Yes      | userId                                  |
+| conversationId | String  | Yes      | Chat session number                     |
+| firstId        | String  | No       | First record id                         |
+| limit          | Integer | No       | Number of records per page, default 20条 |
+
+### 1.6 Get Suggested Responses
+
+#### Method
+
+```java
+List<String> messagesSuggested(String messageId, String apiKey, String userId);
+```
+
+#### Request Parameters
+
+| Parameter name | Type   | Required | Description |
+|----------------|--------|----------|-------------|
+| messageId      | String | Yes      | messageId   |
+| apiKey         | String | Yes      | apiKey      |
+| userId         | String | Yes      | userId      |
+
+#### Response parameter
+
+Return to the list of suggested response texts
+
+## 2. Session
+
+### 2.1 Get session list
 
 #### Method
 
@@ -113,7 +179,7 @@ MessageConversationsResponse
 | createdAt      | Long               | Creating timestamps |
 | updatedAt      | Long               | Updating timestamps |
 
-### 5. Deleting a session
+### 2.2 Deleting a session
 
 #### Method
 
@@ -129,45 +195,41 @@ void deleteConversation(String conversationId, String apiKey, String userId);
 | apiKey         | String | Yes      | apiKey              |
 | userId         | String | Yes      | userId              |
 
-### 6. Getting a list of messages
+### 2.3 Session rename
 
 #### Method
 
 ```java
-DifyPageResult<MessagesResponseVO> messages(MessagesRequest request);
+MessageConversationsResponse renameConversation(RenameConversationRequest renameConversationRequest);
 ```
 
 #### Request Parameters
 
-| Parameter name | Type    | Required | Description                             |
-|----------------|---------|----------|-----------------------------------------|
-| apiKey         | String  | Yes      | apiKey                                  |
-| userId         | String  | Yes      | userId                                  |
-| conversationId | String  | Yes      | Chat session number                     |
-| firstId        | String  | No       | First record id                         |
-| limit          | Integer | No       | Number of records per page, default 20条 |
-
-### 7. Get Suggested Responses
-
-#### Method
-
-```java
-List<String> messagesSuggested(String messageId, String apiKey, String userId);
-```
-
-#### Request Parameters
-
-| Parameter name | Type   | Required | Description |
-|----------------|--------|----------|-------------|
-| messageId      | String | Yes      | messageId   |
-| apiKey         | String | Yes      | apiKey      |
-| userId         | String | Yes      | userId      |
+| Parameter name | Type   | Required | Description                         |
+|----------------|--------|----------|-------------------------------------|
+| conversationId | String | Yes      | Chat session number                 |
+| name           | String | Yes      | Session name                        |
+| autoGenerate   | String | No       | Auto-generated title, default false |
+| apiKey         | String | Yes      | apiKey                              |
+| userId         | String | Yes      | userId                              |
 
 #### Response parameter
 
-Return to the list of suggested response texts
+MessageConversationsResponse
 
-### 8. text-to-speech
+| Parameter name | Type               | Description         |
+|----------------|--------------------|---------------------|
+| id             | String             | Chat session number |
+| name           | String             | Session name        |
+| inputs         | Map<String,Object> | Input parameter     |
+| status         | String             | Session state       |
+| introduction   | String             | Opening remarks     |
+| createdAt      | Long               | Creating timestamps |
+| updatedAt      | Long               | Updating timestamps |
+
+## 3. Other
+
+### 3.1 text-to-speech
 
 #### Method
 
@@ -188,7 +250,7 @@ void textToAudio(TextToAudioRequest request, HttpServletResponse response);
 
 Returns an audio file stream
 
-### 9. speech-to-text
+### 3.2 speech-to-text
 
 #### Method
 

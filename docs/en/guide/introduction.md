@@ -25,19 +25,21 @@ Implementation of the Redis messaging framework.
 * Available - ✅
 * In progress - 🚧
 
-| Feature                                       | Dify interface address    | status |   
-|-----------------------------------------------|---------------------------|--------|
-| 【CHAT】Send a message                          | /v1/chat-messages         | ✅      |    
-| 【CHAT】Send a message and get the message flow | /v1/chat-messages         | ✅      |    
-| 【CHAT】Stop Message Flow                       | /v1/chat-messages/{}/stop | ✅      |    
-| 【CHAT】Get session list                        | /v1/conversations         | ✅      |    
-| 【CHAT】Getting a list of messages              | /v1/messages              | ✅      |    
-| 【CHAT】Get a list of suggested messages        | /v1/messages/{}/suggested | ✅      |    
-| 【CHAT】Deleting a session                      | /v1/conversations/{}      | ✅      |    
-| 【CHAT】Getting Application Parameters          | /v1/parameters            | ✅      |    
-| 【CHAT】text-to-speech                          | /v1/text-to-audio         | ✅      |    
-| 【CHAT】speech-to-text                          | /v1/audio-to-text         | ✅      |    
-| 【SERVER】                                      |                           | 🚧     |    
+| Feature                                       | Dify interface address         | status |   
+|-----------------------------------------------|--------------------------------|--------|
+| 【CHAT】Send a message                          | /v1/chat-messages              | ✅      |    
+| 【CHAT】Send a message and get the message flow | /v1/chat-messages              | ✅      |    
+| 【CHAT】Stop Message Flow                       | /v1/chat-messages/{}/stop      | ✅      |   
+| 【CHAT】Message Feedback (Likes)                | /v1/chat-messages/{}/feedbacks | ✅      |    
+| 【CHAT】Get session list                        | /v1/conversations              | ✅      |    
+| 【CHAT】Getting a list of messages              | /v1/messages                   | ✅      |    
+| 【CHAT】Get a list of suggested messages        | /v1/messages/{}/suggested      | ✅      |    
+| 【CHAT】Deleting a session                      | /v1/conversations/{}           | ✅      |    
+| 【CHAT】Session rename                          | /v1/conversations/{}/name      | ✅      |  
+| 【CHAT】Getting Application Parameters          | /v1/parameters                 | ✅      |    
+| 【CHAT】text-to-speech                          | /v1/text-to-audio              | ✅      |    
+| 【CHAT】speech-to-text                          | /v1/audio-to-text              | ✅      |    
+| 【SERVER】                                      |                                | 🚧     |    
 
 Tips：
 
