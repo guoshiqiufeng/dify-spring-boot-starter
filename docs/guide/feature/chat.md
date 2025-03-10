@@ -1,10 +1,10 @@
 ---
 lang: zh-cn
-title: Dify Chat API
+title: Chat API
 description: 
 ---
 
-# Dify Chat API
+# Chat API
 
 ## 接口概述
 
@@ -31,7 +31,7 @@ ChatMessageSendRequest
 | userId         | String                | 是    | 用户 id  |
 | conversationId | String                | 否    | 聊天对话编号 |
 | content        | String                | 是    | 消息内容   |
-| files          | List<ChatMessageFile> | 否    | 文件     |
+| files          | `List<ChatMessageFile>` | 否    | 文件     |
 | inputs         | Map<String, Object>   | 否    | 自定义参数  |
 
 #### 响应参数
