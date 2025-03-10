@@ -184,7 +184,7 @@ public class DifyChatDefaultImpl implements DifyChat {
             Map<String, Object> values = new HashMap<>(3);
             values.put("rating", request.getRating() != null ? request.getRating().getKey() : null);
             values.put("user", request.getUserId());
-            values.put("content", request.getContent());
+            values.put("content", request.getContent() == null ? "" : request.getContent());
 
             return webClient.post()
                     .uri(url)
@@ -346,8 +346,8 @@ public class DifyChatDefaultImpl implements DifyChat {
             WebClient webClient = getWebClient(renameConversationRequest.getApiKey());
 
             Map<String, Object> values = new HashMap<>(3);
-            values.put("name", renameConversationRequest.getName());
-            values.put("auto_generate", renameConversationRequest.getName());
+            values.put("name", renameConversationRequest.getName() == null ? "" : renameConversationRequest.getName());
+            values.put("auto_generate", renameConversationRequest.getAutoGenerate());
             values.put("user", renameConversationRequest.getUserId());
 
             return webClient.post()
