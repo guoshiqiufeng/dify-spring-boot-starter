@@ -27,14 +27,14 @@ ChatMessageSendResponse send(ChatMessageSendRequest sendRequest);
 
 ChatMessageSendRequest
 
-| Parameter name | Type                  | Required | Description           |
-|----------------|-----------------------|----------|-----------------------|
-| apiKey         | String                | Yes      | apiKey                |
-| userId         | String                | Yes      | User id               |
-| conversationId | String                | No       | Chat session number   |
-| content        | String                | Yes      | Message content       |
+| Parameter name | Type                    | Required | Description           |
+|----------------|-------------------------|----------|-----------------------|
+| apiKey         | String                  | Yes      | apiKey                |
+| userId         | String                  | Yes      | User id               |
+| conversationId | String                  | No       | Chat session number   |
+| content        | String                  | Yes      | Message content       |
 | files          | `List<ChatMessageFile>` | No       | file                  |
-| inputs         | Map<String, Object>   | No       | Customized parameters |
+| inputs         | Map<String, Object>     | No       | Customized parameters |
 
 #### Response parameter
 

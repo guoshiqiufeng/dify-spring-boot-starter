@@ -13,19 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.chat.exception;
+package io.github.guoshiqiufeng.dify.chat.dto.request;
 
-import io.github.guoshiqiufeng.dify.core.exception.BaseException;
-import io.github.guoshiqiufeng.dify.core.exception.BaseExceptionEnum;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
 
 /**
  * @author yanghq
  * @version 1.0
- * @since 2025/3/4 10:59
+ * @since 2025/3/10 13:46
  */
-public class DiftChatException extends BaseException {
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class RenameConversationRequest extends BaseChatRequest implements Serializable {
 
-    public DiftChatException(BaseExceptionEnum abstractExceptionEnum) {
-        super(abstractExceptionEnum);
-    }
+    private static final long serialVersionUID = 3291175701376858324L;
+
+    /**
+     *
+     */
+    private String conversationId;
+
+    /**
+     * 会话名称
+     */
+    private String name;
+
+    /**
+     * 会话ID，标识需要重命名的会话
+     */
+    private Boolean autoGenerate = false;
 }

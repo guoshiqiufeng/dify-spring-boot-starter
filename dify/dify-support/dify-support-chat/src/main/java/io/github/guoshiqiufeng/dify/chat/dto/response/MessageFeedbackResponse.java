@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.chat.exception;
+package io.github.guoshiqiufeng.dify.chat.dto.response;
 
-import io.github.guoshiqiufeng.dify.core.exception.BaseException;
-import io.github.guoshiqiufeng.dify.core.exception.BaseExceptionEnum;
+import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * @author yanghq
  * @version 1.0
- * @since 2025/3/4 10:59
+ * @since 2025/3/10 13:55
  */
-public class DiftChatException extends BaseException {
+@Data
+public class MessageFeedbackResponse implements Serializable {
 
-    public DiftChatException(BaseExceptionEnum abstractExceptionEnum) {
-        super(abstractExceptionEnum);
-    }
+    private String result;
 }

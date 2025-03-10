@@ -25,14 +25,14 @@ ChatMessageSendResponse send(ChatMessageSendRequest sendRequest);
 
 ChatMessageSendRequest
 
-| 参数名            | 类型                    | 是否必须 | 描述     |
-|----------------|-----------------------|------|--------|
-| apiKey         | String                | 是    | apiKey |
-| userId         | String                | 是    | 用户 id  |
-| conversationId | String                | 否    | 聊天对话编号 |
-| content        | String                | 是    | 消息内容   |
+| 参数名            | 类型                      | 是否必须 | 描述     |
+|----------------|-------------------------|------|--------|
+| apiKey         | String                  | 是    | apiKey |
+| userId         | String                  | 是    | 用户 id  |
+| conversationId | String                  | 否    | 聊天对话编号 |
+| content        | String                  | 是    | 消息内容   |
 | files          | `List<ChatMessageFile>` | 否    | 文件     |
-| inputs         | Map<String, Object>   | 否    | 自定义参数  |
+| inputs         | Map<String, Object>     | 否    | 自定义参数  |
 
 #### 响应参数
 
@@ -56,9 +56,11 @@ Flux<ChatMessageSendResponse> sendChatMessageStream(ChatMessageSendRequest sendR
 ```
 
 #### 请求参数
+
 与发送消息接口相同
 
 #### 响应参数
+
 返回消息流，每条消息格式与发送消息响应相同
 
 ### 3. 终止消息流
@@ -71,11 +73,11 @@ void stopMessagesStream(String apiKey, String taskId, String userId);
 
 #### 请求参数
 
-| 参数名   | 类型     | 是否必须 | 描述      |
-|-------|--------|------|---------|
-| apiKey | String | 是    | apiKey  |
-| taskId | String | 是    | 任务 id   |
-| userId | String | 是    | 用户 id   |
+| 参数名    | 类型     | 是否必须 | 描述     |
+|--------|--------|------|--------|
+| apiKey | String | 是    | apiKey |
+| taskId | String | 是    | 任务 id  |
+| userId | String | 是    | 用户 id  |
 
 ### 4. 获取会话列表
 
@@ -87,27 +89,27 @@ DifyPageResult<MessageConversationsResponse> conversations(MessageConversationsR
 
 #### 请求参数
 
-| 参数名    | 类型     | 是否必须 | 描述                |
-|--------|--------|------|-------------------|
-| apiKey | String | 是    | apiKey           |
-| userId | String | 是    | 用户 id            |
-| lastId | String | 否    | 最后一条记录 id        |
-| limit  | Integer| 否    | 每页记录数,默认20       |
-| sortBy | String | 否    | 排序字段,默认-updated_at |
+| 参数名    | 类型      | 是否必须 | 描述                 |
+|--------|---------|------|--------------------|
+| apiKey | String  | 是    | apiKey             |
+| userId | String  | 是    | 用户 id              |
+| lastId | String  | 否    | 最后一条记录 id          |
+| limit  | Integer | 否    | 每页记录数,默认20         |
+| sortBy | String  | 否    | 排序字段,默认-updated_at |
 
 #### 响应参数
 
 MessageConversationsResponse
 
-| 参数名          | 类型              | 描述     |
-|--------------|-----------------|--------|
-| id           | String          | 会话 id  |
-| name         | String          | 会话名称   |
-| inputs       | Map<String,Object> | 输入参数   |
-| status       | String          | 会话状态   |
-| introduction | String          | 开场白    |
-| createdAt    | Long            | 创建时间戳  |
-| updatedAt    | Long            | 更新时间戳  |
+| 参数名          | 类型                 | 描述    |
+|--------------|--------------------|-------|
+| id           | String             | 会话 id |
+| name         | String             | 会话名称  |
+| inputs       | Map<String,Object> | 输入参数  |
+| status       | String             | 会话状态  |
+| introduction | String             | 开场白   |
+| createdAt    | Long               | 创建时间戳 |
+| updatedAt    | Long               | 更新时间戳 |
 
 ### 5. 删除会话
 
@@ -135,13 +137,13 @@ DifyPageResult<MessagesResponseVO> messages(MessagesRequest request);
 
 #### 请求参数
 
-| 参数名            | 类型      | 是否必须 | 描述              |
-|----------------|---------|------|-----------------|
-| apiKey         | String  | 是    | apiKey         |
-| userId         | String  | 是    | 用户 id          |
-| conversationId | String  | 是    | 会话 id          |
-| firstId        | String  | 否    | 第一条记录 id       |
-| limit          | Integer | 否    | 每页记录数,默认20条    |
+| 参数名            | 类型      | 是否必须 | 描述          |
+|----------------|---------|------|-------------|
+| apiKey         | String  | 是    | apiKey      |
+| userId         | String  | 是    | 用户 id       |
+| conversationId | String  | 是    | 会话 id       |
+| firstId        | String  | 否    | 第一条记录 id    |
+| limit          | Integer | 否    | 每页记录数,默认20条 |
 
 ### 7. 获取建议回复
 
@@ -153,13 +155,14 @@ List<String> messagesSuggested(String messageId, String apiKey, String userId);
 
 #### 请求参数
 
-| 参数名      | 类型     | 是否必须 | 描述     |
-|----------|--------|------|--------|
+| 参数名       | 类型     | 是否必须 | 描述     |
+|-----------|--------|------|--------|
 | messageId | String | 是    | 消息 id  |
 | apiKey    | String | 是    | apiKey |
 | userId    | String | 是    | 用户 id  |
 
 #### 响应参数
+
 返回建议回复文本列表
 
 ### 8. 文本转语音
@@ -180,6 +183,7 @@ void textToAudio(TextToAudioRequest request, HttpServletResponse response);
 | messageId | String | 否    | 消息 id  |
 
 #### 响应参数
+
 返回音频文件流
 
 ### 9. 语音转文本
@@ -192,14 +196,14 @@ DifyTextVO audioToText(AudioToTextRequest request);
 
 #### 请求参数
 
-| 参数名    | 类型          | 是否必须 | 描述     |
-|--------|-------------|------|--------|
-| apiKey | String      | 是    | apiKey |
-| userId | String      | 是    | 用户 id  |
+| 参数名    | 类型            | 是否必须 | 描述     |
+|--------|---------------|------|--------|
+| apiKey | String        | 是    | apiKey |
+| userId | String        | 是    | 用户 id  |
 | file   | MultipartFile | 是    | 音频文件   |
 
 #### 响应参数
 
-| 参数名  | 类型     | 描述    |
-|------|--------|-------|
-| text | String | 转换文本  |
+| 参数名  | 类型     | 描述   |
+|------|--------|------|
+| text | String | 转换文本 |

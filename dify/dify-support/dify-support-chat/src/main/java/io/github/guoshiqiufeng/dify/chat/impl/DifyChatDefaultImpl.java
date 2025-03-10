@@ -22,10 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.guoshiqiufeng.dify.chat.DifyChat;
 import io.github.guoshiqiufeng.dify.chat.constant.ChatUriConstant;
 import io.github.guoshiqiufeng.dify.chat.dto.request.*;
-import io.github.guoshiqiufeng.dify.chat.dto.response.AppParametersResponseVO;
-import io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendResponse;
-import io.github.guoshiqiufeng.dify.chat.dto.response.DifyTextVO;
-import io.github.guoshiqiufeng.dify.chat.dto.response.MessageConversationsResponse;
+import io.github.guoshiqiufeng.dify.chat.dto.response.*;
 import io.github.guoshiqiufeng.dify.chat.exception.DiftChatException;
 import io.github.guoshiqiufeng.dify.chat.exception.DiftChatExceptionEnum;
 import io.github.guoshiqiufeng.dify.chat.utils.WebClientUtil;
@@ -175,6 +172,35 @@ public class DifyChatDefaultImpl implements DifyChat {
         }
     }
 
+    @Override
+    public MessageFeedbackResponse messageFeedback(MessageFeedbackRequest request) {
+        String url = difyServerProperties.getUrl() + ChatUriConstant.V1_MESSAGES_URI + "/{}/feedbacks";
+        url = StrUtil.format(url, request.getMessageId());
+
+        try {
+            // 使用 WebClient 发送 GET 请求
+            WebClient webClient = getWebClient(request.getApiKey());
+
+            Map<String, Object> values = new HashMap<>(3);
+            values.put("rating", request.getRating() != null ? request.getRating().getKey() : null);
+            values.put("user", request.getUserId());
+            values.put("content", request.getContent());
+
+            return webClient.post()
+                    .uri(url)
+                    .bodyValue(objectMapper.writeValueAsString(values))
+                    .retrieve()
+                    .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
+                    .bodyToMono(new ParameterizedTypeReference<MessageFeedbackResponse>() {
+                    })
+                    .block();  // 转为同步调用
+
+        } catch (JsonProcessingException | WebClientResponseException e) {
+            log.error("Error while messageFeedback: {}", e.getMessage());
+            throw new DiftChatException(DiftChatExceptionEnum.DIFY_API_ERROR);
+        }
+    }
+
     /**
      * 获取会话列表
      */
@@ -304,6 +330,38 @@ public class DifyChatDefaultImpl implements DifyChat {
         } catch (WebClientResponseException | JsonProcessingException e) {
             log.error("deleteConversation error: {}", e.getMessage());
             throw new DiftChatException(DiftChatExceptionEnum.DELETE_ERROR);
+        }
+    }
+
+    @Override
+    public MessageConversationsResponse renameConversation(RenameConversationRequest renameConversationRequest) {
+        String url = difyServerProperties.getUrl() + ChatUriConstant.V1_CONVERSATIONS_URI + "/{}/name";
+        url = StrUtil.format(url, renameConversationRequest.getConversationId());
+        if (renameConversationRequest.getAutoGenerate() == null) {
+            renameConversationRequest.setAutoGenerate(false);
+        }
+
+        try {
+            // 使用 WebClient 发送 GET 请求
+            WebClient webClient = getWebClient(renameConversationRequest.getApiKey());
+
+            Map<String, Object> values = new HashMap<>(3);
+            values.put("name", renameConversationRequest.getName());
+            values.put("auto_generate", renameConversationRequest.getName());
+            values.put("user", renameConversationRequest.getUserId());
+
+            return webClient.post()
+                    .uri(url)
+                    .bodyValue(objectMapper.writeValueAsString(values))
+                    .retrieve()
+                    .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
+                    .bodyToMono(new ParameterizedTypeReference<MessageConversationsResponse>() {
+                    })
+                    .block();  // 转为同步调用
+
+        } catch (JsonProcessingException | WebClientResponseException e) {
+            log.error("Error while rename conversation: {}", e.getMessage());
+            throw new DiftChatException(DiftChatExceptionEnum.DIFY_API_ERROR);
         }
     }
 
