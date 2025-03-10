@@ -65,6 +65,15 @@ public class MessageFeedbackRequest extends BaseChatRequest implements Serializa
         UNLIKE(null);
 
         private final String key;
+
+        public static Rating keyOf(String key) {
+            for (Rating rating : values()) {
+                if (rating.getKey().equals(key)) {
+                    return rating;
+                }
+            }
+            return null;
+        }
     }
 
 }
