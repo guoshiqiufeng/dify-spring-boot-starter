@@ -63,15 +63,14 @@ export default defineUserConfig({
                                 // '/guide/annotation',
                             ]
                         },
-                        // {
-                        //     text: '发送消息',
-                        //     collapsible: true,
-                        //     children: [
-                        //         '/guide/send/introduction',
-                        //         '/guide/send/mapper',
-                        //     ]
-                        // }, {
-                        //     text: '接收消息',
+                        {
+                            text: '功能',
+                            collapsible: true,
+                            children: [
+                                '/guide/feature/chat'
+                            ]
+                        },
+                        //{     text: '接收消息',
                         //     collapsible: true,
                         //     children: [
                         //         '/guide/listener/introduction',
@@ -91,13 +90,12 @@ export default defineUserConfig({
                             '/guide/install',
                             '/guide/config',
                             // '/guide/annotation',
-                            // {
-                            //     text: '发送消息',
-                            //     children: [
-                            //         '/guide/send/introduction',
-                            //         '/guide/send/mapper',
-                            //     ]
-                            // },
+                            {
+                                text: '功能',
+                                children: [
+                                    '/guide/feature/chat'
+                                ]
+                            },
                             // {
                             //     text: '接收消息',
                             //     children: [
@@ -147,14 +145,13 @@ export default defineUserConfig({
                                 // '/en/guide/annotation',
                             ]
                         },
-                        // {
-                        //     text: 'Send message',
-                        //     collapsible: true,
-                        //     children: [
-                        //         '/en/guide/send/introduction',
-                        //         '/en/guide/send/mapper',
-                        //     ]
-                        // },
+                        {
+                            text: 'Features',
+                            collapsible: true,
+                            children: [
+                                '/en/guide/feature/chat'
+                            ]
+                        },
                         // {
                         //     text: 'Receive message',
                         //     collapsible: true,
@@ -176,13 +173,13 @@ export default defineUserConfig({
                             '/en/guide/install',
                             '/en/guide/config',
                             // '/en/guide/annotation',
-                            // {
-                            //     text: 'Send message',
-                            //     children: [
-                            //         '/en/guide/send/introduction',
-                            //         '/en/guide/send/mapper',
-                            //     ]
-                            // },
+                            {
+                                text: 'Features',
+                                children: [
+                                    '/en/guide/feature/introduction',
+                                    '/en/guide/feature/mapper',
+                                ]
+                            },
                             // {
                             //     text: 'Receive message',
                             //     children: [
