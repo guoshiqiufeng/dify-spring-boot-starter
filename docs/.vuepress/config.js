@@ -67,7 +67,8 @@ export default defineUserConfig({
                             text: '功能',
                             collapsible: true,
                             children: [
-                                '/guide/feature/chat'
+                                '/guide/feature/chat',
+                                '/guide/feature/workflow',
                             ]
                         },
                         //{     text: '接收消息',
@@ -93,7 +94,8 @@ export default defineUserConfig({
                             {
                                 text: '功能',
                                 children: [
-                                    '/guide/feature/chat'
+                                    '/guide/feature/chat',
+                                    '/guide/feature/workflow',
                                 ]
                             },
                             // {
@@ -149,7 +151,8 @@ export default defineUserConfig({
                             text: 'Features',
                             collapsible: true,
                             children: [
-                                '/en/guide/feature/chat'
+                                '/en/guide/feature/chat',
+                                '/en/guide/feature/workflow',
                             ]
                         },
                         // {
@@ -176,7 +179,8 @@ export default defineUserConfig({
                             {
                                 text: 'Features',
                                 children: [
-                                    '/en/guide/feature/chat'
+                                    '/en/guide/feature/chat',
+                                    '/en/guide/feature/workflow',
                                 ]
                             },
                             // {

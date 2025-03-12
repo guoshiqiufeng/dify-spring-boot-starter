@@ -21,7 +21,8 @@ https://guoshiqiufeng.github.io/dify-spring-boot-starter/en
 ### Features
 
 - chat
-- backstage
+- server
+- workflow
 
 ### Use
 
