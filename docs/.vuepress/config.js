@@ -176,8 +176,7 @@ export default defineUserConfig({
                             {
                                 text: 'Features',
                                 children: [
-                                    '/en/guide/feature/introduction',
-                                    '/en/guide/feature/mapper',
+                                    '/en/guide/feature/chat'
                                 ]
                             },
                             // {
