@@ -25,8 +25,8 @@ WorkflowRunResponse runWorkflow(WorkflowRunRequest request);
 
 WorkflowRunRequest
 
-| 参数名    | 类型                  | 是否必须 | 描述     |
-|--------|---------------------|------|--------|
+| 参数名    | 类型                 | 是否必须 | 描述     |
+|--------|--------------------|------|--------|
 | apiKey | String             | 是    | apiKey |
 | inputs | Map<String,Object> | 是    | 输入参数   |
 
@@ -77,9 +77,9 @@ WorkflowStopResponse stopWorkflowStream(String apiKey, String taskId, String use
 
 WorkflowStopResponse
 
-| 参数名    | 类型     | 描述    |
-|--------|--------|-------|
-| result | String | 停止结果  |
+| 参数名    | 类型     | 描述   |
+|--------|--------|------|
+| result | String | 停止结果 |
 
 ### 1.4 获取工作流运行详情
 
@@ -91,10 +91,10 @@ WorkflowRunResponse info(String workflowRunId, String apiKey);
 
 #### 请求参数
 
-| 参数名           | 类型     | 是否必须 | 描述      |
-|---------------|--------|------|---------|
-| workflowRunId | String | 是    | 运行实例id  |
-| apiKey        | String | 是    | apiKey  |
+| 参数名           | 类型     | 是否必须 | 描述     |
+|---------------|--------|------|--------|
+| workflowRunId | String | 是    | 运行实例id |
+| apiKey        | String | 是    | apiKey |
 
 #### 响应参数
 
@@ -124,10 +124,10 @@ WorkflowLogsRequest
 
 WorkflowLogs
 
-| 参数名        | 类型     | 描述     |
-|------------|--------|--------|
-| id         | String | 日志id   |
-| status     | String | 运行状态   |
-| message    | String | 日志消息   |
-| createdAt  | Long   | 创建时间戳  |
-| finishedAt | Long   | 完成时间戳  |
+| 参数名        | 类型     | 描述    |
+|------------|--------|-------|
+| id         | String | 日志id  |
+| status     | String | 运行状态  |
+| message    | String | 日志消息  |
+| createdAt  | Long   | 创建时间戳 |
+| finishedAt | Long   | 完成时间戳 |

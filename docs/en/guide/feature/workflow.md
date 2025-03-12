@@ -8,7 +8,8 @@ description:
 
 ## Interface Overview
 
-The workflow service interface provides complete workflow management and execution capabilities, including workflow running,
+The workflow service interface provides complete workflow management and execution capabilities, including workflow
+running,
 log querying, streaming response, and other core functions. All interfaces require a valid API key for authentication.
 Use the `DifyWorkflow` interface instance.
 
@@ -26,21 +27,21 @@ WorkflowRunResponse runWorkflow(WorkflowRunRequest request);
 
 WorkflowRunRequest
 
-| Parameter name | Type                | Required | Description        |
-|---------------|---------------------|----------|--------------------|
-| apiKey        | String             | Yes      | API Key           |
-| inputs        | Map<String,Object> | Yes      | Input parameters  |
+| Parameter name | Type               | Required | Description      |
+|----------------|--------------------|----------|------------------|
+| apiKey         | String             | Yes      | API Key          |
+| inputs         | Map<String,Object> | Yes      | Input parameters |
 
 #### Response Parameters
 
 WorkflowRunResponse
 
 | Parameter name | Type   | Description              |
-|---------------|--------|--------------------------|
-| id            | String | Workflow run instance ID |
-| status        | String | Execution status         |
-| message       | String | Execution message        |
-| taskId        | String | Task ID                  |
+|----------------|--------|--------------------------|
+| id             | String | Workflow run instance ID |
+| status         | String | Execution status         |
+| message        | String | Execution message        |
+| taskId         | String | Task ID                  |
 
 ### 1.2 Run Workflow with Streaming Response
 
@@ -69,18 +70,18 @@ WorkflowStopResponse stopWorkflowStream(String apiKey, String taskId, String use
 #### Request Parameters
 
 | Parameter name | Type   | Required | Description |
-|---------------|--------|----------|-------------|
-| apiKey        | String | Yes      | API Key     |
-| taskId        | String | Yes      | Task ID     |
-| userId        | String | Yes      | User ID     |
+|----------------|--------|----------|-------------|
+| apiKey         | String | Yes      | API Key     |
+| taskId         | String | Yes      | Task ID     |
+| userId         | String | Yes      | User ID     |
 
 #### Response Parameters
 
 WorkflowStopResponse
 
-| Parameter name | Type   | Description      |
-|---------------|--------|------------------|
-| result        | String | Stopping result  |
+| Parameter name | Type   | Description     |
+|----------------|--------|-----------------|
+| result         | String | Stopping result |
 
 ### 1.4 Get Workflow Run Details
 
@@ -93,9 +94,9 @@ WorkflowRunResponse info(String workflowRunId, String apiKey);
 #### Request Parameters
 
 | Parameter name | Type   | Required | Description              |
-|---------------|--------|----------|--------------------------|
-| workflowRunId | String | Yes      | Workflow run instance ID |
-| apiKey        | String | Yes      | API Key                  |
+|----------------|--------|----------|--------------------------|
+| workflowRunId  | String | Yes      | Workflow run instance ID |
+| apiKey         | String | Yes      | API Key                  |
 
 #### Response Parameters
 
@@ -115,20 +116,20 @@ DifyPageResult<WorkflowLogs> logs(WorkflowLogsRequest request);
 
 WorkflowLogsRequest
 
-| Parameter name | Type    | Required | Description                             |
-|---------------|---------|----------|-----------------------------------------|
-| apiKey        | String  | Yes      | API Key                                 |
-| lastId        | String  | No       | Last record ID                          |
-| limit         | Integer | No       | Records per page, default 20            |
+| Parameter name | Type    | Required | Description                  |
+|----------------|---------|----------|------------------------------|
+| apiKey         | String  | Yes      | API Key                      |
+| lastId         | String  | No       | Last record ID               |
+| limit          | Integer | No       | Records per page, default 20 |
 
 #### Response Parameters
 
 WorkflowLogs
 
-| Parameter name | Type   | Description           |
-|---------------|--------|-----------------------|
-| id            | String | Log ID                |
-| status        | String | Execution status      |
-| message       | String | Log message           |
-| createdAt     | Long   | Creation timestamp    |
-| finishedAt    | Long   | Completion timestamp  |
+| Parameter name | Type   | Description          |
+|----------------|--------|----------------------|
+| id             | String | Log ID               |
+| status         | String | Execution status     |
+| message        | String | Log message          |
+| createdAt      | Long   | Creation timestamp   |
+| finishedAt     | Long   | Completion timestamp |
