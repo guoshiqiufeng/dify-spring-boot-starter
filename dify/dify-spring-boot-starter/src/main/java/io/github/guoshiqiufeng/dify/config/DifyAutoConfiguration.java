@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.guoshiqiufeng.dify.chat.impl.DifyChatDefaultImpl;
 import io.github.guoshiqiufeng.dify.core.config.DifyServerProperties;
 import io.github.guoshiqiufeng.dify.server.impl.DifyServerRedisImpl;
+import io.github.guoshiqiufeng.dify.workflow.impl.DifyWorkflowDefaultImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -53,5 +54,11 @@ public class DifyAutoConfiguration {
     @ConditionalOnMissingBean({DifyServerRedisImpl.class})
     public DifyServerRedisImpl difyServerHandler(DifyServerProperties difyServerProperties, RedisTemplate<String, String> redisTemplate) {
         return new DifyServerRedisImpl(difyServerProperties, redisTemplate);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean({DifyWorkflowDefaultImpl.class})
+    public DifyWorkflowDefaultImpl difyWorkflowHandler(DifyServerProperties difyServerProperties, ObjectMapper objectMapper) {
+        return new DifyWorkflowDefaultImpl(difyServerProperties, objectMapper);
     }
 }

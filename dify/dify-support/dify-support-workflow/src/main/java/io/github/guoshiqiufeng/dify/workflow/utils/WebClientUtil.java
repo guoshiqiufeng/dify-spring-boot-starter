@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.chat.utils;
+package io.github.guoshiqiufeng.dify.workflow.utils;
 
-import io.github.guoshiqiufeng.dify.chat.exception.DiftChatException;
-import io.github.guoshiqiufeng.dify.chat.exception.DiftChatExceptionEnum;
+import io.github.guoshiqiufeng.dify.workflow.exception.DiftWorkflowExceptionEnum;
+import io.github.guoshiqiufeng.dify.workflow.exception.DifyWorkflowException;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -25,7 +25,7 @@ import reactor.core.publisher.Mono;
 /**
  * @author yanghq
  * @version 1.0
- * @since 2025/3/7 13:47
+ * @since 2025/3/11 13:47
  */
 @Slf4j
 @UtilityClass
@@ -35,7 +35,7 @@ public class WebClientUtil {
         return clientResponse.bodyToMono(String.class)
                 .flatMap(errorBody -> {
                             log.error("webClient error: {}", errorBody);
-                            return Mono.error(new DiftChatException(DiftChatExceptionEnum.DIFY_API_ERROR));
+                            return Mono.error(new DifyWorkflowException(DiftWorkflowExceptionEnum.DIFY_API_ERROR));
                         }
                 );
     }
