@@ -78,7 +78,7 @@ public class DifyChatService {
 }
 ```
 
-更多使用参考查看[文档](https://guoshiqiufeng.github.io/dify-spring-boot-starter/zh/)
+更多使用参考查看[文档](https://guoshiqiufeng.github.io/dify-spring-boot-starter)
 
 
 
