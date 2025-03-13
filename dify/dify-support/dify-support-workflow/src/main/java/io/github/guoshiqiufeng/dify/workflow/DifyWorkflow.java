@@ -18,9 +18,7 @@ package io.github.guoshiqiufeng.dify.workflow;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.workflow.dto.request.WorkflowLogsRequest;
 import io.github.guoshiqiufeng.dify.workflow.dto.request.WorkflowRunRequest;
-import io.github.guoshiqiufeng.dify.workflow.dto.response.WorkflowLogs;
-import io.github.guoshiqiufeng.dify.workflow.dto.response.WorkflowRunResponse;
-import io.github.guoshiqiufeng.dify.workflow.dto.response.WorkflowStopResponse;
+import io.github.guoshiqiufeng.dify.workflow.dto.response.*;
 import reactor.core.publisher.Flux;
 
 /**
@@ -44,7 +42,7 @@ public interface DifyWorkflow {
      * @param request 工作流运行请求对象，包含输入参数和配置
      * @return Flux<WorkflowRunResponse> 工作流执行过程的实时响应流，用于持续获取执行状态
      */
-    Flux<WorkflowRunResponse> runWorkflowStream(WorkflowRunRequest request);
+    Flux<WorkflowRunStreamResponse> runWorkflowStream(WorkflowRunRequest request);
 
     /**
      * 获取工作流运行详情
@@ -53,7 +51,7 @@ public interface DifyWorkflow {
      * @param apiKey        API密钥，用于身份验证
      * @return WorkflowRunResponse 工作流运行的详细信息，包含状态、输入输出等数据
      */
-    WorkflowRunResponse info(String workflowRunId, String apiKey);
+    WorkflowInfoResponse info(String workflowRunId, String apiKey);
 
     /**
      * 停止工作流流式响应

@@ -13,26 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.workflow.constant;
+package io.github.guoshiqiufeng.dify.workflow.dto.response.stream;
+
+import com.fasterxml.jackson.annotation.JsonAlias;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
- * 常量
- *
  * @author yanghq
  * @version 1.0
- * @since 2025/3/11 14:18
+ * @since 2025/3/13 10:40
  */
-public interface WorkflowConstant {
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class WorkflowStartedData extends BaseWorkflowRunData {
 
-    String V1_URL = "/v1";
+    /**
+     * ID of related workflow
+     */
+    @JsonAlias("workflow_id")
+    private String workflowId;
 
-    String WORKFLOWS_URL = V1_URL + "/workflows";
-
-    String WORKFLOW_RUN_URL = WORKFLOWS_URL + "/run";
-
-    String WORKFLOW_TASKS_URL = WORKFLOWS_URL + "/tasks";
-
-    String WORKFLOW_LOGS_URL = WORKFLOWS_URL + "/logs";
-
+    /**
+     * Self-increasing serial number, self-increasing in the App, starting from 1
+     */
+    @JsonAlias("sequence_number")
+    private Integer sequenceNumber;
 
 }

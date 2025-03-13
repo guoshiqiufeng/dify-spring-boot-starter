@@ -17,6 +17,7 @@ package io.github.guoshiqiufeng.dify.workflow.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.guoshiqiufeng.dify.core.config.DifyServerProperties;
@@ -27,9 +28,7 @@ import io.github.guoshiqiufeng.dify.workflow.DifyWorkflow;
 import io.github.guoshiqiufeng.dify.workflow.constant.WorkflowConstant;
 import io.github.guoshiqiufeng.dify.workflow.dto.request.WorkflowLogsRequest;
 import io.github.guoshiqiufeng.dify.workflow.dto.request.WorkflowRunRequest;
-import io.github.guoshiqiufeng.dify.workflow.dto.response.WorkflowLogs;
-import io.github.guoshiqiufeng.dify.workflow.dto.response.WorkflowRunResponse;
-import io.github.guoshiqiufeng.dify.workflow.dto.response.WorkflowStopResponse;
+import io.github.guoshiqiufeng.dify.workflow.dto.response.*;
 import io.github.guoshiqiufeng.dify.workflow.exception.DiftWorkflowExceptionEnum;
 import io.github.guoshiqiufeng.dify.workflow.exception.DifyWorkflowException;
 import io.github.guoshiqiufeng.dify.workflow.utils.WebClientUtil;
@@ -41,6 +40,7 @@ import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -82,7 +82,7 @@ public class DifyWorkflowDefaultImpl implements DifyWorkflow {
     }
 
     @Override
-    public Flux<WorkflowRunResponse> runWorkflowStream(WorkflowRunRequest request) {
+    public Flux<WorkflowRunStreamResponse> runWorkflowStream(WorkflowRunRequest request) {
         // 请求地址 url + /v1/chat-messages 请求方式 POST , stream 流
         String url = difyServerProperties.getUrl() + WorkflowConstant.WORKFLOW_RUN_URL;
 
@@ -96,12 +96,12 @@ public class DifyWorkflowDefaultImpl implements DifyWorkflow {
                 .bodyValue(body)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
-                .bodyToFlux(WorkflowRunResponse.class)
+                .bodyToFlux(WorkflowRunStreamResponse.class)
                 .doOnError(e -> log.error("Error while workflow runWorkflow stream: {}", e.getMessage()));
     }
 
     @Override
-    public WorkflowRunResponse info(String workflowRunId, String apiKey) {
+    public WorkflowInfoResponse info(String workflowRunId, String apiKey) {
         String url = difyServerProperties.getUrl() + WorkflowConstant.WORKFLOW_RUN_URL + "/{}";
         url = StrUtil.format(url, workflowRunId);
 
@@ -111,7 +111,16 @@ public class DifyWorkflowDefaultImpl implements DifyWorkflow {
                 .uri(url)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
-                .bodyToMono(new ParameterizedTypeReference<WorkflowRunResponse>() {
+                .bodyToMono(String.class)
+                // .doOnNext(System.out::println)
+                .flatMap(responseBody -> {
+                    try {
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        WorkflowInfoResponse workflowInfoResponse = objectMapper.readValue(responseBody, WorkflowInfoResponse.class);
+                        return Mono.just(workflowInfoResponse);
+                    } catch (Exception e) {
+                        return Mono.error(new RuntimeException("Failed to deserialize response", e));
+                    }
                 })
                 .block();  // 转为同步调用
     }
@@ -152,12 +161,18 @@ public class DifyWorkflowDefaultImpl implements DifyWorkflow {
         // 使用 WebClient 发送 GET 请求
         WebClient webClient = getWebClient(request.getApiKey());
 
+        String uri = url + "?page={}&limit={}";
+        uri = StrUtil.format(uri, request.getPage(), request.getLimit());
+        if (StrUtil.isNotEmpty(request.getStatus())) {
+            uri += "&status={}";
+            uri = StrUtil.format(uri, request.getStatus());
+        }
+        if (StrUtil.isNotEmpty(request.getKeyword())) {
+            uri += "&keyword={}";
+            uri = StrUtil.format(uri, request.getKeyword());
+        }
         return webClient.get()
-                .uri(url + "?page={page}&limit={limit}&status={status}&keyword={keyword}",
-                        request.getPage(),
-                        request.getLimit(),
-                        request.getStatus(),
-                        request.getKeyword())
+                .uri(uri)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(new ParameterizedTypeReference<DifyPageResult<WorkflowLogs>>() {
@@ -179,10 +194,11 @@ public class DifyWorkflowDefaultImpl implements DifyWorkflow {
             }).toList();
             chatMessage.setFiles(BeanUtil.copyToList(files, ChatMessageVO.ChatMessageFile.class));
         }
-        chatMessage.setInputs(request.getInputs());
+        chatMessage.setInputs(request.getInputs() == null ? Map.of() : request.getInputs());
 
         String body = null;
         try {
+            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             body = objectMapper.writeValueAsString(chatMessage);
         } catch (JsonProcessingException e) {
             throw new DifyWorkflowException(DiftWorkflowExceptionEnum.DIFY_DATA_PARSING_FAILURE);

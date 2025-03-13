@@ -108,7 +108,7 @@ public class DifyChatDefaultImpl implements DifyChat {
             }).toList();
             chatMessage.setFiles(BeanUtil.copyToList(files, ChatMessageVO.ChatMessageFile.class));
         }
-        chatMessage.setInputs(sendRequest.getInputs());
+        chatMessage.setInputs(sendRequest.getInputs() == null ? Map.of() : sendRequest.getInputs());
 
         String body = null;
         try {
@@ -219,12 +219,18 @@ public class DifyChatDefaultImpl implements DifyChat {
             // 使用 WebClient 发送 GET 请求
             WebClient webClient = getWebClient(request.getApiKey());
 
+            String uri = url + "?user={}";
+            uri = StrUtil.format(uri, request.getUserId());
+
+            if (StrUtil.isNotEmpty(request.getLastId())) {
+                uri += "&last_id={}";
+                uri = StrUtil.format(uri, request.getLastId());
+            }
+
+            uri += "&limit={}&sort_by={}";
+            uri = StrUtil.format(uri, request.getLimit(), request.getSortBy());
             return webClient.get()
-                    .uri(url + "?user={user}&last_id={lastId}&limit={limit}&sort_by={sortBy}",
-                            request.getUserId(),
-                            request.getLastId(),
-                            request.getLimit(),
-                            request.getSortBy())
+                    .uri(uri)
                     .retrieve()
                     .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
                     .bodyToMono(new ParameterizedTypeReference<DifyPageResult<MessageConversationsResponse>>() {

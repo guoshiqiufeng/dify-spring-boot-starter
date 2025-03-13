@@ -16,10 +16,13 @@
 package io.github.guoshiqiufeng.dify.workflow.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import io.github.guoshiqiufeng.dify.workflow.dto.response.jackson.WorkflowRunStreamResponseDeserializer;
+import io.github.guoshiqiufeng.dify.workflow.dto.response.stream.BaseWorkflowRunData;
+import io.github.guoshiqiufeng.dify.workflow.enums.StreamEventEnum;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Map;
 
 /**
  * @author yanghq
@@ -27,8 +30,14 @@ import java.util.Map;
  * @since 2025/3/11 14:36
  */
 @Data
-public class WorkflowRunResponse implements Serializable {
+@JsonDeserialize(using = WorkflowRunStreamResponseDeserializer.class)
+public class WorkflowRunStreamResponse implements Serializable {
     private static final long serialVersionUID = 7374887951820521203L;
+
+    /**
+     * workflow_started、node_started、node_finished、text_chunk、node_finished
+     */
+    private StreamEventEnum event;
 
     @JsonAlias("workflow_run_id")
     private String workflowRunId;
@@ -36,44 +45,6 @@ public class WorkflowRunResponse implements Serializable {
     @JsonAlias("task_id")
     private String taskId;
 
-    private WorkflowRunData data;
+    private Object data;
 
-    @Data
-    public static class WorkflowRunData implements Serializable {
-        private static final long serialVersionUID = -808300279940666254L;
-
-        /**
-         * workflow 执行 ID
-         */
-        private String id;
-
-        @JsonAlias("workflow_id")
-        private String workflowId;
-
-        /**
-         * 执行状态, running / succeeded / failed / stopped
-         */
-        private String status;
-
-        private Map<String, Object> outputs;
-
-        private String error;
-
-        @JsonAlias("elapsed_time")
-        private Float elapsedTime;
-
-        @JsonAlias("total_tokens")
-        private Integer totalTokens;
-
-        @JsonAlias("total_steps")
-        private Integer totalSteps;
-
-        @JsonAlias("created_at")
-        private Long createdAt;
-
-        @JsonAlias("finished_at")
-        private Long finishedAt;
-
-
-    }
 }
