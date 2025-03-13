@@ -35,7 +35,7 @@ https://guoshiqiufeng.github.io/dify-spring-boot-starter/en
         <dependency>
             <groupId>io.github.guoshiqiufeng.dify</groupId>
             <artifactId>dify-bom</artifactId>
-            <version>0.1.0</version>
+            <version>0.2.0</version>
             <type>import</type>
         </dependency>
     </dependencies>
