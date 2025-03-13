@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.chat.exception;
+package io.github.guoshiqiufeng.dify.workflow.exception;
 
 import io.github.guoshiqiufeng.dify.core.exception.BaseException;
 import io.github.guoshiqiufeng.dify.core.exception.BaseExceptionEnum;
@@ -21,11 +21,11 @@ import io.github.guoshiqiufeng.dify.core.exception.BaseExceptionEnum;
 /**
  * @author yanghq
  * @version 1.0
- * @since 2025/3/4 10:59
+ * @since 2025/3/11 14:23
  */
-public class DiftChatException extends BaseException {
+public class DifyWorkflowException extends BaseException {
 
-    public DiftChatException(BaseExceptionEnum abstractExceptionEnum) {
+    public DifyWorkflowException(BaseExceptionEnum abstractExceptionEnum) {
         super(abstractExceptionEnum);
     }
 }

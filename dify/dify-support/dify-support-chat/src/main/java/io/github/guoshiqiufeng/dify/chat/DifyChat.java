@@ -16,10 +16,7 @@
 package io.github.guoshiqiufeng.dify.chat;
 
 import io.github.guoshiqiufeng.dify.chat.dto.request.*;
-import io.github.guoshiqiufeng.dify.chat.dto.response.AppParametersResponseVO;
-import io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendResponse;
-import io.github.guoshiqiufeng.dify.chat.dto.response.DifyTextVO;
-import io.github.guoshiqiufeng.dify.chat.dto.response.MessageConversationsResponse;
+import io.github.guoshiqiufeng.dify.chat.dto.response.*;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
 import jakarta.servlet.http.HttpServletResponse;
@@ -62,6 +59,14 @@ public interface DifyChat {
     void stopMessagesStream(String apiKey, String taskId, String userId);
 
     /**
+     * 消息反馈
+     *
+     * @param messageFeedbackRequest 消息反馈请求对象，包含消息ID、反馈内容等信息
+     * @return MessageFeedbackResponse 消息反馈响应
+     */
+    MessageFeedbackResponse messageFeedback(MessageFeedbackRequest messageFeedbackRequest);
+
+    /**
      * 获取会话列表
      *
      * @param request 会话查询请求对象，包含分页、过滤条件等信息
@@ -95,6 +100,14 @@ public interface DifyChat {
      * @param userId         用户ID，标识操作者
      */
     void deleteConversation(String conversationId, String apiKey, String userId);
+
+    /**
+     * 会话重命名
+     *
+     * @param renameConversationRequest 会话重命名请求对象，包含会话ID、新名称等信息
+     * @return MessageConversationsResponse 重命名后的会话信息
+     */
+    MessageConversationsResponse renameConversation(RenameConversationRequest renameConversationRequest);
 
     /**
      * 获取应用参数

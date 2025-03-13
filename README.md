@@ -21,10 +21,10 @@ https://guoshiqiufeng.github.io/dify-spring-boot-starter/en
 ### Features
 
 - chat
-- backstage
+- server
+- workflow
 
 ### Use
-
 
 #### Introduces a uniform version dependency, so you don't have to specify a version number when you use it.
 

@@ -13,40 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.core.pojo;
+package io.github.guoshiqiufeng.dify.workflow.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
- * 分页返回结果类，用于封装分页查询接口的返回数据。<br>
- * 泛型 T 表示返回数据的具体类型。
- *
  * @author yanghq
  * @version 1.0
- * @since 2024/12/31 15:49
+ * @since 2025/3/11 15:23
  */
 @Data
-public class DifyPageResult<T> implements Serializable {
-    private static final long serialVersionUID = 9185003870754105941L;
+@EqualsAndHashCode(callSuper = true)
+public class WorkflowLogsRequest extends BaseWorkflowRequest implements Serializable {
+    private static final long serialVersionUID = 3376685474776239732L;
+
 
     /**
-     * 当前页的数据列表，类型由泛型 T 决定
+     * 关键字
      */
-    private List<T> data;
+    private String keyword;
 
     /**
-     * 是否还有更多数据（即是否存在下一页）
+     * 执行状态 succeeded/failed/stopped
      */
-    @JsonAlias("has_more")
-    private Boolean hasMore;
+    private String status;
 
-    /**
-     * 每页的最大数据条数
-     */
-    private Integer limit;
+    private Integer page = 1;
 
+    private Integer limit = 20;
 }

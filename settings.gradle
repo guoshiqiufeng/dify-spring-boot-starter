@@ -23,6 +23,7 @@ include 'dify:dify-core'
 include 'dify:dify-support'
 include 'dify:dify-support:dify-support-chat'
 include 'dify:dify-support:dify-support-server'
+include 'dify:dify-support:dify-support-workflow'
 
 include 'dify:dify-spring-boot-starter'
 

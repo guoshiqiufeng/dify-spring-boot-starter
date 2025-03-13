@@ -1,6 +1,7 @@
 dependencies {
     api project(":dify:dify-support:dify-support-chat")
     api project(":dify:dify-support:dify-support-server")
+    api project(":dify:dify-support:dify-support-workflow")
 
     implementation "org.springframework.boot:spring-boot-starter-data-redis"
 
