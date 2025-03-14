@@ -16,6 +16,8 @@
 package io.github.guoshiqiufeng.dify.dataset.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import io.github.guoshiqiufeng.dify.dataset.enums.IndexingTechniqueEnum;
+import io.github.guoshiqiufeng.dify.dataset.enums.PermissionEnum;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -46,7 +48,7 @@ public class DatasetResponse implements Serializable {
     /**
      * 权限
      */
-    private String permission;
+    private PermissionEnum permission;
 
     /**
      * 数据源类型
@@ -58,7 +60,7 @@ public class DatasetResponse implements Serializable {
      * 索引技术
      */
     @JsonAlias("indexing_technique")
-    private String indexingTechnique;
+    private IndexingTechniqueEnum indexingTechnique;
 
     /**
      * 应用数量

@@ -23,6 +23,7 @@ https://guoshiqiufeng.github.io/dify-spring-boot-starter/en
 - chat
 - server
 - workflow
+- dataset (Knowledge)
 
 ### Use
 
@@ -35,7 +36,7 @@ https://guoshiqiufeng.github.io/dify-spring-boot-starter/en
         <dependency>
             <groupId>io.github.guoshiqiufeng.dify</groupId>
             <artifactId>dify-bom</artifactId>
-            <version>0.2.0</version>
+            <version>0.3.0</version>
             <type>import</type>
         </dependency>
     </dependencies>
