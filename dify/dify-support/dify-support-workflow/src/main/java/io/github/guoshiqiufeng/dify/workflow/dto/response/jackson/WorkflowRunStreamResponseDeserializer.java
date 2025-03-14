@@ -56,7 +56,8 @@ public class WorkflowRunStreamResponseDeserializer
             Class<?> dataClass = event.getClazz();
             if (dataClass == Map.class) {
                 // 处理 Map 类型
-                data = mapper.convertValue(dataNode, new TypeReference<Map<String, Object>>() {});
+                data = mapper.convertValue(dataNode, new TypeReference<Map<String, Object>>() {
+                });
             } else {
                 // 处理其他类型（BaseWorkflowRunData 子类）
                 data = mapper.treeToValue(dataNode, dataClass);

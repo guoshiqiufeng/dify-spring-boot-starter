@@ -1,5 +1,6 @@
 dependencies {
     api project(":dify:dify-support:dify-support-chat")
+    api project(":dify:dify-support:dify-support-dataset")
     api project(":dify:dify-support:dify-support-server")
     api project(":dify:dify-support:dify-support-workflow")
 

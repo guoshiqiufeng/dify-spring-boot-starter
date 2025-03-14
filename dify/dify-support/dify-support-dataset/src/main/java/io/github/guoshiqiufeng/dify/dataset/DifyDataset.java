@@ -1,0 +1,163 @@
+/*
+ * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.github.guoshiqiufeng.dify.dataset;
+
+import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
+import io.github.guoshiqiufeng.dify.dataset.dto.request.*;
+import io.github.guoshiqiufeng.dify.dataset.dto.response.*;
+
+/**
+ * @author yanghq
+ * @version 1.0
+ * @since 2025/3/13 11:33
+ */
+public interface DifyDataset {
+
+    /**
+     * 创建 知识库。
+     *
+     * @param request 知识库创建请求对象，包含创建 知识库所需的信息。
+     * @return 返回创建的 知识库响应对象。
+     */
+    DatasetResponse create(DatasetCreateRequest request);
+
+    /**
+     * 分页查询 知识库列表。
+     *
+     * @param request 分页查询请求对象，包含分页参数和查询条件。
+     * @return 返回分页查询结果，包含 知识库信息列表和分页信息。
+     */
+    DifyPageResult<DatasetResponse> page(DatasetPageRequest request);
+
+    /**
+     * 删除指定 知识库。
+     *
+     * @param datasetId 知识库的唯一标识符。
+     * @param apiKey    用于身份验证的 API 密钥。
+     */
+    void delete(String datasetId, String apiKey);
+
+    /**
+     * 通过文本创建文档。
+     *
+     * @param request 文档创建请求对象，包含通过文本创建文档所需的信息。
+     * @return 返回文档创建响应对象。
+     */
+    DocumentCreateResponse createDocumentByText(DocumentCreateByTextRequest request);
+
+    /**
+     * 通过文件创建文档。
+     *
+     * @param request 文档创建请求对象，包含通过文件创建文档所需的信息。
+     * @return 返回文档创建响应对象。
+     */
+    DocumentCreateResponse createDocumentByFile(DocumentCreateByFileRequest request);
+
+    /**
+     * 通过文本更新文档。
+     *
+     * @param request 文档更新请求对象，包含通过文本更新文档所需的信息。
+     * @return 返回文档更新响应对象。
+     */
+    DocumentCreateResponse updateDocumentByText(DocumentUpdateByTextRequest request);
+
+    /**
+     * 通过文件更新文档。
+     *
+     * @param request 文档更新请求对象，包含通过文件更新文档所需的信息。
+     * @return 返回文档更新响应对象。
+     */
+    DocumentCreateResponse updateDocumentByFile(DocumentUpdateByFileRequest request);
+
+    /**
+     * 分页查询文档列表。
+     *
+     * @param request 分页查询请求对象，包含分页参数和查询条件。
+     * @return 返回分页查询结果，包含文档信息列表和分页信息。
+     */
+    DifyPageResult<DocumentInfo> pageDocument(DatasetPageDocumentRequest request);
+
+    /**
+     * 查询文档索引状态。
+     *
+     * @param request 索引状态查询请求对象，包含查询所需的信息。
+     * @return 返回文档索引状态响应对象。
+     */
+    DocumentIndexingStatusResponse indexingStatus(DocumentIndexingStatusRequest request);
+
+    /**
+     * 删除指定文档。
+     *
+     * @param datasetId  知识库的唯一标识符。
+     * @param documentId 文档的唯一标识符。
+     * @param apiKey     用于身份验证的 API 密钥。
+     * @return 返回文档删除响应对象。
+     */
+    DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apiKey);
+
+    /**
+     * 创建分段。
+     *
+     * @param request 分段创建请求对象，包含创建分段所需的信息。
+     * @return 返回分段创建响应对象。
+     */
+    SegmentResponse createSegment(SegmentCreateRequest request);
+
+    /**
+     * 分页查询分段列表。
+     *
+     * @param request 分页查询请求对象，包含分页参数和查询条件。
+     * @return 返回分段分页查询响应对象。
+     */
+    SegmentResponse pageSegment(SegmentPageRequest request);
+
+    /**
+     * 删除指定分段。
+     *
+     * @param datasetId  知识库的唯一标识符。
+     * @param documentId 文档的唯一标识符。
+     * @param segmentId  分段的唯一标识符。
+     * @param apiKey     用于身份验证的 API 密钥。
+     * @return 返回分段删除响应对象。
+     */
+    SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apiKey);
+
+    /**
+     * 更新分段。
+     *
+     * @param request 分段更新请求对象，包含更新分段所需的信息。
+     * @return 返回分段更新响应对象。
+     */
+    SegmentUpdateResponse updateSegment(SegmentUpdateRequest request);
+
+    /**
+     * 获取上传文件信息。
+     *
+     * @param datasetId  知识库的唯一标识符。
+     * @param documentId 文档的唯一标识符。
+     * @param apiKey     用于身份验证的 API 密钥。
+     * @return 返回上传文件信息响应对象。
+     */
+    UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, String apiKey);
+
+    /**
+     * 检索数据。
+     *
+     * @param request 检索请求对象，包含检索所需的信息。
+     * @return 返回检索响应对象。
+     */
+    RetrieveResponse retrieve(RetrieveRequest request);
+}

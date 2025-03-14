@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.core.pojo;
+package io.github.guoshiqiufeng.dify.dataset.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
@@ -22,40 +22,16 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * 分页返回结果类，用于封装分页查询接口的返回数据。<br>
- * 泛型 T 表示返回数据的具体类型。
- *
  * @author yanghq
  * @version 1.0
- * @since 2024/12/31 15:49
+ * @since 2025/3/13 17:18
  */
 @Data
-public class DifyPageResult<T> implements Serializable {
-    private static final long serialVersionUID = 9185003870754105941L;
+public class SegmentResponse implements Serializable {
+    private static final long serialVersionUID = -1174425396475689757L;
 
-    /**
-     * 当前页的数据列表，类型由泛型 T 决定
-     */
-    private List<T> data;
+    private List<SegmentData> data;
 
-    /**
-     * 是否还有更多数据（即是否存在下一页）
-     */
-    @JsonAlias("has_more")
-    private Boolean hasMore;
-
-    /**
-     * 每页的最大数据条数
-     */
-    private Integer limit;
-
-    /**
-     * 当前页码
-     */
-    private Integer page;
-
-    /**
-     * 总数据条数
-     */
-    private Integer total;
+    @JsonAlias("doc_form")
+    private String docForm;
 }
