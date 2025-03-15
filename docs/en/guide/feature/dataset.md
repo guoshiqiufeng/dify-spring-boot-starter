@@ -406,7 +406,7 @@ DatasetPageDocumentRequest
 
 #### Response Parameters
 
-DifyPageResult<DocumentInfo>
+`DifyPageResult<DocumentInfo>`
 
 | Parameter | Type               | Description      |
 |-----------|--------------------|------------------|
