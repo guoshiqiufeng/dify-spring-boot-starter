@@ -406,7 +406,7 @@ DatasetPageDocumentRequest
 
 #### 响应参数
 
-DifyPageResult<DocumentInfo>
+`DifyPageResult<DocumentInfo>`
 
 | 参数名    | 类型               | 描述     |
 |--------|------------------|--------|
