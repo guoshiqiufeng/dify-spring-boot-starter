@@ -188,7 +188,7 @@ DocumentCreateByTextRequest
 
 | 字段名      | 类型   | 描述   |
 |----------|------|------|
-| preProcessingRules | List<PreProcessingRule> | 预处理规则列表 |
+| preProcessingRules | `List<PreProcessingRule>` | 预处理规则列表 |
 | segmentation | Segmentation | 分段规则 |
 | parentMode | ParentModeEnum | 父分段的召回模式 |
 | subChunkSegmentation | SubChunkSegmentation | 子分段规则 |
@@ -410,7 +410,7 @@ DifyPageResult<DocumentInfo>
 
 | 参数名    | 类型               | 描述     |
 |--------|------------------|--------|
-| list   | List<DocumentInfo> | 文档列表   |
+| list   | `List<DocumentInfo>` | 文档列表   |
 | total  | Long             | 总记录数   |
 | page   | Integer          | 当前页码   |
 | limit  | Integer          | 每页记录数  |
@@ -465,7 +465,7 @@ DocumentIndexingStatusResponse
 
 | 参数名    | 类型     | 描述    |
 |--------|--------|-------|
-| data   | List<ProcessingStatus> | 处理状态列表 |
+| data   | `List<ProcessingStatus> `| 处理状态列表 |
 
 **ProcessingStatus 对象结构**
 
@@ -559,7 +559,7 @@ SegmentCreateRequest
 | apiKey     | String | 是    | apiKey |
 | datasetId  | String | 是    | 知识库 id |
 | documentId | String | 是    | 文档 id  |
-| segments   | List<SegmentParam> | 是    | 分段参数列表 |
+| segments   |` List<SegmentParam> `| 是    | 分段参数列表 |
 
 #### 响应参数
 
@@ -567,7 +567,7 @@ SegmentResponse
 
 | 参数名        | 类型     | 描述    |
 |------------|--------|-------|
-| data       | List<SegmentData> | 分段数据列表 |
+| data       |` List<SegmentData> `| 分段数据列表 |
 | docForm    | String | 文档形式 |
 
 **SegmentData 对象结构**
@@ -593,7 +593,7 @@ SegmentResponse
 |------------|--------|-------|
 | content    | String | 分段内容 |
 | answer     | String | 分段答案 |
-| keywords   | List<String> | 关键词列表 |
+| keywords   |` List<String>` | 关键词列表 |
 
 ### 3.2 分页查询分段列表
 
@@ -621,7 +621,7 @@ SegmentResponse
 
 | 参数名        | 类型     | 描述    |
 |------------|--------|-------|
-| data       | List<SegmentData> | 分段数据列表 |
+| data       | `List<SegmentData> `| 分段数据列表 |
 | docForm    | String | 文档形式 |
 
 **SegmentData 对象结构**
@@ -718,7 +718,7 @@ SegmentUpdateResponse
 |------------|--------|-------|
 | content    | String | 分段内容 |
 | answer     | String | 分段答案 |
-| keywords   | List<String> | 关键词列表 |
+| keywords   | `List<String>` | 关键词列表 |
 
 ## 4. 数据检索
 
@@ -748,7 +748,7 @@ RetrieveResponse
 | 参数名     | 类型                  | 描述    |
 |---------|---------------------|-------|
 | query   | RetrieveQuery       | 查询信息  |
-| records | List<RetrieveRecord> | 检索记录列表 |
+| records | `List<RetrieveRecord>` | 检索记录列表 |
 
 **RetrieveQuery 对象结构**
 
@@ -782,7 +782,7 @@ RetrieveResponse
 | answer     | String | 答案   |
 | wordCount  | Integer | 单词数量 |
 | tokens     | Integer | 令牌数量 |
-| keywords   | List<String> | 关键词列表 |
+| keywords   | `List<String>` | 关键词列表 |
 | indexNodeId | String | 索引节点ID |
 | indexNodeHash | String | 索引节点哈希 |
 | hitCount   | Integer | 命中次数 |
