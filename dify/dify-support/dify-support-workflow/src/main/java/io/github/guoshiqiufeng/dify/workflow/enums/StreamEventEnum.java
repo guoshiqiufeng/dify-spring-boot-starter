@@ -15,7 +15,10 @@
  */
 package io.github.guoshiqiufeng.dify.workflow.enums;
 
-import io.github.guoshiqiufeng.dify.workflow.dto.response.stream.*;
+import io.github.guoshiqiufeng.dify.workflow.dto.response.stream.NodeFinishedData;
+import io.github.guoshiqiufeng.dify.workflow.dto.response.stream.NodeStartedData;
+import io.github.guoshiqiufeng.dify.workflow.dto.response.stream.WorkflowFinishedData;
+import io.github.guoshiqiufeng.dify.workflow.dto.response.stream.WorkflowStartedData;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

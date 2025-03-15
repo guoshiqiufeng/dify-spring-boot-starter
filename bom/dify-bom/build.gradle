@@ -16,7 +16,9 @@ dependencyManagement {
     dependencies {
         dependency "${APP_GROUP}:dify-core:${APP_VERSION}"
         dependency "${APP_GROUP}:dify-support-chat:${APP_VERSION}"
+        dependency "${APP_GROUP}:dify-support-dataset:${APP_VERSION}"
         dependency "${APP_GROUP}:dify-support-server:${APP_VERSION}"
+        dependency "${APP_GROUP}:dify-support-workflow:${APP_VERSION}"
         dependency "${APP_GROUP}:dify-spring-boot-starter:${APP_VERSION}"
     }
 }

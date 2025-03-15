@@ -18,7 +18,6 @@ package io.github.guoshiqiufeng.dify.workflow.dto.response;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.github.guoshiqiufeng.dify.workflow.dto.response.jackson.WorkflowRunStreamResponseDeserializer;
-import io.github.guoshiqiufeng.dify.workflow.dto.response.stream.BaseWorkflowRunData;
 import io.github.guoshiqiufeng.dify.workflow.enums.StreamEventEnum;
 import lombok.Data;
 

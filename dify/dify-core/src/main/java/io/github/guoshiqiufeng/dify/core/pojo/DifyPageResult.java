@@ -49,4 +49,13 @@ public class DifyPageResult<T> implements Serializable {
      */
     private Integer limit;
 
+    /**
+     * 当前页码
+     */
+    private Integer page;
+
+    /**
+     * 总数据条数
+     */
+    private Integer total;
 }

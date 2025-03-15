@@ -24,25 +24,41 @@ description:
 * 可用 - ✅
 * 进行中 - 🚧
 
-| 功能                     | Dify接口地址                                | 状态 |   
-|------------------------|-----------------------------------------|----|
-| 【CHAT】发送消息             | /v1/chat-messages                       | ✅  |    
-| 【CHAT】发送消息并获取消息流       | /v1/chat-messages                       | ✅  |
-| 【CHAT】停止消息流            | /v1/chat-messages/:task_id/stop         | ✅  |   
-| 【CHAT】消息反馈（点赞）         | /v1/chat-messages/:message_id/feedbacks | ✅  |    
-| 【CHAT】获取会话列表           | /v1/conversations                       | ✅  |    
-| 【CHAT】获取消息列表           | /v1/messages                            | ✅  |    
-| 【CHAT】获取建议消息列表         | /v1/messages/:message_id/suggested      | ✅  |    
-| 【CHAT】删除会话             | /v1/conversations/:conversation_id      | ✅  |    
-| 【CHAT】会话重命名            | /v1/conversations/:conversation_id/name | ✅  |    
-| 【CHAT】获取应用参数           | /v1/parameters                          | ✅  |    
-| 【CHAT】文本转语音            | /v1/text-to-audio                       | ✅  |    
-| 【CHAT】语音转文本            | /v1/audio-to-text                       | ✅  |    
-| 【WORKFLOW】 执行工作流       | /v1/workflows/run                       | ✅  |   
-| 【WORKFLOW】 执行工作流并获取工作流 | /v1/workflows/run                       | ✅  |   
-| 【WORKFLOW】 停止工作流响应     | /v1/workflows/tasks/:task_id/stop       | ✅  |  
-| 【WORKFLOW】 获取工作流日志     | /v1/workflows/logs                      | ✅  |   
-| 【SERVER】               |                                         | 🚧 |    
+| 功能                     | 状态 |   
+|------------------------|----|
+| 【CHAT】发送消息             | ✅  |    
+| 【CHAT】发送消息并获取消息流       | ✅  |
+| 【CHAT】停止消息流            | ✅  |   
+| 【CHAT】消息反馈（点赞）         | ✅  |    
+| 【CHAT】获取会话列表           | ✅  |    
+| 【CHAT】获取消息列表           | ✅  |    
+| 【CHAT】获取建议消息列表         | ✅  |    
+| 【CHAT】删除会话             | ✅  |    
+| 【CHAT】会话重命名            | ✅  |    
+| 【CHAT】获取应用参数           | ✅  |    
+| 【CHAT】文本转语音            | ✅  |    
+| 【CHAT】语音转文本            | ✅  |    
+| 【WORKFLOW】 执行工作流       | ✅  |   
+| 【WORKFLOW】 执行工作流并获取工作流 | ✅  |   
+| 【WORKFLOW】 停止工作流响应     | ✅  |  
+| 【WORKFLOW】 获取工作流日志     | ✅  |  
+| 【DataSet】 通过文本创建文档     | ✅  |
+| 【DataSet】 通过文件创建文档     | ✅  |
+| 【DataSet】 创建空知识库       | ✅  |
+| 【DataSet】 知识库列表        | ✅  |
+| 【DataSet】 删除知识库        | ✅  |
+| 【DataSet】 通过文本更新文档     | ✅  |
+| 【DataSet】 通过文件更新文档     | ✅  |
+| 【DataSet】 获取文档嵌入状态（进度） | ✅  |
+| 【DataSet】 删除文档         | ✅  |
+| 【DataSet】 知识库文档列表      | ✅  |
+| 【DataSet】 新增分段         | ✅  |
+| 【DataSet】 查询文档分段       | ✅  |
+| 【DataSet】 删除文档分段       | ✅  |
+| 【DataSet】 更新文档分段       | ✅  |
+| 【DataSet】 获取上传文件       | ✅  |
+| 【DataSet】 检索知识库        | ✅  |
+| 【SERVER】               | 🚧 |    
 
 注：
 

@@ -25,25 +25,41 @@ Implementation of the Redis messaging framework.
 * Available - ✅
 * In progress - 🚧
 
-| Feature                                | Dify interface address                  | status |   
-|----------------------------------------|-----------------------------------------|--------|
-| 【CHAT】Send Message                     | /v1/chat-messages                       | ✅      |    
-| 【CHAT】Send Message Stream              | /v1/chat-messages                       | ✅      |    
-| 【CHAT】Stop Message Stream              | /v1/chat-messages/:task_id/stop         | ✅      |   
-| 【CHAT】Message Feedback (Likes)         | /v1/chat-messages/:message_id/feedbacks | ✅      |    
-| 【CHAT】Get session list                 | /v1/conversations                       | ✅      |    
-| 【CHAT】Getting a list of messages       | /v1/messages                            | ✅      |    
-| 【CHAT】Get a list of suggested messages | /v1/messages/:message_id/suggested      | ✅      |    
-| 【CHAT】Deleting a session               | /v1/conversations/:conversation_id      | ✅      |    
-| 【CHAT】Session rename                   | /v1/conversations/:conversation_id/name | ✅      |  
-| 【CHAT】Getting Application Parameters   | /v1/parameters                          | ✅      |    
-| 【CHAT】text-to-speech                   | /v1/text-to-audio                       | ✅      |    
-| 【CHAT】speech-to-text                   | /v1/audio-to-text                       | ✅      |  
-| 【WORKFLOW】 Run Workflow                | /v1/workflows/run                       | ✅      |   
-| 【WORKFLOW】 Run Workflow Stream         | /v1/workflows/run                       | ✅      |   
-| 【WORKFLOW】 Stop Workflow Stream        | /v1/workflows/tasks/:task_id/stop       | ✅      |  
-| 【WORKFLOW】 Workflow Logs               | /v1/workflows/logs                      | ✅      |  
-| 【SERVER】                               |                                         | 🚧     |    
+| Feature                                               | status |   
+|-------------------------------------------------------|--------|
+| 【CHAT】Send Message                                    | ✅      |    
+| 【CHAT】Send Message Stream                             | ✅      |    
+| 【CHAT】Stop Message Stream                             | ✅      |   
+| 【CHAT】Message Feedback (Likes)                        | ✅      |    
+| 【CHAT】Get session list                                | ✅      |    
+| 【CHAT】Getting a list of messages                      | ✅      |    
+| 【CHAT】Get a list of suggested messages                | ✅      |    
+| 【CHAT】Deleting a session                              | ✅      |    
+| 【CHAT】Session rename                                  | ✅      |  
+| 【CHAT】Getting Application Parameters                  | ✅      |    
+| 【CHAT】text-to-speech                                  | ✅      |    
+| 【CHAT】speech-to-text                                  | ✅      |  
+| 【WORKFLOW】 Run Workflow                               | ✅      |   
+| 【WORKFLOW】 Run Workflow Stream                        | ✅      |   
+| 【WORKFLOW】 Stop Workflow Stream                       | ✅      |  
+| 【WORKFLOW】 Workflow Logs                              | ✅      |
+| 【KNOWLEDGE】 Create a Document from Text               | ✅      |  
+| 【KNOWLEDGE】 Create a Document from a File             | ✅      |  
+| 【KNOWLEDGE】 Create an Empty Knowledge Base            | ✅      |  
+| 【KNOWLEDGE】 Get Knowledge Base List                   | ✅      |  
+| 【KNOWLEDGE】 Delete a Knowledge Base                   | ✅      |  
+| 【KNOWLEDGE】 Update a Document with Text               | ✅      |  
+| 【KNOWLEDGE】 Update a Document with a File             | ✅      |  
+| 【KNOWLEDGE】 Get Document Embedding Status (Progress)  | ✅      |  
+| 【KNOWLEDGE】 Delete a Document                         | ✅      |  
+| 【KNOWLEDGE】 Get the Document List of a Knowledge Base | ✅      |  
+| 【KNOWLEDGE】 Add Chunks to a Document                  | ✅      |  
+| 【KNOWLEDGE】 Get Chunks from a Document                | ✅      |  
+| 【KNOWLEDGE】 Delete a Chunk in a Document              | ✅      |  
+| 【KNOWLEDGE】 Update a Chunk in a Document              | ✅      |  
+| 【KNOWLEDGE】 Get Upload File                           | ✅      |  
+| 【KNOWLEDGE】 Retrieve Chunks from a Knowledge Base     | ✅      |  
+| 【SERVER】                                              | 🚧     |    
 
 Tips：
 

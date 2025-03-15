@@ -92,7 +92,8 @@ public class WorkflowInfoResponse implements Serializable {
                 return null;
             }
             try {
-                return objectMapper.readValue(value, new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
+                return objectMapper.readValue(value, new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {
+                });
             } catch (Exception e) {
                 throw new IOException("Failed to deserialize string to Map: " + value, e);
             }

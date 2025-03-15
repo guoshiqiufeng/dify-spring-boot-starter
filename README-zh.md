@@ -23,6 +23,7 @@
 - 聊天
 - 后台
 - 工作流
+- 知识库
 
 ### 使用
 
@@ -35,7 +36,7 @@
         <dependency>
             <groupId>io.github.guoshiqiufeng.dify</groupId>
             <artifactId>dify-bom</artifactId>
-            <version>0.2.0</version>
+            <version>0.3.0</version>
             <type>import</type>
         </dependency>
     </dependencies>
