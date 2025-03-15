@@ -98,7 +98,7 @@ DatasetPageRequest
 
 #### Response Parameters
 
-DifyPageResult<DatasetResponse>
+`DifyPageResult<DatasetResponse>`
 
 | Parameter | Type                  | Description         |
 |-----------|-----------------------|---------------------|
