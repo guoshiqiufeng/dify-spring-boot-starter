@@ -102,7 +102,7 @@ DifyPageResult<DatasetResponse>
 
 | Parameter | Type                  | Description         |
 |-----------|-----------------------|---------------------|
-| list      | List<DatasetResponse> | Knowledge base list |
+| list      | `List<DatasetResponse>` | Knowledge base list |
 | total     | Long                  | Total records       |
 | page      | Integer               | Current page        |
 | limit     | Integer               | Records per page    |
@@ -146,7 +146,7 @@ DocumentCreateByTextRequest
 | name                   | String                | Yes      | Document name                                             |
 | text                   | String                | Yes      | Document content                                          |
 | docType                | DocTypeEnum           | No       | Document type                                             |
-| docMetadata            | Map<String, Object>   | No       | Document metadata (required if document type is provided) |
+| docMetadata            | `Map<String, Object> `  | No       | Document metadata (required if document type is provided) |
 | indexingTechnique      | IndexingTechniqueEnum | No       | Indexing mode                                             |
 | docForm                | DocFormEnum           | No       | Document form                                             |
 | docLanguage            | String                | No       | Document language                                         |
@@ -190,7 +190,7 @@ DocumentCreateByTextRequest
 
 | Field                | Type                    | Description                   |
 |----------------------|-------------------------|-------------------------------|
-| preProcessingRules   | List<PreProcessingRule> | Pre-processing rules list     |
+| preProcessingRules   | `List<PreProcessingRule>` | Pre-processing rules list     |
 | segmentation         | Segmentation            | Segmentation rules            |
 | parentMode           | ParentModeEnum          | Parent segment retrieval mode |
 | subChunkSegmentation | SubChunkSegmentation    | Sub-chunk segmentation rules  |
@@ -259,7 +259,7 @@ DocumentCreateResponse
 | id                   | String              | Document ID                       |
 | position             | Integer             | Position                          |
 | dataSourceType       | String              | Data source type                  |
-| dataSourceInfo       | Map<String, Object> | Data source information           |
+| dataSourceInfo       | `Map<String, Object>` | Data source information           |
 | datasetProcessRuleId | String              | Knowledge base processing rule ID |
 | name                 | String              | Document name                     |
 | createdFrom          | String              | Creation source                   |
@@ -296,7 +296,7 @@ DocumentCreateByFileRequest
 | name                   | String                | Yes      | Document name                                             |
 | file                   | MultipartFile         | Yes      | Document file                                             |
 | docType                | DocTypeEnum           | No       | Document type                                             |
-| docMetadata            | Map<String, Object>   | No       | Document metadata (required if document type is provided) |
+| docMetadata            | `Map<String, Object>`   | No       | Document metadata (required if document type is provided) |
 | indexingTechnique      | IndexingTechniqueEnum | No       | Indexing mode                                             |
 | docForm                | DocFormEnum           | No       | Document form                                             |
 | docLanguage            | String                | No       | Document language                                         |
@@ -334,7 +334,7 @@ DocumentUpdateByTextRequest
 | name              | String                | No       | Document name                                             |
 | text              | String                | Yes      | Document content                                          |
 | docType           | DocTypeEnum           | No       | Document type                                             |
-| docMetadata       | Map<String, Object>   | No       | Document metadata (required if document type is provided) |
+| docMetadata       | `Map<String, Object>`   | No       | Document metadata (required if document type is provided) |
 | indexingTechnique | IndexingTechniqueEnum | No       | Indexing mode                                             |
 | docForm           | DocFormEnum           | No       | Document form                                             |
 | docLanguage       | String                | No       | Document language                                         |
@@ -369,7 +369,7 @@ DocumentUpdateByFileRequest
 | name              | String                | No       | Document name                                             |
 | file              | MultipartFile         | Yes      | Document file                                             |
 | docType           | DocTypeEnum           | No       | Document type                                             |
-| docMetadata       | Map<String, Object>   | No       | Document metadata (required if document type is provided) |
+| docMetadata       | `Map<String, Object> `  | No       | Document metadata (required if document type is provided) |
 | indexingTechnique | IndexingTechniqueEnum | No       | Indexing mode                                             |
 | docForm           | DocFormEnum           | No       | Document form                                             |
 | docLanguage       | String                | No       | Document language                                         |
@@ -410,7 +410,7 @@ DifyPageResult<DocumentInfo>
 
 | Parameter | Type               | Description      |
 |-----------|--------------------|------------------|
-| list      | List<DocumentInfo> | Document list    |
+| list      |` List<DocumentInfo>` | Document list    |
 | total     | Long               | Total records    |
 | page      | Integer            | Current page     |
 | limit     | Integer            | Records per page |
@@ -423,7 +423,7 @@ DocumentInfo
 | id                   | String              | Document ID                       |
 | position             | Integer             | Position                          |
 | dataSourceType       | String              | Data source type                  |
-| dataSourceInfo       | Map<String, Object> | Data source information           |
+| dataSourceInfo       | `Map<String, Object>` | Data source information           |
 | datasetProcessRuleId | String              | Knowledge base processing rule ID |
 | name                 | String              | Document name                     |
 | createdFrom          | String              | Creation source                   |
@@ -465,7 +465,7 @@ DocumentIndexingStatusResponse
 
 | Parameter | Type                   | Description            |
 |-----------|------------------------|------------------------|
-| data      | List<ProcessingStatus> | Processing status list |
+| data      | `List<ProcessingStatus>` | Processing status list |
 
 **ProcessingStatus Object Structure**
 
@@ -559,7 +559,7 @@ SegmentCreateRequest
 | apiKey     | String             | Yes      | API Key                |
 | datasetId  | String             | Yes      | Knowledge base ID      |
 | documentId | String             | Yes      | Document ID            |
-| segments   | List<SegmentParam> | Yes      | Segment parameter list |
+| segments   | `List<SegmentParam>` | Yes      | Segment parameter list |
 
 #### Response Parameters
 
@@ -567,7 +567,7 @@ SegmentResponse
 
 | Parameter | Type              | Description       |
 |-----------|-------------------|-------------------|
-| data      | List<SegmentData> | Segment data list |
+| data      | `List<SegmentData>` | Segment data list |
 | docForm   | String            | Document form     |
 
 **SegmentData Object Structure**
@@ -593,7 +593,7 @@ SegmentResponse
 |-----------|--------------|-----------------|
 | content   | String       | Segment content |
 | answer    | String       | Segment answer  |
-| keywords  | List<String> | Keyword list    |
+| keywords  | `List<String>` | Keyword list    |
 
 ### 3.2 Paginated Query of Segment List
 
@@ -621,7 +621,7 @@ SegmentResponse
 
 | Parameter | Type              | Description       |
 |-----------|-------------------|-------------------|
-| data      | List<SegmentData> | Segment data list |
+| data      | `List<SegmentData>` | Segment data list |
 | docForm   | String            | Document form     |
 
 **SegmentData Object Structure**
@@ -718,7 +718,7 @@ SegmentUpdateResponse
 |-----------|--------------|-----------------|
 | content   | String       | Segment content |
 | answer    | String       | Segment answer  |
-| keywords  | List<String> | Keyword list    |
+| keywords  | `List<String>` | Keyword list    |
 
 ## 4. Data Retrieval
 
@@ -748,7 +748,7 @@ RetrieveResponse
 | Parameter | Type                 | Description           |
 |-----------|----------------------|-----------------------|
 | query     | RetrieveQuery        | Query information     |
-| records   | List<RetrieveRecord> | Retrieval record list |
+| records   | `List<RetrieveRecord>` | Retrieval record list |
 
 **RetrieveQuery Object Structure**
 
@@ -782,7 +782,7 @@ RetrieveResponse
 | answer        | String       | Answer               |
 | wordCount     | Integer      | Word count           |
 | tokens        | Integer      | Token count          |
-| keywords      | List<String> | Keyword list         |
+| keywords      |` List<String>` | Keyword list         |
 | indexNodeId   | String       | Index node ID        |
 | indexNodeHash | String       | Index node hash      |
 | hitCount      | Integer      | Hit count            |
