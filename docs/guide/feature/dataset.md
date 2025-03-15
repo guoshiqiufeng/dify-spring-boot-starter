@@ -100,7 +100,7 @@ DifyPageResult<DatasetResponse>
 
 | 参数名    | 类型                  | 描述     |
 |--------|-----------------------|--------|
-| list   | List<DatasetResponse> | 知识库列表  |
+| list   | `List<DatasetResponse>` | 知识库列表  |
 | total  | Long                  | 总记录数   |
 | page   | Integer               | 当前页码   |
 | limit  | Integer               | 每页记录数  |
@@ -144,7 +144,7 @@ DocumentCreateByTextRequest
 | name      | String | 是    | 文档名称   |
 | text      | String | 是    | 文档内容   |
 | docType   | DocTypeEnum | 否 | 文档类型 |
-| docMetadata | Map<String, Object> | 否 | 文档元数据（如提供文档类型则必填） |
+| docMetadata | `Map<String, Object>` | 否 | 文档元数据（如提供文档类型则必填） |
 | indexingTechnique | IndexingTechniqueEnum | 否 | 索引模式 |
 | docForm   | DocFormEnum | 否 | 文档形式 |
 | docLanguage | String | 否 | 文档语言 |
@@ -257,7 +257,7 @@ DocumentCreateResponse
 | id         | String | 文档 id  |
 | position   | Integer | 位置 |
 | dataSourceType | String | 数据源类型 |
-| dataSourceInfo | Map<String, Object> | 数据源信息 |
+| dataSourceInfo | `Map<String, Object>` | 数据源信息 |
 | datasetProcessRuleId | String | 知识库处理规则ID |
 | name       | String | 文档名称   |
 | createdFrom | String | 创建来源 |
@@ -294,7 +294,7 @@ DocumentCreateByFileRequest
 | name      | String        | 是    | 文档名称   |
 | file      | MultipartFile | 是    | 文档文件   |
 | docType   | DocTypeEnum | 否 | 文档类型 |
-| docMetadata | Map<String, Object> | 否 | 文档元数据（如提供文档类型则必填） |
+| docMetadata | `Map<String, Object>` | 否 | 文档元数据（如提供文档类型则必填） |
 | indexingTechnique | IndexingTechniqueEnum | 否 | 索引模式 |
 | docForm   | DocFormEnum | 否 | 文档形式 |
 | docLanguage | String | 否 | 文档语言 |
@@ -332,7 +332,7 @@ DocumentUpdateByTextRequest
 | name       | String | 否    | 文档名称   |
 | text       | String | 是    | 文档内容   |
 | docType   | DocTypeEnum | 否 | 文档类型 |
-| docMetadata | Map<String, Object> | 否 | 文档元数据（如提供文档类型则必填） |
+| docMetadata | `Map<String, Object>` | 否 | 文档元数据（如提供文档类型则必填） |
 | indexingTechnique | IndexingTechniqueEnum | 否 | 索引模式 |
 | docForm   | DocFormEnum | 否 | 文档形式 |
 | docLanguage | String | 否 | 文档语言 |
@@ -368,7 +368,7 @@ DocumentUpdateByFileRequest
 | name       | String        | 否    | 文档名称   |
 | file       | MultipartFile | 是    | 文档文件   |
 | docType   | DocTypeEnum | 否 | 文档类型 |
-| docMetadata | Map<String, Object> | 否 | 文档元数据（如提供文档类型则必填） |
+| docMetadata | `Map<String, Object>` | 否 | 文档元数据（如提供文档类型则必填） |
 | indexingTechnique | IndexingTechniqueEnum | 否 | 索引模式 |
 | docForm   | DocFormEnum | 否 | 文档形式 |
 | docLanguage | String | 否 | 文档语言 |
@@ -423,7 +423,7 @@ DocumentInfo
 | id         | String | 文档 id  |
 | position   | Integer | 位置 |
 | dataSourceType | String | 数据源类型 |
-| dataSourceInfo | Map<String, Object> | 数据源信息 |
+| dataSourceInfo | `Map<String, Object>` | 数据源信息 |
 | datasetProcessRuleId | String | 知识库处理规则ID |
 | name       | String | 文档名称   |
 | createdFrom | String | 创建来源 |
