@@ -96,7 +96,7 @@ DatasetPageRequest
 
 #### 响应参数
 
-DifyPageResult<DatasetResponse>
+`DifyPageResult<DatasetResponse>`
 
 | 参数名    | 类型                  | 描述     |
 |--------|-----------------------|--------|
