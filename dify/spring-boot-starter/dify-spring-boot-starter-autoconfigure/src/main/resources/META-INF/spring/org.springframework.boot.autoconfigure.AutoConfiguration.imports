@@ -1,0 +1,5 @@
+io.github.guoshiqiufeng.dify.autoconfigure.DifyPropertiesAutoConfiguration
+io.github.guoshiqiufeng.dify.autoconfigure.DifyChatAutoConfiguration
+io.github.guoshiqiufeng.dify.chat.autoconfiguration.DifyDatasetAutoConfiguration
+io.github.guoshiqiufeng.dify.chat.autoconfiguration.DifyServerAutoConfiguration
+io.github.guoshiqiufeng.dify.chat.autoconfiguration.DifyWorkflowAutoConfiguration

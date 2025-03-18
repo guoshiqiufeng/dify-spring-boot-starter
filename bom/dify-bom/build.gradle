@@ -20,5 +20,10 @@ dependencyManagement {
         dependency "${APP_GROUP}:dify-support-server:${APP_VERSION}"
         dependency "${APP_GROUP}:dify-support-workflow:${APP_VERSION}"
         dependency "${APP_GROUP}:dify-spring-boot-starter:${APP_VERSION}"
+        dependency "${APP_GROUP}:dify-spring-boot-starter-autoconfigure:${APP_VERSION}"
+        dependency "${APP_GROUP}:dify-spring-boot-starter-chat:${APP_VERSION}"
+        dependency "${APP_GROUP}:dify-spring-boot-starter-dataset:${APP_VERSION}"
+        dependency "${APP_GROUP}:dify-spring-boot-starter-server:${APP_VERSION}"
+        dependency "${APP_GROUP}:dify-spring-boot-starter-workflow:${APP_VERSION}"
     }
 }

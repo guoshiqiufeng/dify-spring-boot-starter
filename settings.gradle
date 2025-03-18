@@ -26,7 +26,14 @@ include 'dify:dify-support:dify-support-dataset'
 include 'dify:dify-support:dify-support-server'
 include 'dify:dify-support:dify-support-workflow'
 
-include 'dify:dify-spring-boot-starter'
+// include 'dify:dify-spring-boot-starter'
+include 'dify:spring-boot-starter:dify-spring-boot-starter-autoconfigure'
+include 'dify:spring-boot-starter:dify-spring-boot-starter-chat'
+include 'dify:spring-boot-starter:dify-spring-boot-starter-dataset'
+include 'dify:spring-boot-starter:dify-spring-boot-starter-server'
+include 'dify:spring-boot-starter:dify-spring-boot-starter-workflow'
+
+include 'dify:spring-boot-starter:dify-spring-boot-starter'
 
 include 'bom'
 include 'bom:dify-bom'

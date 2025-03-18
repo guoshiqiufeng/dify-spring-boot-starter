@@ -100,13 +100,13 @@ DatasetPageRequest
 
 `DifyPageResult<DatasetResponse>`
 
-| Parameter | Type                  | Description         |
-|-----------|-----------------------|---------------------|
+| Parameter | Type                    | Description         |
+|-----------|-------------------------|---------------------|
 | list      | `List<DatasetResponse>` | Knowledge base list |
-| total     | Long                  | Total records       |
-| page      | Integer               | Current page        |
-| limit     | Integer               | Records per page    |
-| pages     | Integer               | Total pages         |
+| total     | Long                    | Total records       |
+| page      | Integer                 | Current page        |
+| limit     | Integer                 | Records per page    |
+| pages     | Integer                 | Total pages         |
 
 DatasetResponse See 1.1
 
@@ -139,21 +139,21 @@ DocumentCreateResponse createDocumentByText(DocumentCreateByTextRequest request)
 
 DocumentCreateByTextRequest
 
-| Parameter              | Type                  | Required | Description                                               |
-|------------------------|-----------------------|----------|-----------------------------------------------------------|
-| apiKey                 | String                | Yes      | API Key                                                   |
-| datasetId              | String                | Yes      | Knowledge base ID                                         |
-| name                   | String                | Yes      | Document name                                             |
-| text                   | String                | Yes      | Document content                                          |
-| docType                | DocTypeEnum           | No       | Document type                                             |
-| docMetadata            | `Map<String, Object> `  | No       | Document metadata (required if document type is provided) |
-| indexingTechnique      | IndexingTechniqueEnum | No       | Indexing mode                                             |
-| docForm                | DocFormEnum           | No       | Document form                                             |
-| docLanguage            | String                | No       | Document language                                         |
-| processRule            | ProcessRule           | No       | Processing rules                                          |
-| retrievalModel         | RetrievalModel        | No       | Retrieval model                                           |
-| embeddingModel         | String                | No       | Embedding model                                           |
-| embeddingModelProvider | String                | No       | Embedding model provider                                  |
+| Parameter              | Type                   | Required | Description                                               |
+|------------------------|------------------------|----------|-----------------------------------------------------------|
+| apiKey                 | String                 | Yes      | API Key                                                   |
+| datasetId              | String                 | Yes      | Knowledge base ID                                         |
+| name                   | String                 | Yes      | Document name                                             |
+| text                   | String                 | Yes      | Document content                                          |
+| docType                | DocTypeEnum            | No       | Document type                                             |
+| docMetadata            | `Map<String, Object> ` | No       | Document metadata (required if document type is provided) |
+| indexingTechnique      | IndexingTechniqueEnum  | No       | Indexing mode                                             |
+| docForm                | DocFormEnum            | No       | Document form                                             |
+| docLanguage            | String                 | No       | Document language                                         |
+| processRule            | ProcessRule            | No       | Processing rules                                          |
+| retrievalModel         | RetrievalModel         | No       | Retrieval model                                           |
+| embeddingModel         | String                 | No       | Embedding model                                           |
+| embeddingModelProvider | String                 | No       | Embedding model provider                                  |
 
 **DocTypeEnum Values**
 
@@ -188,12 +188,12 @@ DocumentCreateByTextRequest
 
 **CustomRule Object Structure**
 
-| Field                | Type                    | Description                   |
-|----------------------|-------------------------|-------------------------------|
+| Field                | Type                      | Description                   |
+|----------------------|---------------------------|-------------------------------|
 | preProcessingRules   | `List<PreProcessingRule>` | Pre-processing rules list     |
-| segmentation         | Segmentation            | Segmentation rules            |
-| parentMode           | ParentModeEnum          | Parent segment retrieval mode |
-| subChunkSegmentation | SubChunkSegmentation    | Sub-chunk segmentation rules  |
+| segmentation         | Segmentation              | Segmentation rules            |
+| parentMode           | ParentModeEnum            | Parent segment retrieval mode |
+| subChunkSegmentation | SubChunkSegmentation      | Sub-chunk segmentation rules  |
 
 **PreProcessingRule Object Structure**
 
@@ -254,28 +254,28 @@ DocumentCreateResponse
 
 **DocumentInfo Object Structure**
 
-| Parameter            | Type                | Description                       |
-|----------------------|---------------------|-----------------------------------|
-| id                   | String              | Document ID                       |
-| position             | Integer             | Position                          |
-| dataSourceType       | String              | Data source type                  |
+| Parameter            | Type                  | Description                       |
+|----------------------|-----------------------|-----------------------------------|
+| id                   | String                | Document ID                       |
+| position             | Integer               | Position                          |
+| dataSourceType       | String                | Data source type                  |
 | dataSourceInfo       | `Map<String, Object>` | Data source information           |
-| datasetProcessRuleId | String              | Knowledge base processing rule ID |
-| name                 | String              | Document name                     |
-| createdFrom          | String              | Creation source                   |
-| createdBy            | String              | Created by                        |
-| createdAt            | Long                | Creation timestamp                |
-| tokens               | Integer             | Token count                       |
-| indexingStatus       | String              | Indexing status                   |
-| error                | String              | Error message                     |
-| enabled              | String              | Whether enabled                   |
-| disabledAt           | Long                | Disabled timestamp                |
-| disabledBy           | String              | Disabled by                       |
-| archived             | String              | Whether archived                  |
-| displayStatus        | String              | Display status                    |
-| wordCount            | String              | Word count                        |
-| hitCount             | String              | Hit count                         |
-| docForm              | String              | Document form                     |
+| datasetProcessRuleId | String                | Knowledge base processing rule ID |
+| name                 | String                | Document name                     |
+| createdFrom          | String                | Creation source                   |
+| createdBy            | String                | Created by                        |
+| createdAt            | Long                  | Creation timestamp                |
+| tokens               | Integer               | Token count                       |
+| indexingStatus       | String                | Indexing status                   |
+| error                | String                | Error message                     |
+| enabled              | String                | Whether enabled                   |
+| disabledAt           | Long                  | Disabled timestamp                |
+| disabledBy           | String                | Disabled by                       |
+| archived             | String                | Whether archived                  |
+| displayStatus        | String                | Display status                    |
+| wordCount            | String                | Word count                        |
+| hitCount             | String                | Hit count                         |
+| docForm              | String                | Document form                     |
 
 ### 2.2 Create Document by File
 
@@ -296,7 +296,7 @@ DocumentCreateByFileRequest
 | name                   | String                | Yes      | Document name                                             |
 | file                   | MultipartFile         | Yes      | Document file                                             |
 | docType                | DocTypeEnum           | No       | Document type                                             |
-| docMetadata            | `Map<String, Object>`   | No       | Document metadata (required if document type is provided) |
+| docMetadata            | `Map<String, Object>` | No       | Document metadata (required if document type is provided) |
 | indexingTechnique      | IndexingTechniqueEnum | No       | Indexing mode                                             |
 | docForm                | DocFormEnum           | No       | Document form                                             |
 | docLanguage            | String                | No       | Document language                                         |
@@ -334,7 +334,7 @@ DocumentUpdateByTextRequest
 | name              | String                | No       | Document name                                             |
 | text              | String                | Yes      | Document content                                          |
 | docType           | DocTypeEnum           | No       | Document type                                             |
-| docMetadata       | `Map<String, Object>`   | No       | Document metadata (required if document type is provided) |
+| docMetadata       | `Map<String, Object>` | No       | Document metadata (required if document type is provided) |
 | indexingTechnique | IndexingTechniqueEnum | No       | Indexing mode                                             |
 | docForm           | DocFormEnum           | No       | Document form                                             |
 | docLanguage       | String                | No       | Document language                                         |
@@ -361,19 +361,19 @@ DocumentCreateResponse updateDocumentByFile(DocumentUpdateByFileRequest request)
 
 DocumentUpdateByFileRequest
 
-| Parameter         | Type                  | Required | Description                                               |
-|-------------------|-----------------------|----------|-----------------------------------------------------------|
-| apiKey            | String                | Yes      | API Key                                                   |
-| datasetId         | String                | Yes      | Knowledge base ID                                         |
-| documentId        | String                | Yes      | Document ID                                               |
-| name              | String                | No       | Document name                                             |
-| file              | MultipartFile         | Yes      | Document file                                             |
-| docType           | DocTypeEnum           | No       | Document type                                             |
-| docMetadata       | `Map<String, Object> `  | No       | Document metadata (required if document type is provided) |
-| indexingTechnique | IndexingTechniqueEnum | No       | Indexing mode                                             |
-| docForm           | DocFormEnum           | No       | Document form                                             |
-| docLanguage       | String                | No       | Document language                                         |
-| processRule       | ProcessRule           | No       | Processing rules                                          |
+| Parameter         | Type                   | Required | Description                                               |
+|-------------------|------------------------|----------|-----------------------------------------------------------|
+| apiKey            | String                 | Yes      | API Key                                                   |
+| datasetId         | String                 | Yes      | Knowledge base ID                                         |
+| documentId        | String                 | Yes      | Document ID                                               |
+| name              | String                 | No       | Document name                                             |
+| file              | MultipartFile          | Yes      | Document file                                             |
+| docType           | DocTypeEnum            | No       | Document type                                             |
+| docMetadata       | `Map<String, Object> ` | No       | Document metadata (required if document type is provided) |
+| indexingTechnique | IndexingTechniqueEnum  | No       | Indexing mode                                             |
+| docForm           | DocFormEnum            | No       | Document form                                             |
+| docLanguage       | String                 | No       | Document language                                         |
+| processRule       | ProcessRule            | No       | Processing rules                                          |
 
 #### Response Parameters
 
@@ -408,38 +408,38 @@ DatasetPageDocumentRequest
 
 `DifyPageResult<DocumentInfo>`
 
-| Parameter | Type               | Description      |
-|-----------|--------------------|------------------|
-| list      |` List<DocumentInfo>` | Document list    |
-| total     | Long               | Total records    |
-| page      | Integer            | Current page     |
-| limit     | Integer            | Records per page |
-| pages     | Integer            | Total pages      |
+| Parameter | Type                  | Description      |
+|-----------|-----------------------|------------------|
+| list      | ` List<DocumentInfo>` | Document list    |
+| total     | Long                  | Total records    |
+| page      | Integer               | Current page     |
+| limit     | Integer               | Records per page |
+| pages     | Integer               | Total pages      |
 
 DocumentInfo
 
-| Parameter            | Type                | Description                       |
-|----------------------|---------------------|-----------------------------------|
-| id                   | String              | Document ID                       |
-| position             | Integer             | Position                          |
-| dataSourceType       | String              | Data source type                  |
+| Parameter            | Type                  | Description                       |
+|----------------------|-----------------------|-----------------------------------|
+| id                   | String                | Document ID                       |
+| position             | Integer               | Position                          |
+| dataSourceType       | String                | Data source type                  |
 | dataSourceInfo       | `Map<String, Object>` | Data source information           |
-| datasetProcessRuleId | String              | Knowledge base processing rule ID |
-| name                 | String              | Document name                     |
-| createdFrom          | String              | Creation source                   |
-| createdBy            | String              | Created by                        |
-| createdAt            | Long                | Creation timestamp                |
-| tokens               | Integer             | Token count                       |
-| indexingStatus       | String              | Indexing status                   |
-| error                | String              | Error message                     |
-| enabled              | String              | Whether enabled                   |
-| disabledAt           | Long                | Disabled timestamp                |
-| disabledBy           | String              | Disabled by                       |
-| archived             | String              | Whether archived                  |
-| displayStatus        | String              | Display status                    |
-| wordCount            | String              | Word count                        |
-| hitCount             | String              | Hit count                         |
-| docForm              | String              | Document form                     |
+| datasetProcessRuleId | String                | Knowledge base processing rule ID |
+| name                 | String                | Document name                     |
+| createdFrom          | String                | Creation source                   |
+| createdBy            | String                | Created by                        |
+| createdAt            | Long                  | Creation timestamp                |
+| tokens               | Integer               | Token count                       |
+| indexingStatus       | String                | Indexing status                   |
+| error                | String                | Error message                     |
+| enabled              | String                | Whether enabled                   |
+| disabledAt           | Long                  | Disabled timestamp                |
+| disabledBy           | String                | Disabled by                       |
+| archived             | String                | Whether archived                  |
+| displayStatus        | String                | Display status                    |
+| wordCount            | String                | Word count                        |
+| hitCount             | String                | Hit count                         |
+| docForm              | String                | Document form                     |
 
 ### 2.6 Query Document Indexing Status
 
@@ -463,8 +463,8 @@ DocumentIndexingStatusRequest
 
 DocumentIndexingStatusResponse
 
-| Parameter | Type                   | Description            |
-|-----------|------------------------|------------------------|
+| Parameter | Type                     | Description            |
+|-----------|--------------------------|------------------------|
 | data      | `List<ProcessingStatus>` | Processing status list |
 
 **ProcessingStatus Object Structure**
@@ -554,21 +554,21 @@ SegmentResponse createSegment(SegmentCreateRequest request);
 
 SegmentCreateRequest
 
-| Parameter  | Type               | Required | Description            |
-|------------|--------------------|----------|------------------------|
-| apiKey     | String             | Yes      | API Key                |
-| datasetId  | String             | Yes      | Knowledge base ID      |
-| documentId | String             | Yes      | Document ID            |
+| Parameter  | Type                 | Required | Description            |
+|------------|----------------------|----------|------------------------|
+| apiKey     | String               | Yes      | API Key                |
+| datasetId  | String               | Yes      | Knowledge base ID      |
+| documentId | String               | Yes      | Document ID            |
 | segments   | `List<SegmentParam>` | Yes      | Segment parameter list |
 
 #### Response Parameters
 
 SegmentResponse
 
-| Parameter | Type              | Description       |
-|-----------|-------------------|-------------------|
+| Parameter | Type                | Description       |
+|-----------|---------------------|-------------------|
 | data      | `List<SegmentData>` | Segment data list |
-| docForm   | String            | Document form     |
+| docForm   | String              | Document form     |
 
 **SegmentData Object Structure**
 
@@ -589,10 +589,10 @@ SegmentResponse
 
 **SegmentParam Object Structure**
 
-| Parameter | Type         | Description     |
-|-----------|--------------|-----------------|
-| content   | String       | Segment content |
-| answer    | String       | Segment answer  |
+| Parameter | Type           | Description     |
+|-----------|----------------|-----------------|
+| content   | String         | Segment content |
+| answer    | String         | Segment answer  |
 | keywords  | `List<String>` | Keyword list    |
 
 ### 3.2 Paginated Query of Segment List
@@ -619,10 +619,10 @@ SegmentPageRequest
 
 SegmentResponse
 
-| Parameter | Type              | Description       |
-|-----------|-------------------|-------------------|
+| Parameter | Type                | Description       |
+|-----------|---------------------|-------------------|
 | data      | `List<SegmentData>` | Segment data list |
-| docForm   | String            | Document form     |
+| docForm   | String              | Document form     |
 
 **SegmentData Object Structure**
 
@@ -714,10 +714,10 @@ SegmentUpdateResponse
 
 **SegmentParam Object Structure**
 
-| Parameter | Type         | Description     |
-|-----------|--------------|-----------------|
-| content   | String       | Segment content |
-| answer    | String       | Segment answer  |
+| Parameter | Type           | Description     |
+|-----------|----------------|-----------------|
+| content   | String         | Segment content |
+| answer    | String         | Segment answer  |
 | keywords  | `List<String>` | Keyword list    |
 
 ## 4. Data Retrieval
@@ -745,9 +745,9 @@ RetrieveRequest
 
 RetrieveResponse
 
-| Parameter | Type                 | Description           |
-|-----------|----------------------|-----------------------|
-| query     | RetrieveQuery        | Query information     |
+| Parameter | Type                   | Description           |
+|-----------|------------------------|-----------------------|
+| query     | RetrieveQuery          | Query information     |
 | records   | `List<RetrieveRecord>` | Retrieval record list |
 
 **RetrieveQuery Object Structure**
@@ -773,30 +773,30 @@ RetrieveResponse
 
 **Segment Object Structure**
 
-| Parameter     | Type         | Description          |
-|---------------|--------------|----------------------|
-| id            | String       | Segment ID           |
-| position      | Integer      | Position             |
-| documentId    | String       | Document ID          |
-| content       | String       | Segment content      |
-| answer        | String       | Answer               |
-| wordCount     | Integer      | Word count           |
-| tokens        | Integer      | Token count          |
-| keywords      |` List<String>` | Keyword list         |
-| indexNodeId   | String       | Index node ID        |
-| indexNodeHash | String       | Index node hash      |
-| hitCount      | Integer      | Hit count            |
-| enabled       | String       | Whether enabled      |
-| disabledAt    | Long         | Disabled timestamp   |
-| disabledBy    | String       | Disabled by          |
-| status        | String       | Status               |
-| createdAt     | Long         | Creation timestamp   |
-| createdBy     | String       | Created by           |
-| indexingAt    | Long         | Indexing timestamp   |
-| completedAt   | Long         | Completion timestamp |
-| error         | String       | Error message        |
-| stoppedAt     | Long         | Stop timestamp       |
-| document      | Document     | Document information |
+| Parameter     | Type            | Description          |
+|---------------|-----------------|----------------------|
+| id            | String          | Segment ID           |
+| position      | Integer         | Position             |
+| documentId    | String          | Document ID          |
+| content       | String          | Segment content      |
+| answer        | String          | Answer               |
+| wordCount     | Integer         | Word count           |
+| tokens        | Integer         | Token count          |
+| keywords      | ` List<String>` | Keyword list         |
+| indexNodeId   | String          | Index node ID        |
+| indexNodeHash | String          | Index node hash      |
+| hitCount      | Integer         | Hit count            |
+| enabled       | String          | Whether enabled      |
+| disabledAt    | Long            | Disabled timestamp   |
+| disabledBy    | String          | Disabled by          |
+| status        | String          | Status               |
+| createdAt     | Long            | Creation timestamp   |
+| createdBy     | String          | Created by           |
+| indexingAt    | Long            | Indexing timestamp   |
+| completedAt   | Long            | Completion timestamp |
+| error         | String          | Error message        |
+| stoppedAt     | Long            | Stop timestamp       |
+| document      | Document        | Document information |
 
 **Document Object Structure**
 
