@@ -27,7 +27,6 @@ DatasetCreateRequest
 
 | 参数名               | 类型                    | 是否必须 | 描述     |
 |-------------------|-----------------------|------|--------|
-| apiKey            | String                | 是    | apiKey |
 | name              | String                | 是    | 知识库名称  |
 | description       | String                | 否    | 知识库描述  |
 | permission        | PermissionEnum        | 否    | 权限设置   |
@@ -90,7 +89,6 @@ DatasetPageRequest
 
 | 参数名    | 类型      | 是否必须 | 描述          |
 |--------|---------|------|-------------|
-| apiKey | String  | 是    | apiKey      |
 | page   | Integer | 否    | 页码，默认1      |
 | limit  | Integer | 否    | 每页记录数，默认20条 |
 
@@ -113,7 +111,7 @@ DatasetResponse 查看 1.1
 #### 方法
 
 ```java
-void delete(String datasetId, String apiKey);
+void delete(String datasetId);
 ```
 
 #### 请求参数
@@ -121,7 +119,6 @@ void delete(String datasetId, String apiKey);
 | 参数名       | 类型     | 是否必须 | 描述     |
 |-----------|--------|------|--------|
 | datasetId | String | 是    | 知识库 id |
-| apiKey    | String | 是    | apiKey |
 
 ## 2. 文档管理
 
@@ -139,7 +136,6 @@ DocumentCreateByTextRequest
 
 | 参数名                    | 类型                    | 是否必须 | 描述                |
 |------------------------|-----------------------|------|-------------------|
-| apiKey                 | String                | 是    | apiKey            |
 | datasetId              | String                | 是    | 知识库 id            |
 | name                   | String                | 是    | 文档名称              |
 | text                   | String                | 是    | 文档内容              |
@@ -289,7 +285,6 @@ DocumentCreateByFileRequest
 
 | 参数名                    | 类型                    | 是否必须 | 描述                |
 |------------------------|-----------------------|------|-------------------|
-| apiKey                 | String                | 是    | apiKey            |
 | datasetId              | String                | 是    | 知识库 id            |
 | name                   | String                | 是    | 文档名称              |
 | file                   | MultipartFile         | 是    | 文档文件              |
@@ -326,7 +321,6 @@ DocumentUpdateByTextRequest
 
 | 参数名               | 类型                    | 是否必须 | 描述                |
 |-------------------|-----------------------|------|-------------------|
-| apiKey            | String                | 是    | apiKey            |
 | datasetId         | String                | 是    | 知识库 id            |
 | documentId        | String                | 是    | 文档 id             |
 | name              | String                | 否    | 文档名称              |
@@ -361,7 +355,6 @@ DocumentUpdateByFileRequest
 
 | 参数名               | 类型                    | 是否必须 | 描述                |
 |-------------------|-----------------------|------|-------------------|
-| apiKey            | String                | 是    | apiKey            |
 | datasetId         | String                | 是    | 知识库 id            |
 | documentId        | String                | 是    | 文档 id             |
 | name              | String                | 否    | 文档名称              |
@@ -396,7 +389,6 @@ DatasetPageDocumentRequest
 
 | 参数名       | 类型      | 是否必须 | 描述          |
 |-----------|---------|------|-------------|
-| apiKey    | String  | 是    | apiKey      |
 | datasetId | String  | 是    | 知识库 id      |
 | keyword   | String  | 否    | 搜索关键词       |
 | page      | Integer | 否    | 页码，默认1      |
@@ -453,7 +445,6 @@ DocumentIndexingStatusRequest
 
 | 参数名       | 类型     | 是否必须 | 描述     |
 |-----------|--------|------|--------|
-| apiKey    | String | 是    | apiKey |
 | datasetId | String | 是    | 知识库 id |
 | batch     | String | 是    | 批次号    |
 
@@ -487,7 +478,7 @@ DocumentIndexingStatusResponse
 #### 方法
 
 ```java
-DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apiKey);
+DocumentDeleteResponse deleteDocument(String datasetId, String documentId);
 ```
 
 #### 请求参数
@@ -496,7 +487,6 @@ DocumentDeleteResponse deleteDocument(String datasetId, String documentId, Strin
 |------------|--------|------|--------|
 | datasetId  | String | 是    | 知识库 id |
 | documentId | String | 是    | 文档 id  |
-| apiKey     | String | 是    | apiKey |
 
 #### 响应参数
 
@@ -511,7 +501,7 @@ DocumentDeleteResponse
 #### 方法
 
 ```java
-UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, String apiKey);
+UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId);
 ```
 
 #### 请求参数
@@ -520,7 +510,6 @@ UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, Strin
 |------------|--------|------|--------|
 | datasetId  | String | 是    | 知识库 id |
 | documentId | String | 是    | 文档 id  |
-| apiKey     | String | 是    | apiKey |
 
 #### 响应参数
 
@@ -554,7 +543,6 @@ SegmentCreateRequest
 
 | 参数名        | 类型                     | 是否必须 | 描述     |
 |------------|------------------------|------|--------|
-| apiKey     | String                 | 是    | apiKey |
 | datasetId  | String                 | 是    | 知识库 id |
 | documentId | String                 | 是    | 文档 id  |
 | segments   | ` List<SegmentParam> ` | 是    | 分段参数列表 |
@@ -607,7 +595,6 @@ SegmentPageRequest
 
 | 参数名        | 类型     | 是否必须 | 描述     |
 |------------|--------|------|--------|
-| apiKey     | String | 是    | apiKey |
 | datasetId  | String | 是    | 知识库 id |
 | documentId | String | 是    | 文档 id  |
 | keyword    | String | 否    | 搜索关键词  |
@@ -644,7 +631,7 @@ SegmentResponse
 #### 方法
 
 ```java
-SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apiKey);
+SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId);
 ```
 
 #### 请求参数
@@ -654,7 +641,6 @@ SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String 
 | datasetId  | String | 是    | 知识库 id |
 | documentId | String | 是    | 文档 id  |
 | segmentId  | String | 是    | 分段 id  |
-| apiKey     | String | 是    | apiKey |
 
 #### 响应参数
 
@@ -678,7 +664,6 @@ SegmentUpdateRequest
 
 | 参数名        | 类型           | 是否必须 | 描述     |
 |------------|--------------|------|--------|
-| apiKey     | String       | 是    | apiKey |
 | datasetId  | String       | 是    | 知识库 id |
 | documentId | String       | 是    | 文档 id  |
 | segmentId  | String       | 是    | 分段 id  |
@@ -734,7 +719,6 @@ RetrieveRequest
 
 | 参数名            | 类型             | 是否必须 | 描述     |
 |----------------|----------------|------|--------|
-| apiKey         | String         | 是    | apiKey |
 | datasetId      | String         | 是    | 知识库 id |
 | query          | String         | 是    | 检索查询内容 |
 | retrievalModel | RetrievalModel | 否    | 检索模型   |

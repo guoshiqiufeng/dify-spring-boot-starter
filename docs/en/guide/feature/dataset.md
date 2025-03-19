@@ -29,7 +29,6 @@ DatasetCreateRequest
 
 | Parameter         | Type                  | Required | Description                |
 |-------------------|-----------------------|----------|----------------------------|
-| apiKey            | String                | Yes      | API Key                    |
 | name              | String                | Yes      | Knowledge base name        |
 | description       | String                | No       | Knowledge base description |
 | permission        | PermissionEnum        | No       | Permission settings        |
@@ -92,7 +91,6 @@ DatasetPageRequest
 
 | Parameter | Type    | Required | Description                  |
 |-----------|---------|----------|------------------------------|
-| apiKey    | String  | Yes      | API Key                      |
 | page      | Integer | No       | Page number, default 1       |
 | limit     | Integer | No       | Records per page, default 20 |
 
@@ -115,7 +113,7 @@ DatasetResponse See 1.1
 #### Method
 
 ```java
-void delete(String datasetId, String apiKey);
+void delete(String datasetId);
 ```
 
 #### Request Parameters
@@ -123,7 +121,6 @@ void delete(String datasetId, String apiKey);
 | Parameter | Type   | Required | Description       |
 |-----------|--------|----------|-------------------|
 | datasetId | String | Yes      | Knowledge base ID |
-| apiKey    | String | Yes      | API Key           |
 
 ## 2. Document Management
 
@@ -141,7 +138,6 @@ DocumentCreateByTextRequest
 
 | Parameter              | Type                   | Required | Description                                               |
 |------------------------|------------------------|----------|-----------------------------------------------------------|
-| apiKey                 | String                 | Yes      | API Key                                                   |
 | datasetId              | String                 | Yes      | Knowledge base ID                                         |
 | name                   | String                 | Yes      | Document name                                             |
 | text                   | String                 | Yes      | Document content                                          |
@@ -291,7 +287,6 @@ DocumentCreateByFileRequest
 
 | Parameter              | Type                  | Required | Description                                               |
 |------------------------|-----------------------|----------|-----------------------------------------------------------|
-| apiKey                 | String                | Yes      | API Key                                                   |
 | datasetId              | String                | Yes      | Knowledge base ID                                         |
 | name                   | String                | Yes      | Document name                                             |
 | file                   | MultipartFile         | Yes      | Document file                                             |
@@ -328,7 +323,6 @@ DocumentUpdateByTextRequest
 
 | Parameter         | Type                  | Required | Description                                               |
 |-------------------|-----------------------|----------|-----------------------------------------------------------|
-| apiKey            | String                | Yes      | API Key                                                   |
 | datasetId         | String                | Yes      | Knowledge base ID                                         |
 | documentId        | String                | Yes      | Document ID                                               |
 | name              | String                | No       | Document name                                             |
@@ -363,7 +357,6 @@ DocumentUpdateByFileRequest
 
 | Parameter         | Type                   | Required | Description                                               |
 |-------------------|------------------------|----------|-----------------------------------------------------------|
-| apiKey            | String                 | Yes      | API Key                                                   |
 | datasetId         | String                 | Yes      | Knowledge base ID                                         |
 | documentId        | String                 | Yes      | Document ID                                               |
 | name              | String                 | No       | Document name                                             |
@@ -398,7 +391,6 @@ DatasetPageDocumentRequest
 
 | Parameter | Type    | Required | Description                  |
 |-----------|---------|----------|------------------------------|
-| apiKey    | String  | Yes      | API Key                      |
 | datasetId | String  | Yes      | Knowledge base ID            |
 | keyword   | String  | No       | Search keyword               |
 | page      | Integer | No       | Page number, default 1       |
@@ -455,7 +447,6 @@ DocumentIndexingStatusRequest
 
 | Parameter | Type   | Required | Description       |
 |-----------|--------|----------|-------------------|
-| apiKey    | String | Yes      | API Key           |
 | datasetId | String | Yes      | Knowledge base ID |
 | batch     | String | Yes      | Batch number      |
 
@@ -489,7 +480,7 @@ DocumentIndexingStatusResponse
 #### Method
 
 ```java
-DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apiKey);
+DocumentDeleteResponse deleteDocument(String datasetId, String documentId);
 ```
 
 #### Request Parameters
@@ -498,7 +489,6 @@ DocumentDeleteResponse deleteDocument(String datasetId, String documentId, Strin
 |------------|--------|----------|-------------------|
 | datasetId  | String | Yes      | Knowledge base ID |
 | documentId | String | Yes      | Document ID       |
-| apiKey     | String | Yes      | API Key           |
 
 #### Response Parameters
 
@@ -513,7 +503,7 @@ DocumentDeleteResponse
 #### Method
 
 ```java
-UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, String apiKey);
+UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId);
 ```
 
 #### Request Parameters
@@ -522,7 +512,6 @@ UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, Strin
 |------------|--------|----------|-------------------|
 | datasetId  | String | Yes      | Knowledge base ID |
 | documentId | String | Yes      | Document ID       |
-| apiKey     | String | Yes      | API Key           |
 
 #### Response Parameters
 
@@ -556,7 +545,6 @@ SegmentCreateRequest
 
 | Parameter  | Type                 | Required | Description            |
 |------------|----------------------|----------|------------------------|
-| apiKey     | String               | Yes      | API Key                |
 | datasetId  | String               | Yes      | Knowledge base ID      |
 | documentId | String               | Yes      | Document ID            |
 | segments   | `List<SegmentParam>` | Yes      | Segment parameter list |
@@ -609,7 +597,6 @@ SegmentPageRequest
 
 | Parameter  | Type   | Required | Description       |
 |------------|--------|----------|-------------------|
-| apiKey     | String | Yes      | API Key           |
 | datasetId  | String | Yes      | Knowledge base ID |
 | documentId | String | Yes      | Document ID       |
 | keyword    | String | No       | Search keyword    |
@@ -646,7 +633,7 @@ SegmentResponse
 #### Method
 
 ```java
-SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apiKey);
+SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId);
 ```
 
 #### Request Parameters
@@ -656,7 +643,6 @@ SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String 
 | datasetId  | String | Yes      | Knowledge base ID |
 | documentId | String | Yes      | Document ID       |
 | segmentId  | String | Yes      | Segment ID        |
-| apiKey     | String | Yes      | API Key           |
 
 #### Response Parameters
 
@@ -680,7 +666,6 @@ SegmentUpdateRequest
 
 | Parameter  | Type         | Required | Description       |
 |------------|--------------|----------|-------------------|
-| apiKey     | String       | Yes      | API Key           |
 | datasetId  | String       | Yes      | Knowledge base ID |
 | documentId | String       | Yes      | Document ID       |
 | segmentId  | String       | Yes      | Segment ID        |
@@ -736,7 +721,6 @@ RetrieveRequest
 
 | Parameter      | Type           | Required | Description             |
 |----------------|----------------|----------|-------------------------|
-| apiKey         | String         | Yes      | API Key                 |
 | datasetId      | String         | Yes      | Knowledge base ID       |
 | query          | String         | Yes      | Retrieval query content |
 | retrievalModel | RetrievalModel | No       | Retrieval model         |
