@@ -18,22 +18,49 @@ package io.github.guoshiqiufeng.dify.autoconfigure;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.guoshiqiufeng.dify.core.config.DifyServerProperties;
 import io.github.guoshiqiufeng.dify.dataset.impl.DifyDatasetDefaultImpl;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import java.util.Optional;
 
 /**
  * @author yanghq
  * @version 1.0
  * @since 2025/3/18 16:17
  */
+@Slf4j
 @Configuration
 public class DifyDatasetAutoConfiguration {
 
+    @Bean(name = "difyDatasetWebClient")
+    @ConditionalOnMissingBean(name = "difyDatasetWebClient")
+    public WebClient difyDatasetWebClient(DifyServerProperties properties) {
+        if (properties == null) {
+            log.error("Dify server properties must not be null");
+            return null;
+        }
+        String apiKey = Optional.ofNullable(properties.getDataset())
+                .map(DifyServerProperties.Dataset::getApiKey)
+                .orElse("");
+
+        return WebClient.builder()
+                .baseUrl(properties.getUrl())
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+    }
+
     @Bean
     @ConditionalOnMissingBean({DifyDatasetDefaultImpl.class})
-    public DifyDatasetDefaultImpl difyDatasetHandler(DifyServerProperties difyServerProperties, ObjectMapper objectMapper) {
-        return new DifyDatasetDefaultImpl(difyServerProperties, objectMapper);
+    public DifyDatasetDefaultImpl difyDatasetHandler(ObjectMapper objectMapper,
+                                                     @Qualifier("difyDatasetWebClient") WebClient difyDatasetWebClient) {
+        return new DifyDatasetDefaultImpl(objectMapper, difyDatasetWebClient);
     }
 
 }

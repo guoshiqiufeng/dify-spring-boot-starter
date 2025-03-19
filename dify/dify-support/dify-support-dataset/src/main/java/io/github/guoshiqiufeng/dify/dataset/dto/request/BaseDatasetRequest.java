@@ -15,7 +15,6 @@
  */
 package io.github.guoshiqiufeng.dify.dataset.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -28,6 +27,4 @@ import java.io.Serializable;
 @Data
 public class BaseDatasetRequest implements Serializable {
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String apiKey;
 }
