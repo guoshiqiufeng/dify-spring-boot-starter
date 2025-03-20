@@ -25,13 +25,13 @@ DatasetResponse create(DatasetCreateRequest request);
 
 DatasetCreateRequest
 
-| 参数名               | 类型                    | 是否必须 | 描述     |
-|-------------------|-----------------------|------|--------|
-| name              | String                | 是    | 知识库名称  |
-| description       | String                | 否    | 知识库描述  |
-| permission        | PermissionEnum        | 否    | 权限设置   |
-| provider          | ProviderEnum          | 否    | 所属     |
-| indexingTechnique | IndexingTechniqueEnum | 否    | 索引技术   |
+| 参数名               | 类型                    | 是否必须 | 描述    |
+|-------------------|-----------------------|------|-------|
+| name              | String                | 是    | 知识库名称 |
+| description       | String                | 否    | 知识库描述 |
+| permission        | PermissionEnum        | 否    | 权限设置  |
+| provider          | ProviderEnum          | 否    | 所属    |
+| indexingTechnique | IndexingTechniqueEnum | 否    | 索引技术  |
 
 **ProviderEnum 枚举值**
 
@@ -87,10 +87,10 @@ DifyPageResult<DatasetResponse> page(DatasetPageRequest request);
 
 DatasetPageRequest
 
-| 参数名    | 类型      | 是否必须 | 描述          |
-|--------|---------|------|-------------|
-| page   | Integer | 否    | 页码，默认1      |
-| limit  | Integer | 否    | 每页记录数，默认20条 |
+| 参数名   | 类型      | 是否必须 | 描述          |
+|-------|---------|------|-------------|
+| page  | Integer | 否    | 页码，默认1      |
+| limit | Integer | 否    | 每页记录数，默认20条 |
 
 #### 响应参数
 

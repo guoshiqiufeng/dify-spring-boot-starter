@@ -75,7 +75,7 @@ public class DifyChatService {
     @Resource
     private DifyChat difyChat;
 
-    
+
     public List<String> messagesSuggested(String messageId, String apiKey, String userId) {
         return difyChat.messagesSuggested(messageId, apiKey, userId);
     }
