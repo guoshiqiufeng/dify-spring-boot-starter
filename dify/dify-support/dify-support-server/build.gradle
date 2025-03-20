@@ -1,5 +1,6 @@
 dependencies {
     api project(":dify:dify-core")
+    api "org.springframework:spring-webflux"
     api "${lib["hutool-core"]}"
     api "${lib["hutool-json"]}"
 
