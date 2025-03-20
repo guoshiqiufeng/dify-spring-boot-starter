@@ -48,3 +48,21 @@ public WebClient difyDatasetWebClient(DifyServerProperties properties) {
 }
 ```
 
+## Workflow Webclient
+
+> 支持自定义 dataset webclient，覆盖默认实例
+
+```java
+
+public WebClient difyWorkflowWebClient(DifyServerProperties properties) {
+    if (properties == null) {
+        log.error("Dify server properties must not be null");
+        return null;
+    }
+
+    return WebClient.builder()
+            .baseUrl(properties.getUrl())
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .build();
+}
+```
