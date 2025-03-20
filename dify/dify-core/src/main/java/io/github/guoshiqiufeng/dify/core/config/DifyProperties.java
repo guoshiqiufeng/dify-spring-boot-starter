@@ -29,7 +29,7 @@ import java.io.Serializable;
  * @since 2024/12/31 13:49
  */
 @Data
-public class DifyServerProperties implements Serializable {
+public class DifyProperties implements Serializable {
 
     private static final long serialVersionUID = 2857476370638253392L;
     /**

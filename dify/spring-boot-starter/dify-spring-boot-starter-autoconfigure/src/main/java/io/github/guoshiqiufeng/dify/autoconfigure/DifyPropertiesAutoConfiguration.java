@@ -15,7 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.autoconfigure;
 
-import io.github.guoshiqiufeng.dify.core.config.DifyServerProperties;
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -31,9 +31,9 @@ public class DifyPropertiesAutoConfiguration {
 
     @Bean
     @ConfigurationProperties(prefix = "dify")
-    @ConditionalOnMissingBean({DifyServerProperties.class})
-    public DifyServerProperties difyProperties() {
-        return new DifyServerProperties();
+    @ConditionalOnMissingBean({DifyProperties.class})
+    public DifyProperties difyProperties() {
+        return new DifyProperties();
     }
 
 }

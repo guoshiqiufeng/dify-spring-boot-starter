@@ -16,7 +16,7 @@
 package io.github.guoshiqiufeng.dify.autoconfigure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.guoshiqiufeng.dify.core.config.DifyServerProperties;
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.dataset.impl.DifyDatasetDefaultImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -40,13 +40,13 @@ public class DifyDatasetAutoConfiguration {
 
     @Bean(name = "difyDatasetWebClient")
     @ConditionalOnMissingBean(name = "difyDatasetWebClient")
-    public WebClient difyDatasetWebClient(DifyServerProperties properties) {
+    public WebClient difyDatasetWebClient(DifyProperties properties) {
         if (properties == null) {
             log.error("Dify server properties must not be null");
             return null;
         }
         String apiKey = Optional.ofNullable(properties.getDataset())
-                .map(DifyServerProperties.Dataset::getApiKey)
+                .map(DifyProperties.Dataset::getApiKey)
                 .orElse("");
 
         return WebClient.builder()

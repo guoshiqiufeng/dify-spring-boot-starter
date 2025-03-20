@@ -12,7 +12,7 @@ description:
 
 ```java
 
-public WebClient difyChatWebClient(DifyServerProperties properties) {
+public WebClient difyChatWebClient(DifyProperties properties) {
     if (properties == null) {
         log.error("Dify server properties must not be null");
         return null;
@@ -32,12 +32,12 @@ public WebClient difyChatWebClient(DifyServerProperties properties) {
 ```java
 
 @Bean
-public WebClient difyDatasetWebClient(DifyServerProperties properties) {
+public WebClient difyDatasetWebClient(DifyProperties properties) {
     if (properties == null) {
         return null;
     }
     String apiKey = Optional.ofNullable(properties.getDataset())
-            .map(DifyServerProperties.Dataset::getApiKey)
+            .map(DifyProperties.Dataset::getApiKey)
             .orElse("");
 
     return WebClient.builder()
@@ -54,7 +54,7 @@ public WebClient difyDatasetWebClient(DifyServerProperties properties) {
 
 ```java
 
-public WebClient difyWorkflowWebClient(DifyServerProperties properties) {
+public WebClient difyWorkflowWebClient(DifyProperties properties) {
     if (properties == null) {
         log.error("Dify server properties must not be null");
         return null;

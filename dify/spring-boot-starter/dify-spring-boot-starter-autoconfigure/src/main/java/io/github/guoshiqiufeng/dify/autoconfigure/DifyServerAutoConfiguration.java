@@ -15,7 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.autoconfigure;
 
-import io.github.guoshiqiufeng.dify.core.config.DifyServerProperties;
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.server.impl.DifyServerRedisImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -34,8 +34,8 @@ public class DifyServerAutoConfiguration {
     @Bean
     @ConditionalOnBean(RedisTemplate.class)
     @ConditionalOnMissingBean({DifyServerRedisImpl.class})
-    public DifyServerRedisImpl difyServerHandler(DifyServerProperties difyServerProperties, RedisTemplate<String, String> redisTemplate) {
-        return new DifyServerRedisImpl(difyServerProperties, redisTemplate);
+    public DifyServerRedisImpl difyServerHandler(DifyProperties difyProperties, RedisTemplate<String, String> redisTemplate) {
+        return new DifyServerRedisImpl(difyProperties, redisTemplate);
     }
 
 }

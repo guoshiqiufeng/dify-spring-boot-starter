@@ -17,7 +17,7 @@ package io.github.guoshiqiufeng.dify.server.impl;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import io.github.guoshiqiufeng.dify.core.config.DifyServerProperties;
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.cache.DifyRedisKey;
@@ -43,14 +43,14 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class DifyServerRedisImpl implements DifyServer {
 
-    private final DifyServerProperties difyServerProperties;
+    private final DifyProperties difyProperties;
 
     private final RestTemplate httpRestTemplate;
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    public DifyServerRedisImpl(DifyServerProperties difyServerProperties, RedisTemplate<String, String> redisTemplate) {
-        this.difyServerProperties = difyServerProperties;
+    public DifyServerRedisImpl(DifyProperties difyProperties, RedisTemplate<String, String> redisTemplate) {
+        this.difyProperties = difyProperties;
         this.httpRestTemplate = new RestTemplate();
         this.redisTemplate = redisTemplate;
     }
@@ -169,7 +169,7 @@ public class DifyServerRedisImpl implements DifyServer {
      * 登录
      */
     private LoginResponseVO login() {
-        DifyLoginRequestVO requestVO = DifyLoginRequestVO.build(difyServerProperties.getEmail(), difyServerProperties.getPassword());
+        DifyLoginRequestVO requestVO = DifyLoginRequestVO.build(difyProperties.getEmail(), difyProperties.getPassword());
 
         String json = postRequest(ServerUriConstant.LOGIN, JSONUtil.toJsonStr(requestVO));
         if (StrUtil.isNotEmpty(json)) {
@@ -215,7 +215,7 @@ public class DifyServerRedisImpl implements DifyServer {
         }
 
         String serverUrl = "{}{}";
-        serverUrl = StrUtil.format(serverUrl, difyServerProperties.getUrl(), uri);
+        serverUrl = StrUtil.format(serverUrl, difyProperties.getUrl(), uri);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -282,7 +282,7 @@ public class DifyServerRedisImpl implements DifyServer {
 
         // 白名单
         String serverUrl = "{}{}";
-        serverUrl = StrUtil.format(serverUrl, difyServerProperties.getUrl(), uri);
+        serverUrl = StrUtil.format(serverUrl, difyProperties.getUrl(), uri);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 

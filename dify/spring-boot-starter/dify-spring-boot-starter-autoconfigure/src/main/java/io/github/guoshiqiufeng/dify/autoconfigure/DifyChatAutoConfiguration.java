@@ -17,7 +17,7 @@ package io.github.guoshiqiufeng.dify.autoconfigure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.guoshiqiufeng.dify.chat.impl.DifyChatDefaultImpl;
-import io.github.guoshiqiufeng.dify.core.config.DifyServerProperties;
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -38,7 +38,7 @@ public class DifyChatAutoConfiguration {
 
     @Bean(name = "difyChatWebClient")
     @ConditionalOnMissingBean(name = "difyChatWebClient")
-    public WebClient difyChatWebClient(DifyServerProperties properties) {
+    public WebClient difyChatWebClient(DifyProperties properties) {
         if (properties == null) {
             log.error("Dify server properties must not be null");
             return null;
@@ -52,7 +52,7 @@ public class DifyChatAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean({DifyChatDefaultImpl.class})
-    public DifyChatDefaultImpl difyChatHandler(DifyServerProperties difyServerProperties, ObjectMapper objectMapper,
+    public DifyChatDefaultImpl difyChatHandler(ObjectMapper objectMapper,
                                                @Qualifier("difyChatWebClient") WebClient difyChatWebClient) {
         return new DifyChatDefaultImpl(objectMapper, difyChatWebClient);
     }
