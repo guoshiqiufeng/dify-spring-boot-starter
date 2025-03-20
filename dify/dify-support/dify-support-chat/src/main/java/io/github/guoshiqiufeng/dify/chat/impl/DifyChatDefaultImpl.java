@@ -26,7 +26,6 @@ import io.github.guoshiqiufeng.dify.chat.dto.response.*;
 import io.github.guoshiqiufeng.dify.chat.exception.DiftChatException;
 import io.github.guoshiqiufeng.dify.chat.exception.DiftChatExceptionEnum;
 import io.github.guoshiqiufeng.dify.chat.utils.WebClientUtil;
-import io.github.guoshiqiufeng.dify.core.config.DifyServerProperties;
 import io.github.guoshiqiufeng.dify.core.enums.ResponseModeEnum;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
@@ -64,12 +63,12 @@ import java.util.Map;
 @Slf4j
 public class DifyChatDefaultImpl implements DifyChat {
 
-    private final DifyServerProperties difyServerProperties;
     private final ObjectMapper objectMapper;
+    private final WebClient webClient;
 
-    public DifyChatDefaultImpl(DifyServerProperties difyServerProperties, ObjectMapper objectMapper) {
-        this.difyServerProperties = difyServerProperties;
+    public DifyChatDefaultImpl(ObjectMapper objectMapper, WebClient webClient) {
         this.objectMapper = objectMapper;
+        this.webClient = webClient;
     }
 
     /**
@@ -78,15 +77,15 @@ public class DifyChatDefaultImpl implements DifyChat {
     @Override
     public ChatMessageSendResponse send(ChatMessageSendRequest sendRequest) {
         // 请求地址 url + /v1/chat-messages
-        String url = difyServerProperties.getUrl() + ChatUriConstant.V1_CHAT_MESSAGES_URI;
+        String url = ChatUriConstant.V1_CHAT_MESSAGES_URI;
 
         // 请求体
         String body = builderChatMessageBody(ResponseModeEnum.blocking, sendRequest);
         // 使用 WebClient 发送 POST 请求
-        WebClient webClient = getWebClient(sendRequest.getApiKey());
 
         return webClient.post()
                 .uri(url)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + sendRequest.getApiKey())
                 .bodyValue(body)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
@@ -125,15 +124,15 @@ public class DifyChatDefaultImpl implements DifyChat {
     @Override
     public Flux<ChatMessageSendResponse> sendChatMessageStream(ChatMessageSendRequest sendRequest) {
         // 请求地址 url + /v1/chat-messages 请求方式 POST , stream 流
-        String url = difyServerProperties.getUrl() + ChatUriConstant.V1_CHAT_MESSAGES_URI;
+        String url = ChatUriConstant.V1_CHAT_MESSAGES_URI;
 
         String body = builderChatMessageBody(ResponseModeEnum.streaming, sendRequest);
 
         // 使用 WebClient 发送 POST 请求
-        WebClient webClient = getWebClient(sendRequest.getApiKey());
 
         return webClient.post()
                 .uri(url)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + sendRequest.getApiKey())
                 .bodyValue(body)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
@@ -143,11 +142,10 @@ public class DifyChatDefaultImpl implements DifyChat {
 
     @Override
     public void stopMessagesStream(String apiKey, String taskId, String userId) {
-        String url = difyServerProperties.getUrl() + ChatUriConstant.V1_CHAT_MESSAGES_URI + "/{}/stop";
+        String url = ChatUriConstant.V1_CHAT_MESSAGES_URI + "/{}/stop";
         url = StrUtil.format(url, taskId);
 
         // 使用 WebClient 发送 POST 请求
-        WebClient webClient = getWebClient(apiKey);
 
         Map<String, Object> params = new HashMap<>(2);
         params.put("user", userId);
@@ -157,6 +155,7 @@ public class DifyChatDefaultImpl implements DifyChat {
 
             webClient.post()
                     .uri(url)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                     .bodyValue(body)
                     .retrieve()
                     .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
@@ -174,12 +173,11 @@ public class DifyChatDefaultImpl implements DifyChat {
 
     @Override
     public MessageFeedbackResponse messageFeedback(MessageFeedbackRequest request) {
-        String url = difyServerProperties.getUrl() + ChatUriConstant.V1_MESSAGES_URI + "/{}/feedbacks";
+        String url = ChatUriConstant.V1_MESSAGES_URI + "/{}/feedbacks";
         url = StrUtil.format(url, request.getMessageId());
 
         try {
             // 使用 WebClient 发送 GET 请求
-            WebClient webClient = getWebClient(request.getApiKey());
 
             Map<String, Object> values = new HashMap<>(3);
             values.put("rating", request.getRating() != null ? request.getRating().getKey() : null);
@@ -188,6 +186,7 @@ public class DifyChatDefaultImpl implements DifyChat {
 
             return webClient.post()
                     .uri(url)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
                     .bodyValue(objectMapper.writeValueAsString(values))
                     .retrieve()
                     .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
@@ -206,7 +205,7 @@ public class DifyChatDefaultImpl implements DifyChat {
      */
     @Override
     public DifyPageResult<MessageConversationsResponse> conversations(MessageConversationsRequest request) {
-        String url = difyServerProperties.getUrl() + ChatUriConstant.V1_CONVERSATIONS_URI;
+        String url = ChatUriConstant.V1_CONVERSATIONS_URI;
 
         if (StrUtil.isEmpty(request.getSortBy())) {
             request.setSortBy("-updated_at");
@@ -217,7 +216,6 @@ public class DifyChatDefaultImpl implements DifyChat {
 
         try {
             // 使用 WebClient 发送 GET 请求
-            WebClient webClient = getWebClient(request.getApiKey());
 
             String uri = url + "?user={}";
             uri = StrUtil.format(uri, request.getUserId());
@@ -231,6 +229,7 @@ public class DifyChatDefaultImpl implements DifyChat {
             uri = StrUtil.format(uri, request.getLimit(), request.getSortBy());
             return webClient.get()
                     .uri(uri)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
                     .retrieve()
                     .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
                     .bodyToMono(new ParameterizedTypeReference<DifyPageResult<MessageConversationsResponse>>() {
@@ -248,7 +247,7 @@ public class DifyChatDefaultImpl implements DifyChat {
      */
     @Override
     public DifyPageResult<MessagesResponseVO> messages(MessagesRequest request) {
-        String url = difyServerProperties.getUrl() + ChatUriConstant.V1_MESSAGES_URI;
+        String url = ChatUriConstant.V1_MESSAGES_URI;
 
         if (request.getLimit() == null) {
             request.setLimit(20);
@@ -256,7 +255,6 @@ public class DifyChatDefaultImpl implements DifyChat {
 
         try {
             // 使用 WebClient 发送 GET 请求
-            WebClient webClient = getWebClient(request.getApiKey());
 
             return webClient.get()
                     .uri(url + "?conversation_id={conversationId}&user={user}&first_id={lastId}&limit={limit}",
@@ -264,6 +262,7 @@ public class DifyChatDefaultImpl implements DifyChat {
                             request.getUserId(),
                             request.getFirstId(),
                             request.getLimit())
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
                     .retrieve()
                     .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
                     .bodyToMono(new ParameterizedTypeReference<DifyPageResult<MessagesResponseVO>>() {
@@ -281,16 +280,16 @@ public class DifyChatDefaultImpl implements DifyChat {
      */
     @Override
     public List<String> messagesSuggested(String messageId, String apiKey, String userId) {
-        String url = difyServerProperties.getUrl() + ChatUriConstant.V1_MESSAGES_URI + "/{}/suggested";
+        String url = ChatUriConstant.V1_MESSAGES_URI + "/{}/suggested";
         url = StrUtil.format(url, messageId);
 
         try {
             // 使用 WebClient 发送 GET 请求
-            WebClient webClient = getWebClient(apiKey);
 
             DifyResult<List<String>> difyResult = webClient.get()
                     .uri(url + "?user={user}",
                             userId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                     .retrieve()
                     .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
                     .bodyToMono(new ParameterizedTypeReference<DifyResult<List<String>>>() {
@@ -313,11 +312,10 @@ public class DifyChatDefaultImpl implements DifyChat {
      */
     @Override
     public void deleteConversation(String conversationId, String apiKey, String userId) {
-        String url = difyServerProperties.getUrl() + ChatUriConstant.V1_CONVERSATIONS_URI + "/{}";
+        String url = ChatUriConstant.V1_CONVERSATIONS_URI + "/{}";
         url = StrUtil.format(url, conversationId);
 
         // 使用 WebClient 发送 Delete 请求
-        WebClient webClient = getWebClient(apiKey);
 
         Map<String, Object> params = new HashMap<>();
         params.put("user", userId);
@@ -327,6 +325,7 @@ public class DifyChatDefaultImpl implements DifyChat {
 
             webClient.method(HttpMethod.DELETE)
                     .uri(url)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(body)
                     .retrieve()
@@ -341,7 +340,7 @@ public class DifyChatDefaultImpl implements DifyChat {
 
     @Override
     public MessageConversationsResponse renameConversation(RenameConversationRequest renameConversationRequest) {
-        String url = difyServerProperties.getUrl() + ChatUriConstant.V1_CONVERSATIONS_URI + "/{}/name";
+        String url = ChatUriConstant.V1_CONVERSATIONS_URI + "/{}/name";
         url = StrUtil.format(url, renameConversationRequest.getConversationId());
         if (renameConversationRequest.getAutoGenerate() == null) {
             renameConversationRequest.setAutoGenerate(false);
@@ -349,7 +348,6 @@ public class DifyChatDefaultImpl implements DifyChat {
 
         try {
             // 使用 WebClient 发送 GET 请求
-            WebClient webClient = getWebClient(renameConversationRequest.getApiKey());
 
             Map<String, Object> values = new HashMap<>(3);
             values.put("name", renameConversationRequest.getName() == null ? "" : renameConversationRequest.getName());
@@ -358,6 +356,7 @@ public class DifyChatDefaultImpl implements DifyChat {
 
             return webClient.post()
                     .uri(url)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + renameConversationRequest.getApiKey())
                     .bodyValue(objectMapper.writeValueAsString(values))
                     .retrieve()
                     .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
@@ -372,32 +371,19 @@ public class DifyChatDefaultImpl implements DifyChat {
     }
 
     /**
-     * 获取WebClient
-     *
-     * @param apiKey API密钥，用于身份验证
-     * @return WebClient
-     */
-    private static WebClient getWebClient(String apiKey) {
-        return WebClient.builder()
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .build();
-    }
-
-    /**
      * 获取应用参数
      */
     @Override
     public AppParametersResponseVO parameters(String apiKey) {
-        String url = difyServerProperties.getUrl() + ChatUriConstant.V1_PARAMETERS_URI;
+        String url = ChatUriConstant.V1_PARAMETERS_URI;
 
         try {
             // 使用 WebClient 发送 GET 请求
-            WebClient webClient = getWebClient(apiKey);
 
             // 转为同步调用
             return webClient.get()
                     .uri(url)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                     .retrieve()
                     .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
                     .bodyToMono(new ParameterizedTypeReference<AppParametersResponseVO>() {
@@ -417,13 +403,10 @@ public class DifyChatDefaultImpl implements DifyChat {
 
     @Override
     public void textToAudio(TextToAudioRequest request, HttpServletResponse response) {
-        String url = difyServerProperties.getUrl() + ChatUriConstant.V1_TEXT_TO_AUDIO_URI;
+        String url = ChatUriConstant.V1_TEXT_TO_AUDIO_URI;
 
         try {
             // 使用 WebClient 发送 POST 请求
-            WebClient webClient = WebClient.builder()
-                    .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
-                    .build();
 
             // 构建请求体
             Map<String, String> requestBody = new HashMap<>();
@@ -434,6 +417,7 @@ public class DifyChatDefaultImpl implements DifyChat {
             // 获取响应，包括headers和body
             WebClient.ResponseSpec responseSpec = webClient.post()
                     .uri(url)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
                     .bodyValue(requestBody)
                     .retrieve()
                     .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction);
@@ -470,19 +454,16 @@ public class DifyChatDefaultImpl implements DifyChat {
 
     @Override
     public DifyTextVO audioToText(AudioToTextRequest request) {
-        String url = difyServerProperties.getUrl() + ChatUriConstant.V1_AUDIO_TO_TEXT_URI;
+        String url = ChatUriConstant.V1_AUDIO_TO_TEXT_URI;
 
         try {
             // 使用 WebClient 发送 POST 请求
-            WebClient webClient = WebClient.builder()
-                    .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
-                    .build();
-
             // 构建 MultipartData 请求
             MultipartFile file = request.getFile();
 
             return webClient.post()
                     .uri(url)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .body(BodyInserters.fromMultipartData(
                             new LinkedMultiValueMap<>() {{
