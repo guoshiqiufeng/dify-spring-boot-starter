@@ -4,6 +4,27 @@ title: Customized Configuration
 description: 
 ---
 
+# Customized Configuration
+
+## Chat Webclient
+
+> Support for custom dataset webclient, overriding the default instance
+
+```java
+
+public WebClient difyChatWebClient(DifyServerProperties properties) {
+    if (properties == null) {
+        log.error("Dify server properties must not be null");
+        return null;
+    }
+
+    return WebClient.builder()
+            .baseUrl(properties.getUrl())
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .build();
+}
+```
+
 ## Dataset Webclient
 
 > Support for custom dataset webclient, overriding the default instance
