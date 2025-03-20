@@ -20,7 +20,6 @@ import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.guoshiqiufeng.dify.core.config.DifyServerProperties;
 import io.github.guoshiqiufeng.dify.core.enums.ResponseModeEnum;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.request.ChatMessageVO;
@@ -36,7 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -53,27 +51,27 @@ import java.util.Map;
 @Slf4j
 public class DifyWorkflowDefaultImpl implements DifyWorkflow {
 
-    private final DifyServerProperties difyServerProperties;
     private final ObjectMapper objectMapper;
+    private final WebClient webClient;
 
-    public DifyWorkflowDefaultImpl(DifyServerProperties difyServerProperties, ObjectMapper objectMapper) {
-        this.difyServerProperties = difyServerProperties;
+    public DifyWorkflowDefaultImpl(ObjectMapper objectMapper, WebClient webClient) {
         this.objectMapper = objectMapper;
+        this.webClient = webClient;
     }
 
 
     @Override
     public WorkflowRunResponse runWorkflow(WorkflowRunRequest request) {
         // 请求地址 url + /v1/chat-messages
-        String url = difyServerProperties.getUrl() + WorkflowConstant.WORKFLOW_RUN_URL;
+        String url = WorkflowConstant.WORKFLOW_RUN_URL;
 
         // 请求体
         String body = builderRunBody(ResponseModeEnum.blocking, request);
         // 使用 WebClient 发送 POST 请求
-        WebClient webClient = getWebClient(request.getApiKey());
 
         return webClient.post()
                 .uri(url)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
                 .bodyValue(body)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
@@ -84,15 +82,15 @@ public class DifyWorkflowDefaultImpl implements DifyWorkflow {
     @Override
     public Flux<WorkflowRunStreamResponse> runWorkflowStream(WorkflowRunRequest request) {
         // 请求地址 url + /v1/chat-messages 请求方式 POST , stream 流
-        String url = difyServerProperties.getUrl() + WorkflowConstant.WORKFLOW_RUN_URL;
+        String url = WorkflowConstant.WORKFLOW_RUN_URL;
 
         String body = builderRunBody(ResponseModeEnum.streaming, request);
 
         // 使用 WebClient 发送 POST 请求
-        WebClient webClient = getWebClient(request.getApiKey());
 
         return webClient.post()
                 .uri(url)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
                 .bodyValue(body)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
@@ -102,13 +100,14 @@ public class DifyWorkflowDefaultImpl implements DifyWorkflow {
 
     @Override
     public WorkflowInfoResponse info(String workflowRunId, String apiKey) {
-        String url = difyServerProperties.getUrl() + WorkflowConstant.WORKFLOW_RUN_URL + "/{}";
+        String url = WorkflowConstant.WORKFLOW_RUN_URL + "/{}";
         url = StrUtil.format(url, workflowRunId);
 
         // 使用 WebClient 发送 GET 请求
-        WebClient webClient = getWebClient(apiKey);
+
         return webClient.get()
                 .uri(url)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(String.class)
@@ -127,7 +126,7 @@ public class DifyWorkflowDefaultImpl implements DifyWorkflow {
 
     @Override
     public WorkflowStopResponse stopWorkflowStream(String apiKey, String taskId, String userId) {
-        String url = difyServerProperties.getUrl() + WorkflowConstant.WORKFLOW_TASKS_URL + "/{}/stop";
+        String url = WorkflowConstant.WORKFLOW_TASKS_URL + "/{}/stop";
         String body = "";
         try {
             body = objectMapper.writeValueAsString(Map.of("user", userId));
@@ -136,10 +135,10 @@ public class DifyWorkflowDefaultImpl implements DifyWorkflow {
         }
 
         // 使用 WebClient 发送 POST 请求
-        WebClient webClient = getWebClient(apiKey);
 
         return webClient.post()
                 .uri(url)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                 .bodyValue(body)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
@@ -149,7 +148,7 @@ public class DifyWorkflowDefaultImpl implements DifyWorkflow {
 
     @Override
     public DifyPageResult<WorkflowLogs> logs(WorkflowLogsRequest request) {
-        String url = difyServerProperties.getUrl() + WorkflowConstant.WORKFLOW_LOGS_URL;
+        String url = WorkflowConstant.WORKFLOW_LOGS_URL;
 
         if (request.getPage() == null) {
             request.setPage(1);
@@ -159,7 +158,6 @@ public class DifyWorkflowDefaultImpl implements DifyWorkflow {
         }
 
         // 使用 WebClient 发送 GET 请求
-        WebClient webClient = getWebClient(request.getApiKey());
 
         String uri = url + "?page={}&limit={}";
         uri = StrUtil.format(uri, request.getPage(), request.getLimit());
@@ -173,6 +171,7 @@ public class DifyWorkflowDefaultImpl implements DifyWorkflow {
         }
         return webClient.get()
                 .uri(uri)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(new ParameterizedTypeReference<DifyPageResult<WorkflowLogs>>() {
@@ -204,20 +203,6 @@ public class DifyWorkflowDefaultImpl implements DifyWorkflow {
             throw new DifyWorkflowException(DiftWorkflowExceptionEnum.DIFY_DATA_PARSING_FAILURE);
         }
         return body;
-    }
-
-
-    /**
-     * 获取WebClient
-     *
-     * @param apiKey API密钥，用于身份验证
-     * @return WebClient
-     */
-    private static WebClient getWebClient(String apiKey) {
-        return WebClient.builder()
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .build();
     }
 
 
