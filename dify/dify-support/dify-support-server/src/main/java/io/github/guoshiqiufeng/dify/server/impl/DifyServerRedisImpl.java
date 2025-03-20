@@ -169,7 +169,11 @@ public class DifyServerRedisImpl implements DifyServer {
      * 登录
      */
     private LoginResponseVO login() {
-        DifyLoginRequestVO requestVO = DifyLoginRequestVO.build(difyProperties.getEmail(), difyProperties.getPassword());
+        DifyProperties.Server server = difyProperties.getServer();
+        if (server == null) {
+            throw new RuntimeException("DifyProperties server is null");
+        }
+        DifyLoginRequestVO requestVO = DifyLoginRequestVO.build(server.getEmail(), server.getPassword());
 
         String json = postRequest(ServerUriConstant.LOGIN, JSONUtil.toJsonStr(requestVO));
         if (StrUtil.isNotEmpty(json)) {

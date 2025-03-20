@@ -17,6 +17,7 @@ package io.github.guoshiqiufeng.dify.autoconfigure;
 
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.server.impl.DifyServerRedisImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +29,7 @@ import org.springframework.data.redis.core.RedisTemplate;
  * @version 1.0
  * @since 2025/3/18 16:17
  */
+@Slf4j
 @Configuration
 public class DifyServerAutoConfiguration {
 

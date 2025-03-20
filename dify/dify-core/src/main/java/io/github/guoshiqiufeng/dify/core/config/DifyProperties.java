@@ -38,19 +38,14 @@ public class DifyProperties implements Serializable {
     private String url;
 
     /**
-     * email
-     */
-    private String email;
-
-    /**
-     * 密码
-     */
-    private String password;
-
-    /**
      * 知识库
      */
     private Dataset dataset;
+
+    /**
+     * 后台服务
+     */
+    private Server server;
 
     @Data
     @AllArgsConstructor
@@ -58,5 +53,22 @@ public class DifyProperties implements Serializable {
     public static class Dataset implements Serializable {
         private static final long serialVersionUID = -8070163136236819894L;
         private String apiKey;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Server implements Serializable {
+        private static final long serialVersionUID = -8070163136236819894L;
+
+        /**
+         * email
+         */
+        private String email;
+
+        /**
+         * 密码
+         */
+        private String password;
     }
 }

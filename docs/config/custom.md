@@ -14,7 +14,7 @@ description:
 
 public WebClient difyChatWebClient(DifyProperties properties) {
     if (properties == null) {
-        log.error("Dify server properties must not be null");
+        log.error("Dify properties must not be null");
         return null;
     }
 
@@ -56,7 +56,7 @@ public WebClient difyDatasetWebClient(DifyProperties properties) {
 
 public WebClient difyWorkflowWebClient(DifyProperties properties) {
     if (properties == null) {
-        log.error("Dify server properties must not be null");
+        log.error("Dify properties must not be null");
         return null;
     }
 

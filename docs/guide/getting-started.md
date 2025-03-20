@@ -55,9 +55,10 @@ implementation group: 'io.github.guoshiqiufeng.dify', name: 'dify-spring-boot-st
 
 ```yaml
 dify:
-  email: admin@admin.com # 请替换为实际的 Dify 服务邮箱，若不需要调用 server相关接口可不填
-  password: admin123456 # 请替换为实际的 Dify 服务密码，若不需要调用 server相关接口可不填
   url: http://192.168.1.10 # 请替换为实际的 Dify 服务地址
+  server:
+    email: admin@admin.com # 请替换为实际的 Dify 服务邮箱，若不需要调用 server相关接口可不填
+    password: admin123456 # 请替换为实际的 Dify 服务密码，若不需要调用 server相关接口可不填
   dataset:
     api-key: dataset-aaabbbcccdddeeefffggghhh # 请替换为实际的知识库api-key, 若不需要调用知识库可不填
 ```

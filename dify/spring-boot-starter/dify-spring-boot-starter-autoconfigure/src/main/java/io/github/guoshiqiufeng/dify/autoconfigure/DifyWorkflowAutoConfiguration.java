@@ -40,7 +40,7 @@ public class DifyWorkflowAutoConfiguration {
     @ConditionalOnMissingBean(name = "difyWorkflowWebClient")
     public WebClient difyWorkflowWebClient(DifyProperties properties) {
         if (properties == null) {
-            log.error("Dify server properties must not be null");
+            log.error("Dify properties must not be null");
             return null;
         }
 
