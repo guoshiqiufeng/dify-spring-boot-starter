@@ -84,8 +84,6 @@ public class DifyChatService {
 
 For more usage references check the [documentation](https://guoshiqiufeng.github.io/dify-spring-boot-starter/en/)
 
-
-
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=guoshiqiufeng/dify-spring-boot-starter&type=Date)](https://www.star-history.com/#guoshiqiufeng/dify-spring-boot-starter&Date)

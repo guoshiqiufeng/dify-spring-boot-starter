@@ -18,11 +18,13 @@ package io.github.guoshiqiufeng.dify.autoconfigure;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.server.impl.DifyServerRedisImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 /**
  * @author yanghq
@@ -31,12 +33,13 @@ import org.springframework.data.redis.core.RedisTemplate;
  */
 @Slf4j
 @Configuration
+@AutoConfigureAfter(RedisAutoConfiguration.class)
 public class DifyServerAutoConfiguration {
 
     @Bean
-    @ConditionalOnBean(RedisTemplate.class)
+    @ConditionalOnBean(StringRedisTemplate.class)
     @ConditionalOnMissingBean({DifyServerRedisImpl.class})
-    public DifyServerRedisImpl difyServerHandler(DifyProperties difyProperties, RedisTemplate<String, String> redisTemplate) {
+    public DifyServerRedisImpl difyServerHandler(DifyProperties difyProperties, StringRedisTemplate redisTemplate) {
         return new DifyServerRedisImpl(difyProperties, redisTemplate);
     }
 
