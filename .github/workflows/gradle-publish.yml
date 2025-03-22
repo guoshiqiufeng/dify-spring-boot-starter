@@ -1,11 +1,13 @@
 name: Gradle Package
 
 on:
-  release:
-    types: [ created ]
-  push:
-    branches:
-      - main
+  #release:
+  #  types: [ created ]
+  # push:
+  #   branches:
+  #     - main
+  # 手动触发部署
+  workflow_dispatch:
 
 jobs:
   build:
