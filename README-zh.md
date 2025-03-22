@@ -36,7 +36,7 @@
         <dependency>
             <groupId>io.github.guoshiqiufeng.dify</groupId>
             <artifactId>dify-bom</artifactId>
-            <version>0.3.0</version>
+            <version>0.4.0</version>
             <type>import</type>
         </dependency>
     </dependencies>
@@ -57,9 +57,12 @@
 
 ```yaml
 dify:
-  email: admin@admin.com # 请替换为实际的 Dify 服务邮箱，若不需要调用 server相关接口可不填
-  password: admin123456 # 请替换为实际的 Dify 服务密码，若不需要调用 server相关接口可不填
   url: http://192.168.1.10 # 请替换为实际的 Dify 服务地址
+  server:
+    email: admin@admin.com # 请替换为实际的 Dify 服务邮箱，若不需要调用 server相关接口可不填
+    password: admin123456 # 请替换为实际的 Dify 服务密码，若不需要调用 server相关接口可不填
+  dataset:
+    api-key: dataset-aaabbbcccdddeeefffggghhh # 请替换为实际的知识库api-key, 若不需要调用知识库可不填
 ```
 
 #### 获取消息建议
@@ -81,5 +84,6 @@ public class DifyChatService {
 
 更多使用参考查看[文档](https://guoshiqiufeng.github.io/dify-spring-boot-starter)
 
+## Star History
 
-
+[![Star History Chart](https://api.star-history.com/svg?repos=guoshiqiufeng/dify-spring-boot-starter&type=Date)](https://www.star-history.com/#guoshiqiufeng/dify-spring-boot-starter&Date)

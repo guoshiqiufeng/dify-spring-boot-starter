@@ -21,9 +21,9 @@ jobs:
         run: |
           APP_VERSION=$(grep 'APP_VERSION' gradle.properties | awk -F'=' '{print $2}' | tr -d '[:space:]')
           echo '{
-             "name": "dify-doc",
+             "name": "dify-spring-boot-starter-doc",
              "version": "'"$APP_VERSION"'",
-             "description": "dify doc",
+             "description": "dify-spring-boot-starter doc",
              "main": "index.js",
              "scripts": {
                "docs:dev": "vuepress dev docs",
@@ -31,18 +31,18 @@ jobs:
              },
              "repository": {
                "type": "git",
-               "url": "git+https://github.com/guoshiqiufeng/dify.git"
+               "url": "git+https://github.com/guoshiqiufeng/dify-spring-boot-starter.git"
              },
              "keywords": [
-               "spring-cloud-stream",
-               "dify"
+               "dify",
+               "dify-spring-boot-starter"
              ],
              "author": "guoshiqiufeng",
              "license": "MIT",
              "bugs": {
-               "url": "https://github.com/guoshiqiufeng/dify/issues"
+               "url": "https://github.com/guoshiqiufeng/dify-spring-boot-starter/issues"
              },
-             "homepage": "https://github.com/guoshiqiufeng/dify#readme",
+             "homepage": "https://github.com/guoshiqiufeng/dify-spring-boot-starter#readme",
              "devDependencies": {
                "@vuepress/client": "^2.0.0-rc.0",
                "@vuepress/plugin-docsearch": "^2.0.0-rc.3",

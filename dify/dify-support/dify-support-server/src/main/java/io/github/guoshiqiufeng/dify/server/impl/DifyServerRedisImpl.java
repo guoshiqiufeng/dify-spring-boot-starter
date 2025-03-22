@@ -17,7 +17,7 @@ package io.github.guoshiqiufeng.dify.server.impl;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import io.github.guoshiqiufeng.dify.core.config.DifyServerProperties;
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.cache.DifyRedisKey;
@@ -26,9 +26,11 @@ import io.github.guoshiqiufeng.dify.server.dto.request.DifyLoginRequestVO;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,15 +45,16 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class DifyServerRedisImpl implements DifyServer {
 
-    private final DifyServerProperties difyServerProperties;
-
-    private final RestTemplate httpRestTemplate;
-
+    private final DifyProperties difyProperties;
+    private final WebClient webClient;
     private final RedisTemplate<String, String> redisTemplate;
 
-    public DifyServerRedisImpl(DifyServerProperties difyServerProperties, RedisTemplate<String, String> redisTemplate) {
-        this.difyServerProperties = difyServerProperties;
-        this.httpRestTemplate = new RestTemplate();
+    public DifyServerRedisImpl(DifyProperties difyProperties, RedisTemplate<String, String> redisTemplate) {
+        this.difyProperties = difyProperties;
+        this.webClient = WebClient.builder()
+                .baseUrl(difyProperties.getUrl())
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
         this.redisTemplate = redisTemplate;
     }
 
@@ -169,7 +172,11 @@ public class DifyServerRedisImpl implements DifyServer {
      * 登录
      */
     private LoginResponseVO login() {
-        DifyLoginRequestVO requestVO = DifyLoginRequestVO.build(difyServerProperties.getEmail(), difyServerProperties.getPassword());
+        DifyProperties.Server server = difyProperties.getServer();
+        if (server == null) {
+            throw new RuntimeException("DifyProperties server is null");
+        }
+        DifyLoginRequestVO requestVO = DifyLoginRequestVO.build(server.getEmail(), server.getPassword());
 
         String json = postRequest(ServerUriConstant.LOGIN, JSONUtil.toJsonStr(requestVO));
         if (StrUtil.isNotEmpty(json)) {
@@ -214,11 +221,7 @@ public class DifyServerRedisImpl implements DifyServer {
             return null;
         }
 
-        String serverUrl = "{}{}";
-        serverUrl = StrUtil.format(serverUrl, difyServerProperties.getUrl(), uri);
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
         if (!WHITELISTING.contains(uri)) {
             String accessToken = redisTemplate.opsForValue().get(DifyRedisKey.ACCESS_TOKEN);
             if (StrUtil.isNotEmpty(accessToken)) {
@@ -229,35 +232,33 @@ public class DifyServerRedisImpl implements DifyServer {
             }
         }
 
-        HttpEntity<?> entity = new HttpEntity<>(headers);
-        log.debug("请求地址:{}, 重试次数:{}", serverUrl, retryCount);
+        log.debug("请求地址:{}, 重试次数:{}", uri, retryCount);
 
         try {
-            ResponseEntity<String> responseEntity = httpRestTemplate.exchange(
-                    serverUrl,
-                    HttpMethod.GET,
-                    entity,
-                    String.class
-            );
-            log.debug("响应数据:{}", responseEntity.getBody());
+            Mono<String> response = webClient.get()
+                    .uri(uri)
+                    .headers(httpHeaders -> httpHeaders.addAll(headers))
+                    .retrieve()
+                    .bodyToMono(String.class);
 
-            if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                return responseEntity.getBody();
+            String responseBody = response.block();
+            log.debug("响应数据:{}", responseBody);
+
+            if (responseBody != null) {
+                return responseBody;
             }
 
             // 401 刷新token 重试
-            if (!WHITELISTING.contains(uri) && responseEntity.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+            if (!WHITELISTING.contains(uri)) {
                 String refreshToken = redisTemplate.opsForValue().get(DifyRedisKey.REFRESH_TOKEN);
                 if (StrUtil.isNotEmpty(refreshToken)) {
                     LoginResponseVO login = refreshToken(refreshToken);
                     saveToken(login);
-                    // 重新发起请求，递增重试计数
                     return getRequest(uri, retryCount + 1);
                 }
             }
         } catch (Exception e) {
             log.error("请求失败, uri: {}, 重试次数: {}, 错误信息: {}", uri, retryCount, e.getMessage());
-            // 发生异常时也进行重试
             return getRequest(uri, retryCount + 1);
         }
 
@@ -271,21 +272,13 @@ public class DifyServerRedisImpl implements DifyServer {
         return postRequest(uri, json, 0);
     }
 
-    /**
-     * post获取请求
-     */
     private String postRequest(String uri, String json, int retryCount) {
         if (retryCount >= MAX_RETRY_ATTEMPTS) {
             log.warn("请求超过最大重试次数: {}, uri: {}", MAX_RETRY_ATTEMPTS, uri);
             return null;
         }
 
-        // 白名单
-        String serverUrl = "{}{}";
-        serverUrl = StrUtil.format(serverUrl, difyServerProperties.getUrl(), uri);
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
         if (!WHITELISTING.contains(uri)) {
             String accessToken = redisTemplate.opsForValue().get(DifyRedisKey.ACCESS_TOKEN);
             if (StrUtil.isNotEmpty(accessToken)) {
@@ -296,18 +289,24 @@ public class DifyServerRedisImpl implements DifyServer {
             }
         }
 
-        HttpEntity<String> entity = new HttpEntity<>(json, headers);
-        log.debug("postRequest 请求地址:{}, 请求参数:{}", serverUrl, json);
+        log.debug("postRequest 请求地址:{}, 请求参数:{}", uri, json);
 
         try {
-            ResponseEntity<String> responseEntity = httpRestTemplate.postForEntity(serverUrl, entity, String.class);
-            log.debug("postRequest 响应数据:{}", responseEntity.getBody());
+            Mono<String> response = webClient.post()
+                    .uri(uri)
+                    .headers(httpHeaders -> httpHeaders.addAll(headers))
+                    .bodyValue(json)
+                    .retrieve()
+                    .bodyToMono(String.class);
 
-            if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                return responseEntity.getBody();
+            String responseBody = response.block();
+            log.debug("postRequest 响应数据:{}", responseBody);
+
+            if (responseBody != null) {
+                return responseBody;
             }
 
-            if (!WHITELISTING.contains(uri) && responseEntity.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+            if (!WHITELISTING.contains(uri)) {
                 String refreshToken = redisTemplate.opsForValue().get(DifyRedisKey.REFRESH_TOKEN);
                 if (StrUtil.isNotEmpty(refreshToken)) {
                     LoginResponseVO login = refreshToken(refreshToken);

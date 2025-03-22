@@ -15,7 +15,9 @@
  */
 package io.github.guoshiqiufeng.dify.core.config;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
@@ -27,20 +29,46 @@ import java.io.Serializable;
  * @since 2024/12/31 13:49
  */
 @Data
-public class DifyServerProperties implements Serializable {
+public class DifyProperties implements Serializable {
 
+    private static final long serialVersionUID = 2857476370638253392L;
     /**
      * 服务地址
      */
     private String url;
 
     /**
-     * email
+     * 知识库
      */
-    private String email;
+    private Dataset dataset;
 
     /**
-     * 密码
+     * 后台服务
      */
-    private String password;
+    private Server server;
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Dataset implements Serializable {
+        private static final long serialVersionUID = -8070163136236819894L;
+        private String apiKey;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Server implements Serializable {
+        private static final long serialVersionUID = -8070163136236819894L;
+
+        /**
+         * email
+         */
+        private String email;
+
+        /**
+         * 密码
+         */
+        private String password;
+    }
 }

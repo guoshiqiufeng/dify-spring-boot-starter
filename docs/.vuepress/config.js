@@ -81,6 +81,15 @@ export default defineUserConfig({
                         //     ]
                         // }
                     ],
+                    "/config/": [
+                        {
+                            text: '配置',
+                            children: [
+                                '/config/introduction',
+                                '/config/custom',
+                            ]
+                        }
+                    ]
                 },
                 navbar: [
                     {
@@ -108,6 +117,13 @@ export default defineUserConfig({
                             //         '/guide/listener/non-auto',
                             //     ]
                             // }
+                        ]
+                    },
+                    {
+                        text: '配置',
+                        children: [
+                            '/config/introduction',
+                            '/config/custom',
                         ]
                     },
                     {
@@ -168,6 +184,15 @@ export default defineUserConfig({
                         //     ]
                         // }
                     ],
+                    "/en/config/": [
+                        {
+                            text: 'Config',
+                            children: [
+                                '/en/config/introduction',
+                                '/en/config/custom',
+                            ]
+                        }
+                    ]
                 },
                 navbar: [
                     {
@@ -195,6 +220,13 @@ export default defineUserConfig({
                             //         '/en/guide/listener/non-auto',
                             //     ]
                             // }
+                        ]
+                    },
+                    {
+                        text: 'Config',
+                        children: [
+                            '/en/config/introduction',
+                            '/en/config/custom',
                         ]
                     },
                     {

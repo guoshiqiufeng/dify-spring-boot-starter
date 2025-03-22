@@ -1,4 +1,6 @@
 dependencies {
+    api project(":dify:spring-boot-starter:dify-spring-boot-starter-autoconfigure")
+
     api project(":dify:dify-support:dify-support-chat")
     api project(":dify:dify-support:dify-support-dataset")
     api project(":dify:dify-support:dify-support-server")

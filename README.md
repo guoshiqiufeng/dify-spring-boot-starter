@@ -36,7 +36,7 @@ https://guoshiqiufeng.github.io/dify-spring-boot-starter/en
         <dependency>
             <groupId>io.github.guoshiqiufeng.dify</groupId>
             <artifactId>dify-bom</artifactId>
-            <version>0.3.0</version>
+            <version>0.4.0</version>
             <type>import</type>
         </dependency>
     </dependencies>
@@ -57,9 +57,12 @@ https://guoshiqiufeng.github.io/dify-spring-boot-starter/en
 
 ```yaml
 dify:
-  email: admin@admin.com # Please replace the actual Dify service mailbox, if you do not need to call the server-related interfaces can not be filled in!
-  password: admin123456 # Please replace the password with the actual Dify service password, if you don't need to call the server-related interfaces can not be filled in!
   url: http://192.168.1.10 # Please replace with the actual Dify service address
+  server:
+    email: admin@admin.com # Please replace the actual Dify service mailbox, if you do not need to call the server-related interfaces can not be filled in!
+    password: admin123456 # Please replace the password with the actual Dify service password, if you don't need to call the server-related interfaces can not be filled in!
+  dataset:
+    api-key: dataset-aaabbbcccdddeeefffggghhh # Please replace with the actual Dify dataset API key, if you don't need to call the dataset-related interfaces can not be filled in!
 ```
 
 #### Get message suggestions
@@ -81,5 +84,6 @@ public class DifyChatService {
 
 For more usage references check the [documentation](https://guoshiqiufeng.github.io/dify-spring-boot-starter/en/)
 
+## Star History
 
-
+[![Star History Chart](https://api.star-history.com/svg?repos=guoshiqiufeng/dify-spring-boot-starter&type=Date)](https://www.star-history.com/#guoshiqiufeng/dify-spring-boot-starter&Date)

@@ -19,7 +19,6 @@ import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.guoshiqiufeng.dify.core.config.DifyServerProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
 import io.github.guoshiqiufeng.dify.dataset.constant.DatasetUriConstant;
@@ -29,7 +28,6 @@ import io.github.guoshiqiufeng.dify.dataset.exception.DiftDatasetException;
 import io.github.guoshiqiufeng.dify.dataset.exception.DiftDatasetExceptionEnum;
 import io.github.guoshiqiufeng.dify.dataset.utils.WebClientUtil;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
@@ -45,24 +43,23 @@ import java.io.IOException;
  */
 public class DifyDatasetDefaultImpl implements DifyDataset {
 
-    private final DifyServerProperties difyServerProperties;
     private final ObjectMapper objectMapper;
+    private final WebClient webClient;
 
-    public DifyDatasetDefaultImpl(DifyServerProperties difyServerProperties, ObjectMapper objectMapper) {
-        this.difyServerProperties = difyServerProperties;
+    public DifyDatasetDefaultImpl(ObjectMapper objectMapper, WebClient webClient) {
         this.objectMapper = objectMapper;
+        this.webClient = webClient;
     }
 
 
     @Override
     public DatasetResponse create(DatasetCreateRequest request) {
         // 请求地址
-        String url = difyServerProperties.getUrl() + DatasetUriConstant.V1_DATASETS_URL;
+        String url = DatasetUriConstant.V1_DATASETS_URL;
 
         // 请求体
         String body = builderBody(request);
         // 使用 WebClient 发送 POST 请求
-        WebClient webClient = getWebClient(request.getApiKey());
 
         return webClient.post()
                 .uri(url)
@@ -77,10 +74,9 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     @Override
     public DifyPageResult<DatasetResponse> page(DatasetPageRequest request) {
         // 请求地址
-        String url = difyServerProperties.getUrl() + DatasetUriConstant.V1_DATASETS_URL;
+        String url = DatasetUriConstant.V1_DATASETS_URL;
 
         // 使用 WebClient 发送请求
-        WebClient webClient = getWebClient(request.getApiKey());
         url += "?page={}&limit={}";
         url = StrUtil.format(url, request.getPage(), request.getLimit());
 
@@ -96,10 +92,9 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     @Override
     public void delete(String datasetId, String apiKey) {
         // 请求地址
-        String url = difyServerProperties.getUrl() + DatasetUriConstant.V1_DATASETS_URL + "/" + datasetId;
+        String url = DatasetUriConstant.V1_DATASETS_URL + "/" + datasetId;
 
         // 使用 WebClient 发送 DELETE 请求
-        WebClient webClient = getWebClient(apiKey);
 
         webClient.delete()
                 .uri(url)
@@ -112,12 +107,11 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     @Override
     public DocumentCreateResponse createDocumentByText(DocumentCreateByTextRequest request) {
         // 请求地址
-        String url = difyServerProperties.getUrl() + DatasetUriConstant.V1_DOCUMENT_CREATE_BY_TEXT_URL;
+        String url = DatasetUriConstant.V1_DOCUMENT_CREATE_BY_TEXT_URL;
         url = StrUtil.format(url, request.getDatasetId());
         // 请求体
         String body = builderBody(request);
         // 使用 WebClient 发送 POST 请求
-        WebClient webClient = getWebClient(request.getApiKey());
 
         return webClient.post()
                 .uri(url)
@@ -131,7 +125,7 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     @Override
     public DocumentCreateResponse createDocumentByFile(DocumentCreateByFileRequest request) {
         // 请求地址
-        String url = difyServerProperties.getUrl() + DatasetUriConstant.V1_DOCUMENT_CREATE_BY_FILE_URL;
+        String url = DatasetUriConstant.V1_DOCUMENT_CREATE_BY_FILE_URL;
         url = StrUtil.format(url, request.getDatasetId());
         // 请求体
         String json = builderBody(request);
@@ -159,9 +153,6 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
         }
 
         // 使用 WebClient 发送 POST 请求
-        WebClient webClient = WebClient.builder()
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
-                .build();
 
         return webClient.post()
                 .uri(url)
@@ -176,12 +167,11 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     @Override
     public DocumentCreateResponse updateDocumentByText(DocumentUpdateByTextRequest request) {
         // 请求地址
-        String url = difyServerProperties.getUrl() + DatasetUriConstant.V1_DOCUMENT_UPDATE_BY_TEXT_URL;
+        String url = DatasetUriConstant.V1_DOCUMENT_UPDATE_BY_TEXT_URL;
         url = StrUtil.format(url, request.getDatasetId(), request.getDocumentId());
         // 请求体
         String body = builderBody(request);
         // 使用 WebClient 发送 POST 请求
-        WebClient webClient = getWebClient(request.getApiKey());
 
         return webClient.post()
                 .uri(url)
@@ -195,7 +185,7 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     @Override
     public DocumentCreateResponse updateDocumentByFile(DocumentUpdateByFileRequest request) {
         // 请求地址
-        String url = difyServerProperties.getUrl() + DatasetUriConstant.V1_DOCUMENT_UPDATE_BY_FILE_URL;
+        String url = DatasetUriConstant.V1_DOCUMENT_UPDATE_BY_FILE_URL;
         url = StrUtil.format(url, request.getDatasetId(), request.getDocumentId());
         // 请求体
         String json = builderBody(request);
@@ -222,9 +212,6 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
         }
 
         // 使用 WebClient 发送 POST 请求
-        WebClient webClient = WebClient.builder()
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
-                .build();
 
         return webClient.post()
                 .uri(url)
@@ -239,10 +226,9 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     @Override
     public DifyPageResult<DocumentInfo> pageDocument(DatasetPageDocumentRequest request) {
         // 请求地址
-        String url = difyServerProperties.getUrl() + DatasetUriConstant.V1_DOCUMENTS_URL;
+        String url = DatasetUriConstant.V1_DOCUMENTS_URL;
         url = StrUtil.format(url, request.getDatasetId());
         // 使用 WebClient 发送请求
-        WebClient webClient = getWebClient(request.getApiKey());
         url += "?page={}&limit={}";
         url = StrUtil.format(url, request.getPage(), request.getLimit());
 
@@ -263,10 +249,9 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     @Override
     public DocumentIndexingStatusResponse indexingStatus(DocumentIndexingStatusRequest request) {
         // 请求地址
-        String url = difyServerProperties.getUrl() + DatasetUriConstant.V1_DOCUMENT_INDEXING_STATUS_URL;
+        String url = DatasetUriConstant.V1_DOCUMENT_INDEXING_STATUS_URL;
         url = StrUtil.format(url, request.getDatasetId(), request.getBatch());
         // 使用 WebClient 发送请求
-        WebClient webClient = getWebClient(request.getApiKey());
 
         return webClient.get()
                 .uri(url)
@@ -280,12 +265,11 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     @Override
     public DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apiKey) {
         // 请求地址
-        String url = difyServerProperties.getUrl() + DatasetUriConstant.V1_DOCUMENT_URL;
+        String url = DatasetUriConstant.V1_DOCUMENT_URL;
 
         url = StrUtil.format(url, datasetId, documentId);
 
         // 使用 WebClient 发送 DELETE 请求
-        WebClient webClient = getWebClient(apiKey);
 
         return webClient.delete()
                 .uri(url)
@@ -298,12 +282,11 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     @Override
     public SegmentResponse createSegment(SegmentCreateRequest request) {
         // 请求地址
-        String url = difyServerProperties.getUrl() + DatasetUriConstant.V1_DOCUMENTS_SEGMENTS_URL;
+        String url = DatasetUriConstant.V1_DOCUMENTS_SEGMENTS_URL;
         url = StrUtil.format(url, request.getDatasetId(), request.getDocumentId());
         // 请求体
         String body = builderBody(request);
         // 使用 WebClient 发送 POST 请求
-        WebClient webClient = getWebClient(request.getApiKey());
 
         return webClient.post()
                 .uri(url)
@@ -317,10 +300,9 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     @Override
     public SegmentResponse pageSegment(SegmentPageRequest request) {
         // 请求地址
-        String url = difyServerProperties.getUrl() + DatasetUriConstant.V1_DOCUMENTS_SEGMENTS_URL;
+        String url = DatasetUriConstant.V1_DOCUMENTS_SEGMENTS_URL;
         url = StrUtil.format(url, request.getDatasetId(), request.getDocumentId());
         // 使用 WebClient 发送请求
-        WebClient webClient = getWebClient(request.getApiKey());
         url += "?";
 
         if (StrUtil.isNotEmpty(request.getKeyword())) {
@@ -345,12 +327,11 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     @Override
     public SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apiKey) {
         // 请求地址
-        String url = difyServerProperties.getUrl() + DatasetUriConstant.V1_DOCUMENTS_SEGMENT_URL;
+        String url = DatasetUriConstant.V1_DOCUMENTS_SEGMENT_URL;
 
         url = StrUtil.format(url, datasetId, documentId, segmentId);
 
         // 使用 WebClient 发送 DELETE 请求
-        WebClient webClient = getWebClient(apiKey);
 
         return webClient.delete()
                 .uri(url)
@@ -363,12 +344,11 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     @Override
     public SegmentUpdateResponse updateSegment(SegmentUpdateRequest request) {
         // 请求地址
-        String url = difyServerProperties.getUrl() + DatasetUriConstant.V1_DOCUMENTS_SEGMENT_URL;
+        String url = DatasetUriConstant.V1_DOCUMENTS_SEGMENT_URL;
         url = StrUtil.format(url, request.getDatasetId(), request.getDocumentId(), request.getSegmentId());
         // 请求体
         String body = builderBody(request);
         // 使用 WebClient 发送 POST 请求
-        WebClient webClient = getWebClient(request.getApiKey());
 
         return webClient.post()
                 .uri(url)
@@ -382,10 +362,9 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     @Override
     public UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, String apiKey) {
         // 请求地址
-        String url = difyServerProperties.getUrl() + DatasetUriConstant.V1_DOCUMENTS_UPLOAD_FILE;
+        String url = DatasetUriConstant.V1_DOCUMENTS_UPLOAD_FILE;
         url = StrUtil.format(url, datasetId, documentId);
         // 使用 WebClient 发送请求
-        WebClient webClient = getWebClient(apiKey);
 
         return webClient.get()
                 .uri(url)
@@ -399,12 +378,11 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     @Override
     public RetrieveResponse retrieve(RetrieveRequest request) {
         // 请求地址
-        String url = difyServerProperties.getUrl() + DatasetUriConstant.V1_DATASETS_RETRIEVE_URL;
+        String url = DatasetUriConstant.V1_DATASETS_RETRIEVE_URL;
         url = StrUtil.format(url, request.getDatasetId());
         // 请求体
         String body = builderBody(request);
         // 使用 WebClient 发送 POST 请求
-        WebClient webClient = getWebClient(request.getApiKey());
 
         return webClient.post()
                 .uri(url)
@@ -413,19 +391,6 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(RetrieveResponse.class)
                 .block();
-    }
-
-    /**
-     * 获取WebClient
-     *
-     * @param apiKey API密钥，用于身份验证
-     * @return WebClient
-     */
-    private static WebClient getWebClient(String apiKey) {
-        return WebClient.builder()
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .build();
     }
 
     private String builderBody(Object request) {

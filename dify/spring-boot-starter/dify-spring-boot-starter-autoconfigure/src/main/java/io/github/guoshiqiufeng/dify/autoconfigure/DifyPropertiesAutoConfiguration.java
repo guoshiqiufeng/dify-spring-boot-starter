@@ -13,18 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.dataset.dto.request;
+package io.github.guoshiqiufeng.dify.autoconfigure;
 
-import lombok.Data;
-
-import java.io.Serializable;
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author yanghq
  * @version 1.0
- * @since 2025/3/13 13:13
+ * @since 2025/3/18 17:29
  */
-@Data
-public class BaseDatasetRequest implements Serializable {
+@Configuration
+public class DifyPropertiesAutoConfiguration {
+
+    @Bean
+    @ConfigurationProperties(prefix = "dify")
+    @ConditionalOnMissingBean({DifyProperties.class})
+    public DifyProperties difyProperties() {
+        return new DifyProperties();
+    }
 
 }
