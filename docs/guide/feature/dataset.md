@@ -788,3 +788,184 @@ RetrieveResponse
 | dataSourceType | String | 数据源类型 |
 | name           | String | 文档名称  |
 | docType        | String | 文档类型  |
+
+## 5. 元数据管理
+
+### 5.1 创建元数据
+
+#### 方法
+
+```java
+MetaDataResponse createMetaData(MetaDataCreateRequest request);
+```
+
+#### 请求参数
+
+MetaDataCreateRequest
+
+| 参数名       | 类型     | 是否必须 | 描述     |
+|-----------|--------|------|--------|
+| datasetId | String | 是    | 知识库 id |
+| type      | String | 是    | 元数据类型  |
+| name      | String | 是    | 元数据名称  |
+
+#### 响应参数
+
+MetaDataResponse
+
+| 参数名  | 类型     | 描述    |
+|------|--------|-------|
+| id   | String | 元数据ID |
+| type | String | 元数据类型 |
+| name | String | 元数据名称 |
+
+### 5.2 更新元数据
+
+#### 方法
+
+```java
+MetaDataResponse updateMetaData(MetaDataUpdateRequest request);
+```
+
+#### 请求参数
+
+MetaDataUpdateRequest
+
+| 参数名        | 类型     | 是否必须 | 描述     |
+|------------|--------|------|--------|
+| datasetId  | String | 是    | 知识库 id |
+| metaDataId | String | 是    | 元数据 id |
+| name       | String | 是    | 元数据名称  |
+
+#### 响应参数
+
+MetaDataResponse 查看 5.1
+
+### 5.3 删除元数据
+
+#### 方法
+
+```java
+MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId);
+```
+
+#### 请求参数
+
+| 参数名        | 类型     | 是否必须 | 描述     |
+|------------|--------|------|--------|
+| datasetId  | String | 是    | 知识库 id |
+| metadataId | String | 是    | 元数据 id |
+
+#### 响应参数
+
+MetaDataDeleteResponse
+
+| 参数名    | 类型     | 描述           |
+|--------|--------|--------------|
+| result | String | 固定返回 success |
+
+### 5.4 元数据操作
+
+#### 方法
+
+```java
+MetaDataActionResponse actionMetaData(MetaDataActionRequest request);
+```
+
+#### 请求参数
+
+MetaDataActionRequest
+
+| 参数名       | 类型                 | 是否必须 | 描述     |
+|-----------|--------------------|------|--------|
+| datasetId | String             | 是    | 知识库 id |
+| action    | MetaDataActionEnum | 是    | 操作类型   |
+
+**MetaDataActionEnum 枚举值**
+
+| 枚举值     | 描述 |
+|---------|----|
+| enable  | 启用 |
+| disable | 禁用 |
+
+#### 响应参数
+
+MetaDataActionResponse
+
+| 参数名    | 类型     | 描述           |
+|--------|--------|--------------|
+| result | String | 固定返回 success |
+
+### 5.5 更新文档元数据
+
+#### 方法
+
+```java
+DocumentMetaDataUpdateResponse updateDocumentMetaData(DocumentMetaDataUpdateRequest request);
+```
+
+#### 请求参数
+
+DocumentMetaDataUpdateRequest
+
+| 参数名           | 类型                     | 是否必须 | 描述     |
+|---------------|------------------------|------|--------|
+| datasetId     | String                 | 是    | 知识库 id |
+| operationData | `List<OperationData> ` | 是    | 操作数据列表 |
+
+**OperationData 对象结构**
+
+| 参数名          | 类型                | 描述    |
+|--------------|-------------------|-------|
+| documentId   | String            | 文档ID  |
+| metadataList | `List<MetaData> ` | 元数据列表 |
+
+**MetaData 对象结构**
+
+| 参数名  | 类型     | 描述    |
+|------|--------|-------|
+| id   | String | 元数据ID |
+| type | String | 元数据类型 |
+| name | String | 元数据名称 |
+
+#### 响应参数
+
+DocumentMetaDataUpdateResponse
+
+| 参数名    | 类型     | 描述           |
+|--------|--------|--------------|
+| result | String | 固定返回 success |
+
+### 5.6 获取元数据列表
+
+#### 方法
+
+```java
+MetaDataListResponse listMetaData(String datasetId);
+```
+
+#### 请求参数
+
+| 参数名       | 类型     | 是否必须 | 描述     |
+|-----------|--------|------|--------|
+| datasetId | String | 是    | 知识库 id |
+
+#### 响应参数
+
+MetaDataListResponse
+
+| 参数名                 | 类型                   | 描述       |
+|---------------------|----------------------|----------|
+| builtInFieldEnabled | Boolean              | 内置字段是否启用 |
+| docMetadata         | `List<DocMetadata> ` | 文档元数据列表  |
+
+**DocMetadata 对象结构**
+
+| 参数名       | 类型      | 描述    |
+|-----------|---------|-------|
+| id        | String  | 元数据ID |
+| type      | String  | 元数据类型 |
+| name      | String  | 元数据名称 |
+| userCount | Integer | 使用次数  |
+
+

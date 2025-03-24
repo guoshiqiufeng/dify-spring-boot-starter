@@ -790,3 +790,185 @@ RetrieveResponse
 | dataSourceType | String | Data source type |
 | name           | String | Document name    |
 | docType        | String | Document type    |
+
+## 5. Metadata Management
+
+### 5.1 Create Metadata
+
+#### Method
+
+```java
+MetaDataResponse createMetaData(MetaDataCreateRequest request);
+```
+
+#### Request Parameters
+
+MetaDataCreateRequest
+
+| Parameter | Type   | Required | Description       |
+|-----------|--------|----------|-------------------|
+| datasetId | String | Yes      | Knowledge base ID |
+| type      | String | Yes      | Metadata type     |
+| name      | String | Yes      | Metadata name     |
+
+#### Response Parameters
+
+MetaDataResponse
+
+| Parameter | Type   | Description   |
+|-----------|--------|---------------|
+| id        | String | Metadata ID   |
+| type      | String | Metadata type |
+| name      | String | Metadata name |
+
+### 5.2 Update Metadata
+
+#### Method
+
+```java
+MetaDataResponse updateMetaData(MetaDataUpdateRequest request);
+```
+
+#### Request Parameters
+
+MetaDataUpdateRequest
+
+| Parameter  | Type   | Required | Description       |
+|------------|--------|----------|-------------------|
+| datasetId  | String | Yes      | Knowledge base ID |
+| metaDataId | String | Yes      | Metadata ID       |
+| name       | String | Yes      | Metadata name     |
+
+#### Response Parameters
+
+MetaDataResponse See 5.1
+
+### 5.3 Delete Metadata
+
+#### Method
+
+```java
+MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId);
+```
+
+#### Request Parameters
+
+| Parameter  | Type   | Required | Description       |
+|------------|--------|----------|-------------------|
+| datasetId  | String | Yes      | Knowledge base ID |
+| metadataId | String | Yes      | Metadata ID       |
+
+#### Response Parameters
+
+MetaDataDeleteResponse
+
+| Parameter | Type   | Description            |
+|-----------|--------|------------------------|
+| result    | String | Fixed return "success" |
+
+### 5.4 Metadata Operations
+
+#### Method
+
+```java
+MetaDataActionResponse actionMetaData(MetaDataActionRequest request);
+```
+
+#### Request Parameters
+
+MetaDataActionRequest
+
+| Parameter | Type               | Required | Description       |
+|-----------|--------------------|----------|-------------------|
+| datasetId | String             | Yes      | Knowledge base ID |
+| action    | MetaDataActionEnum | Yes      | Operation type    |
+
+**MetaDataActionEnum Values**
+
+| Value   | Description |
+|---------|-------------|
+| ENABLE  | Enable      |
+| DISABLE | Disable     |
+| ARCHIVE | Archive     |
+
+#### Response Parameters
+
+MetaDataActionResponse
+
+| Parameter | Type   | Description            |
+|-----------|--------|------------------------|
+| result    | String | Fixed return "success" |
+
+### 5.5 Update Document Metadata
+
+#### Method
+
+```java
+DocumentMetaDataUpdateResponse updateDocumentMetaData(DocumentMetaDataUpdateRequest request);
+```
+
+#### Request Parameters
+
+DocumentMetaDataUpdateRequest
+
+| Parameter     | Type                  | Required | Description         |
+|---------------|-----------------------|----------|---------------------|
+| datasetId     | String                | Yes      | Knowledge base ID   |
+| operationData | `List<OperationData>` | Yes      | Operation data list |
+
+**OperationData Object Structure**
+
+| Parameter    | Type             | Description   |
+|--------------|------------------|---------------|
+| documentId   | String           | Document ID   |
+| metadataList | `List<MetaData>` | Metadata list |
+
+**MetaData Object Structure**
+
+| Parameter | Type   | Description   |
+|-----------|--------|---------------|
+| id        | String | Metadata ID   |
+| type      | String | Metadata type |
+| name      | String | Metadata name |
+
+#### Response Parameters
+
+DocumentMetaDataUpdateResponse
+
+| Parameter | Type   | Description            |
+|-----------|--------|------------------------|
+| result    | String | Fixed return "success" |
+
+### 5.6 Get Metadata List
+
+#### Method
+
+```java
+MetaDataListResponse listMetaData(String datasetId);
+```
+
+#### Request Parameters
+
+| Parameter | Type   | Required | Description       |
+|-----------|--------|----------|-------------------|
+| datasetId | String | Yes      | Knowledge base ID |
+
+#### Response Parameters
+
+MetaDataListResponse
+
+| Parameter           | Type                | Description                       |
+|---------------------|---------------------|-----------------------------------|
+| builtInFieldEnabled | Boolean             | Whether built-in field is enabled |
+| docMetadata         | `List<DocMetadata>` | Document metadata list            |
+
+**DocMetadata Object Structure**
+
+| Parameter | Type    | Description   |
+|-----------|---------|---------------|
+| id        | String  | Metadata ID   |
+| type      | String  | Metadata type |
+| name      | String  | Metadata name |
+| userCount | Integer | Usage count   |
+
+
