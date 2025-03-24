@@ -160,4 +160,58 @@ public interface DifyDataset {
      * @return 返回检索响应对象。
      */
     RetrieveResponse retrieve(RetrieveRequest request);
+
+    /**
+     * 创建元数据
+     *
+     * @param request 元数据创建请求参数（需包含数据集ID和元数据内容）
+     * @return 创建成功的元数据详情
+     * @throws IllegalArgumentException 参数校验异常
+     */
+    MetaDataResponse createMetaData(MetaDataCreateRequest request);
+
+    /**
+     * 更新元数据
+     *
+     * @param request 元数据更新请求参数（需包含元数据ID和更新内容）
+     * @return 更新后的元数据详情
+     * @throws IllegalArgumentException 参数校验异常
+     */
+    MetaDataResponse updateMetaData(MetaDataUpdateRequest request);
+
+    /**
+     * 删除元数据
+     *
+     * @param datasetId  数据集ID
+     * @param metadataId 元数据ID
+     * @return 删除结果（包含删除状态和影响记录数）
+     */
+    MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId);
+
+    /**
+     * 执行元数据业务操作（如启用/禁用、归档等）
+     *
+     * @param request 操作请求参数（需包含操作类型和目标元数据ID）
+     * @return 操作结果状态
+     * @throws UnsupportedOperationException 不支持的操作类型
+     */
+    MetaDataActionResponse actionMetaData(MetaDataActionRequest request);
+
+    /**
+     * 更新文档关联的元数据
+     *
+     * @param request 文档元数据更新请求（需包含文档ID和元数据变更内容）
+     * @return 更新后的文档元数据详情
+     * @throws IllegalArgumentException 参数校验异常
+     */
+    DocumentMetaDataUpdateResponse updateDocumentMetaData(DocumentMetaDataUpdateRequest request);
+
+    /**
+     * 获取数据集元数据列表
+     *
+     * @param datasetId 数据集ID
+     * @return 元数据列表及分页信息
+     */
+    MetaDataListResponse listMetaData(String datasetId);
+
 }

@@ -49,4 +49,16 @@ public interface DatasetUriConstant {
     String V1_DOCUMENTS_UPLOAD_FILE = V1_DOCUMENT_URL + "/upload-file";
 
     String V1_DATASETS_RETRIEVE_URL = V1_DATASET_URL + "/retrieve";
+
+    String V1_METADATA_CREATE_URL = V1_DATASET_URL + "/metadata";
+
+    String V1_METADATA_UPDATE_URL = V1_METADATA_CREATE_URL + "/{}";
+
+    String V1_METADATA_DELETE_URL = V1_METADATA_UPDATE_URL + "/{}";
+
+    String V1_METADATA_ACTION_URL = V1_METADATA_UPDATE_URL + "/built-in/{}";
+
+    String V1_DOCUMENT_METADATA_UPDATE_URL = V1_DATASET_URL + "documents/metadata";
+
+    String V1_METADATA_LIST_URL = V1_METADATA_CREATE_URL;
 }

@@ -43,10 +43,13 @@ public class DifyChatAutoConfiguration {
             log.error("Dify properties must not be null");
             return null;
         }
+//        HttpClient httpClient = HttpClient.create()
+//                .protocol(HttpProtocol.HTTP11);
 
         return WebClient.builder()
                 .baseUrl(properties.getUrl())
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                //.clientConnector(new ReactorClientHttpConnector(httpClient))
                 .build();
     }
 

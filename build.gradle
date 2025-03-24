@@ -25,11 +25,11 @@ subprojects {
     }
 
     compileJava {
-        options.release = 17
+        options.release = 21
     }
 
     compileTestJava {
-        options.release = 17
+        options.release = 21
     }
 
     repositories {
