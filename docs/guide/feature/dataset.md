@@ -224,15 +224,15 @@ DocumentCreateByTextRequest
 
 **RetrievalModel 对象结构**
 
-| 字段名                   | 类型               | 描述       |
-|-----------------------|------------------|----------|
-| searchMethod          | SearchMethodEnum | 搜索方法     |
-| rerankingEnable       | Boolean          | 是否启用重排序  |
-| rerankingModel        | RerankingModel   | 重排序模型    |
-| weights               | Float            | 权重       |
-| topK                  | Integer          | 返回结果数量   |
-| scoreThresholdEnabled | Boolean          | 是否启用分数阈值 |
-| scoreThreshold        | Float            | 分数阈值     |
+| 字段名                   | 类型                   | 描述       |
+|-----------------------|----------------------|----------|
+| searchMethod          | SearchMethodEnum     | 搜索方法     |
+| rerankingEnable       | Boolean              | 是否启用重排序  |
+| rerankingModel        | RerankingModel       | 重排序模型    |
+| weights               | RerankingModelWeight | 权重       |
+| topK                  | Integer              | 返回结果数量   |
+| scoreThresholdEnabled | Boolean              | 是否启用分数阈值 |
+| scoreThreshold        | Float                | 分数阈值     |
 
 **RerankingModel 对象结构**
 
@@ -240,6 +240,28 @@ DocumentCreateByTextRequest
 |-----------------------|--------|----------|
 | rerankingProviderName | String | 重排序提供商名称 |
 | rerankingModelName    | String | 重排序模型名称  |
+
+**RerankingModelWeight 对象结构**
+
+| 字段名            | 类型             | 描述             |
+|----------------|----------------|----------------|
+| weightType     | String         | 默认为 customized |
+| vectorSetting  | VectorSetting  | 语义权重           |
+| keywordSetting | KeywordSetting | 关键词权重          |
+
+**VectorSetting 对象结构**
+
+| 字段名                   | 类型     | 描述      |
+|-----------------------|--------|---------|
+| vectorWeight          | Float  | 语义权重    |
+| embeddingModelName    | String | 嵌入模型    |
+| embeddingProviderName | String | 嵌入模型提供商 |
+
+**RerankingModelWeight 对象结构**
+
+| 字段名           | 类型    | 描述    |
+|---------------|-------|-------|
+| keywordWeight | Float | 关键词权重 |
 
 #### 响应参数
 

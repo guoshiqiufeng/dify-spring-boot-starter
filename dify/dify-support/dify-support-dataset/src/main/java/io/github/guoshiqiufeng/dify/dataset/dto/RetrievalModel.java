@@ -39,7 +39,7 @@ public class RetrievalModel implements Serializable {
     @JsonProperty("reranking_model")
     private RerankingModel rerankingModel;
 
-    private Float weights;
+    private RerankingModelWeight weights;
 
     @JsonProperty("top_k")
     private Integer topK;
@@ -60,6 +60,49 @@ public class RetrievalModel implements Serializable {
 
         @JsonProperty("reranking_model_name")
         private String rerankingModelName;
+
+    }
+
+    @Data
+    public static class RerankingModelWeight implements Serializable {
+
+        private static final long serialVersionUID = 3614734284341383364L;
+
+        @JsonProperty("weight_type")
+        private String weightType = "customized";
+
+        @JsonProperty("vector_setting")
+        private VectorSetting vectorSetting;
+
+        @JsonProperty("keyword_setting")
+        private KeywordSetting keywordSetting;
+
+    }
+
+    @Data
+    public static class VectorSetting implements Serializable {
+
+        private static final long serialVersionUID = 3614734284341383364L;
+
+        @JsonProperty("vector_weight")
+        private Float vectorWeight;
+
+        @JsonProperty("embedding_model_name")
+        private String embeddingModelName;
+
+        @JsonProperty("embedding_provider_name")
+        private String embeddingProviderName;
+
+    }
+
+    @Data
+    public static class KeywordSetting implements Serializable {
+
+        private static final long serialVersionUID = 3614734284341383364L;
+
+        @JsonProperty("keyword_weight")
+        private Float keywordWeight;
+
 
     }
 }

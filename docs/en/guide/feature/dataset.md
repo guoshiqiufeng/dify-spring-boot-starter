@@ -226,15 +226,15 @@ DocumentCreateByTextRequest
 
 **RetrievalModel Object Structure**
 
-| Field                 | Type             | Description                       |
-|-----------------------|------------------|-----------------------------------|
-| searchMethod          | SearchMethodEnum | Search method                     |
-| rerankingEnable       | Boolean          | Whether to enable reranking       |
-| rerankingModel        | RerankingModel   | Reranking model                   |
-| weights               | Float            | Weights                           |
-| topK                  | Integer          | Number of results to return       |
-| scoreThresholdEnabled | Boolean          | Whether to enable score threshold |
-| scoreThreshold        | Float            | Score threshold                   |
+| Field                 | Type                 | Description                       |
+|-----------------------|----------------------|-----------------------------------|
+| searchMethod          | SearchMethodEnum     | Search method                     |
+| rerankingEnable       | Boolean              | Whether to enable reranking       |
+| rerankingModel        | RerankingModel       | Reranking model                   |
+| weights               | RerankingModelWeight | Weights                           |
+| topK                  | Integer              | Number of results to return       |
+| scoreThresholdEnabled | Boolean              | Whether to enable score threshold |
+| scoreThreshold        | Float                | Score threshold                   |
 
 **RerankingModel Object Structure**
 
@@ -242,6 +242,28 @@ DocumentCreateByTextRequest
 |-----------------------|--------|-------------------------|
 | rerankingProviderName | String | Reranking provider name |
 | rerankingModelName    | String | Reranking model name    |
+
+**RerankingModelWeight Object Structure**
+
+| Field          | Type           | Description           |
+|----------------|----------------|-----------------------|
+| weightType     | String         | default is customized |
+| vectorSetting  | VectorSetting  | Vector weight         |
+| keywordSetting | KeywordSetting | keyword weight        |
+
+**VectorSetting Object Structure**
+
+| Field                 | Type   | Description              |
+|-----------------------|--------|--------------------------|
+| vectorWeight          | Float  | Vector weight            |
+| embeddingModelName    | String | Embedding model          |
+| embeddingProviderName | String | Embedding model provider |
+
+**RerankingModelWeight Object Structure**
+
+| 字段名           | 类型    | 描述             |
+|---------------|-------|----------------|
+| keywordWeight | Float | keyword weight |
 
 #### Response Parameters
 
