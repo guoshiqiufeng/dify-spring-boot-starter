@@ -120,6 +120,10 @@ void delete(String datasetId);
 |-----------|--------|------|--------|
 | datasetId | String | 是    | 知识库 id |
 
+#### 响应参数
+
+无
+
 ## 2. 文档管理
 
 ### 2.1 通过文本创建文档
@@ -858,11 +862,7 @@ MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId);
 
 #### 响应参数
 
-MetaDataDeleteResponse
-
-| 参数名    | 类型     | 描述           |
-|--------|--------|--------------|
-| result | String | 固定返回 success |
+无
 
 ### 5.4 元数据操作
 
@@ -890,11 +890,7 @@ MetaDataActionRequest
 
 #### 响应参数
 
-MetaDataActionResponse
-
-| 参数名    | 类型     | 描述           |
-|--------|--------|--------------|
-| result | String | 固定返回 success |
+无
 
 ### 5.5 更新文档元数据
 
@@ -930,11 +926,7 @@ DocumentMetaDataUpdateRequest
 
 #### 响应参数
 
-DocumentMetaDataUpdateResponse
-
-| 参数名    | 类型     | 描述           |
-|--------|--------|--------------|
-| result | String | 固定返回 success |
+无
 
 ### 5.6 获取元数据列表
 

@@ -54,11 +54,11 @@ public interface DatasetUriConstant {
 
     String V1_METADATA_UPDATE_URL = V1_METADATA_CREATE_URL + "/{}";
 
-    String V1_METADATA_DELETE_URL = V1_METADATA_UPDATE_URL + "/{}";
+    String V1_METADATA_DELETE_URL = V1_METADATA_UPDATE_URL;
 
-    String V1_METADATA_ACTION_URL = V1_METADATA_UPDATE_URL + "/built-in/{}";
+    String V1_METADATA_ACTION_URL = V1_METADATA_CREATE_URL + "/built-in/{}";
 
-    String V1_DOCUMENT_METADATA_UPDATE_URL = V1_DATASET_URL + "documents/metadata";
+    String V1_DOCUMENT_METADATA_UPDATE_URL = V1_DATASET_URL + "/documents/metadata";
 
     String V1_METADATA_LIST_URL = V1_METADATA_CREATE_URL;
 }

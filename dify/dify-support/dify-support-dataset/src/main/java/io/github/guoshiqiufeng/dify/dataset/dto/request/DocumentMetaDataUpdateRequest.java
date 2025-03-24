@@ -29,6 +29,7 @@ public class DocumentMetaDataUpdateRequest extends BaseDatasetRequest implements
 
         private static final long serialVersionUID = 6071302031098356179L;
 
+        @JsonProperty("document_id")
         private String documentId;
 
         @JsonProperty("metadata_list")

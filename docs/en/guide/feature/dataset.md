@@ -122,6 +122,10 @@ void delete(String datasetId);
 |-----------|--------|----------|-------------------|
 | datasetId | String | Yes      | Knowledge base ID |
 
+#### Response Parameters
+
+not have
+
 ## 2. Document Management
 
 ### 2.1 Create Document by Text
@@ -860,11 +864,7 @@ MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId);
 
 #### Response Parameters
 
-MetaDataDeleteResponse
-
-| Parameter | Type   | Description            |
-|-----------|--------|------------------------|
-| result    | String | Fixed return "success" |
+not have
 
 ### 5.4 Metadata Operations
 
@@ -889,15 +889,10 @@ MetaDataActionRequest
 |---------|-------------|
 | ENABLE  | Enable      |
 | DISABLE | Disable     |
-| ARCHIVE | Archive     |
 
 #### Response Parameters
 
-MetaDataActionResponse
-
-| Parameter | Type   | Description            |
-|-----------|--------|------------------------|
-| result    | String | Fixed return "success" |
+not have
 
 ### 5.5 Update Document Metadata
 
@@ -933,11 +928,7 @@ DocumentMetaDataUpdateRequest
 
 #### Response Parameters
 
-DocumentMetaDataUpdateResponse
-
-| Parameter | Type   | Description            |
-|-----------|--------|------------------------|
-| result    | String | Fixed return "success" |
+not have
 
 ### 5.6 Get Metadata List
 

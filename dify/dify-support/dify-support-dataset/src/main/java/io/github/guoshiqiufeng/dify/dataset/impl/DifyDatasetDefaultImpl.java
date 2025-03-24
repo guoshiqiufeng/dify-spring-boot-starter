@@ -420,7 +420,7 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
         String body = builderBody(request);
         // 使用 WebClient 发送 POST 请求
 
-        return webClient.post()
+        return webClient.patch()
                 .uri(url)
                 .bodyValue(body)
                 .retrieve()
@@ -430,48 +430,47 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     }
 
     @Override
-    public MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId) {
+    public void deleteMetaData(String datasetId, String metadataId) {
         // 请求地址
         String url = DatasetUriConstant.V1_METADATA_DELETE_URL;
         url = StrUtil.format(url, datasetId, metadataId);
 
-        return webClient.delete()
+        webClient.delete()
                 .uri(url)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
-                .bodyToMono(MetaDataDeleteResponse.class)
+                .bodyToMono(void.class)
                 .block();
     }
 
     @Override
-    public MetaDataActionResponse actionMetaData(MetaDataActionRequest request) {
+    public void actionMetaData(MetaDataActionRequest request) {
         // 请求地址
         String url = DatasetUriConstant.V1_METADATA_ACTION_URL;
-        url = StrUtil.format(url, request.getDatasetId(), request.getAction());
+        url = StrUtil.format(url, request.getDatasetId(), request.getAction().name());
 
-        return webClient.post()
+        webClient.post()
                 .uri(url)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
-                .bodyToMono(MetaDataActionResponse.class)
+                .bodyToMono(Void.class)
                 .block();
     }
 
     @Override
-    public DocumentMetaDataUpdateResponse updateDocumentMetaData(DocumentMetaDataUpdateRequest request) {
+    public void updateDocumentMetaData(DocumentMetaDataUpdateRequest request) {
         // 请求地址
         String url = DatasetUriConstant.V1_DOCUMENT_METADATA_UPDATE_URL;
         url = StrUtil.format(url, request.getDatasetId());
         // 请求体
         String body = builderBody(request);
         // 使用 WebClient 发送 POST 请求
-
-        return webClient.post()
+        webClient.post()
                 .uri(url)
                 .bodyValue(body)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
-                .bodyToMono(DocumentMetaDataUpdateResponse.class)
+                .bodyToMono(Void.class)
                 .block();
     }
 
@@ -479,9 +478,9 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     public MetaDataListResponse listMetaData(String datasetId) {
         // 请求地址
         String url = DatasetUriConstant.V1_METADATA_LIST_URL;
-
+        url = StrUtil.format(url, datasetId);
         return webClient.get()
-                .uri(url, datasetId)
+                .uri(url)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(MetaDataListResponse.class)
