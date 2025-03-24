@@ -90,7 +90,7 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     }
 
     @Override
-    public void delete(String datasetId, String apiKey) {
+    public void delete(String datasetId) {
         // 请求地址
         String url = DatasetUriConstant.V1_DATASETS_URL + "/" + datasetId;
 
@@ -263,7 +263,7 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     }
 
     @Override
-    public DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apiKey) {
+    public DocumentDeleteResponse deleteDocument(String datasetId, String documentId) {
         // 请求地址
         String url = DatasetUriConstant.V1_DOCUMENT_URL;
 
@@ -325,7 +325,7 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     }
 
     @Override
-    public SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apiKey) {
+    public SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId) {
         // 请求地址
         String url = DatasetUriConstant.V1_DOCUMENTS_SEGMENT_URL;
 
@@ -360,7 +360,7 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     }
 
     @Override
-    public UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, String apiKey) {
+    public UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId) {
         // 请求地址
         String url = DatasetUriConstant.V1_DOCUMENTS_UPLOAD_FILE;
         url = StrUtil.format(url, datasetId, documentId);

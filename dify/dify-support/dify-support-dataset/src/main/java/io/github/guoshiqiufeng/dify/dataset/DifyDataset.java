@@ -46,9 +46,8 @@ public interface DifyDataset {
      * 删除指定 知识库。
      *
      * @param datasetId 知识库的唯一标识符。
-     * @param apiKey    用于身份验证的 API 密钥。
      */
-    void delete(String datasetId, String apiKey);
+    void delete(String datasetId);
 
     /**
      * 通过文本创建文档。
@@ -103,10 +102,9 @@ public interface DifyDataset {
      *
      * @param datasetId  知识库的唯一标识符。
      * @param documentId 文档的唯一标识符。
-     * @param apiKey     用于身份验证的 API 密钥。
      * @return 返回文档删除响应对象。
      */
-    DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apiKey);
+    DocumentDeleteResponse deleteDocument(String datasetId, String documentId);
 
     /**
      * 创建分段。
@@ -130,10 +128,9 @@ public interface DifyDataset {
      * @param datasetId  知识库的唯一标识符。
      * @param documentId 文档的唯一标识符。
      * @param segmentId  分段的唯一标识符。
-     * @param apiKey     用于身份验证的 API 密钥。
      * @return 返回分段删除响应对象。
      */
-    SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apiKey);
+    SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId);
 
     /**
      * 更新分段。
@@ -148,10 +145,9 @@ public interface DifyDataset {
      *
      * @param datasetId  知识库的唯一标识符。
      * @param documentId 文档的唯一标识符。
-     * @param apiKey     用于身份验证的 API 密钥。
      * @return 返回上传文件信息响应对象。
      */
-    UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, String apiKey);
+    UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId);
 
     /**
      * 检索数据。
@@ -189,7 +185,7 @@ public interface DifyDataset {
     MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId);
 
     /**
-     * 执行元数据业务操作（如启用/禁用、归档等）
+     * 执行元数据业务操作（如启用/禁用等）
      *
      * @param request 操作请求参数（需包含操作类型和目标元数据ID）
      * @return 操作结果状态
