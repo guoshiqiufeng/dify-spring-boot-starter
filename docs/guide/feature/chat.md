@@ -269,3 +269,113 @@ DifyTextVO audioToText(AudioToTextRequest request);
 | 参数名  | 类型     | 描述   |
 |------|--------|------|
 | text | String | 转换文本 |
+
+### 3.3 获取应用参数
+
+#### 方法
+
+```java
+AppParametersResponseVO parameters(String apiKey);
+```
+
+#### 请求参数
+
+| 参数名    | 类型     | 是否必须 | 描述     |
+|--------|--------|------|--------|
+| apiKey | String | 是    | apiKey |
+
+#### 响应参数
+
+AppParametersResponseVO
+
+| 参数名                           | 类型                    | 描述          |
+|-------------------------------|-----------------------|-------------|
+| openingStatement              | String                | 开场白         |
+| suggestedQuestions            | `List<String>`        | 开场推荐问题列表    |
+| suggestedQuestionsAfterAnswer | Enabled               | 启用回答后给出推荐问题 |
+| speechToText                  | Enabled               | 语音转文本功能配置   |
+| textToSpeech                  | TextToSpeech          | 文本转语音功能配置   |
+| retrieverResource             | Enabled               | 引用和归属功能配置   |
+| annotationReply               | Enabled               | 标记回复功能配置    |
+| moreLikeThis                  | Enabled               | 更多类似功能配置    |
+| userInputForm                 | `List<UserInputForm>` | 用户输入表单配置    |
+| sensitiveWordAvoidance        | Enabled               | 敏感词规避功能配置   |
+| fileUpload                    | FileUpload            | 文件上传配置      |
+| systemParameters              | FileUploadConfig      | 系统参数配置      |
+
+Enabled 对象结构:
+
+| 参数名     | 类型      | 描述   |
+|---------|---------|------|
+| enabled | Boolean | 是否启用 |
+
+TextToSpeech 对象结构:
+
+| 参数名     | 类型      | 描述   |
+|---------|---------|------|
+| enabled | Boolean | 是否启用 |
+| voice   | String  | 语音类型 |
+
+FileUpload 对象结构:
+
+| 参数名                      | 类型               | 描述          |
+|--------------------------|------------------|-------------|
+| enabled                  | Boolean          | 是否启用文件上传功能  |
+| image                    | FileUploadImage  | 图片上传配置      |
+| allowedFileTypes         | `List<String>`   | 允许的文件类型列表   |
+| allowedFileExtensions    | `List<String>`   | 允许的文件扩展名列表  |
+| allowedFileUploadMethods | `List<String>`   | 允许的文件上传方式列表 |
+| numberLimits             | Integer          | 文件数量限制      |
+| fileUploadConfig         | FileUploadConfig | 文件上传详细配置    |
+
+FileUploadImage 对象结构:
+
+| 参数名             | 类型             | 描述                                |
+|-----------------|----------------|-----------------------------------|
+| enabled         | Boolean        | 是否启用图片上传功能                        |
+| numberLimits    | Integer        | 图片数量限制，默认3                        |
+| transferMethods | `List<String>` | 传递方式列表，可选值：remote_url, local_file |
+
+FileUploadConfig 对象结构:
+
+| 参数名                     | 类型      | 描述           |
+|-------------------------|---------|--------------|
+| fileSizeLimit           | Integer | 文件大小限制(MB)   |
+| batchCountLimit         | Integer | 批量上传数量限制     |
+| imageFileSizeLimit      | Integer | 图片文件大小限制(MB) |
+| videoFileSizeLimit      | Integer | 视频文件大小限制(MB) |
+| audioFileSizeLimit      | Integer | 音频文件大小限制(MB) |
+| workflowFileUploadLimit | Integer | 工作流文件上传限制    |
+
+UserInputForm 对象结构:
+
+| 参数名       | 类型        | 描述         |
+|-----------|-----------|------------|
+| textInput | TextInput | 文本输入控件配置   |
+| paragraph | Paragraph | 段落文本输入控件配置 |
+| select    | Select    | 下拉控件配置     |
+
+TextInput 对象结构:
+
+| 参数名          | 类型      | 描述      |
+|--------------|---------|---------|
+| label        | String  | 控件展示标签名 |
+| variable     | String  | 控件ID    |
+| required     | Boolean | 是否必填    |
+| maxLength    | Integer | 最大长度限制  |
+| defaultValue | String  | 默认值     |
+
+Paragraph 对象结构:
+继承自 TextInput，具有相同的字段结构
+
+Select 对象结构:
+
+| 参数名          | 类型             | 描述      |
+|--------------|----------------|---------|
+| label        | String         | 控件展示标签名 |
+| variable     | String         | 控件ID    |
+| required     | Boolean        | 是否必填    |
+| maxLength    | Integer        | 最大长度限制  |
+| defaultValue | String         | 默认值     |
+| type         | String         | 下拉类型    |
+| options      | `List<String>` | 选项列表    | 

@@ -271,3 +271,113 @@ DifyTextVO audioToText(AudioToTextRequest request);
 | Parameter name | Type   | Description  |
 |----------------|--------|--------------|
 | text           | String | Convert Text |
+
+### 3.3 Get Application Parameters
+
+#### Method
+
+```java
+AppParametersResponseVO parameters(String apiKey);
+```
+
+#### Request Parameters
+
+| Parameter name | Type   | Required | Description |
+|----------------|--------|----------|-------------|
+| apiKey         | String | Yes      | apiKey      |
+
+#### Response Parameters
+
+AppParametersResponseVO
+
+| Parameter name                | Type                  | Description                               |
+|-------------------------------|-----------------------|-------------------------------------------|
+| openingStatement              | String                | Opening statement                         |
+| suggestedQuestions            | `List<String>`        | Opening recommended questions             |
+| suggestedQuestionsAfterAnswer | Enabled               | Enable recommended questions after answer |
+| speechToText                  | Enabled               | Speech-to-text feature config             |
+| textToSpeech                  | TextToSpeech          | Text-to-speech feature config             |
+| retrieverResource             | Enabled               | Reference and attribution config          |
+| annotationReply               | Enabled               | Annotation reply config                   |
+| moreLikeThis                  | Enabled               | More like this feature config             |
+| userInputForm                 | `List<UserInputForm>` | User input form config                    |
+| sensitiveWordAvoidance        | Enabled               | Sensitive word avoidance config           |
+| fileUpload                    | FileUpload            | File upload config                        |
+| systemParameters              | FileUploadConfig      | System parameters config                  |
+
+Enabled Object Structure:
+
+| Parameter name | Type    | Description     |
+|----------------|---------|-----------------|
+| enabled        | Boolean | Whether enabled |
+
+TextToSpeech Object Structure:
+
+| Parameter name | Type    | Description     |
+|----------------|---------|-----------------|
+| enabled        | Boolean | Whether enabled |
+| voice          | String  | Voice type      |
+
+FileUpload Object Structure:
+
+| Parameter name           | Type             | Description                    |
+|--------------------------|------------------|--------------------------------|
+| enabled                  | Boolean          | Whether file upload is enabled |
+| image                    | FileUploadImage  | Image upload configuration     |
+| allowedFileTypes         | `List<String>  ` | Allowed file types list        |
+| allowedFileExtensions    | List<String>     | Allowed file extensions list   |
+| allowedFileUploadMethods | List<String>     | Allowed upload methods list    |
+| numberLimits             | Integer          | File count limit               |
+| fileUploadConfig         | FileUploadConfig | Detailed upload configuration  |
+
+FileUploadImage Object Structure:
+
+| Parameter name  | Type           | Description                              |
+|-----------------|----------------|------------------------------------------|
+| enabled         | Boolean        | Whether image upload is enabled          |
+| numberLimits    | Integer        | Image count limit, default 3             |
+| transferMethods | `List<String>` | Transfer methods: remote_url, local_file |
+
+FileUploadConfig Object Structure:
+
+| Parameter name          | Type    | Description                |
+|-------------------------|---------|----------------------------|
+| fileSizeLimit           | Integer | File size limit (MB)       |
+| batchCountLimit         | Integer | Batch upload count limit   |
+| imageFileSizeLimit      | Integer | Image file size limit (MB) |
+| videoFileSizeLimit      | Integer | Video file size limit (MB) |
+| audioFileSizeLimit      | Integer | Audio file size limit (MB) |
+| workflowFileUploadLimit | Integer | Workflow file upload limit |
+
+UserInputForm Object Structure:
+
+| Parameter name | Type      | Description                 |
+|----------------|-----------|-----------------------------|
+| textInput      | TextInput | Text input control config   |
+| paragraph      | Paragraph | Paragraph text input config |
+| select         | Select    | Dropdown control config     |
+
+TextInput Object Structure:
+
+| Parameter name | Type    | Description           |
+|----------------|---------|-----------------------|
+| label          | String  | Control display label |
+| variable       | String  | Control ID            |
+| required       | Boolean | Whether required      |
+| maxLength      | Integer | Maximum length limit  |
+| defaultValue   | String  | Default value         |
+
+Paragraph Object Structure:
+Inherits from TextInput, has the same field structure
+
+Select Object Structure:
+
+| Parameter name | Type         | Description           |
+|----------------|--------------|-----------------------|
+| label          | String       | Control display label |
+| variable       | String       | Control ID            |
+| required       | Boolean      | Whether required      |
+| maxLength      | Integer      | Maximum length limit  |
+| defaultValue   | String       | Default value         |
+| type           | String       | Dropdown type         |
+| options        | List<String> | Options list          |
