@@ -372,12 +372,12 @@ Inherits from TextInput, has the same field structure
 
 Select Object Structure:
 
-| Parameter name | Type         | Description           |
-|----------------|--------------|-----------------------|
-| label          | String       | Control display label |
-| variable       | String       | Control ID            |
-| required       | Boolean      | Whether required      |
-| maxLength      | Integer      | Maximum length limit  |
-| defaultValue   | String       | Default value         |
-| type           | String       | Dropdown type         |
-| options        | List<String> | Options list          |
+| Parameter name | Type           | Description           |
+|----------------|----------------|-----------------------|
+| label          | String         | Control display label |
+| variable       | String         | Control ID            |
+| required       | Boolean        | Whether required      |
+| maxLength      | Integer        | Maximum length limit  |
+| defaultValue   | String         | Default value         |
+| type           | String         | Dropdown type         |
+| options        | `List<String>` | Options list          |
