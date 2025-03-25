@@ -25,6 +25,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -40,6 +41,7 @@ import reactor.netty.http.client.HttpClient;
  */
 @Slf4j
 @Configuration
+@ConditionalOnBean(RedisTemplate.class)
 @AutoConfigureAfter(RedisAutoConfiguration.class)
 public class DifyServerAutoConfiguration {
 
@@ -62,7 +64,7 @@ public class DifyServerAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnBean(StringRedisTemplate.class)
+    @ConditionalOnBean(RedisTemplate.class)
     @ConditionalOnMissingBean({DifyServerRedisImpl.class})
     public DifyServerRedisImpl difyServerHandler(DifyProperties difyProperties, StringRedisTemplate redisTemplate,
                                                  @Qualifier("difyServerWebClient") WebClient difyServerWebClient) {
