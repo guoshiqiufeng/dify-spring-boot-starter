@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.dataset.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -32,9 +33,11 @@ public class SegmentPageRequest extends BaseDatasetRequest implements Serializab
     private static final long serialVersionUID = 7786447642979142908L;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonAlias("datasetId")
     private String datasetId;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonAlias("documentId")
     private String documentId;
 
     private String keyword;

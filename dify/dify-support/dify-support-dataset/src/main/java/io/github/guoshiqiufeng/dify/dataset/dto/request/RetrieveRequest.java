@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.dataset.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import io.github.guoshiqiufeng.dify.dataset.dto.RetrievalModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,11 +34,13 @@ public class RetrieveRequest extends BaseDatasetRequest implements Serializable 
     private static final long serialVersionUID = -4555074954659951949L;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonAlias("datasetId")
     private String datasetId;
 
     private String query;
 
     @JsonProperty("retrieval_model")
+    @JsonAlias("retrievalModel")
     private RetrievalModel retrievalModel;
 
 }
