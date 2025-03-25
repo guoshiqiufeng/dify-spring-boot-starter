@@ -17,6 +17,7 @@ package io.github.guoshiqiufeng.dify.dataset.dto;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.github.guoshiqiufeng.dify.dataset.enums.RerankingModeEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.SearchMethodEnum;
 import lombok.Data;
 
@@ -33,6 +34,10 @@ public class RetrievalModel implements Serializable {
     @JsonAlias("searchMethod")
     @JsonProperty("search_method")
     private SearchMethodEnum searchMethod;
+
+    @JsonAlias("rerankingMode")
+    @JsonProperty("reranking_mode")
+    private RerankingModeEnum rerankingMode;
 
     @JsonAlias("rerankingEnable")
     @JsonProperty("reranking_enable")
