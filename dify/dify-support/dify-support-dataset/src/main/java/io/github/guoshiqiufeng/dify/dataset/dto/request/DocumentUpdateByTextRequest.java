@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.dataset.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.document.ProcessRule;
 import io.github.guoshiqiufeng.dify.dataset.enums.IndexingTechniqueEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.document.DocFormEnum;
@@ -36,9 +37,11 @@ import java.util.Map;
 public class DocumentUpdateByTextRequest extends BaseDatasetRequest implements Serializable {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonAlias("datasetId")
     private String datasetId;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonAlias("documentId")
     private String documentId;
 
     private String name;
@@ -49,27 +52,33 @@ public class DocumentUpdateByTextRequest extends BaseDatasetRequest implements S
      * 文档类型（选填）
      */
     @JsonProperty("doc_type")
+    @JsonAlias("docType")
     private DocTypeEnum docType;
 
     /**
      * 文档元数据（如提供文档类型则必填）
      */
     @JsonProperty("doc_metadata")
+    @JsonAlias("docMetadata")
     private Map<String, Object> docMetadata;
 
     /**
      * 索引模式
      */
     @JsonProperty("indexing_technique")
+    @JsonAlias("indexingTechnique")
     private IndexingTechniqueEnum indexingTechnique;
 
     @JsonProperty("doc_form")
+    @JsonAlias("docForm")
     private DocFormEnum docForm;
 
     @JsonProperty("doc_language")
+    @JsonAlias("docLanguage")
     private String docLanguage;
 
     @JsonProperty("process_rule")
+    @JsonAlias("processRule")
     private ProcessRule processRule;
 
 }

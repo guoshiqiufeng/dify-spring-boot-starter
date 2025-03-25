@@ -16,8 +16,8 @@
 package io.github.guoshiqiufeng.dify.chat.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import io.github.guoshiqiufeng.dify.chat.dto.response.parameter.*;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.List;
@@ -53,6 +53,9 @@ public class AppParametersResponseVO implements Serializable {
     @JsonAlias("speech_to_text")
     private Enabled speechToText;
 
+    @JsonAlias("text_to_speech")
+    private TextToSpeech textToSpeech;
+
     /**
      * retriever_resource (object) 引用和归属
      */
@@ -65,12 +68,17 @@ public class AppParametersResponseVO implements Serializable {
     @JsonAlias("annotation_reply")
     private Enabled annotationReply;
 
+    @JsonAlias("more_like_this")
+    private Enabled moreLikeThis;
+
     /**
      * user_input_form (array[object]) 用户输入表单配置
      */
     @JsonAlias("user_input_form")
     private List<UserInputForm> userInputForm;
 
+    @JsonAlias("sensitive_word_avoidance")
+    private Enabled sensitiveWordAvoidance;
 
     /**
      * file_upload(object) 文件上传配置
@@ -78,110 +86,6 @@ public class AppParametersResponseVO implements Serializable {
     @JsonAlias("file_upload")
     private FileUpload fileUpload;
 
-
-    @Data
-    public static class Enabled implements Serializable {
-        /**
-         * 是否开启
-         */
-        private Boolean enabled;
-    }
-
-    @Data
-    public static class UserInputForm implements Serializable {
-        /**
-         * text-input (object) 文本输入控件
-         */
-        @JsonAlias("text-input")
-        private TextInput textInput;
-
-        /**
-         * paragraph(object) 段落文本输入控件
-         */
-        @JsonAlias("paragraph")
-        private Paragraph paragraph;
-
-        /**
-         * select(object) 下拉控件
-         */
-        @JsonAlias("select")
-        private Select select;
-    }
-
-    @Data
-    public static class TextInput implements Serializable {
-
-        /**
-         * label (string) 控件展示标签名
-         */
-        @JsonAlias("label")
-        private String label;
-        /**
-         * variable (string) 控件 ID
-         */
-        @JsonAlias("variable")
-        private String variable;
-        /**
-         * required (bool) 是否必填
-         */
-        @JsonAlias("required")
-        private Boolean required;
-
-        @JsonAlias("max_length")
-        private Integer maxLength;
-        /**
-         * default (string) 默认值
-         */
-        @JsonAlias("default")
-        private String defaultValue;
-    }
-
-    @Data
-    @EqualsAndHashCode(callSuper = true)
-    public static class Paragraph extends TextInput implements Serializable {
-
-    }
-
-    @Data
-    @EqualsAndHashCode(callSuper = true)
-    public static class Select extends TextInput implements Serializable {
-
-        private List<String> options;
-    }
-
-    @Data
-    public static class FileUpload implements Serializable {
-        private static final long serialVersionUID = -7707822045842729660L;
-        /**
-         * image(object) 图片设置 当前仅支持图片类型：png,jpg,jpeg,webp,gif
-         */
-        @JsonAlias("image")
-        private FileUploadImage image;
-
-    }
-
-    @Data
-    public static class FileUploadImage implements Serializable {
-
-        private static final long serialVersionUID = 2405030232637136714L;
-
-        /**
-         * enabled(bool) 是否开启
-         */
-        @JsonAlias("enabled")
-        private Boolean enabled;
-        /**
-         * number_limits(int) 图片数量限制，默认 3
-         */
-        @JsonAlias("number_limits")
-        private Integer numberLimits;
-
-        /**
-         * transfer_methods(array[string]) 传递方式列表，remote_url ,local_file， 必选一个
-         */
-        @JsonAlias("transfer_methods")
-        private List<String> transferMethods;
-
-
-    }
+    @JsonAlias("system_parameters")
+    private FileUploadConfig systemParameters;
 }

@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.dataset.dto.request.document;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -36,6 +37,7 @@ public class Segmentation implements Serializable {
     /**
      * 最大长度（token）默认为 1000
      */
+    @JsonAlias("maxTokens")
     @JsonProperty("max_tokens")
     private Integer maxTokens;
 }

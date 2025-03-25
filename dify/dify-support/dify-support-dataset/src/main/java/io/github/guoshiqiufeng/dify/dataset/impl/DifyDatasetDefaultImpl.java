@@ -90,7 +90,7 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     }
 
     @Override
-    public void delete(String datasetId, String apiKey) {
+    public void delete(String datasetId) {
         // 请求地址
         String url = DatasetUriConstant.V1_DATASETS_URL + "/" + datasetId;
 
@@ -263,7 +263,7 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     }
 
     @Override
-    public DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apiKey) {
+    public DocumentDeleteResponse deleteDocument(String datasetId, String documentId) {
         // 请求地址
         String url = DatasetUriConstant.V1_DOCUMENT_URL;
 
@@ -325,7 +325,7 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     }
 
     @Override
-    public SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apiKey) {
+    public SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId) {
         // 请求地址
         String url = DatasetUriConstant.V1_DOCUMENTS_SEGMENT_URL;
 
@@ -360,7 +360,7 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     }
 
     @Override
-    public UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, String apiKey) {
+    public UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId) {
         // 请求地址
         String url = DatasetUriConstant.V1_DOCUMENTS_UPLOAD_FILE;
         url = StrUtil.format(url, datasetId, documentId);
@@ -390,6 +390,100 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(RetrieveResponse.class)
+                .block();
+    }
+
+    @Override
+    public MetaDataResponse createMetaData(MetaDataCreateRequest request) {
+        // 请求地址
+        String url = DatasetUriConstant.V1_METADATA_CREATE_URL;
+        url = StrUtil.format(url, request.getDatasetId());
+        // 请求体
+        String body = builderBody(request);
+        // 使用 WebClient 发送 POST 请求
+
+        return webClient.post()
+                .uri(url)
+                .bodyValue(body)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(MetaDataResponse.class)
+                .block();
+    }
+
+    @Override
+    public MetaDataResponse updateMetaData(MetaDataUpdateRequest request) {
+        // 请求地址
+        String url = DatasetUriConstant.V1_METADATA_UPDATE_URL;
+        url = StrUtil.format(url, request.getDatasetId(), request.getMetaDataId());
+        // 请求体
+        String body = builderBody(request);
+        // 使用 WebClient 发送 POST 请求
+
+        return webClient.patch()
+                .uri(url)
+                .bodyValue(body)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(MetaDataResponse.class)
+                .block();
+    }
+
+    @Override
+    public void deleteMetaData(String datasetId, String metadataId) {
+        // 请求地址
+        String url = DatasetUriConstant.V1_METADATA_DELETE_URL;
+        url = StrUtil.format(url, datasetId, metadataId);
+
+        webClient.delete()
+                .uri(url)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(void.class)
+                .block();
+    }
+
+    @Override
+    public void actionMetaData(MetaDataActionRequest request) {
+        // 请求地址
+        String url = DatasetUriConstant.V1_METADATA_ACTION_URL;
+        url = StrUtil.format(url, request.getDatasetId(), request.getAction().name());
+
+        webClient.post()
+                .uri(url)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(Void.class)
+                .block();
+    }
+
+    @Override
+    public void updateDocumentMetaData(DocumentMetaDataUpdateRequest request) {
+        // 请求地址
+        String url = DatasetUriConstant.V1_DOCUMENT_METADATA_UPDATE_URL;
+        url = StrUtil.format(url, request.getDatasetId());
+        // 请求体
+        String body = builderBody(request);
+        // 使用 WebClient 发送 POST 请求
+        webClient.post()
+                .uri(url)
+                .bodyValue(body)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(Void.class)
+                .block();
+    }
+
+    @Override
+    public MetaDataListResponse listMetaData(String datasetId) {
+        // 请求地址
+        String url = DatasetUriConstant.V1_METADATA_LIST_URL;
+        url = StrUtil.format(url, datasetId);
+        return webClient.get()
+                .uri(url)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(MetaDataListResponse.class)
                 .block();
     }
 

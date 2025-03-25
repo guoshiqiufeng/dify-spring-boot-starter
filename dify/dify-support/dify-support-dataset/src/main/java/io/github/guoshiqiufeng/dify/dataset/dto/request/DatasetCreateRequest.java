@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.dataset.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import io.github.guoshiqiufeng.dify.dataset.enums.IndexingTechniqueEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.PermissionEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.ProviderEnum;
@@ -47,6 +48,7 @@ public class DatasetCreateRequest extends BaseDatasetRequest implements Serializ
      * 索引模式
      */
     @JsonProperty("indexing_technique")
+    @JsonAlias("indexingTechnique")
     private IndexingTechniqueEnum indexingTechnique;
 
     /**
@@ -60,12 +62,14 @@ public class DatasetCreateRequest extends BaseDatasetRequest implements Serializ
      * 外部知识库 API_ID
      */
     @JsonProperty("external_knowledge_api_id")
+    @JsonAlias("externalKnowledgeApiId")
     private String externalKnowledgeApiId;
 
     /**
      * 外部知识库 ID
      */
     @JsonProperty("external_knowledge_id")
+    @JsonAlias("externalKnowledgeId")
     private String externalKnowledgeId;
 
 

@@ -59,6 +59,12 @@ Implementation of the Redis messaging framework.
 | 【KNOWLEDGE】 Update a Chunk in a Document              | ✅      |  
 | 【KNOWLEDGE】 Get Upload File                           | ✅      |  
 | 【KNOWLEDGE】 Retrieve Chunks from a Knowledge Base     | ✅      |  
+| 【KNOWLEDGE】 Create a Knowledge Metadata               | ✅      |
+| 【KNOWLEDGE】 Update a Knowledge Metadata               | ✅      |
+| 【KNOWLEDGE】 Delete a Knowledge Metadata               | ✅      |
+| 【KNOWLEDGE】 Disable Or Enable Built-in Metadata       | ✅      |
+| 【KNOWLEDGE】 Update Documents Metadata                 | ✅      |
+| 【KNOWLEDGE】 Get Knowledge Metadata List               | ✅      |
 | 【SERVER】                                              | 🚧     |    
 
 Tips：

@@ -85,3 +85,5 @@ public class DifyChatService {
 ## 小结
 
 通过以上几个简单的步骤，我们就实现了 dify 接口的调用。
+
+更多使用参考查看 [examples](https://guoshiqiufeng.github.io/dify-spring-boot-starter-examples)

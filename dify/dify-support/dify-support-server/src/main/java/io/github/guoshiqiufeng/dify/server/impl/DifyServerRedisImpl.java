@@ -27,7 +27,6 @@ import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -49,12 +48,9 @@ public class DifyServerRedisImpl implements DifyServer {
     private final WebClient webClient;
     private final RedisTemplate<String, String> redisTemplate;
 
-    public DifyServerRedisImpl(DifyProperties difyProperties, RedisTemplate<String, String> redisTemplate) {
+    public DifyServerRedisImpl(DifyProperties difyProperties, RedisTemplate<String, String> redisTemplate, WebClient webClient) {
         this.difyProperties = difyProperties;
-        this.webClient = WebClient.builder()
-                .baseUrl(difyProperties.getUrl())
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .build();
+        this.webClient = webClient;
         this.redisTemplate = redisTemplate;
     }
 

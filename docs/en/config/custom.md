@@ -17,10 +17,12 @@ public WebClient difyChatWebClient(DifyProperties properties) {
         log.error("Dify properties must not be null");
         return null;
     }
-
+    HttpClient httpClient = HttpClient.create()
+            .protocol(HttpProtocol.HTTP11);
     return WebClient.builder()
             .baseUrl(properties.getUrl())
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .clientConnector(new ReactorClientHttpConnector(httpClient))
             .build();
 }
 ```
@@ -39,11 +41,13 @@ public WebClient difyDatasetWebClient(DifyProperties properties) {
     String apiKey = Optional.ofNullable(properties.getDataset())
             .map(DifyProperties.Dataset::getApiKey)
             .orElse("");
-
+    HttpClient httpClient = HttpClient.create()
+            .protocol(HttpProtocol.HTTP11);
     return WebClient.builder()
             .baseUrl(properties.getUrl())
             .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .clientConnector(new ReactorClientHttpConnector(httpClient))
             .build();
 }
 ```
@@ -59,10 +63,33 @@ public WebClient difyWorkflowWebClient(DifyProperties properties) {
         log.error("Dify properties must not be null");
         return null;
     }
-
+    HttpClient httpClient = HttpClient.create()
+            .protocol(HttpProtocol.HTTP11);
     return WebClient.builder()
             .baseUrl(properties.getUrl())
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .clientConnector(new ReactorClientHttpConnector(httpClient))
+            .build();
+}
+```
+
+## Server Webclient
+
+> Support for custom server webclient, overriding the default instance
+
+```java
+
+public WebClient difyServerWebClient(DifyProperties properties) {
+    if (properties == null) {
+        log.error("Dify properties must not be null");
+        return null;
+    }
+    HttpClient httpClient = HttpClient.create()
+            .protocol(HttpProtocol.HTTP11);
+    return WebClient.builder()
+            .baseUrl(properties.getUrl())
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .clientConnector(new ReactorClientHttpConnector(httpClient))
             .build();
 }
 ```

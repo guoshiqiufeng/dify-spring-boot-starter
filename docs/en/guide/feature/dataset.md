@@ -122,6 +122,10 @@ void delete(String datasetId);
 |-----------|--------|----------|-------------------|
 | datasetId | String | Yes      | Knowledge base ID |
 
+#### Response Parameters
+
+not have
+
 ## 2. Document Management
 
 ### 2.1 Create Document by Text
@@ -222,15 +226,15 @@ DocumentCreateByTextRequest
 
 **RetrievalModel Object Structure**
 
-| Field                 | Type             | Description                       |
-|-----------------------|------------------|-----------------------------------|
-| searchMethod          | SearchMethodEnum | Search method                     |
-| rerankingEnable       | Boolean          | Whether to enable reranking       |
-| rerankingModel        | RerankingModel   | Reranking model                   |
-| weights               | Float            | Weights                           |
-| topK                  | Integer          | Number of results to return       |
-| scoreThresholdEnabled | Boolean          | Whether to enable score threshold |
-| scoreThreshold        | Float            | Score threshold                   |
+| Field                 | Type                 | Description                       |
+|-----------------------|----------------------|-----------------------------------|
+| searchMethod          | SearchMethodEnum     | Search method                     |
+| rerankingEnable       | Boolean              | Whether to enable reranking       |
+| rerankingModel        | RerankingModel       | Reranking model                   |
+| weights               | RerankingModelWeight | Weights                           |
+| topK                  | Integer              | Number of results to return       |
+| scoreThresholdEnabled | Boolean              | Whether to enable score threshold |
+| scoreThreshold        | Float                | Score threshold                   |
 
 **RerankingModel Object Structure**
 
@@ -238,6 +242,28 @@ DocumentCreateByTextRequest
 |-----------------------|--------|-------------------------|
 | rerankingProviderName | String | Reranking provider name |
 | rerankingModelName    | String | Reranking model name    |
+
+**RerankingModelWeight Object Structure**
+
+| Field          | Type           | Description           |
+|----------------|----------------|-----------------------|
+| weightType     | String         | default is customized |
+| vectorSetting  | VectorSetting  | Vector weight         |
+| keywordSetting | KeywordSetting | keyword weight        |
+
+**VectorSetting Object Structure**
+
+| Field                 | Type   | Description              |
+|-----------------------|--------|--------------------------|
+| vectorWeight          | Float  | Vector weight            |
+| embeddingModelName    | String | Embedding model          |
+| embeddingProviderName | String | Embedding model provider |
+
+**RerankingModelWeight Object Structure**
+
+| 字段名           | 类型    | 描述             |
+|---------------|-------|----------------|
+| keywordWeight | Float | keyword weight |
 
 #### Response Parameters
 
@@ -790,3 +816,172 @@ RetrieveResponse
 | dataSourceType | String | Data source type |
 | name           | String | Document name    |
 | docType        | String | Document type    |
+
+## 5. Metadata Management
+
+### 5.1 Create Metadata
+
+#### Method
+
+```java
+MetaDataResponse createMetaData(MetaDataCreateRequest request);
+```
+
+#### Request Parameters
+
+MetaDataCreateRequest
+
+| Parameter | Type   | Required | Description       |
+|-----------|--------|----------|-------------------|
+| datasetId | String | Yes      | Knowledge base ID |
+| type      | String | Yes      | Metadata type     |
+| name      | String | Yes      | Metadata name     |
+
+#### Response Parameters
+
+MetaDataResponse
+
+| Parameter | Type   | Description   |
+|-----------|--------|---------------|
+| id        | String | Metadata ID   |
+| type      | String | Metadata type |
+| name      | String | Metadata name |
+
+### 5.2 Update Metadata
+
+#### Method
+
+```java
+MetaDataResponse updateMetaData(MetaDataUpdateRequest request);
+```
+
+#### Request Parameters
+
+MetaDataUpdateRequest
+
+| Parameter  | Type   | Required | Description       |
+|------------|--------|----------|-------------------|
+| datasetId  | String | Yes      | Knowledge base ID |
+| metaDataId | String | Yes      | Metadata ID       |
+| name       | String | Yes      | Metadata name     |
+
+#### Response Parameters
+
+MetaDataResponse See 5.1
+
+### 5.3 Delete Metadata
+
+#### Method
+
+```java
+MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId);
+```
+
+#### Request Parameters
+
+| Parameter  | Type   | Required | Description       |
+|------------|--------|----------|-------------------|
+| datasetId  | String | Yes      | Knowledge base ID |
+| metadataId | String | Yes      | Metadata ID       |
+
+#### Response Parameters
+
+not have
+
+### 5.4 Metadata Operations
+
+#### Method
+
+```java
+MetaDataActionResponse actionMetaData(MetaDataActionRequest request);
+```
+
+#### Request Parameters
+
+MetaDataActionRequest
+
+| Parameter | Type               | Required | Description       |
+|-----------|--------------------|----------|-------------------|
+| datasetId | String             | Yes      | Knowledge base ID |
+| action    | MetaDataActionEnum | Yes      | Operation type    |
+
+**MetaDataActionEnum Values**
+
+| Value   | Description |
+|---------|-------------|
+| ENABLE  | Enable      |
+| DISABLE | Disable     |
+
+#### Response Parameters
+
+not have
+
+### 5.5 Update Document Metadata
+
+#### Method
+
+```java
+DocumentMetaDataUpdateResponse updateDocumentMetaData(DocumentMetaDataUpdateRequest request);
+```
+
+#### Request Parameters
+
+DocumentMetaDataUpdateRequest
+
+| Parameter     | Type                  | Required | Description         |
+|---------------|-----------------------|----------|---------------------|
+| datasetId     | String                | Yes      | Knowledge base ID   |
+| operationData | `List<OperationData>` | Yes      | Operation data list |
+
+**OperationData Object Structure**
+
+| Parameter    | Type             | Description   |
+|--------------|------------------|---------------|
+| documentId   | String           | Document ID   |
+| metadataList | `List<MetaData>` | Metadata list |
+
+**MetaData Object Structure**
+
+| Parameter | Type   | Description   |
+|-----------|--------|---------------|
+| id        | String | Metadata ID   |
+| type      | String | Metadata type |
+| name      | String | Metadata name |
+
+#### Response Parameters
+
+not have
+
+### 5.6 Get Metadata List
+
+#### Method
+
+```java
+MetaDataListResponse listMetaData(String datasetId);
+```
+
+#### Request Parameters
+
+| Parameter | Type   | Required | Description       |
+|-----------|--------|----------|-------------------|
+| datasetId | String | Yes      | Knowledge base ID |
+
+#### Response Parameters
+
+MetaDataListResponse
+
+| Parameter           | Type                | Description                       |
+|---------------------|---------------------|-----------------------------------|
+| builtInFieldEnabled | Boolean             | Whether built-in field is enabled |
+| docMetadata         | `List<DocMetadata>` | Document metadata list            |
+
+**DocMetadata Object Structure**
+
+| Parameter | Type    | Description   |
+|-----------|---------|---------------|
+| id        | String  | Metadata ID   |
+| type      | String  | Metadata type |
+| name      | String  | Metadata name |
+| userCount | Integer | Usage count   |
+
+

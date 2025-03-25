@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.dataset.dto.request.document;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -30,9 +31,11 @@ public class SubChunkSegmentation implements Serializable {
 
     private String separator;
 
+    @JsonAlias("maxTokens")
     @JsonProperty("max_tokens")
     private Integer maxTokens;
 
+    @JsonAlias("chunkOverlap")
     @JsonProperty("chunk_overlap")
     private Integer chunkOverlap;
 

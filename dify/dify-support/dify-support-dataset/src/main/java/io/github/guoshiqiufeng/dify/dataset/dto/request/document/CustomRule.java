@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.dataset.dto.request.document;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.guoshiqiufeng.dify.dataset.enums.document.ParentModeEnum;
 import lombok.Data;
@@ -31,6 +32,7 @@ import java.util.List;
 public class CustomRule implements Serializable {
     private static final long serialVersionUID = 2662516999304017667L;
 
+    @JsonAlias("preProcessingRules")
     @JsonProperty("pre_processing_rules")
     private List<PreProcessingRule> preProcessingRules;
 
@@ -42,9 +44,11 @@ public class CustomRule implements Serializable {
     /**
      * 父分段的召回模式
      */
+    @JsonAlias("parentMode")
     @JsonProperty("parent_mode")
     private ParentModeEnum parentMode;
 
+    @JsonAlias("subChunkSegmentation")
     @JsonProperty("subchunk_segmentation")
     private SubChunkSegmentation subChunkSegmentation;
 }

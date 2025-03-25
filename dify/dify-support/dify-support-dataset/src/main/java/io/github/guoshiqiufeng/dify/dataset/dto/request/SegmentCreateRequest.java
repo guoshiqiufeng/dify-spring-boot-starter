@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.dataset.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -33,9 +34,11 @@ import java.util.List;
 public class SegmentCreateRequest extends BaseDatasetRequest implements Serializable {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonAlias("datasetId")
     private String datasetId;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonAlias("documentId")
     private String documentId;
 
     private List<SegmentParam> segments;

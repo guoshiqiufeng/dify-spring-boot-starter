@@ -16,16 +16,21 @@
 package io.github.guoshiqiufeng.dify.autoconfigure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.guoshiqiufeng.dify.chat.impl.DifyChatDefaultImpl;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.dataset.impl.DifyDatasetDefaultImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.HttpProtocol;
+import reactor.netty.http.client.HttpClient;
 
 import java.util.Optional;
 
@@ -36,6 +41,7 @@ import java.util.Optional;
  */
 @Slf4j
 @Configuration
+@ConditionalOnClass({DifyDatasetDefaultImpl.class})
 public class DifyDatasetAutoConfiguration {
 
     @Bean(name = "difyDatasetWebClient")
@@ -49,10 +55,14 @@ public class DifyDatasetAutoConfiguration {
                 .map(DifyProperties.Dataset::getApiKey)
                 .orElse("");
 
+        HttpClient httpClient = HttpClient.create()
+                .protocol(HttpProtocol.HTTP11);
+
         return WebClient.builder()
                 .baseUrl(properties.getUrl())
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .build();
     }
 

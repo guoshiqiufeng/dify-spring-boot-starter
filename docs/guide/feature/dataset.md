@@ -120,6 +120,10 @@ void delete(String datasetId);
 |-----------|--------|------|--------|
 | datasetId | String | 是    | 知识库 id |
 
+#### 响应参数
+
+无
+
 ## 2. 文档管理
 
 ### 2.1 通过文本创建文档
@@ -220,15 +224,15 @@ DocumentCreateByTextRequest
 
 **RetrievalModel 对象结构**
 
-| 字段名                   | 类型               | 描述       |
-|-----------------------|------------------|----------|
-| searchMethod          | SearchMethodEnum | 搜索方法     |
-| rerankingEnable       | Boolean          | 是否启用重排序  |
-| rerankingModel        | RerankingModel   | 重排序模型    |
-| weights               | Float            | 权重       |
-| topK                  | Integer          | 返回结果数量   |
-| scoreThresholdEnabled | Boolean          | 是否启用分数阈值 |
-| scoreThreshold        | Float            | 分数阈值     |
+| 字段名                   | 类型                   | 描述       |
+|-----------------------|----------------------|----------|
+| searchMethod          | SearchMethodEnum     | 搜索方法     |
+| rerankingEnable       | Boolean              | 是否启用重排序  |
+| rerankingModel        | RerankingModel       | 重排序模型    |
+| weights               | RerankingModelWeight | 权重       |
+| topK                  | Integer              | 返回结果数量   |
+| scoreThresholdEnabled | Boolean              | 是否启用分数阈值 |
+| scoreThreshold        | Float                | 分数阈值     |
 
 **RerankingModel 对象结构**
 
@@ -236,6 +240,28 @@ DocumentCreateByTextRequest
 |-----------------------|--------|----------|
 | rerankingProviderName | String | 重排序提供商名称 |
 | rerankingModelName    | String | 重排序模型名称  |
+
+**RerankingModelWeight 对象结构**
+
+| 字段名            | 类型             | 描述             |
+|----------------|----------------|----------------|
+| weightType     | String         | 默认为 customized |
+| vectorSetting  | VectorSetting  | 语义权重           |
+| keywordSetting | KeywordSetting | 关键词权重          |
+
+**VectorSetting 对象结构**
+
+| 字段名                   | 类型     | 描述      |
+|-----------------------|--------|---------|
+| vectorWeight          | Float  | 语义权重    |
+| embeddingModelName    | String | 嵌入模型    |
+| embeddingProviderName | String | 嵌入模型提供商 |
+
+**RerankingModelWeight 对象结构**
+
+| 字段名           | 类型    | 描述    |
+|---------------|-------|-------|
+| keywordWeight | Float | 关键词权重 |
 
 #### 响应参数
 
@@ -788,3 +814,172 @@ RetrieveResponse
 | dataSourceType | String | 数据源类型 |
 | name           | String | 文档名称  |
 | docType        | String | 文档类型  |
+
+## 5. 元数据管理
+
+### 5.1 创建元数据
+
+#### 方法
+
+```java
+MetaDataResponse createMetaData(MetaDataCreateRequest request);
+```
+
+#### 请求参数
+
+MetaDataCreateRequest
+
+| 参数名       | 类型     | 是否必须 | 描述     |
+|-----------|--------|------|--------|
+| datasetId | String | 是    | 知识库 id |
+| type      | String | 是    | 元数据类型  |
+| name      | String | 是    | 元数据名称  |
+
+#### 响应参数
+
+MetaDataResponse
+
+| 参数名  | 类型     | 描述    |
+|------|--------|-------|
+| id   | String | 元数据ID |
+| type | String | 元数据类型 |
+| name | String | 元数据名称 |
+
+### 5.2 更新元数据
+
+#### 方法
+
+```java
+MetaDataResponse updateMetaData(MetaDataUpdateRequest request);
+```
+
+#### 请求参数
+
+MetaDataUpdateRequest
+
+| 参数名        | 类型     | 是否必须 | 描述     |
+|------------|--------|------|--------|
+| datasetId  | String | 是    | 知识库 id |
+| metaDataId | String | 是    | 元数据 id |
+| name       | String | 是    | 元数据名称  |
+
+#### 响应参数
+
+MetaDataResponse 查看 5.1
+
+### 5.3 删除元数据
+
+#### 方法
+
+```java
+MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId);
+```
+
+#### 请求参数
+
+| 参数名        | 类型     | 是否必须 | 描述     |
+|------------|--------|------|--------|
+| datasetId  | String | 是    | 知识库 id |
+| metadataId | String | 是    | 元数据 id |
+
+#### 响应参数
+
+无
+
+### 5.4 元数据操作
+
+#### 方法
+
+```java
+MetaDataActionResponse actionMetaData(MetaDataActionRequest request);
+```
+
+#### 请求参数
+
+MetaDataActionRequest
+
+| 参数名       | 类型                 | 是否必须 | 描述     |
+|-----------|--------------------|------|--------|
+| datasetId | String             | 是    | 知识库 id |
+| action    | MetaDataActionEnum | 是    | 操作类型   |
+
+**MetaDataActionEnum 枚举值**
+
+| 枚举值     | 描述 |
+|---------|----|
+| enable  | 启用 |
+| disable | 禁用 |
+
+#### 响应参数
+
+无
+
+### 5.5 更新文档元数据
+
+#### 方法
+
+```java
+DocumentMetaDataUpdateResponse updateDocumentMetaData(DocumentMetaDataUpdateRequest request);
+```
+
+#### 请求参数
+
+DocumentMetaDataUpdateRequest
+
+| 参数名           | 类型                     | 是否必须 | 描述     |
+|---------------|------------------------|------|--------|
+| datasetId     | String                 | 是    | 知识库 id |
+| operationData | `List<OperationData> ` | 是    | 操作数据列表 |
+
+**OperationData 对象结构**
+
+| 参数名          | 类型                | 描述    |
+|--------------|-------------------|-------|
+| documentId   | String            | 文档ID  |
+| metadataList | `List<MetaData> ` | 元数据列表 |
+
+**MetaData 对象结构**
+
+| 参数名  | 类型     | 描述    |
+|------|--------|-------|
+| id   | String | 元数据ID |
+| type | String | 元数据类型 |
+| name | String | 元数据名称 |
+
+#### 响应参数
+
+无
+
+### 5.6 获取元数据列表
+
+#### 方法
+
+```java
+MetaDataListResponse listMetaData(String datasetId);
+```
+
+#### 请求参数
+
+| 参数名       | 类型     | 是否必须 | 描述     |
+|-----------|--------|------|--------|
+| datasetId | String | 是    | 知识库 id |
+
+#### 响应参数
+
+MetaDataListResponse
+
+| 参数名                 | 类型                   | 描述       |
+|---------------------|----------------------|----------|
+| builtInFieldEnabled | Boolean              | 内置字段是否启用 |
+| docMetadata         | `List<DocMetadata> ` | 文档元数据列表  |
+
+**DocMetadata 对象结构**
+
+| 参数名       | 类型      | 描述    |
+|-----------|---------|-------|
+| id        | String  | 元数据ID |
+| type      | String  | 元数据类型 |
+| name      | String  | 元数据名称 |
+| userCount | Integer | 使用次数  |
+
+

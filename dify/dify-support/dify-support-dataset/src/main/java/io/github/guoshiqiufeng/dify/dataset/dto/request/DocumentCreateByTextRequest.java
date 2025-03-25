@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.dataset.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.guoshiqiufeng.dify.dataset.dto.RetrievalModel;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.document.ProcessRule;
@@ -37,6 +38,7 @@ import java.util.Map;
 public class DocumentCreateByTextRequest extends BaseDatasetRequest implements Serializable {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonAlias("datasetId")
     private String datasetId;
 
     private String name;
@@ -46,36 +48,45 @@ public class DocumentCreateByTextRequest extends BaseDatasetRequest implements S
     /**
      * 文档类型（选填）
      */
+    @JsonAlias("docType")
     @JsonProperty("doc_type")
     private DocTypeEnum docType;
 
     /**
      * 文档元数据（如提供文档类型则必填）
      */
+    @JsonAlias("docMetadata")
     @JsonProperty("doc_metadata")
     private Map<String, Object> docMetadata;
 
     /**
      * 索引模式
      */
+    @JsonAlias("indexingTechnique")
     @JsonProperty("indexing_technique")
     private IndexingTechniqueEnum indexingTechnique;
 
+    @JsonAlias("docForm")
     @JsonProperty("doc_form")
     private DocFormEnum docForm;
 
+    @JsonAlias("docLanguage")
     @JsonProperty("doc_language")
     private String docLanguage;
 
+    @JsonAlias("processRule")
     @JsonProperty("process_rule")
     private ProcessRule processRule;
 
+    @JsonAlias("retrievalModel")
     @JsonProperty("retrieval_model")
     private RetrievalModel retrievalModel;
 
+    @JsonAlias("embeddingModel")
     @JsonProperty("embedding_model")
     private String embeddingModel;
 
+    @JsonAlias("embeddingModelProvider")
     @JsonProperty("embedding_model_provider")
     private String embeddingModelProvider;
 
