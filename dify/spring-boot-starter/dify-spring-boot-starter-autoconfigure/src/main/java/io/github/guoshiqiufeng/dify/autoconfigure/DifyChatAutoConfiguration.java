@@ -20,6 +20,7 @@ import io.github.guoshiqiufeng.dify.chat.impl.DifyChatDefaultImpl;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,6 +38,7 @@ import reactor.netty.http.client.HttpClient;
  */
 @Slf4j
 @Configuration
+@ConditionalOnClass({DifyChatDefaultImpl.class})
 public class DifyChatAutoConfiguration {
 
     @Bean(name = "difyChatWebClient")

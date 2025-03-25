@@ -17,9 +17,11 @@ package io.github.guoshiqiufeng.dify.autoconfigure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
+import io.github.guoshiqiufeng.dify.server.impl.DifyServerRedisImpl;
 import io.github.guoshiqiufeng.dify.workflow.impl.DifyWorkflowDefaultImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,6 +39,7 @@ import reactor.netty.http.client.HttpClient;
  */
 @Slf4j
 @Configuration
+@ConditionalOnClass({DifyWorkflowDefaultImpl.class})
 public class DifyWorkflowAutoConfiguration {
 
     @Bean(name = "difyWorkflowWebClient")
