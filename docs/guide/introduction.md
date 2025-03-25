@@ -58,6 +58,12 @@ description:
 | 【DataSet】 更新文档分段       | ✅  |
 | 【DataSet】 获取上传文件       | ✅  |
 | 【DataSet】 检索知识库        | ✅  |
+| 【DataSet】 新增元数据        | ✅  |
+| 【DataSet】 更新元数据        | ✅  |
+| 【DataSet】 删除元数据        | ✅  |
+| 【DataSet】 启用/禁用内置元数据   | ✅  |
+| 【DataSet】 更新文档元数据      | ✅  |
+| 【DataSet】 查询知识库元数据列表   | ✅  |
 | 【SERVER】               | 🚧 |    
 
 注：
