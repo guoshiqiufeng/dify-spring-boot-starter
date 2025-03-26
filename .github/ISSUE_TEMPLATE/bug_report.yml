@@ -1,0 +1,54 @@
+name: "🐞  Bug report"
+description: Report errors or unexpected behavior
+labels:
+  - bug
+body:
+  - type: input
+    attributes:
+      label: Dify version
+      description: See about section in Dify console
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: dify-spring-boot-starter version
+      description: You use the dify-spring-boot-starter version
+    validations:
+      required: true
+
+  - type: dropdown
+    attributes:
+      label: dify-spring-boot-starter used
+      description: Which dependency is used?
+      multiple: true
+      options:
+        - dify-spring-boot-starter
+        - dify-spring-boot-starter-chat
+        - dify-spring-boot-starter-server
+        - dify-spring-boot-starter-workflow
+        - dify-spring-boot-starter-dataset
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+      description: We highly suggest including screenshots and a bug report log. Please use the right markdown syntax for code blocks.
+      placeholder: Having detailed steps helps us reproduce the bug.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: ✔️ Expected Behavior
+      placeholder: What were you expecting?
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: ❌ Actual Behavior
+      placeholder: What happened instead?
+    validations:
+      required: false
