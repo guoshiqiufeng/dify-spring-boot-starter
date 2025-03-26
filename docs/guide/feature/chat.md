@@ -32,7 +32,7 @@ ChatMessageSendRequest
 | conversationId | String                  | 否    | 聊天对话编号 |
 | content        | String                  | 是    | 消息内容   |
 | files          | `List<ChatMessageFile>` | 否    | 文件     |
-| inputs         | Map<String, Object>     | 否    | 自定义参数  |
+| inputs         | `Map<String, Object>`   | 否    | 自定义参数  |
 
 #### 响应参数
 
@@ -167,15 +167,15 @@ DifyPageResult<MessageConversationsResponse> conversations(MessageConversationsR
 
 MessageConversationsResponse
 
-| 参数名          | 类型                 | 描述    |
-|--------------|--------------------|-------|
-| id           | String             | 会话 id |
-| name         | String             | 会话名称  |
-| inputs       | Map<String,Object> | 输入参数  |
-| status       | String             | 会话状态  |
-| introduction | String             | 开场白   |
-| createdAt    | Long               | 创建时间戳 |
-| updatedAt    | Long               | 更新时间戳 |
+| 参数名          | 类型                   | 描述    |
+|--------------|----------------------|-------|
+| id           | String               | 会话 id |
+| name         | String               | 会话名称  |
+| inputs       | `Map<String,Object>` | 输入参数  |
+| status       | String               | 会话状态  |
+| introduction | String               | 开场白   |
+| createdAt    | Long                 | 创建时间戳 |
+| updatedAt    | Long                 | 更新时间戳 |
 
 ### 2.2 删除会话
 
@@ -215,15 +215,15 @@ MessageConversationsResponse renameConversation(RenameConversationRequest rename
 
 MessageConversationsResponse
 
-| 参数名          | 类型                 | 描述    |
-|--------------|--------------------|-------|
-| id           | String             | 会话 id |
-| name         | String             | 会话名称  |
-| inputs       | Map<String,Object> | 输入参数  |
-| status       | String             | 会话状态  |
-| introduction | String             | 开场白   |
-| createdAt    | Long               | 创建时间戳 |
-| updatedAt    | Long               | 更新时间戳 |
+| 参数名          | 类型                   | 描述    |
+|--------------|----------------------|-------|
+| id           | String               | 会话 id |
+| name         | String               | 会话名称  |
+| inputs       | `Map<String,Object>` | 输入参数  |
+| status       | String               | 会话状态  |
+| introduction | String               | 开场白   |
+| createdAt    | Long                 | 创建时间戳 |
+| updatedAt    | Long                 | 更新时间戳 |
 
 ## 3. 其他
 
