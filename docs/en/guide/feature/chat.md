@@ -34,7 +34,7 @@ ChatMessageSendRequest
 | conversationId | String                  | No       | Chat session number   |
 | content        | String                  | Yes      | Message content       |
 | files          | `List<ChatMessageFile>` | No       | file                  |
-| inputs         | Map<String, Object>     | No       | Customized parameters |
+| inputs         | `Map<String, Object>`   | No       | Customized parameters |
 
 #### Response parameter
 
@@ -169,15 +169,15 @@ DifyPageResult<MessageConversationsResponse> conversations(MessageConversationsR
 
 MessageConversationsResponse
 
-| Parameter name | Type               | Description         |
-|----------------|--------------------|---------------------|
-| id             | String             | Chat session number |
-| name           | String             | Session name        |
-| inputs         | Map<String,Object> | Input parameter     |
-| status         | String             | Session state       |
-| introduction   | String             | Opening remarks     |
-| createdAt      | Long               | Creating timestamps |
-| updatedAt      | Long               | Updating timestamps |
+| Parameter name | Type                 | Description         |
+|----------------|----------------------|---------------------|
+| id             | String               | Chat session number |
+| name           | String               | Session name        |
+| inputs         | `Map<String,Object>` | Input parameter     |
+| status         | String               | Session state       |
+| introduction   | String               | Opening remarks     |
+| createdAt      | Long                 | Creating timestamps |
+| updatedAt      | Long                 | Updating timestamps |
 
 ### 2.2 Deleting a session
 
@@ -217,15 +217,15 @@ MessageConversationsResponse renameConversation(RenameConversationRequest rename
 
 MessageConversationsResponse
 
-| Parameter name | Type               | Description         |
-|----------------|--------------------|---------------------|
-| id             | String             | Chat session number |
-| name           | String             | Session name        |
-| inputs         | Map<String,Object> | Input parameter     |
-| status         | String             | Session state       |
-| introduction   | String             | Opening remarks     |
-| createdAt      | Long               | Creating timestamps |
-| updatedAt      | Long               | Updating timestamps |
+| Parameter name | Type                 | Description         |
+|----------------|----------------------|---------------------|
+| id             | String               | Chat session number |
+| name           | String               | Session name        |
+| inputs         | `Map<String,Object>` | Input parameter     |
+| status         | String               | Session state       |
+| introduction   | String               | Opening remarks     |
+| createdAt      | Long                 | Creating timestamps |
+| updatedAt      | Long                 | Updating timestamps |
 
 ## 3. Other
 
@@ -325,8 +325,8 @@ FileUpload Object Structure:
 | enabled                  | Boolean          | Whether file upload is enabled |
 | image                    | FileUploadImage  | Image upload configuration     |
 | allowedFileTypes         | `List<String>  ` | Allowed file types list        |
-| allowedFileExtensions    | List<String>     | Allowed file extensions list   |
-| allowedFileUploadMethods | List<String>     | Allowed upload methods list    |
+| allowedFileExtensions    | `List<String>`   | Allowed file extensions list   |
+| allowedFileUploadMethods | `List<String>`   | Allowed upload methods list    |
 | numberLimits             | Integer          | File count limit               |
 | fileUploadConfig         | FileUploadConfig | Detailed upload configuration  |
 
@@ -372,12 +372,12 @@ Inherits from TextInput, has the same field structure
 
 Select Object Structure:
 
-| Parameter name | Type         | Description           |
-|----------------|--------------|-----------------------|
-| label          | String       | Control display label |
-| variable       | String       | Control ID            |
-| required       | Boolean      | Whether required      |
-| maxLength      | Integer      | Maximum length limit  |
-| defaultValue   | String       | Default value         |
-| type           | String       | Dropdown type         |
-| options        | List<String> | Options list          |
+| Parameter name | Type           | Description           |
+|----------------|----------------|-----------------------|
+| label          | String         | Control display label |
+| variable       | String         | Control ID            |
+| required       | Boolean        | Whether required      |
+| maxLength      | Integer        | Maximum length limit  |
+| defaultValue   | String         | Default value         |
+| type           | String         | Dropdown type         |
+| options        | `List<String>` | Options list          |
