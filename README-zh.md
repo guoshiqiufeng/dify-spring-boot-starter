@@ -84,7 +84,7 @@ public class DifyChatService {
 
 更多使用参考查看
 - [文档](https://guoshiqiufeng.github.io/dify-spring-boot-starter)
-- [examples](https://guoshiqiufeng.github.io/dify-spring-boot-starter-examples)
+- [examples](https://github.com/guoshiqiufeng/dify-spring-boot-starter-examples)
 
 ## Star History
 
