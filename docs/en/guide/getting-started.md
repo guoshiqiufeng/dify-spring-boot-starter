@@ -87,4 +87,4 @@ public class DifyChatService {
 
 With these few simple steps, we have implemented the dify interface call.
 
-For more usage references check the [examples](https://guoshiqiufeng.github.io/dify-spring-boot-starter-examples)
+For more usage references check the [examples](https://github.com/guoshiqiufeng/dify-spring-boot-starter-examples)
