@@ -47,7 +47,7 @@ public class WorkflowLogs implements Serializable {
     private CreatedByEndUser createdByEndUser;
 
     @JsonAlias("created_at")
-    private String createdAt;
+    private Long createdAt;
 
     @Data
     public static class CreatedByEndUser implements Serializable {

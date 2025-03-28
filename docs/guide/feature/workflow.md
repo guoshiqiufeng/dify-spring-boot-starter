@@ -600,10 +600,12 @@ WorkflowLogsRequest
 
 WorkflowLogs
 
-| 参数名        | 类型     | 描述    |
-|------------|--------|-------|
-| id         | String | 日志id  |
-| status     | String | 运行状态  |
-| message    | String | 日志消息  |
-| createdAt  | Long   | 创建时间戳 |
-| finishedAt | Long   | 完成时间戳 |
+| 参数名              | 类型                  | 描述      |
+|------------------|---------------------|---------|
+| id               | String              | 日志id    |
+| workflowRun      | WorkflowRunResponse | 工作流运行详情 |
+| createdFrom      | String              | 创建于     |
+| createdByRole    | String              | 创建角色    |
+| createdByAccount | String              | 创建账号    |
+| createdByEndUser | CreatedByEndUser    | 创建最终用户  |
+| createdAt        | Long                | 创建时间戳   |
