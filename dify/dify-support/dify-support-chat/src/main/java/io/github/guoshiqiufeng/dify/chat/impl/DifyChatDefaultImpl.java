@@ -102,8 +102,12 @@ public class DifyChatDefaultImpl implements DifyChat {
         List<ChatMessageSendRequest.ChatMessageFile> files = sendRequest.getFiles();
         if (!CollectionUtils.isEmpty(files)) {
             files = files.stream().peek(f -> {
-                f.setType("image");
-                f.setTransferMethod("remote_url");
+                if (StrUtil.isEmpty(f.getType())) {
+                    f.setType("image");
+                }
+                if (StrUtil.isEmpty(f.getTransferMethod())) {
+                    f.setTransferMethod("remote_url");
+                }
             }).toList();
             chatMessage.setFiles(BeanUtil.copyToList(files, ChatMessageVO.ChatMessageFile.class));
         }
