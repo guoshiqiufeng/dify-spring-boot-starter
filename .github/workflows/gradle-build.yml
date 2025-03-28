@@ -37,4 +37,4 @@ jobs:
 
       - name: Build with Gradle
         run: |
-          gradle build --no-daemon --parallel
+          gradle build --parallel
