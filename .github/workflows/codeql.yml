@@ -3,11 +3,9 @@ name: CodeQL
 permissions:
   contents: read
   pull-requests: write
-  security-events: write  # 必需的CodeQL权限
+  security-events: write
 
-on:
-  push:
-    branches: [ "main" ]
+on: [pull_request]
 
 jobs:
   build:
@@ -16,7 +14,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 需要完整历史记录进行差异分析
+          fetch-depth: 0
 
       # 配置JDK环境
       - name: Set up JDK 21
@@ -24,11 +22,11 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-          cache: gradle  # 启用Gradle缓存
+          cache: gradle
 
-      # Gradle依赖缓存优化
+      # Gradle依赖缓存
       - name: Cache Gradle packages
-        uses: actions/cache@v4  # 更新到最新版本
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
@@ -37,13 +35,25 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # 初始化CodeQL分析
+      # CodeQL核心缓存（新增部分）
+      - name: Cache CodeQL dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.codeql
+            **/codeql-db
+          key: ${{ runner.os }}-codeql-${{ hashFiles('**/codeql-config.yml') }}-${{ github.job }}-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-codeql-
+            
+      # 初始化CodeQL
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: java
-          # 如果自动构建失败，取消注释以下行
-          # auto-build: false
+          # 启用查询缓存（需要CodeQL 2.12+）
+          ql-queries-cache-enabled: true
+          ql-queries-cache-size: 4096
 
       # 配置Gradle环境
       - name: Setup Gradle
@@ -55,9 +65,9 @@ jobs:
       # 执行构建并收集CodeQL数据
       - name: Build with Gradle
         run: |
-          gradle build --no-daemon --parallel --stacktrace
+          gradle build --parallel --stacktrace
 
-      # 执行CodeQL分析并上传结果
+      # 执行CodeQL分析
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
