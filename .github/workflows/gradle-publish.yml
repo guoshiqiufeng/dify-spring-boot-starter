@@ -1,5 +1,7 @@
 name: Gradle Package
-
+permissions:
+  contents: read
+  pull-requests: write
 on:
   #release:
   #  types: [ created ]
@@ -32,7 +34,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: 8.9
+          gradle-version: "8.10.2"
 
       - name: Set Gradle Env
         run: |

@@ -1,13 +1,8 @@
-name: docs
+name: docs build
 permissions:
   contents: write
   pull-requests: write
-on:
-  # 每当 push 到 main 分支时触发部署
-  #  push:
-  #    branches: [ main ]
-  # 手动触发部署
-  workflow_dispatch:
+on: [pull_request]
 
 jobs:
   docs:
