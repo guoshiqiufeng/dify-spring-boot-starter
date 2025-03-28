@@ -55,8 +55,7 @@ jobs:
       # 执行构建并收集CodeQL数据
       - name: Build with Gradle
         run: |
-          chmod +x ./gradlew
-          ./gradlew build --no-daemon --parallel --stacktrace
+          gradle build --no-daemon --parallel --stacktrace
 
       # 执行CodeQL分析并上传结果
       - name: Perform CodeQL Analysis
