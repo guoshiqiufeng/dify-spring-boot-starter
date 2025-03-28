@@ -602,10 +602,12 @@ WorkflowLogsRequest
 
 WorkflowLogs
 
-| Parameter name | Type   | Description          |
-|----------------|--------|----------------------|
-| id             | String | Log ID               |
-| status         | String | Execution status     |
-| message        | String | Log message          |
-| createdAt      | Long   | Creation timestamp   |
-| finishedAt     | Long   | Completion timestamp |
+| Parameter name   | Type                | Description               |
+|------------------|---------------------|---------------------------|
+| id               | String              | log id                    |
+| workflowRun      | WorkflowRunResponse | Workflow Run Details      |
+| createdFrom      | String              | created From              |
+| createdByRole    | String              | created Role              |
+| createdByAccount | String              | created Account           |
+| createdByEndUser | CreatedByEndUser    | created EndUser           |
+| createdAt        | Long                | Creation time (timestamp) |
