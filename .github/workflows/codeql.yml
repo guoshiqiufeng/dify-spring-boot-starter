@@ -5,7 +5,9 @@ permissions:
   pull-requests: write
   security-events: write
 
-on: [pull_request]
+on:
+  push:
+    branches: [ "main" ]
 
 jobs:
   build:
