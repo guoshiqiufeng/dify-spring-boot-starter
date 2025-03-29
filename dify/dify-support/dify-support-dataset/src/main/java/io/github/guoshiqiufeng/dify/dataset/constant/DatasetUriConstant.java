@@ -26,7 +26,7 @@ public interface DatasetUriConstant {
 
     String V1_DATASETS_URL = V1_URL + "/datasets";
 
-    String V1_DATASET_URL = V1_DATASETS_URL + "/{}";
+    String V1_DATASET_URL = V1_DATASETS_URL + "/{datasetId}";
 
     String V1_DOCUMENTS_URL = V1_DATASET_URL + "/documents";
 
@@ -34,9 +34,9 @@ public interface DatasetUriConstant {
 
     String V1_DOCUMENT_CREATE_BY_FILE_URL = V1_DATASET_URL + "/document/create-by-file";
 
-    String V1_DOCUMENT_URL = V1_DOCUMENTS_URL + "/{}";
+    String V1_DOCUMENT_URL = V1_DOCUMENTS_URL + "/{documentId}";
 
-    String V1_DOCUMENT_INDEXING_STATUS_URL = V1_DOCUMENT_URL + "/indexing-status";
+    String V1_DOCUMENT_INDEXING_STATUS_URL = V1_DOCUMENTS_URL + "/{batch}/indexing-status";
 
     String V1_DOCUMENT_UPDATE_BY_TEXT_URL = V1_DOCUMENT_URL + "/update-by-text";
 
@@ -44,7 +44,7 @@ public interface DatasetUriConstant {
 
     String V1_DOCUMENTS_SEGMENTS_URL = V1_DOCUMENT_URL + "/segments";
 
-    String V1_DOCUMENTS_SEGMENT_URL = V1_DOCUMENT_URL + "/segments/{}";
+    String V1_DOCUMENTS_SEGMENT_URL = V1_DOCUMENT_URL + "/segments/{segmentId}";
 
     String V1_DOCUMENTS_UPLOAD_FILE = V1_DOCUMENT_URL + "/upload-file";
 
@@ -52,11 +52,11 @@ public interface DatasetUriConstant {
 
     String V1_METADATA_CREATE_URL = V1_DATASET_URL + "/metadata";
 
-    String V1_METADATA_UPDATE_URL = V1_METADATA_CREATE_URL + "/{}";
+    String V1_METADATA_UPDATE_URL = V1_METADATA_CREATE_URL + "/{metadataId}";
 
     String V1_METADATA_DELETE_URL = V1_METADATA_UPDATE_URL;
 
-    String V1_METADATA_ACTION_URL = V1_METADATA_CREATE_URL + "/built-in/{}";
+    String V1_METADATA_ACTION_URL = V1_METADATA_CREATE_URL + "/built-in/{action}";
 
     String V1_DOCUMENT_METADATA_UPDATE_URL = V1_DATASET_URL + "/documents/metadata";
 
