@@ -16,7 +16,6 @@
 package io.github.guoshiqiufeng.dify.autoconfigure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.guoshiqiufeng.dify.chat.impl.DifyChatDefaultImpl;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.dataset.impl.DifyDatasetDefaultImpl;
 import lombok.extern.slf4j.Slf4j;

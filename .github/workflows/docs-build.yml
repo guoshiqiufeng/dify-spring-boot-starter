@@ -2,7 +2,7 @@ name: docs build
 permissions:
   contents: write
   pull-requests: write
-on: [pull_request]
+on: [ pull_request ]
 
 jobs:
   docs:

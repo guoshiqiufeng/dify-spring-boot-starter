@@ -36,7 +36,7 @@
         <dependency>
             <groupId>io.github.guoshiqiufeng.dify</groupId>
             <artifactId>dify-bom</artifactId>
-            <version>0.5.0</version>
+            <version>0.6.0</version>
             <type>import</type>
         </dependency>
     </dependencies>
@@ -83,6 +83,7 @@ public class DifyChatService {
 ```
 
 更多使用参考查看
+
 - [文档](https://guoshiqiufeng.github.io/dify-spring-boot-starter)
 - [examples](https://github.com/guoshiqiufeng/dify-spring-boot-starter-examples)
 

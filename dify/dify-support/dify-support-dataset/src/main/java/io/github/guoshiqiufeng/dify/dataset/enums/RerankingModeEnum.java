@@ -8,7 +8,7 @@ package io.github.guoshiqiufeng.dify.dataset.enums;
 public enum RerankingModeEnum {
 
     /**
-     *权重
+     * 权重
      */
     weighted_score,
 
