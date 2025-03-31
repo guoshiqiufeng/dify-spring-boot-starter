@@ -146,8 +146,8 @@ public class DifyChatDefaultImpl implements DifyChat {
 
     @Override
     public void stopMessagesStream(String apiKey, String taskId, String userId) {
-        String url = ChatUriConstant.V1_CHAT_MESSAGES_URI + "/{}/stop";
-        url = StrUtil.format(url, taskId);
+        String url = ChatUriConstant.V1_CHAT_MESSAGES_URI + "/{taskId}/stop";
+        // url = StrUtil.format(url, taskId);
 
         // 使用 WebClient 发送 POST 请求
 
@@ -158,7 +158,7 @@ public class DifyChatDefaultImpl implements DifyChat {
             String body = objectMapper.writeValueAsString(params);
 
             webClient.post()
-                    .uri(url)
+                    .uri(url, taskId)
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                     .bodyValue(body)
                     .retrieve()
@@ -177,8 +177,8 @@ public class DifyChatDefaultImpl implements DifyChat {
 
     @Override
     public MessageFeedbackResponse messageFeedback(MessageFeedbackRequest request) {
-        String url = ChatUriConstant.V1_MESSAGES_URI + "/{}/feedbacks";
-        url = StrUtil.format(url, request.getMessageId());
+        String url = ChatUriConstant.V1_MESSAGES_URI + "/{messageId}/feedbacks";
+        // url = StrUtil.format(url, request.getMessageId());
 
         try {
             // 使用 WebClient 发送 GET 请求
@@ -189,7 +189,7 @@ public class DifyChatDefaultImpl implements DifyChat {
             values.put("content", request.getContent() == null ? "" : request.getContent());
 
             return webClient.post()
-                    .uri(url)
+                    .uri(url, request.getMessageId())
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
                     .bodyValue(objectMapper.writeValueAsString(values))
                     .retrieve()
@@ -284,14 +284,14 @@ public class DifyChatDefaultImpl implements DifyChat {
      */
     @Override
     public List<String> messagesSuggested(String messageId, String apiKey, String userId) {
-        String url = ChatUriConstant.V1_MESSAGES_URI + "/{}/suggested";
-        url = StrUtil.format(url, messageId);
+        String url = ChatUriConstant.V1_MESSAGES_URI + "/{messageId}/suggested";
+        // url = StrUtil.format(url, messageId);
 
         try {
             // 使用 WebClient 发送 GET 请求
 
             DifyResult<List<String>> difyResult = webClient.get()
-                    .uri(url + "?user={user}",
+                    .uri(url + "?user={user}", messageId,
                             userId)
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                     .retrieve()
@@ -316,8 +316,8 @@ public class DifyChatDefaultImpl implements DifyChat {
      */
     @Override
     public void deleteConversation(String conversationId, String apiKey, String userId) {
-        String url = ChatUriConstant.V1_CONVERSATIONS_URI + "/{}";
-        url = StrUtil.format(url, conversationId);
+        String url = ChatUriConstant.V1_CONVERSATIONS_URI + "/{conversationId}";
+        // url = StrUtil.format(url, conversationId);
 
         // 使用 WebClient 发送 Delete 请求
 
@@ -328,7 +328,7 @@ public class DifyChatDefaultImpl implements DifyChat {
             String body = objectMapper.writeValueAsString(params);
 
             webClient.method(HttpMethod.DELETE)
-                    .uri(url)
+                    .uri(url, conversationId)
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(body)
@@ -344,8 +344,8 @@ public class DifyChatDefaultImpl implements DifyChat {
 
     @Override
     public MessageConversationsResponse renameConversation(RenameConversationRequest renameConversationRequest) {
-        String url = ChatUriConstant.V1_CONVERSATIONS_URI + "/{}/name";
-        url = StrUtil.format(url, renameConversationRequest.getConversationId());
+        String url = ChatUriConstant.V1_CONVERSATIONS_URI + "/{conversationId}/name";
+        // url = StrUtil.format(url, renameConversationRequest.getConversationId());
         if (renameConversationRequest.getAutoGenerate() == null) {
             renameConversationRequest.setAutoGenerate(false);
         }
@@ -359,7 +359,7 @@ public class DifyChatDefaultImpl implements DifyChat {
             values.put("user", renameConversationRequest.getUserId());
 
             return webClient.post()
-                    .uri(url)
+                    .uri(url, renameConversationRequest.getConversationId())
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + renameConversationRequest.getApiKey())
                     .bodyValue(objectMapper.writeValueAsString(values))
                     .retrieve()

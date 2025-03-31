@@ -100,13 +100,13 @@ public class DifyWorkflowDefaultImpl implements DifyWorkflow {
 
     @Override
     public WorkflowInfoResponse info(String workflowRunId, String apiKey) {
-        String url = WorkflowConstant.WORKFLOW_RUN_URL + "/{}";
-        url = StrUtil.format(url, workflowRunId);
+        String url = WorkflowConstant.WORKFLOW_RUN_URL + "/{workflowRunId}";
+        // url = StrUtil.format(url, workflowRunId);
 
         // 使用 WebClient 发送 GET 请求
 
         return webClient.get()
-                .uri(url)
+                .uri(url, workflowRunId)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
@@ -126,7 +126,7 @@ public class DifyWorkflowDefaultImpl implements DifyWorkflow {
 
     @Override
     public WorkflowStopResponse stopWorkflowStream(String apiKey, String taskId, String userId) {
-        String url = WorkflowConstant.WORKFLOW_TASKS_URL + "/{}/stop";
+        String url = WorkflowConstant.WORKFLOW_TASKS_URL + "/{taskId}/stop";
         String body = "";
         try {
             body = objectMapper.writeValueAsString(Map.of("user", userId));
@@ -137,7 +137,7 @@ public class DifyWorkflowDefaultImpl implements DifyWorkflow {
         // 使用 WebClient 发送 POST 请求
 
         return webClient.post()
-                .uri(url)
+                .uri(url, taskId)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                 .bodyValue(body)
                 .retrieve()
@@ -159,8 +159,8 @@ public class DifyWorkflowDefaultImpl implements DifyWorkflow {
 
         // 使用 WebClient 发送 GET 请求
 
-        String uri = url + "?page={}&limit={}";
-        uri = StrUtil.format(uri, request.getPage(), request.getLimit());
+        String uri = url + "?page={page}&limit={limit}";
+        // uri = StrUtil.format(uri, request.getPage(), request.getLimit());
         if (StrUtil.isNotEmpty(request.getStatus())) {
             uri += "&status={}";
             uri = StrUtil.format(uri, request.getStatus());
@@ -170,7 +170,7 @@ public class DifyWorkflowDefaultImpl implements DifyWorkflow {
             uri = StrUtil.format(uri, request.getKeyword());
         }
         return webClient.get()
-                .uri(uri)
+                .uri(uri, request.getPage(), request.getLimit())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)

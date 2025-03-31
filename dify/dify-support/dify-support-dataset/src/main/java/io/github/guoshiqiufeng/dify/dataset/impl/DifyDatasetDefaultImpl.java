@@ -77,11 +77,11 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
         String url = DatasetUriConstant.V1_DATASETS_URL;
 
         // 使用 WebClient 发送请求
-        url += "?page={}&limit={}";
-        url = StrUtil.format(url, request.getPage(), request.getLimit());
+        url += "?page={page}&limit={limit}";
+        // url = StrUtil.format(url);
 
         return webClient.get()
-                .uri(url)
+                .uri(url, request.getPage(), request.getLimit())
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(new ParameterizedTypeReference<DifyPageResult<DatasetResponse>>() {
@@ -92,12 +92,12 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     @Override
     public void delete(String datasetId) {
         // 请求地址
-        String url = DatasetUriConstant.V1_DATASETS_URL + "/" + datasetId;
+        String url = DatasetUriConstant.V1_DATASETS_URL + "/{datasetId}";
 
         // 使用 WebClient 发送 DELETE 请求
 
         webClient.delete()
-                .uri(url)
+                .uri(url, datasetId)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(Void.class)
@@ -108,13 +108,13 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     public DocumentCreateResponse createDocumentByText(DocumentCreateByTextRequest request) {
         // 请求地址
         String url = DatasetUriConstant.V1_DOCUMENT_CREATE_BY_TEXT_URL;
-        url = StrUtil.format(url, request.getDatasetId());
+        // url = StrUtil.format(url, request.getDatasetId());
         // 请求体
         String body = builderBody(request);
         // 使用 WebClient 发送 POST 请求
 
         return webClient.post()
-                .uri(url)
+                .uri(url, request.getDatasetId())
                 .bodyValue(body)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
@@ -126,7 +126,7 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     public DocumentCreateResponse createDocumentByFile(DocumentCreateByFileRequest request) {
         // 请求地址
         String url = DatasetUriConstant.V1_DOCUMENT_CREATE_BY_FILE_URL;
-        url = StrUtil.format(url, request.getDatasetId());
+        // url = StrUtil.format(url, request.getDatasetId());
         // 请求体
         String json = builderBody(request);
 
@@ -155,7 +155,7 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
         // 使用 WebClient 发送 POST 请求
 
         return webClient.post()
-                .uri(url)
+                .uri(url, request.getDatasetId())
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(BodyInserters.fromMultipartData(builder.build()))
                 .retrieve()
@@ -168,13 +168,13 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     public DocumentCreateResponse updateDocumentByText(DocumentUpdateByTextRequest request) {
         // 请求地址
         String url = DatasetUriConstant.V1_DOCUMENT_UPDATE_BY_TEXT_URL;
-        url = StrUtil.format(url, request.getDatasetId(), request.getDocumentId());
+        // url = StrUtil.format(url, request.getDatasetId(), request.getDocumentId());
         // 请求体
         String body = builderBody(request);
         // 使用 WebClient 发送 POST 请求
 
         return webClient.post()
-                .uri(url)
+                .uri(url, request.getDatasetId(), request.getDocumentId())
                 .bodyValue(body)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
@@ -186,7 +186,7 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     public DocumentCreateResponse updateDocumentByFile(DocumentUpdateByFileRequest request) {
         // 请求地址
         String url = DatasetUriConstant.V1_DOCUMENT_UPDATE_BY_FILE_URL;
-        url = StrUtil.format(url, request.getDatasetId(), request.getDocumentId());
+        // url = StrUtil.format(url, request.getDatasetId(), request.getDocumentId());
         // 请求体
         String json = builderBody(request);
 
@@ -214,7 +214,7 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
         // 使用 WebClient 发送 POST 请求
 
         return webClient.post()
-                .uri(url)
+                .uri(url, request.getDatasetId(), request.getDocumentId())
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(BodyInserters.fromMultipartData(builder.build()))
                 .retrieve()
@@ -227,7 +227,7 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     public DifyPageResult<DocumentInfo> pageDocument(DatasetPageDocumentRequest request) {
         // 请求地址
         String url = DatasetUriConstant.V1_DOCUMENTS_URL;
-        url = StrUtil.format(url, request.getDatasetId());
+        // url = StrUtil.format(url, request.getDatasetId());
         // 使用 WebClient 发送请求
         url += "?page={}&limit={}";
         url = StrUtil.format(url, request.getPage(), request.getLimit());
@@ -238,7 +238,7 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
         }
 
         return webClient.get()
-                .uri(url)
+                .uri(url, request.getDatasetId())
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(new ParameterizedTypeReference<DifyPageResult<DocumentInfo>>() {
@@ -250,11 +250,11 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     public DocumentIndexingStatusResponse indexingStatus(DocumentIndexingStatusRequest request) {
         // 请求地址
         String url = DatasetUriConstant.V1_DOCUMENT_INDEXING_STATUS_URL;
-        url = StrUtil.format(url, request.getDatasetId(), request.getBatch());
+        // url = StrUtil.format(url, request.getDatasetId(), request.getBatch());
         // 使用 WebClient 发送请求
 
         return webClient.get()
-                .uri(url)
+                .uri(url, request.getDatasetId(), request.getBatch())
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(new ParameterizedTypeReference<DocumentIndexingStatusResponse>() {
@@ -267,12 +267,12 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
         // 请求地址
         String url = DatasetUriConstant.V1_DOCUMENT_URL;
 
-        url = StrUtil.format(url, datasetId, documentId);
+        // url = StrUtil.format(url, datasetId, documentId);
 
         // 使用 WebClient 发送 DELETE 请求
 
         return webClient.delete()
-                .uri(url)
+                .uri(url, datasetId, documentId)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(DocumentDeleteResponse.class)
@@ -283,13 +283,13 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     public SegmentResponse createSegment(SegmentCreateRequest request) {
         // 请求地址
         String url = DatasetUriConstant.V1_DOCUMENTS_SEGMENTS_URL;
-        url = StrUtil.format(url, request.getDatasetId(), request.getDocumentId());
+        // url = StrUtil.format(url, request.getDatasetId(), request.getDocumentId());
         // 请求体
         String body = builderBody(request);
         // 使用 WebClient 发送 POST 请求
 
         return webClient.post()
-                .uri(url)
+                .uri(url, request.getDatasetId(), request.getDocumentId())
                 .bodyValue(body)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
@@ -301,7 +301,7 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     public SegmentResponse pageSegment(SegmentPageRequest request) {
         // 请求地址
         String url = DatasetUriConstant.V1_DOCUMENTS_SEGMENTS_URL;
-        url = StrUtil.format(url, request.getDatasetId(), request.getDocumentId());
+        // url = StrUtil.format(url, request.getDatasetId(), request.getDocumentId());
         // 使用 WebClient 发送请求
         url += "?";
 
@@ -316,7 +316,7 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
         }
 
         return webClient.get()
-                .uri(url)
+                .uri(url, request.getDatasetId(), request.getDocumentId())
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(new ParameterizedTypeReference<SegmentResponse>() {
@@ -329,12 +329,12 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
         // 请求地址
         String url = DatasetUriConstant.V1_DOCUMENTS_SEGMENT_URL;
 
-        url = StrUtil.format(url, datasetId, documentId, segmentId);
+        // url = StrUtil.format(url, datasetId, documentId, segmentId);
 
         // 使用 WebClient 发送 DELETE 请求
 
         return webClient.delete()
-                .uri(url)
+                .uri(url, datasetId, documentId, segmentId)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(SegmentDeleteResponse.class)
@@ -345,13 +345,13 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     public SegmentUpdateResponse updateSegment(SegmentUpdateRequest request) {
         // 请求地址
         String url = DatasetUriConstant.V1_DOCUMENTS_SEGMENT_URL;
-        url = StrUtil.format(url, request.getDatasetId(), request.getDocumentId(), request.getSegmentId());
+        // url = StrUtil.format(url, request.getDatasetId(), request.getDocumentId(), request.getSegmentId());
         // 请求体
         String body = builderBody(request);
         // 使用 WebClient 发送 POST 请求
 
         return webClient.post()
-                .uri(url)
+                .uri(url, request.getDatasetId(), request.getDocumentId(), request.getSegmentId())
                 .bodyValue(body)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
@@ -363,11 +363,11 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     public UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId) {
         // 请求地址
         String url = DatasetUriConstant.V1_DOCUMENTS_UPLOAD_FILE;
-        url = StrUtil.format(url, datasetId, documentId);
+        // url = StrUtil.format(url, datasetId, documentId);
         // 使用 WebClient 发送请求
 
         return webClient.get()
-                .uri(url)
+                .uri(url, datasetId, documentId)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(new ParameterizedTypeReference<UploadFileInfoResponse>() {
@@ -379,13 +379,13 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     public RetrieveResponse retrieve(RetrieveRequest request) {
         // 请求地址
         String url = DatasetUriConstant.V1_DATASETS_RETRIEVE_URL;
-        url = StrUtil.format(url, request.getDatasetId());
+        // url = StrUtil.format(url, request.getDatasetId());
         // 请求体
         String body = builderBody(request);
         // 使用 WebClient 发送 POST 请求
 
         return webClient.post()
-                .uri(url)
+                .uri(url, request.getDatasetId())
                 .bodyValue(body)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
@@ -397,13 +397,13 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     public MetaDataResponse createMetaData(MetaDataCreateRequest request) {
         // 请求地址
         String url = DatasetUriConstant.V1_METADATA_CREATE_URL;
-        url = StrUtil.format(url, request.getDatasetId());
+        // url = StrUtil.format(url, request.getDatasetId());
         // 请求体
         String body = builderBody(request);
         // 使用 WebClient 发送 POST 请求
 
         return webClient.post()
-                .uri(url)
+                .uri(url, request.getDatasetId())
                 .bodyValue(body)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
@@ -415,13 +415,13 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     public MetaDataResponse updateMetaData(MetaDataUpdateRequest request) {
         // 请求地址
         String url = DatasetUriConstant.V1_METADATA_UPDATE_URL;
-        url = StrUtil.format(url, request.getDatasetId(), request.getMetaDataId());
+        // url = StrUtil.format(url, request.getDatasetId(), request.getMetaDataId());
         // 请求体
         String body = builderBody(request);
         // 使用 WebClient 发送 POST 请求
 
         return webClient.patch()
-                .uri(url)
+                .uri(url, request.getDatasetId(), request.getMetaDataId())
                 .bodyValue(body)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
@@ -433,10 +433,10 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     public void deleteMetaData(String datasetId, String metadataId) {
         // 请求地址
         String url = DatasetUriConstant.V1_METADATA_DELETE_URL;
-        url = StrUtil.format(url, datasetId, metadataId);
+        // url = StrUtil.format(url, datasetId, metadataId);
 
         webClient.delete()
-                .uri(url)
+                .uri(url, datasetId, metadataId)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(void.class)
@@ -447,10 +447,10 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     public void actionMetaData(MetaDataActionRequest request) {
         // 请求地址
         String url = DatasetUriConstant.V1_METADATA_ACTION_URL;
-        url = StrUtil.format(url, request.getDatasetId(), request.getAction().name());
+        // url = StrUtil.format(url, request.getDatasetId(), request.getAction().name());
 
         webClient.post()
-                .uri(url)
+                .uri(url, request.getDatasetId(), request.getAction().name())
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(Void.class)
@@ -461,12 +461,12 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     public void updateDocumentMetaData(DocumentMetaDataUpdateRequest request) {
         // 请求地址
         String url = DatasetUriConstant.V1_DOCUMENT_METADATA_UPDATE_URL;
-        url = StrUtil.format(url, request.getDatasetId());
+        // url = StrUtil.format(url, request.getDatasetId());
         // 请求体
         String body = builderBody(request);
         // 使用 WebClient 发送 POST 请求
         webClient.post()
-                .uri(url)
+                .uri(url, request.getDatasetId())
                 .bodyValue(body)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
@@ -478,9 +478,9 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     public MetaDataListResponse listMetaData(String datasetId) {
         // 请求地址
         String url = DatasetUriConstant.V1_METADATA_LIST_URL;
-        url = StrUtil.format(url, datasetId);
+        // url = StrUtil.format(url, datasetId);
         return webClient.get()
-                .uri(url)
+                .uri(url, datasetId)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(MetaDataListResponse.class)
