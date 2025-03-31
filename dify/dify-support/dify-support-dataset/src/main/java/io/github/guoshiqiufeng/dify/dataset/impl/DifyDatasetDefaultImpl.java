@@ -174,7 +174,7 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
         // 使用 WebClient 发送 POST 请求
 
         return webClient.post()
-                .uri(url, request.getDocumentId())
+                .uri(url, request.getDatasetId(), request.getDocumentId())
                 .bodyValue(body)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
@@ -214,7 +214,7 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
         // 使用 WebClient 发送 POST 请求
 
         return webClient.post()
-                .uri(url, request.getDocumentId())
+                .uri(url, request.getDatasetId(), request.getDocumentId())
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(BodyInserters.fromMultipartData(builder.build()))
                 .retrieve()
@@ -463,10 +463,10 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
         String url = DatasetUriConstant.V1_DOCUMENT_METADATA_UPDATE_URL;
         // url = StrUtil.format(url, request.getDatasetId());
         // 请求体
-        String body = builderBody(request, request.getDatasetId());
+        String body = builderBody(request);
         // 使用 WebClient 发送 POST 请求
         webClient.post()
-                .uri(url)
+                .uri(url, request.getDatasetId())
                 .bodyValue(body)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
