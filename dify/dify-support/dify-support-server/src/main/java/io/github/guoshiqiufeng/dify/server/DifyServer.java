@@ -17,6 +17,7 @@ package io.github.guoshiqiufeng.dify.server;
 
 import io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponseVO;
 import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponseVO;
+import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponseVO;
 
 import java.util.List;
 
@@ -63,4 +64,18 @@ public interface DifyServer {
      */
     List<ApiKeyResponseVO> initApiKey(String id);
 
+
+    /**
+     * 获取知识库 apikey
+     *
+     * @return 知识库 apikey
+     */
+    List<DatasetApiKeyResponseVO> getDatasetApiKey();
+
+    /**
+     * 初始化知识库 apikey
+     *
+     * @return 知识库 apikey
+     */
+    List<DatasetApiKeyResponseVO> initDatasetApiKey();
 }

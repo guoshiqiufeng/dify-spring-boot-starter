@@ -34,6 +34,7 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -122,6 +123,30 @@ public class DifyServerRedisImpl implements DifyServer {
         String json = postRequest(uri, "");
         if (StrUtil.isNotEmpty(json)) {
             return JSONUtil.toList(json, ApiKeyResponseVO.class);
+        }
+        return null;
+    }
+
+    @Override
+    public List<DatasetApiKeyResponseVO> getDatasetApiKey() {
+        String uri = ServerUriConstant.DATASETS + "/api-keys";
+        String json = getRequest(uri);
+        if (StrUtil.isNotEmpty(json)) {
+            return Optional.of(JSONUtil.toBean(json, DatasetApiKeyResultVO.class))
+                    .orElse(new DatasetApiKeyResultVO())
+                    .getData();
+        }
+        return null;
+    }
+
+    @Override
+    public List<DatasetApiKeyResponseVO> initDatasetApiKey() {
+        String uri = ServerUriConstant.DATASETS + "/api-keys";
+        String json = postRequest(uri, "");
+        if (StrUtil.isNotEmpty(json)) {
+            return Optional.of(JSONUtil.toBean(json, DatasetApiKeyResultVO.class))
+                    .orElse(new DatasetApiKeyResultVO())
+                    .getData();
         }
         return null;
     }

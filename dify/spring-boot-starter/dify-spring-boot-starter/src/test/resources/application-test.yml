@@ -1,0 +1,7 @@
+dify:
+  url: http://192.168.10.144:80
+  server:
+    email: ltzk@admin.com
+    password: lt123456
+  dataset:
+    api-key: aa
