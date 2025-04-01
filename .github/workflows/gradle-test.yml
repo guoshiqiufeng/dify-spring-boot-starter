@@ -233,7 +233,7 @@ jobs:
           gradle-home-cache-cleanup: true
 
       - name: Run Gradle tests
-        run: ./gradlew test
+        run: gradle test
 
       # - name: Upload test results
       #   if: always()
