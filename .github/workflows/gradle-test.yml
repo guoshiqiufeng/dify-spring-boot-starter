@@ -14,11 +14,8 @@ concurrency:
 
 # Define permissions at workflow level using least privilege principle
 permissions:
-  contents: read    # To checkout code
-  packages: read    # For package access
-  actions: read     # For workflow runs info
-  checks: write     # For test reports
-  id-token: write   # For token authentication
+  contents: read
+  pull-requests: write
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -31,6 +28,16 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      # Cache Ollama models to avoid re-downloading
+      - name: Cache Ollama models
+        uses: actions/cache@v3
+        id: ollama-cache
+        with:
+          path: ~/.ollama/models
+          key: ollama-models-${{ hashFiles('**/ollama-models.txt') || 'bge-m3-latest' }}
+          restore-keys: |
+            ollama-models-
 
       - name: Setup environment
         run: |
@@ -49,9 +56,19 @@ jobs:
         run: |
           curl -fsSL https://ollama.com/install.sh | sh
           ollama --version
+          # Create Ollama directory structure if it doesn't exist from cache
+          mkdir -p ~/.ollama/models
 
       - name: Pull Ollama model
-        run: ollama pull bge-m3:latest
+        run: |
+          # Only pull if not in cache
+          if [ "${{ steps.ollama-cache.outputs.cache-hit }}" != 'true' ]; then
+            echo "Cache miss for Ollama models, pulling..."
+            ollama pull bge-m3:latest
+          else
+            echo "Using cached Ollama models"
+            ls -la ~/.ollama/models
+          fi
 
       - name: Wait for application to start and verify health
         run: |
@@ -124,8 +141,8 @@ jobs:
           gradle-home-cache-cleanup: true
 
       - name: Run Gradle tests
-        run: ./gradlew test
-        
+        run: ./gradle test
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
