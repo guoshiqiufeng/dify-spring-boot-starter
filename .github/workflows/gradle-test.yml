@@ -34,10 +34,7 @@ jobs:
 
       - name: Setup environment
         run: |
-          # Clone Dify repo only if we're not already in it
-          if [ ! -d "dify" ]; then
-            git clone https://github.com/langgenius/dify.git 
-          fi
+          git clone https://github.com/langgenius/dify.git 
           cd dify/docker
           cp .env.example .env
 
