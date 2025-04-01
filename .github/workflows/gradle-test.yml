@@ -12,6 +12,14 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Define permissions at workflow level using least privilege principle
+permissions:
+  contents: read    # To checkout code
+  packages: read    # For package access
+  actions: read     # For workflow runs info
+  checks: write     # For test reports
+  id-token: write   # For token authentication
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   test:
@@ -42,9 +50,9 @@ jobs:
           docker compose ps
 
       - name: Set up Ollama
-        uses: ollama/setup-ollama@v2
-        with:
-          version: latest
+        run: |
+          curl -fsSL https://ollama.com/install.sh | sh
+          ollama --version
 
       - name: Pull Ollama model
         run: ollama pull bge-m3:latest
