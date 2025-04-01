@@ -182,7 +182,7 @@ jobs:
             RESPONSE=$(curl -sSf -X GET 'http://localhost/console/api/workspaces/current/plugin/list' \
               -H "Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}" \
               -H 'Content-Type: application/json')
-              
+            echo "Response: $RESPONSE"
             # Check if plugin_id is langgenius/ollama in the response
             if echo "$RESPONSE" | grep -q '"plugin_id":"langgenius/ollama"'; then
               echo "✅ Plugin 'langgenius/ollama' found and installed correctly!"
@@ -231,14 +231,14 @@ jobs:
           gradle-home-cache-cleanup: true
 
       - name: Run Gradle tests
-        run: ./gradlew test
+        run: ./gradle test
 
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: |
-            **/build/reports/tests/
-            **/build/test-results/
-          retention-days: 7
+      # - name: Upload test results
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: test-results
+      #     path: |
+      #       **/build/reports/tests/
+      #       **/build/test-results/
+      #     retention-days: 7
