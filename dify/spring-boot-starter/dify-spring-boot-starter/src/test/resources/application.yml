@@ -7,4 +7,5 @@ dify:
     api-key: dataset-aaabbbcccdddeeefffggghhh
 logging:
   level:
-    io.github.guoshiqiufeng.dify.boot: debug
+    root: ERROR
+    io.github.guoshiqiufeng.dify: DEBUG

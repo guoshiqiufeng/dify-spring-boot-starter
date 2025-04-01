@@ -85,8 +85,21 @@ public abstract class BaseDatasetContainerTest implements RedisContainerTest {
      * 初始化API Key
      */
     private String fetchOrCreateApiKey() {
-        return difyServer.getDatasetApiKey()
-                .stream()
+        if (difyServer == null) {
+            throw new IllegalStateException("DifyServer is not initialized");
+        }
+
+        List<DatasetApiKeyResponseVO> apiKeys = difyServer.getDatasetApiKey();
+        if (apiKeys == null) {
+            log.debug("No existing API keys found, creating new key");
+            apiKeys = difyServer.initDatasetApiKey();
+            if (CollectionUtils.isEmpty(apiKeys)) {
+                throw new IllegalStateException("Failed to initialize API Key");
+            }
+            return apiKeys.getFirst().getToken();
+        }
+
+        return apiKeys.stream()
                 .findFirst()
                 .map(DatasetApiKeyResponseVO::getToken)
                 .orElseGet(() -> {

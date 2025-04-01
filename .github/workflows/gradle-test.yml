@@ -179,7 +179,8 @@ jobs:
           curl -sSf -X POST 'http://localhost/console/api/setup' \
             -H 'Accept: */*' \
             -H 'Content-Type: application/json' \
-            --data-raw '{"email":"admin@admin.com","name":"admin","password":"admin123456"}'
+            --data-raw '{"email":"admin@admin.com","name":"admin","password":"admin123456"}' \
+            --retry 10 --retry-delay 5
 
       - name: Get admin token
         id: get_token
@@ -214,10 +215,10 @@ jobs:
             RESPONSE=$(curl -sSf -X GET 'http://localhost/console/api/workspaces/current/plugin/list' \
               -H "Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}" \
               -H 'Content-Type: application/json')
-            
+          
             # Install jq if not already installed
             apt-get update && apt-get install -y jq || true
-            
+          
             # Use jq to check if the plugin_id exists
             if echo "$RESPONSE" | jq -e '.plugins[] | select(.plugin_id=="langgenius/ollama")' > /dev/null; then
               echo "✅ Plugin 'langgenius/ollama' found and installed correctly!"
@@ -270,7 +271,7 @@ jobs:
           gradle-home-cache-cleanup: true
 
       - name: Run Gradle tests
-        run: gradle test
+        run: gradle test --info
 
       # - name: Upload test results
       #   if: always()
