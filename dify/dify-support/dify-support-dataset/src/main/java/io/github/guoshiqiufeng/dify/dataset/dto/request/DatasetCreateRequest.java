@@ -15,8 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.dataset.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.guoshiqiufeng.dify.dataset.enums.IndexingTechniqueEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.PermissionEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.ProviderEnum;

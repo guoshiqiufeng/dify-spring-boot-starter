@@ -15,8 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.dataset.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.guoshiqiufeng.dify.dataset.dto.RetrievalModel;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.document.ProcessRule;
 import io.github.guoshiqiufeng.dify.dataset.enums.IndexingTechniqueEnum;
@@ -41,8 +41,6 @@ public class DocumentCreateByFileRequest extends BaseDatasetRequest implements S
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @JsonAlias("datasetId")
     private String datasetId;
-
-    // private String name;
 
     @JsonProperty("original_document_id")
     @JsonAlias("originalDocumentId")

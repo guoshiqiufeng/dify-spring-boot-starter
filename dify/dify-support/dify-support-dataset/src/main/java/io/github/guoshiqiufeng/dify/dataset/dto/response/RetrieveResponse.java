@@ -49,7 +49,7 @@ public class RetrieveResponse implements Serializable {
         private Float score;
 
         @JsonAlias("tsne_position")
-        private TsnePosition tsne_position;
+        private TsnePosition tsnePosition;
     }
 
     @Data

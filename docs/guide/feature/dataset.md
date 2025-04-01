@@ -766,11 +766,11 @@ RetrieveResponse
 
 **RetrieveRecord 对象结构**
 
-| 参数名           | 类型           | 描述       |
-|---------------|--------------|----------|
-| segment       | Segment      | 分段信息     |
-| score         | Float        | 相关性得分    |
-| tsne_position | TsnePosition | TSNE位置信息 |
+| 参数名          | 类型           | 描述       |
+|--------------|--------------|----------|
+| segment      | Segment      | 分段信息     |
+| score        | Float        | 相关性得分    |
+| tsnePosition | TsnePosition | TSNE位置信息 |
 
 **TsnePosition 对象结构**
 

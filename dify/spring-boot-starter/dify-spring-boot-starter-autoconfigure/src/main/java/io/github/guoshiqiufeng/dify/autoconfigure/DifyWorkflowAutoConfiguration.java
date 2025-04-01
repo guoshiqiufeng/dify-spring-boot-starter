@@ -17,7 +17,6 @@ package io.github.guoshiqiufeng.dify.autoconfigure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
-import io.github.guoshiqiufeng.dify.server.impl.DifyServerRedisImpl;
 import io.github.guoshiqiufeng.dify.workflow.impl.DifyWorkflowDefaultImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
