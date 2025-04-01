@@ -37,4 +37,4 @@ jobs:
 
       - name: Build with Gradle
         run: |
-          gradle build --parallel
+          gradle build  -x test --parallel

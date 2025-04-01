@@ -1,0 +1,244 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Gradle test
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+# Concurrency control to prevent redundant workflow runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Define permissions at workflow level using least privilege principle
+permissions:
+  contents: read
+  pull-requests: write
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup environment
+        run: |
+          mkdir -p runners
+          git clone https://github.com/langgenius/dify.git runners/dify
+          cd runners/dify/docker
+          cp .env.example .env
+
+      # Extract Dify version for cache key
+      - name: Extract Dify version
+        id: dify-version
+        run: |
+          cd runners/dify/docker
+          # Extract version from docker-compose.yaml using grep and cut
+          DIFY_VERSION=$(grep -E 'image: langgenius/dify-api:' docker-compose.yaml | head -1 | cut -d':' -f3)
+          echo "Found Dify version: $DIFY_VERSION"
+          echo "version=$DIFY_VERSION" >> $GITHUB_OUTPUT
+
+      # Cache Docker images to avoid re-downloading
+      - name: Cache Docker images
+        uses: actions/cache@v3
+        id: docker-cache
+        with:
+          path: /tmp/docker-images
+          key: ${{ runner.os }}-docker-dify-${{ steps.dify-version.outputs.version }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-docker-dify-${{ steps.dify-version.outputs.version }}-
+
+      # Cache Ollama models to avoid re-downloading
+      - name: Cache Ollama models
+        uses: actions/cache@v3
+        id: ollama-cache
+        with:
+          path: ~/.ollama/models
+          key: ollama-models-${{ hashFiles('**/ollama-models.txt') || 'bge-m3-latest' }}
+          restore-keys: |
+            ollama-models-
+
+      - name: Load cached Docker images
+        if: steps.docker-cache.outputs.cache-hit == 'true'
+        run: |
+          echo "Loading Docker images from cache for Dify version ${{ steps.dify-version.outputs.version }}..."
+          docker load < /tmp/docker-images/dify-images.tar || true
+          docker images
+
+      - name: Start Docker containers
+        run: |
+          cd runners/dify/docker
+          # Create volumes directory with appropriate permissions
+          mkdir -p volumes/db/data
+          chmod -R 777 volumes
+          # Start containers
+          docker compose up -d
+          docker compose ps
+
+      # Fix permissions after containers are started
+      - name: Fix directory permissions
+        run: |
+          # Fix permission issues for volumes (especially PostgreSQL data)
+          sudo chmod -R 777 runners/dify/docker/volumes || true
+
+      - name: Save Docker images to cache
+        if: steps.docker-cache.outputs.cache-hit != 'true'
+        run: |
+          echo "Saving Docker images to cache for Dify version ${{ steps.dify-version.outputs.version }}..."
+          mkdir -p /tmp/docker-images
+          # Save all relevant images based on detected version
+          docker images -a | grep -E "langgenius/dify|postgres|redis|weaviate" | awk '{print $1":"$2}' | xargs docker save -o /tmp/docker-images/dify-images.tar
+
+      - name: Set up Ollama
+        run: |
+          curl -fsSL https://ollama.com/install.sh | sh
+          ollama --version
+          # Create Ollama directory structure if it doesn't exist from cache
+          mkdir -p ~/.ollama/models
+
+      - name: Pull Ollama model
+        run: |
+          # Only pull if not in cache
+          if [ "${{ steps.ollama-cache.outputs.cache-hit }}" != 'true' ]; then
+            echo "Cache miss for Ollama models, pulling..."
+            ollama pull bge-m3:latest
+          else
+            echo "Using cached Ollama models"
+            ls -la ~/.ollama/models
+          fi
+
+      - name: Wait for application to start and verify health
+        run: |
+          cd runners/dify/docker
+          # More robust wait using health check instead of fixed sleep
+          attempt=0
+          max_attempts=30
+          until $(curl --output /dev/null --silent --fail http://localhost/console/api/init); do
+            if [ ${attempt} -eq ${max_attempts} ]; then
+              echo "Max attempts reached. Application failed to start."
+              docker compose logs
+              exit 1
+            fi
+            printf '.'
+            attempt=$(($attempt+1))
+            sleep 5
+          done
+
+      - name: Initialize Dify application
+        run: |
+          cd runners/dify/docker
+          curl -sSf -X GET 'http://localhost/console/api/init' \
+            -H 'Accept: */*' \
+            -H 'Content-Type: application/json' \
+            --retry 10 --retry-delay 5
+
+      - name: Create admin user
+        run: |
+          cd runners/dify/docker
+          curl -sSf -X POST 'http://localhost/console/api/setup' \
+            -H 'Accept: */*' \
+            -H 'Content-Type: application/json' \
+            --data-raw '{"email":"admin@admin.com","name":"admin","password":"admin123456"}' \
+            --retry 10 --retry-delay 5
+
+      - name: Get admin token
+        id: get_token
+        run: |
+          cd runners/dify/docker
+          # Install jq for reliable JSON parsing
+          apt-get update && apt-get install -y jq || true
+          RESPONSE=$(curl -sSf -X POST 'http://localhost/console/api/login' \
+            -H 'Accept: */*' \
+            -H 'Content-Type: application/json' \
+            --data-raw '{"email":"admin@admin.com","password":"admin123456"}')
+          TOKEN=$(echo $RESPONSE | jq -r '.data.access_token')
+          echo "admin_token=$TOKEN" >> $GITHUB_OUTPUT
+
+      - name: Add dify Ollama Plugin
+        run: |
+          cd runners/dify/docker
+          curl -sSf -X POST 'http://localhost/console/api/workspaces/current/plugin/install/marketplace' \
+            -H 'Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}' \
+            -H 'Content-Type: application/json' \
+            --data-raw '{"plugin_unique_identifiers":["langgenius/ollama:0.0.3@9ded90ac00e8510119a24be7396ba77191c9610d5e1e29f59d68fa1229822fc7"]}'
+
+      - name: Wait for plugin to be installed
+        run: |
+          cd runners/dify/docker
+          echo "Checking if plugin is installed correctly..."
+          MAX_ATTEMPTS=10
+          ATTEMPT=0
+          PLUGIN_FOUND=false
+          
+          while [ $ATTEMPT -lt $MAX_ATTEMPTS ] && [ "$PLUGIN_FOUND" != "true" ]; do
+            RESPONSE=$(curl -sSf -X GET 'http://localhost/console/api/workspaces/current/plugin/list' \
+              -H "Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}" \
+              -H 'Content-Type: application/json')
+              
+            # Check if plugin_id is langgenius/ollama in the response
+            if echo "$RESPONSE" | grep -q '"plugin_id":"langgenius/ollama"'; then
+              echo "✅ Plugin 'langgenius/ollama' found and installed correctly!"
+              PLUGIN_FOUND=true
+            else
+              echo "Plugin not yet installed (attempt $ATTEMPT/$MAX_ATTEMPTS). Waiting..."
+              sleep 5
+              ATTEMPT=$((ATTEMPT+1))
+            fi
+          done
+          
+          if [ "$PLUGIN_FOUND" != "true" ]; then
+            echo "❌ Plugin installation failed or timed out!"
+            exit 1
+          fi
+
+      - name: Add dify Ollama model
+        run: |
+          cd runners/dify/docker
+          curl 'http://localhost/console/api/workspaces/current/model-providers/langgenius/ollama/ollama/models' \
+            -H 'Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}' \
+            -H 'content-type: application/json' \
+            --data-raw '{"model":"bge-m3:latest","model_type":"text-embedding","credentials":{"mode":"chat","context_size":"4096","max_tokens":"4096","vision_support":"false","function_call_support":"false","base_url":"http://localhost:11434"},"load_balancing":{"enabled":false,"configs":[]}}'
+
+      # Fix permissions again before Java setup
+      - name: Fix permissions before Java setup
+        run: |
+          # Fix any remaining permission issues
+          sudo chown -R $USER:$USER .
+          sudo find . -type d -not -path "*/\.*" -exec chmod 755 {} \;
+          sudo find . -type f -not -path "*/\.*" -exec chmod 644 {} \;
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
+
+      # Using Gradle's official action for better caching
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.10.2"
+          build-root-directory: .
+          gradle-home-cache-cleanup: true
+
+      - name: Run Gradle tests
+        run: ./gradlew test
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            **/build/reports/tests/
+            **/build/test-results/
+          retention-days: 7
