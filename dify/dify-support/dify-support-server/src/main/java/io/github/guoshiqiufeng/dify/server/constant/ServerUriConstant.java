@@ -29,4 +29,6 @@ public interface ServerUriConstant {
     String REFRESH_TOKEN = API + "/refresh-token";
 
     String APPS = API + "/apps";
+
+    String DATASETS = API + "/datasets";
 }
