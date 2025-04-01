@@ -34,13 +34,14 @@ jobs:
 
       - name: Setup environment
         run: |
-          git clone https://github.com/langgenius/dify.git 
-          cd dify/docker
+          mkdir -p runners
+          git clone https://github.com/langgenius/dify.git runners/dify
+          cd runners/dify/docker
           cp .env.example .env
 
       - name: Start Docker containers
         run: |
-          cd dify/docker
+          cd runners/dify/docker
           docker compose up -d
           docker compose ps
 
@@ -54,7 +55,7 @@ jobs:
 
       - name: Wait for application to start and verify health
         run: |
-          cd dify/docker
+          cd runners/dify/docker
           # More robust wait using health check instead of fixed sleep
           attempt=0
           max_attempts=30
@@ -71,7 +72,7 @@ jobs:
 
       - name: Initialize Dify application
         run: |
-          cd dify/docker
+          cd runners/dify/docker
           curl -sSf -X GET 'http://localhost/console/api/init' \
             -H 'Accept: */*' \
             -H 'Content-Type: application/json' \
@@ -79,7 +80,7 @@ jobs:
 
       - name: Create admin user
         run: |
-          cd dify/docker
+          cd runners/dify/docker
           curl -sSf -X POST 'http://localhost/console/api/setup' \
             -H 'Accept: */*' \
             -H 'Content-Type: application/json' \
@@ -89,7 +90,7 @@ jobs:
       - name: Get admin token
         id: get_token
         run: |
-          cd dify/docker
+          cd runners/dify/docker
           # Install jq for reliable JSON parsing
           apt-get update && apt-get install -y jq || true
           RESPONSE=$(curl -sSf -X POST 'http://localhost/console/api/login' \
@@ -101,7 +102,7 @@ jobs:
 
       - name: Add dify Ollama model
         run: |
-          cd dify/docker
+          cd runners/dify/docker
           curl 'http://localhost/console/api/workspaces/current/model-providers/langgenius/ollama/ollama/models' \
             -H 'Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}' \
             -H 'content-type: application/json' \
