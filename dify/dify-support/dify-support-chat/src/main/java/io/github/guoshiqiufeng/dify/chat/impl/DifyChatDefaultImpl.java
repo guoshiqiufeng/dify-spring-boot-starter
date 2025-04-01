@@ -147,7 +147,6 @@ public class DifyChatDefaultImpl implements DifyChat {
     @Override
     public void stopMessagesStream(String apiKey, String taskId, String userId) {
         String url = ChatUriConstant.V1_CHAT_MESSAGES_URI + "/{taskId}/stop";
-        // url = StrUtil.format(url, taskId);
 
         // 使用 WebClient 发送 POST 请求
 
@@ -178,7 +177,6 @@ public class DifyChatDefaultImpl implements DifyChat {
     @Override
     public MessageFeedbackResponse messageFeedback(MessageFeedbackRequest request) {
         String url = ChatUriConstant.V1_MESSAGES_URI + "/{messageId}/feedbacks";
-        // url = StrUtil.format(url, request.getMessageId());
 
         try {
             // 使用 WebClient 发送 GET 请求
@@ -285,7 +283,6 @@ public class DifyChatDefaultImpl implements DifyChat {
     @Override
     public List<String> messagesSuggested(String messageId, String apiKey, String userId) {
         String url = ChatUriConstant.V1_MESSAGES_URI + "/{messageId}/suggested";
-        // url = StrUtil.format(url, messageId);
 
         try {
             // 使用 WebClient 发送 GET 请求
@@ -317,11 +314,10 @@ public class DifyChatDefaultImpl implements DifyChat {
     @Override
     public void deleteConversation(String conversationId, String apiKey, String userId) {
         String url = ChatUriConstant.V1_CONVERSATIONS_URI + "/{conversationId}";
-        // url = StrUtil.format(url, conversationId);
 
         // 使用 WebClient 发送 Delete 请求
 
-        Map<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>(1);
         params.put("user", userId);
 
         try {
@@ -345,7 +341,6 @@ public class DifyChatDefaultImpl implements DifyChat {
     @Override
     public MessageConversationsResponse renameConversation(RenameConversationRequest renameConversationRequest) {
         String url = ChatUriConstant.V1_CONVERSATIONS_URI + "/{conversationId}/name";
-        // url = StrUtil.format(url, renameConversationRequest.getConversationId());
         if (renameConversationRequest.getAutoGenerate() == null) {
             renameConversationRequest.setAutoGenerate(false);
         }
@@ -413,7 +408,7 @@ public class DifyChatDefaultImpl implements DifyChat {
             // 使用 WebClient 发送 POST 请求
 
             // 构建请求体
-            Map<String, String> requestBody = new HashMap<>();
+            Map<String, String> requestBody = new HashMap<>(3);
             requestBody.put("user", request.getUserId());
             requestBody.put("text", request.getText());
             requestBody.put("message_id", request.getMessageId());

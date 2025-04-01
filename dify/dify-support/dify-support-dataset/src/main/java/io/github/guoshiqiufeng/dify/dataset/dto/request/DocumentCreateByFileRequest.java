@@ -42,8 +42,6 @@ public class DocumentCreateByFileRequest extends BaseDatasetRequest implements S
     @JsonAlias("datasetId")
     private String datasetId;
 
-    // private String name;
-
     @JsonProperty("original_document_id")
     @JsonAlias("originalDocumentId")
     private String originalDocumentId;

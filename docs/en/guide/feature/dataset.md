@@ -768,11 +768,11 @@ RetrieveResponse
 
 **RetrieveRecord Object Structure**
 
-| Parameter     | Type         | Description               |
-|---------------|--------------|---------------------------|
-| segment       | Segment      | Segment information       |
-| score         | Float        | Relevance score           |
-| tsne_position | TsnePosition | TSNE position information |
+| Parameter    | Type         | Description               |
+|--------------|--------------|---------------------------|
+| segment      | Segment      | Segment information       |
+| score        | Float        | Relevance score           |
+| tsnePosition | TsnePosition | TSNE position information |
 
 **TsnePosition Object Structure**
 

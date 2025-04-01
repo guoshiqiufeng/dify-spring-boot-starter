@@ -101,7 +101,6 @@ public class DifyWorkflowDefaultImpl implements DifyWorkflow {
     @Override
     public WorkflowInfoResponse info(String workflowRunId, String apiKey) {
         String url = WorkflowConstant.WORKFLOW_RUN_URL + "/{workflowRunId}";
-        // url = StrUtil.format(url, workflowRunId);
 
         // 使用 WebClient 发送 GET 请求
 
@@ -160,7 +159,6 @@ public class DifyWorkflowDefaultImpl implements DifyWorkflow {
         // 使用 WebClient 发送 GET 请求
 
         String uri = url + "?page={page}&limit={limit}";
-        // uri = StrUtil.format(uri, request.getPage(), request.getLimit());
         if (StrUtil.isNotEmpty(request.getStatus())) {
             uri += "&status={}";
             uri = StrUtil.format(uri, request.getStatus());
