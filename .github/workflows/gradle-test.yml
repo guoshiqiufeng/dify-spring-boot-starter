@@ -1,0 +1,133 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Gradle test
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+# Concurrency control to prevent redundant workflow runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup environment
+        run: |
+          # Clone Dify repo only if we're not already in it
+          if [ ! -d "docker" ]; then
+            git clone --depth=1 https://github.com/langgenius/dify.git
+            cd dify/docker
+          else
+            cd docker
+          fi
+          cp .env.example .env
+
+      - name: Start Docker containers
+        run: |
+          cd dify/docker || cd docker
+          docker compose up -d
+          docker compose ps
+
+      - name: Set up Ollama
+        uses: ollama/setup-ollama@v2
+        with:
+          version: latest
+
+      - name: Pull Ollama model
+        run: ollama pull bge-m3:latest
+
+      - name: Wait for application to start and verify health
+        run: |
+          cd dify/docker || cd docker
+          # More robust wait using health check instead of fixed sleep
+          attempt=0
+          max_attempts=30
+          until $(curl --output /dev/null --silent --fail http://localhost/console/api/init); do
+            if [ ${attempt} -eq ${max_attempts} ]; then
+              echo "Max attempts reached. Application failed to start."
+              docker compose logs
+              exit 1
+            fi
+            printf '.'
+            attempt=$(($attempt+1))
+            sleep 5
+          done
+
+      - name: Initialize Dify application
+        run: |
+          cd dify/docker || cd docker
+          curl -sSf -X GET 'http://localhost/console/api/init' \
+            -H 'Accept: */*' \
+            -H 'Content-Type: application/json' \
+            --retry 5 --retry-delay 5
+
+      - name: Create admin user
+        run: |
+          cd dify/docker || cd docker
+          curl -sSf -X POST 'http://localhost/console/api/setup' \
+            -H 'Accept: */*' \
+            -H 'Content-Type: application/json' \
+            --data-raw '{"email":"admin@admin.com","name":"admin","password":"admin123456"}' \
+            --retry 5 --retry-delay 5
+
+      - name: Get admin token
+        id: get_token
+        run: |
+          cd dify/docker || cd docker
+          # Install jq for reliable JSON parsing
+          apt-get update && apt-get install -y jq || true
+          RESPONSE=$(curl -sSf -X POST 'http://localhost/console/api/login' \
+            -H 'Accept: */*' \
+            -H 'Content-Type: application/json' \
+            --data-raw '{"email":"admin@admin.com","password":"admin123456"}')
+          TOKEN=$(echo $RESPONSE | jq -r '.data.access_token')
+          echo "admin_token=$TOKEN" >> $GITHUB_OUTPUT
+
+      - name: Add dify Ollama model
+        run: |
+          cd dify/docker || cd docker
+          curl 'http://localhost/console/api/workspaces/current/model-providers/langgenius/ollama/ollama/models' \
+            -H 'Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}' \
+            -H 'content-type: application/json' \
+            --data-raw '{"model":"bge-m3:latest","model_type":"text-embedding","credentials":{"mode":"chat","context_size":"4096","max_tokens":"4096","vision_support":"false","function_call_support":"false","base_url":"http://localhost:11434"},"load_balancing":{"enabled":false,"configs":[]}}'
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
+
+      # Using Gradle's official action for better caching
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.10.2"
+          build-root-directory: .
+          gradle-home-cache-cleanup: true
+
+      - name: Run Gradle tests
+        run: ./gradlew test
+        
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            **/build/reports/tests/
+            **/build/test-results/
+          retention-days: 7
