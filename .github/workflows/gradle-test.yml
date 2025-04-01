@@ -270,7 +270,7 @@ jobs:
           gradle-home-cache-cleanup: true
 
       - name: Run Gradle tests
-        run: gradle test
+        run: gradle test --info --debug
 
       # - name: Upload test results
       #   if: always()
