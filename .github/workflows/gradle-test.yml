@@ -181,9 +181,12 @@ jobs:
             RESPONSE=$(curl -sSf -X GET 'http://localhost/console/api/workspaces/current/plugin/list' \
               -H "Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}" \
               -H 'Content-Type: application/json')
-            echo "Response: $RESPONSE"
-            # Check if plugin_id is langgenius/ollama in the response
-            if echo "$RESPONSE" | grep -q '"plugin_id":"langgenius/ollama"'; then
+            
+            # Install jq if not already installed
+            apt-get update && apt-get install -y jq || true
+            
+            # Use jq to check if the plugin_id exists
+            if echo "$RESPONSE" | jq -e '.plugins[] | select(.plugin_id=="langgenius/ollama")' > /dev/null; then
               echo "✅ Plugin 'langgenius/ollama' found and installed correctly!"
               PLUGIN_FOUND=true
             else
@@ -230,7 +233,7 @@ jobs:
           gradle-home-cache-cleanup: true
 
       - name: Run Gradle tests
-        run: ./gradle test
+        run: ./gradlew test
 
       # - name: Upload test results
       #   if: always()
