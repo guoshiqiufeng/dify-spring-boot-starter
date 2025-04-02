@@ -13,22 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.server.constant;
+package io.github.guoshiqiufeng.dify.server.exception;
+
+import io.github.guoshiqiufeng.dify.core.exception.BaseExceptionEnum;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * @author yanghq
  * @version 1.0
- * @since 2025/3/4 15:11
+ * @since 2025/3/11 14:24
  */
-public interface ServerUriConstant {
+@Getter
+@AllArgsConstructor
+public enum DifyServerExceptionEnum implements BaseExceptionEnum {
 
-    String API = "/console/api";
+    /**
+     * 数据解析失败
+     */
+    DIFY_DATA_PARSING_FAILURE(39910, "数据解析失败"),
 
-    String LOGIN = API + "/login";
+    /**
+     * 远程调用失败
+     */
+    DIFY_API_ERROR(29990, "远程调用失败"),
+    ;
 
-    String REFRESH_TOKEN = API + "/refresh-token";
+    private final Integer code;
 
-    String APPS = API + "/apps";
-
-    String DATASETS = API + "/datasets";
+    private final String msg;
 }

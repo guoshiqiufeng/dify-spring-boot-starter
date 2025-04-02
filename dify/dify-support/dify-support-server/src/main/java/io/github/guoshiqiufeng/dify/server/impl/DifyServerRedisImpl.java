@@ -24,9 +24,11 @@ import io.github.guoshiqiufeng.dify.server.cache.DifyRedisKey;
 import io.github.guoshiqiufeng.dify.server.constant.ServerUriConstant;
 import io.github.guoshiqiufeng.dify.server.dto.request.DifyLoginRequestVO;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
+import io.github.guoshiqiufeng.dify.server.utils.WebClientUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -34,6 +36,7 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -122,6 +125,30 @@ public class DifyServerRedisImpl implements DifyServer {
         String json = postRequest(uri, "");
         if (StrUtil.isNotEmpty(json)) {
             return JSONUtil.toList(json, ApiKeyResponseVO.class);
+        }
+        return null;
+    }
+
+    @Override
+    public List<DatasetApiKeyResponseVO> getDatasetApiKey() {
+        String uri = ServerUriConstant.DATASETS + "/api-keys";
+        String json = getRequest(uri);
+        if (StrUtil.isNotEmpty(json)) {
+            return Optional.of(JSONUtil.toBean(json, DatasetApiKeyResultVO.class))
+                    .orElse(new DatasetApiKeyResultVO())
+                    .getData();
+        }
+        return null;
+    }
+
+    @Override
+    public List<DatasetApiKeyResponseVO> initDatasetApiKey() {
+        String uri = ServerUriConstant.DATASETS + "/api-keys";
+        String json = postRequest(uri, "");
+        if (StrUtil.isNotEmpty(json)) {
+            return Optional.of(JSONUtil.toBean(json, DatasetApiKeyResponseVO.class))
+                    .map(List::of)
+                    .orElse(List.of());
         }
         return null;
     }
@@ -228,17 +255,18 @@ public class DifyServerRedisImpl implements DifyServer {
             }
         }
 
-        log.debug("请求地址:{}, 重试次数:{}", uri, retryCount);
+        log.debug("GET请求开始 - URL:{}, 重试次数:{}, 请求头:{}", uri, retryCount, headers);
 
         try {
             Mono<String> response = webClient.get()
                     .uri(uri)
                     .headers(httpHeaders -> httpHeaders.addAll(headers))
                     .retrieve()
+                    .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
                     .bodyToMono(String.class);
 
             String responseBody = response.block();
-            log.debug("响应数据:{}", responseBody);
+            log.debug("GET请求完成 - URL:{}, 响应状态:成功, 响应数据:{}", uri, responseBody);
 
             if (responseBody != null) {
                 return responseBody;
@@ -246,6 +274,7 @@ public class DifyServerRedisImpl implements DifyServer {
 
             // 401 刷新token 重试
             if (!WHITELISTING.contains(uri)) {
+                log.debug("GET请求需要刷新Token - URL:{}", uri);
                 String refreshToken = redisTemplate.opsForValue().get(DifyRedisKey.REFRESH_TOKEN);
                 if (StrUtil.isNotEmpty(refreshToken)) {
                     LoginResponseVO login = refreshToken(refreshToken);
@@ -254,7 +283,7 @@ public class DifyServerRedisImpl implements DifyServer {
                 }
             }
         } catch (Exception e) {
-            log.error("请求失败, uri: {}, 重试次数: {}, 错误信息: {}", uri, retryCount, e.getMessage());
+            log.error("GET请求失败 - URL:{}, 重试次数:{}, 错误信息:{}", uri, retryCount, e.getMessage(), e);
             return getRequest(uri, retryCount + 1);
         }
 
@@ -285,7 +314,7 @@ public class DifyServerRedisImpl implements DifyServer {
             }
         }
 
-        log.debug("postRequest 请求地址:{}, 请求参数:{}", uri, json);
+        log.debug("POST请求开始 - URL:{}, 重试次数:{}, 请求头:{}, 请求体:{}", uri, retryCount, headers, json);
 
         try {
             Mono<String> response = webClient.post()
@@ -293,16 +322,18 @@ public class DifyServerRedisImpl implements DifyServer {
                     .headers(httpHeaders -> httpHeaders.addAll(headers))
                     .bodyValue(json)
                     .retrieve()
+                    .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
                     .bodyToMono(String.class);
 
             String responseBody = response.block();
-            log.debug("postRequest 响应数据:{}", responseBody);
+            log.debug("POST请求完成 - URL:{}, 响应状态:成功, 响应数据:{}", uri, responseBody);
 
             if (responseBody != null) {
                 return responseBody;
             }
 
             if (!WHITELISTING.contains(uri)) {
+                log.debug("POST请求需要刷新Token - URL:{}", uri);
                 String refreshToken = redisTemplate.opsForValue().get(DifyRedisKey.REFRESH_TOKEN);
                 if (StrUtil.isNotEmpty(refreshToken)) {
                     LoginResponseVO login = refreshToken(refreshToken);
@@ -311,7 +342,7 @@ public class DifyServerRedisImpl implements DifyServer {
                 }
             }
         } catch (Exception e) {
-            log.error("请求失败, uri: {}, 重试次数: {}, 错误信息: {}", uri, retryCount, e.getMessage());
+            log.error("POST请求失败 - URL:{}, 重试次数:{}, 错误信息:{}", uri, retryCount, e.getMessage(), e);
             return postRequest(uri, json, retryCount + 1);
         }
 

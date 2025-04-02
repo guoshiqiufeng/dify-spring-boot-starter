@@ -45,6 +45,7 @@ subprojects {
         dependencyManagement {
             imports {
                 mavenBom "org.springframework.boot:spring-boot-dependencies:${springBoot3Version}"
+                mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
             }
             dependencies {
 

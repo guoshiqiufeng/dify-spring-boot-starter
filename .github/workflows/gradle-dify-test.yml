@@ -1,0 +1,193 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Gradle dify test
+
+# Controls when the workflow will run
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          path: "dify-spring-boot-starter"
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
+
+      # Using Gradle's official action for better caching
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.10.2"
+          build-root-directory: ./dify-spring-boot-starter
+          gradle-home-cache-cleanup: true
+
+      # Runs a single command using the runners shell
+      - name: Clone Dify repository
+        run: git clone https://github.com/langgenius/dify.git
+
+      - name: Setup environment
+        run: |
+          cd dify/docker
+          cp .env.example .env
+
+      # Runs a set of commands using the runners shell
+      - name: Start Docker containers
+        run: |
+          cd dify/docker
+          docker compose up -d
+          docker compose ps
+
+      - name: Set up Ollama
+        run: |
+          # Instead of running Ollama directly on the host, run it in a Docker container and connect to Dify network
+          docker run -d --name ollama -p 11434:11434 ollama/ollama
+          # Wait for Ollama to initialize
+          echo "Waiting for Ollama container to start..."
+          sleep 10
+          # Test if Ollama is running
+          curl -s http://localhost:11434/api/tags
+          
+          # Find Dify network and connect Ollama to it
+          DIFY_NETWORK=$(docker network ls | grep docker_default | awk '{print $1}')
+          if [ -n "$DIFY_NETWORK" ]; then
+            echo "Connecting Ollama to Dify network: $DIFY_NETWORK"
+            docker network connect $DIFY_NETWORK ollama
+          else
+            echo "Warning: Could not find Dify network"
+          fi
+      - name: Pull Ollama model
+        run: |
+          # Pull model in the Ollama container
+          docker exec ollama ollama pull bge-m3:latest
+      - name: Check network configuration
+        run: |
+          echo "Host network information:"
+          ip addr show
+          
+          echo "Docker network information:"
+          docker network ls
+          
+          # Get the network name used by Dify
+          NETWORK_NAME=$(docker network ls | grep dify | awk '{print $2}')
+          if [ -n "$NETWORK_NAME" ]; then
+            echo "Docker network details for $NETWORK_NAME:"
+            docker network inspect $NETWORK_NAME
+          fi
+          
+          # Get host IP
+          HOST_IP=$(hostname -I | awk '{print $1}')
+          echo "Host IP: $HOST_IP"
+          
+          # Test Ollama accessibility from host
+          echo "Testing Ollama from host:"
+          curl -s http://localhost:11434/api/tags || echo "Failed to connect to Ollama from host"
+          
+          # Test from a container
+          echo "Testing Ollama from container:"
+          docker run --rm curlimages/curl curl -s http://${HOST_IP}:11434/api/tags || echo "Failed to connect to Ollama from container"
+      - name: Initialize Dify application
+        run: |
+          cd dify/docker
+          curl -sSf -X GET 'http://localhost/console/api/init' \
+            -H 'Accept: */*' \
+            -H 'Content-Type: application/json' \
+            --retry 10 --retry-delay 5
+      - name: Create admin user
+        run: |
+          cd dify/docker
+          curl -sSf -X POST 'http://localhost/console/api/setup' \
+            -H 'Accept: */*' \
+            -H 'Content-Type: application/json' \
+            --data-raw '{"email":"admin@admin.com","name":"admin","password":"admin123456"}' \
+            --retry 5 --retry-delay 5
+      - name: Get admin token
+        id: get_token
+        run: |
+          cd dify/docker
+          # Install jq for reliable JSON parsing
+          apt-get update && apt-get install -y jq || true
+          RESPONSE=$(curl -sSf -X POST 'http://localhost/console/api/login' \
+            -H 'Accept: */*' \
+            -H 'Content-Type: application/json' \
+            --data-raw '{"email":"admin@admin.com","password":"admin123456"}')
+          TOKEN=$(echo $RESPONSE | jq -r '.data.access_token')
+          echo "admin_token=$TOKEN" >> $GITHUB_OUTPUT
+
+      - name: Add dify Ollama Plugin
+        run: |
+          cd dify/docker
+          curl -sSf -X POST 'http://localhost/console/api/workspaces/current/plugin/install/marketplace' \
+            -H 'Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}' \
+            -H 'Content-Type: application/json' \
+            --data-raw '{"plugin_unique_identifiers":["langgenius/ollama:0.0.3@9ded90ac00e8510119a24be7396ba77191c9610d5e1e29f59d68fa1229822fc7"]}'
+      - name: Wait for plugin to be installed
+        run: |
+          cd dify/docker
+          echo "Checking if plugin is installed correctly..."
+          MAX_ATTEMPTS=10
+          ATTEMPT=0
+          PLUGIN_FOUND=false
+          
+          while [ $ATTEMPT -lt $MAX_ATTEMPTS ] && [ "$PLUGIN_FOUND" != "true" ]; do
+            RESPONSE=$(curl -sSf -X GET 'http://localhost/console/api/workspaces/current/plugin/list' \
+              -H "Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}" \
+              -H 'Content-Type: application/json')
+          
+            # Install jq if not already installed
+            apt-get update && apt-get install -y jq || true
+          
+            # Use jq to check if the plugin_id exists
+            if echo "$RESPONSE" | jq -e '.plugins[] | select(.plugin_id=="langgenius/ollama")' > /dev/null; then
+              echo "✅ Plugin 'langgenius/ollama' found and installed correctly!"
+              PLUGIN_FOUND=true
+            else
+              echo "Plugin not yet installed (attempt $ATTEMPT/$MAX_ATTEMPTS). Waiting..."
+              sleep 5
+              ATTEMPT=$((ATTEMPT+1))
+            fi
+          done
+          
+          if [ "$PLUGIN_FOUND" != "true" ]; then
+            echo "❌ Plugin installation failed or timed out!"
+            exit 1
+          fi
+      - name: Add dify Ollama model
+        run: |
+          cd dify/docker
+          
+          # Get Docker container name and network info for Ollama
+          OLLAMA_CONTAINER_NAME="ollama"
+          
+          curl 'http://localhost/console/api/workspaces/current/model-providers/langgenius/ollama/ollama/models' \
+            -H 'Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}' \
+            -H 'content-type: application/json' \
+            --data-raw "{\"model\":\"bge-m3:latest\",\"model_type\":\"text-embedding\",\"credentials\":{\"mode\":\"chat\",\"context_size\":\"4096\",\"max_tokens\":\"4096\",\"vision_support\":\"false\",\"function_call_support\":\"false\",\"base_url\":\"http://${OLLAMA_CONTAINER_NAME}:11434\"},\"load_balancing\":{\"enabled\":false,\"configs\":[]}}"
+      - name: Run Gradle tests
+        run: |
+          cd dify-spring-boot-starter
+          gradle test --info

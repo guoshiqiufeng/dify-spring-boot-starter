@@ -13,33 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.workflow.exception;
+package io.github.guoshiqiufeng.dify.server.exception;
 
+import io.github.guoshiqiufeng.dify.core.exception.BaseException;
 import io.github.guoshiqiufeng.dify.core.exception.BaseExceptionEnum;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 /**
  * @author yanghq
  * @version 1.0
- * @since 2025/3/11 14:24
+ * @since 2025/3/11 14:23
  */
-@Getter
-@AllArgsConstructor
-public enum DiftWorkflowExceptionEnum implements BaseExceptionEnum {
+public class DifyServerException extends BaseException {
 
-    /**
-     * 数据解析失败
-     */
-    DIFY_DATA_PARSING_FAILURE(39910, "数据解析失败"),
-
-    /**
-     * 远程调用失败
-     */
-    DIFY_API_ERROR(29990, "远程调用失败"),
-    ;
-
-    private final Integer code;
-
-    private final String msg;
+    public DifyServerException(BaseExceptionEnum abstractExceptionEnum) {
+        super(abstractExceptionEnum);
+    }
 }

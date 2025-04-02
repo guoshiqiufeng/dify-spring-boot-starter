@@ -28,8 +28,8 @@ import io.github.guoshiqiufeng.dify.workflow.constant.WorkflowConstant;
 import io.github.guoshiqiufeng.dify.workflow.dto.request.WorkflowLogsRequest;
 import io.github.guoshiqiufeng.dify.workflow.dto.request.WorkflowRunRequest;
 import io.github.guoshiqiufeng.dify.workflow.dto.response.*;
-import io.github.guoshiqiufeng.dify.workflow.exception.DiftWorkflowExceptionEnum;
 import io.github.guoshiqiufeng.dify.workflow.exception.DifyWorkflowException;
+import io.github.guoshiqiufeng.dify.workflow.exception.DifyWorkflowExceptionEnum;
 import io.github.guoshiqiufeng.dify.workflow.utils.WebClientUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -130,7 +130,7 @@ public class DifyWorkflowDefaultImpl implements DifyWorkflow {
         try {
             body = objectMapper.writeValueAsString(Map.of("user", userId));
         } catch (JsonProcessingException e) {
-            throw new DifyWorkflowException(DiftWorkflowExceptionEnum.DIFY_DATA_PARSING_FAILURE);
+            throw new DifyWorkflowException(DifyWorkflowExceptionEnum.DIFY_DATA_PARSING_FAILURE);
         }
 
         // 使用 WebClient 发送 POST 请求
@@ -202,7 +202,7 @@ public class DifyWorkflowDefaultImpl implements DifyWorkflow {
             objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             body = objectMapper.writeValueAsString(chatMessage);
         } catch (JsonProcessingException e) {
-            throw new DifyWorkflowException(DiftWorkflowExceptionEnum.DIFY_DATA_PARSING_FAILURE);
+            throw new DifyWorkflowException(DifyWorkflowExceptionEnum.DIFY_DATA_PARSING_FAILURE);
         }
         return body;
     }
