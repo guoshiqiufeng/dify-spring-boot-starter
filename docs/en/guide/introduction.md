@@ -18,6 +18,8 @@ Implementation of the Redis messaging framework.
 ## Supported
 
 - Chat (Chat Related)
+- Workflow (Workflow Related)
+- Dataset (Knowledge Base)
 - Server (Doesn't provide open interface functionality)
 
 ## Features
@@ -65,7 +67,12 @@ Implementation of the Redis messaging framework.
 | 【KNOWLEDGE】 Disable Or Enable Built-in Metadata       | ✅      |
 | 【KNOWLEDGE】 Update Documents Metadata                 | ✅      |
 | 【KNOWLEDGE】 Get Knowledge Metadata List               | ✅      |
-| 【SERVER】                                              | 🚧     |    
+| 【SERVER】Get Applications List                         | ✅      |
+| 【SERVER】Get Application Information                   | ✅      |
+| 【SERVER】Get Application API Keys                      | ✅      |
+| 【SERVER】Initialize Application API Key                | ✅      | 
+| 【SERVER】Get Knowledge Base API Keys                   | ✅      |
+| 【SERVER】Initialize Knowledge Base API Key             | ✅      |
 
 Tips：
 

@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.server.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -29,5 +30,13 @@ public class ApiKeyResponseVO implements Serializable {
 
     private String id;
 
+    private String type;
+
     private String token;
+
+    @JsonAlias("last_used_at")
+    private Long lastUsedAt;
+
+    @JsonAlias("created_at")
+    private Long createdAt;
 }

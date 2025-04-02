@@ -17,6 +17,8 @@ description:
 ## 支持的服务
 
 - Chat (聊天相关)
+- Workflow (工作流相关)
+- Dataset (知识库)
 - Server (没提供开放接口的功能)
 
 ## 功能
@@ -64,7 +66,12 @@ description:
 | 【DataSet】 启用/禁用内置元数据   | ✅  |
 | 【DataSet】 更新文档元数据      | ✅  |
 | 【DataSet】 查询知识库元数据列表   | ✅  |
-| 【SERVER】               | 🚧 |    
+| 【SERVER】获取应用列表         | ✅  |
+| 【SERVER】获取应用信息         | ✅  |
+| 【SERVER】获取应用API密钥      | ✅  |
+| 【SERVER】初始化应用API密钥     | ✅  |
+| 【SERVER】获取知识库API密钥     | ✅  |
+| 【SERVER】初始化知识库API密钥    | ✅  |
 
 注：
 

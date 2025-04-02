@@ -2,7 +2,6 @@ dependencies {
     api project(":dify:dify-core")
     api "org.springframework:spring-webflux"
     api "${lib["hutool-core"]}"
-    api "${lib["hutool-json"]}"
 
     api "org.springframework.boot:spring-boot-starter-web"
     implementation "org.springframework.boot:spring-boot-starter-data-redis"
