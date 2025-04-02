@@ -16,7 +16,9 @@
 package io.github.guoshiqiufeng.dify.server.impl;
 
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
@@ -36,7 +38,6 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -51,6 +52,7 @@ public class DifyServerRedisImpl implements DifyServer {
     private final DifyProperties difyProperties;
     private final WebClient webClient;
     private final RedisTemplate<String, String> redisTemplate;
+    private final ObjectMapper objectMapper;
 
     /**
      * 白名单
@@ -71,6 +73,7 @@ public class DifyServerRedisImpl implements DifyServer {
         this.difyProperties = difyProperties;
         this.webClient = webClient;
         this.redisTemplate = redisTemplate;
+        this.objectMapper = new ObjectMapper();
     }
 
     /**
@@ -88,12 +91,11 @@ public class DifyServerRedisImpl implements DifyServer {
      */
     private void appPages(String name, int page, List<AppsResponseVO> result) {
         String uri = ServerUriConstant.APPS + "?name=" + name + "&page=" + page + "&limit=100";
-        String json = getRequest(uri);
-        if (StrUtil.isEmpty(json)) {
+        AppsResponseResultVO tmp = getRequest(uri, AppsResponseResultVO.class);
+        if (tmp == null) {
             return;
         }
 
-        AppsResponseResultVO tmp = JSONUtil.toBean(json, AppsResponseResultVO.class);
         result.addAll(tmp.getData());
 
         if (tmp.getHasMore()) {
@@ -106,8 +108,7 @@ public class DifyServerRedisImpl implements DifyServer {
      */
     @Override
     public AppsResponseVO app(String appId) {
-        String json = getRequest(ServerUriConstant.APPS + "/" + appId);
-        return StrUtil.isNotEmpty(json) ? JSONUtil.toBean(json, AppsResponseVO.class) : null;
+        return getRequest(ServerUriConstant.APPS + "/" + appId, AppsResponseVO.class);
     }
 
     /**
@@ -115,12 +116,7 @@ public class DifyServerRedisImpl implements DifyServer {
      */
     @Override
     public List<ApiKeyResponseVO> getAppApiKey(String id) {
-        String json = getRequest(ServerUriConstant.APPS + "/" + id + "/api-keys");
-        if (StrUtil.isEmpty(json)) {
-            return new ArrayList<>();
-        }
-
-        ApiKeyResultResponseVO tmp = JSONUtil.toBean(json, ApiKeyResultResponseVO.class);
+        ApiKeyResultResponseVO tmp = getRequest(ServerUriConstant.APPS + "/" + id + "/api-keys", ApiKeyResultResponseVO.class);
         if (tmp == null) {
             return new ArrayList<>();
         }
@@ -132,42 +128,68 @@ public class DifyServerRedisImpl implements DifyServer {
     }
 
     /**
+     * 处理返回单个对象或数组的情况
+     *
+     * @param uri          URI路径
+     * @param requestBody  请求体
+     * @param elementClass 元素类型
+     * @param <T>          元素类型
+     * @return 元素列表
+     */
+    private <T> List<T> postRequestForList(String uri, Object requestBody, Class<T> elementClass) {
+        try {
+            String requestBodyJson = requestBody instanceof String ? (String) requestBody :
+                    objectMapper.writeValueAsString(requestBody);
+
+            // 首先尝试将响应解析为单个对象
+            T singleItem = null;
+            try {
+                singleItem = sendRequest(uri, requestSpec ->
+                                requestSpec.post().uri(uri).bodyValue(requestBodyJson)
+                        , elementClass);
+
+                if (singleItem != null) {
+                    return List.of(singleItem);
+                }
+            } catch (Exception e) {
+                log.debug("解析为单个对象失败，尝试解析为列表 - URI:{}", uri);
+            }
+
+            // 如果解析为单个对象失败，则尝试解析为列表
+            TypeReference<List<T>> typeReference = new TypeReference<List<T>>() {
+            };
+            List<T> items = sendRequest(uri, requestSpec ->
+                            requestSpec.post().uri(uri).bodyValue(requestBodyJson)
+                    , typeReference);
+
+            return (items != null) ? items : List.of();
+
+        } catch (JsonProcessingException e) {
+            log.error("序列化请求数据失败 - URI:{}", uri, e);
+            return List.of();
+        }
+    }
+
+    /**
      * 初始化api key
      */
     @Override
     public List<ApiKeyResponseVO> initAppApiKey(String id) {
         String uri = StrUtil.format(ServerUriConstant.APPS + "/{}/api-keys", id);
-        String json = postRequest(uri, "");
-
-        return Optional.of(JSONUtil.toBean(json, ApiKeyResponseVO.class))
-                .map(List::of)
-                .orElse(List.of());
+        return postRequestForList(uri, "", ApiKeyResponseVO.class);
     }
 
     @Override
     public List<DatasetApiKeyResponseVO> getDatasetApiKey() {
         String uri = ServerUriConstant.DATASETS + "/api-keys";
-        String json = getRequest(uri);
-        if (StrUtil.isEmpty(json)) {
-            return null;
-        }
-
-        return Optional.of(JSONUtil.toBean(json, DatasetApiKeyResultVO.class))
-                .orElse(new DatasetApiKeyResultVO())
-                .getData();
+        DatasetApiKeyResultVO result = getRequest(uri, DatasetApiKeyResultVO.class);
+        return result != null ? result.getData() : null;
     }
 
     @Override
     public List<DatasetApiKeyResponseVO> initDatasetApiKey() {
         String uri = ServerUriConstant.DATASETS + "/api-keys";
-        String json = postRequest(uri, "");
-        if (StrUtil.isEmpty(json)) {
-            return List.of();
-        }
-
-        return Optional.of(JSONUtil.toBean(json, DatasetApiKeyResponseVO.class))
-                .map(List::of)
-                .orElse(List.of());
+        return postRequestForList(uri, "", DatasetApiKeyResponseVO.class);
     }
 
     /**
@@ -220,9 +242,9 @@ public class DifyServerRedisImpl implements DifyServer {
         }
 
         DifyLoginRequestVO requestVO = DifyLoginRequestVO.build(server.getEmail(), server.getPassword());
-        String json = postRequest(ServerUriConstant.LOGIN, JSONUtil.toJsonStr(requestVO));
+        LoginResultResponseVO result = postRequest(ServerUriConstant.LOGIN, requestVO, LoginResultResponseVO.class);
 
-        return processLoginResponse(json);
+        return processLoginResult(result);
     }
 
     /**
@@ -230,53 +252,89 @@ public class DifyServerRedisImpl implements DifyServer {
      */
     private LoginResponseVO refreshToken(String refreshToken) {
         Map<String, String> requestVO = Map.of("refresh_token", refreshToken);
-        String json = postRequest(ServerUriConstant.REFRESH_TOKEN, JSONUtil.toJsonStr(requestVO));
+        LoginResultResponseVO result = postRequest(ServerUriConstant.REFRESH_TOKEN, requestVO, LoginResultResponseVO.class);
 
-        return processLoginResponse(json);
+        return processLoginResult(result);
     }
 
     /**
-     * 处理登录或刷新令牌响应
+     * 处理登录结果
      */
-    private LoginResponseVO processLoginResponse(String json) {
-        if (StrUtil.isEmpty(json)) {
-            return null;
-        }
-
-        LoginResultResponseVO result = JSONUtil.toBean(json, LoginResultResponseVO.class);
+    private LoginResponseVO processLoginResult(LoginResultResponseVO result) {
         if (result != null && DifyResult.SUCCESS.equals(result.getResult())) {
             return result.getData();
         }
-
         return null;
     }
 
     /**
      * GET请求
      */
-    private String getRequest(String uri) {
+    private <T> T getRequest(String uri, Class<T> responseType) {
         return sendRequest(uri, requestSpec ->
-                requestSpec.get().uri(uri)
-        );
+                        requestSpec.get().uri(uri)
+                , responseType);
+    }
+
+    /**
+     * GET请求（支持复杂泛型类型）
+     */
+    private <T> T getRequest(String uri, TypeReference<T> typeReference) {
+        return sendRequest(uri, requestSpec ->
+                        requestSpec.get().uri(uri)
+                , typeReference);
     }
 
     /**
      * POST请求
      */
-    private String postRequest(String uri, String json) {
-        return sendRequest(uri, requestSpec ->
-                requestSpec.post().uri(uri).bodyValue(json)
-        );
+    private <T> T postRequest(String uri, Object requestBody, Class<T> responseType) {
+        try {
+            String requestBodyJson = requestBody instanceof String ? (String) requestBody :
+                    objectMapper.writeValueAsString(requestBody);
+            return sendRequest(uri, requestSpec ->
+                            requestSpec.post().uri(uri).bodyValue(requestBodyJson)
+                    , responseType);
+        } catch (JsonProcessingException e) {
+            log.error("序列化请求数据失败 - URI:{}", uri, e);
+            return null;
+        }
+    }
+
+    /**
+     * POST请求（支持复杂泛型类型）
+     */
+    private <T> T postRequest(String uri, Object requestBody, TypeReference<T> typeReference) {
+        try {
+            String requestBodyJson = requestBody instanceof String ? (String) requestBody :
+                    objectMapper.writeValueAsString(requestBody);
+            return sendRequest(uri, requestSpec ->
+                            requestSpec.post().uri(uri).bodyValue(requestBodyJson)
+                    , typeReference);
+        } catch (JsonProcessingException e) {
+            log.error("序列化请求数据失败 - URI:{}", uri, e);
+            return null;
+        }
     }
 
     /**
      * 发送请求通用方法
      */
-    private String sendRequest(String uri, Function<WebClient, WebClient.RequestHeadersSpec<?>> requestConfigurer) {
-        return sendRequest(uri, requestConfigurer, 0);
+    private <T> T sendRequest(String uri, Function<WebClient, WebClient.RequestHeadersSpec<?>> requestConfigurer,
+                              Class<T> responseType) {
+        return sendRequest(uri, requestConfigurer, 0, responseType);
     }
 
-    private String sendRequest(String uri, Function<WebClient, WebClient.RequestHeadersSpec<?>> requestConfigurer, int retryCount) {
+    /**
+     * 处理复杂泛型类型的请求
+     */
+    private <T> T sendRequest(String uri, Function<WebClient, WebClient.RequestHeadersSpec<?>> requestConfigurer,
+                              TypeReference<T> typeReference) {
+        return sendRequest(uri, requestConfigurer, 0, typeReference);
+    }
+
+    private <T> T sendRequest(String uri, Function<WebClient, WebClient.RequestHeadersSpec<?>> requestConfigurer,
+                              int retryCount, Class<T> responseType) {
         if (retryCount >= MAX_RETRY_ATTEMPTS) {
             log.warn("请求超过最大重试次数: {}, uri: {}", MAX_RETRY_ATTEMPTS, uri);
             return null;
@@ -287,7 +345,7 @@ public class DifyServerRedisImpl implements DifyServer {
             String accessToken = redisTemplate.opsForValue().get(DifyRedisKey.ACCESS_TOKEN);
             if (StrUtil.isEmpty(accessToken)) {
                 getToken();
-                return sendRequest(uri, requestConfigurer, retryCount + 1);
+                return sendRequest(uri, requestConfigurer, retryCount + 1, responseType);
             }
             headers.setBearerAuth(accessToken);
         }
@@ -306,7 +364,15 @@ public class DifyServerRedisImpl implements DifyServer {
             log.debug("{} 请求完成 - URL:{}, 响应状态:成功, 响应数据:{}", methodType, uri, responseBody);
 
             if (responseBody != null) {
-                return responseBody;
+                if (responseType == String.class) {
+                    return (T) responseBody;
+                }
+                try {
+                    return objectMapper.readValue(responseBody, responseType);
+                } catch (JsonProcessingException e) {
+                    log.error("解析响应数据失败 - URI:{}, 类型:{}", uri, responseType.getName(), e);
+                    return null;
+                }
             }
 
             // 401 刷新token 重试
@@ -316,12 +382,95 @@ public class DifyServerRedisImpl implements DifyServer {
                 if (StrUtil.isNotEmpty(refreshToken)) {
                     LoginResponseVO login = refreshToken(refreshToken);
                     saveToken(login);
-                    return sendRequest(uri, requestConfigurer, retryCount + 1);
+                    return sendRequest(uri, requestConfigurer, retryCount + 1, responseType);
                 }
             }
         } catch (Exception e) {
             log.error("{} 请求失败 - URL:{}, 重试次数:{}, 错误信息:{}", methodType, uri, retryCount, e.getMessage(), e);
-            return sendRequest(uri, requestConfigurer, retryCount + 1);
+            return sendRequest(uri, requestConfigurer, retryCount + 1, responseType);
+        }
+
+        return null;
+    }
+
+    private <T> T sendRequest(String uri, Function<WebClient, WebClient.RequestHeadersSpec<?>> requestConfigurer,
+                              int retryCount, TypeReference<T> typeReference) {
+        if (retryCount >= MAX_RETRY_ATTEMPTS) {
+            log.warn("请求超过最大重试次数: {}, uri: {}", MAX_RETRY_ATTEMPTS, uri);
+            return null;
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        if (!WHITELISTING.contains(uri)) {
+            String accessToken = redisTemplate.opsForValue().get(DifyRedisKey.ACCESS_TOKEN);
+            if (StrUtil.isEmpty(accessToken)) {
+                getToken();
+                return sendRequest(uri, requestConfigurer, retryCount + 1, typeReference);
+            }
+            headers.setBearerAuth(accessToken);
+        }
+
+        String methodType = requestConfigurer.toString().contains("post") ? "POST" : "GET";
+        log.debug("{} 请求开始 - URL:{}, 重试次数:{}, 请求头:{}", methodType, uri, retryCount, headers);
+
+        try {
+            Mono<String> response = requestConfigurer.apply(webClient)
+                    .headers(httpHeaders -> httpHeaders.addAll(headers))
+                    .retrieve()
+                    .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
+                    .bodyToMono(String.class);
+
+            String responseBody = response.block();
+            log.debug("{} 请求完成 - URL:{}, 响应状态:成功, 响应数据:{}", methodType, uri, responseBody);
+
+            if (responseBody != null) {
+                if (String.class.equals(typeReference.getType())) {
+                    return (T) responseBody;
+                }
+                try {
+                    // 检查响应是否是一个有效的JSON数组或对象
+                    boolean expectingList = typeReference.getType().toString().contains("List");
+                    boolean isJsonArray = responseBody.trim().startsWith("[");
+                    boolean isJsonObject = responseBody.trim().startsWith("{");
+
+                    if (expectingList && !isJsonArray && isJsonObject) {
+                        log.debug("响应不是数组格式但正在尝试解析为列表 - URI:{}", uri);
+
+                        // 尝试从响应对象中提取可能的数组字段
+                        try {
+                            Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<Map<String, Object>>() {
+                            });
+                            for (Map.Entry<String, Object> entry : responseMap.entrySet()) {
+                                if (entry.getValue() instanceof List) {
+                                    log.debug("找到数组字段: {} - URI:{}", entry.getKey(), uri);
+                                    return (T) entry.getValue();
+                                }
+                            }
+                        } catch (Exception e) {
+                            log.debug("尝试提取数组字段失败 - URI:{}", uri, e);
+                        }
+                    }
+
+                    return objectMapper.readValue(responseBody, typeReference);
+                } catch (JsonProcessingException e) {
+                    log.error("解析响应数据失败 - URI:{}, 类型:{}, 响应体:{}", uri, typeReference.getType().getTypeName(), responseBody, e);
+                    return null;
+                }
+            }
+
+            // 401 刷新token 重试
+            if (!WHITELISTING.contains(uri)) {
+                log.debug("{} 请求需要刷新Token - URL:{}", methodType, uri);
+                String refreshToken = redisTemplate.opsForValue().get(DifyRedisKey.REFRESH_TOKEN);
+                if (StrUtil.isNotEmpty(refreshToken)) {
+                    LoginResponseVO login = refreshToken(refreshToken);
+                    saveToken(login);
+                    return sendRequest(uri, requestConfigurer, retryCount + 1, typeReference);
+                }
+            }
+        } catch (Exception e) {
+            log.error("{} 请求失败 - URL:{}, 重试次数:{}, 错误信息:{}", methodType, uri, retryCount, e.getMessage(), e);
+            return sendRequest(uri, requestConfigurer, retryCount + 1, typeReference);
         }
 
         return null;

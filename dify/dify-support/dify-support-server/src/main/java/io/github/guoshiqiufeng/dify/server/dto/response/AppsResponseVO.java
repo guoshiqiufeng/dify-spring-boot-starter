@@ -20,6 +20,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author yanghq
@@ -49,20 +50,42 @@ public class AppsResponseVO implements Serializable {
 
     @JsonAlias("icon_url")
     private String iconUrl;
+
+    @JsonAlias("enable_site")
+    private Boolean enableSite;
+
+    @JsonAlias("enable_api")
+    private Boolean enableApi;
+
     @JsonAlias("model_config")
     private ModelConfig modelConfig;
-    private Object workflow;
+
+    private Map<String, Object> workflow;
+
+    private Map<String, Object> site;
+
+    @JsonAlias("api_base_url")
+    private String apiBaseUrl;
+
     @JsonAlias("use_icon_as_answer_icon")
     private Boolean useIconAsAnswerIcon;
+
     @JsonAlias("created_by")
     private String createdBy;
+
     @JsonAlias("created_at")
     private Long createdAt;
+
     @JsonAlias("updated_by")
     private String updatedBy;
+
     @JsonAlias("updated_at")
     private Long updatedAt;
+
     private List<String> tags;
+
+    @JsonAlias("deleted_tools")
+    private List<String> deletedTools;
 
     @Data
     public static class ModelConfig {
@@ -91,5 +114,7 @@ public class AppsResponseVO implements Serializable {
     @Data
     public static class CompletionParams {
         private List<String> stop;
+
+        private String format;
     }
 }
