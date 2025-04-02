@@ -232,7 +232,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
         assertNotNull(response);
         log.info("Indexing status: {}", JSONUtil.toJsonStr(response));
         int attempts = 0;
-        while (response.getData().getFirst().getIndexingStatus().equals("indexing") && attempts<5) {
+        while (response.getData().getFirst().getIndexingStatus().equals("indexing") && attempts < 5) {
             attempts++;
             Thread.sleep(500);
             response = difyDataset.indexingStatus(request);
