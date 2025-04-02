@@ -1,5 +1,5 @@
 dify:
-  url: http://localhost:80
+  url: http://localhost
   server:
     email: admin@admin.com
     password: admin123456
