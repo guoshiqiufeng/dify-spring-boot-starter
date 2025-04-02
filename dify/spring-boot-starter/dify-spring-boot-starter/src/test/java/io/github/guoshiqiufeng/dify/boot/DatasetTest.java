@@ -221,7 +221,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
     @Test
     @Order(7)
     @DisplayName("Test document indexing status")
-    public void testDocumentIndexingStatus() {
+    public void testDocumentIndexingStatus() throws InterruptedException {
         assertNotNull(datasetId, "Dataset ID should be available from previous test");
 
         DocumentIndexingStatusRequest request = new DocumentIndexingStatusRequest();
@@ -230,6 +230,13 @@ public class DatasetTest extends BaseDatasetContainerTest {
 
         DocumentIndexingStatusResponse response = difyDataset.indexingStatus(request);
         assertNotNull(response);
+        log.info("Indexing status: {}", JSONUtil.toJsonStr(response));
+        int attempts = 0;
+        while (response.getData().getFirst().getIndexingStatus().equals("indexing") && attempts<5) {
+            attempts++;
+            Thread.sleep(500);
+            response = difyDataset.indexingStatus(request);
+        }
         log.info("Indexing status: {}", JSONUtil.toJsonStr(response));
     }
 
