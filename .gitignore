@@ -46,3 +46,4 @@ node_modules/**
 /docs/.vuepress/.cache/
 /docs/.vuepress/.temp/
 /docs/.vuepress/dist/
+/dify/spring-boot-starter/dify-spring-boot-starter/src/test/resources/application-test.yml

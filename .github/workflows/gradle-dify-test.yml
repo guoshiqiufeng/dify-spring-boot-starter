@@ -82,6 +82,7 @@ jobs:
         run: |
           # Pull model in the Ollama container
           docker exec ollama ollama pull bge-m3:latest
+          docker exec ollama ollama pull qwen2.5:1.5b
       - name: Check network configuration
         run: |
           echo "Host network information:"
@@ -185,6 +186,12 @@ jobs:
             -H 'Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}' \
             -H 'content-type: application/json' \
             --data-raw "{\"model\":\"bge-m3:latest\",\"model_type\":\"text-embedding\",\"credentials\":{\"mode\":\"chat\",\"context_size\":\"4096\",\"max_tokens\":\"4096\",\"vision_support\":\"false\",\"function_call_support\":\"false\",\"base_url\":\"http://${OLLAMA_CONTAINER_NAME}:11434\"},\"load_balancing\":{\"enabled\":false,\"configs\":[]}}"
+          
+          curl 'http://localhost/console/api/workspaces/current/model-providers/langgenius/ollama/ollama/models' \
+            -H 'Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}' \
+            -H 'content-type: application/json' \
+            --data-raw "{\"model\":\"qwen2.5:1.5b\",\"model_type\":\"llm\",\"credentials\":{\"mode\":\"chat\",\"context_size\":\"40960\",\"max_tokens\":\"4096\",\"vision_support\":\"false\",\"function_call_support\":\"false\",\"base_url\":\"http://${OLLAMA_CONTAINER_NAME}:11434\"},\"load_balancing\":{\"enabled\":false,\"configs\":[]}}"
+
       - name: Run Gradle tests
         run: |
           cd dify-spring-boot-starter
