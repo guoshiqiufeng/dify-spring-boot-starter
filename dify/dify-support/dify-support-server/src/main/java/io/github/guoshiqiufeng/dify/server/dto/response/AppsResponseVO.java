@@ -58,7 +58,7 @@ public class AppsResponseVO implements Serializable {
     private Boolean enableApi;
 
     @JsonAlias("model_config")
-    private ModelConfig modelConfig;
+    private Map<String, Object> modelConfig;
 
     private Map<String, Object> workflow;
 
