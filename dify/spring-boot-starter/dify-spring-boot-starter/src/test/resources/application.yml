@@ -7,6 +7,5 @@ dify:
     api-key: dataset-aaabbbcccdddeeefffggghhh
 logging:
   level:
-    io.github.guoshiqiufeng.dify.boot: debug
-    io.github.guoshiqiufeng.dify.server: debug
-    org.springframework.web.reactive: debug
+    root: ERROR
+    io.github.guoshiqiufeng.dify: DEBUG

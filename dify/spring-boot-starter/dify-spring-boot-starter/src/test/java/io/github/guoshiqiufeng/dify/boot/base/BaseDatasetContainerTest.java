@@ -88,7 +88,7 @@ public abstract class BaseDatasetContainerTest implements RedisContainerTest {
         if (difyServer == null) {
             throw new IllegalStateException("DifyServer is not initialized");
         }
-        
+
         List<DatasetApiKeyResponseVO> apiKeys = difyServer.getDatasetApiKey();
         if (apiKeys == null) {
             log.debug("No existing API keys found, creating new key");
@@ -98,7 +98,7 @@ public abstract class BaseDatasetContainerTest implements RedisContainerTest {
             }
             return apiKeys.getFirst().getToken();
         }
-        
+
         return apiKeys.stream()
                 .findFirst()
                 .map(DatasetApiKeyResponseVO::getToken)

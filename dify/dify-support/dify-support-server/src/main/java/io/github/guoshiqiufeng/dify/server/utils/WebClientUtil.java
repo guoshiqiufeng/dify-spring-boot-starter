@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.workflow.utils;
+package io.github.guoshiqiufeng.dify.server.utils;
 
-import io.github.guoshiqiufeng.dify.workflow.exception.DifyWorkflowException;
-import io.github.guoshiqiufeng.dify.workflow.exception.DifyWorkflowExceptionEnum;
+import io.github.guoshiqiufeng.dify.server.exception.DifyServerException;
+import io.github.guoshiqiufeng.dify.server.exception.DifyServerExceptionEnum;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -35,7 +35,7 @@ public class WebClientUtil {
         return clientResponse.bodyToMono(String.class)
                 .flatMap(errorBody -> {
                             log.error("webClient error: {}", errorBody);
-                            return Mono.error(new DifyWorkflowException(DifyWorkflowExceptionEnum.DIFY_API_ERROR));
+                            return Mono.error(new DifyServerException(DifyServerExceptionEnum.DIFY_API_ERROR));
                         }
                 );
     }
