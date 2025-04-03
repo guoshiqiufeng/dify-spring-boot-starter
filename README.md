@@ -18,6 +18,11 @@ https://guoshiqiufeng.github.io/dify-spring-boot-starter/en
 
 - Spring Boot 3
 
+### Running the minimum version
+
+- Spring Boot 3
+- Java 17
+
 ### Features
 
 - chat
@@ -36,7 +41,7 @@ https://guoshiqiufeng.github.io/dify-spring-boot-starter/en
         <dependency>
             <groupId>io.github.guoshiqiufeng.dify</groupId>
             <artifactId>dify-bom</artifactId>
-            <version>0.6.0</version>
+            <version>0.6.1</version>
             <type>import</type>
         </dependency>
     </dependencies>

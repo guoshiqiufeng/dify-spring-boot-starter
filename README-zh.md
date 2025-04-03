@@ -18,6 +18,11 @@
 
 - Spring Boot 3
 
+### 运行最低版本
+
+- Spring Boot 3
+- Java 17
+
 ### 功能
 
 - 聊天
@@ -36,7 +41,7 @@
         <dependency>
             <groupId>io.github.guoshiqiufeng.dify</groupId>
             <artifactId>dify-bom</artifactId>
-            <version>0.6.0</version>
+            <version>0.6.1</version>
             <type>import</type>
         </dependency>
     </dependencies>

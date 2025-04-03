@@ -1,7 +1,14 @@
 buildscript {
     repositories {
-        maven { url "https://maven.aliyun.com/repository/public" }
-        maven { url "https://maven.aliyun.com/repository/gradle-plugin" }
+        mavenLocal()
+        maven { 
+            url "https://maven.aliyun.com/repository/public"
+            allowInsecureProtocol = true
+        }
+        maven { 
+            url "https://maven.aliyun.com/repository/gradle-plugin"
+            allowInsecureProtocol = true
+        }
         mavenCentral()
         maven { url "https://plugins.gradle.org/m2/" }
     }
