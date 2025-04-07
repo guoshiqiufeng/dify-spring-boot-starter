@@ -1,0 +1,115 @@
+package io.github.guoshiqiufeng.dify.chat.impl;
+
+import io.github.guoshiqiufeng.dify.chat.DifyChat;
+import io.github.guoshiqiufeng.dify.chat.client.DifyChatClient;
+import io.github.guoshiqiufeng.dify.chat.dto.request.*;
+import io.github.guoshiqiufeng.dify.chat.dto.response.*;
+import io.github.guoshiqiufeng.dify.chat.exception.DiftChatException;
+import io.github.guoshiqiufeng.dify.chat.exception.DiftChatExceptionEnum;
+import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
+import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Flux;
+
+import java.io.IOException;
+import java.util.List;
+
+/**
+ * @author yanghq
+ * @version 0.8.0
+ * @since 2025/4/7 14:27
+ */
+@Slf4j
+public class DifyChatClientImpl implements DifyChat {
+
+    private final DifyChatClient difyChatApi;
+
+    public DifyChatClientImpl(DifyChatClient difyChatApi) {
+        this.difyChatApi = difyChatApi;
+    }
+
+    @Override
+    public ChatMessageSendResponse send(ChatMessageSendRequest sendRequest) {
+        return difyChatApi.chat(sendRequest);
+    }
+
+    @Override
+    public Flux<ChatMessageSendResponse> sendChatMessageStream(ChatMessageSendRequest sendRequest) {
+        return difyChatApi.streamingChat(sendRequest);
+    }
+
+    @Override
+    public void stopMessagesStream(String apiKey, String taskId, String userId) {
+        difyChatApi.stopMessagesStream(apiKey, taskId, userId);
+    }
+
+    @Override
+    public MessageFeedbackResponse messageFeedback(MessageFeedbackRequest messageFeedbackRequest) {
+        return difyChatApi.messageFeedback(messageFeedbackRequest);
+    }
+
+    @Override
+    public DifyPageResult<MessageConversationsResponse> conversations(MessageConversationsRequest request) {
+        return difyChatApi.conversations(request);
+    }
+
+    @Override
+    public DifyPageResult<MessagesResponseVO> messages(MessagesRequest request) {
+        return difyChatApi.messages(request);
+    }
+
+    @Override
+    public List<String> messagesSuggested(String messageId, String apiKey, String userId) {
+        return difyChatApi.messagesSuggested(messageId, apiKey, userId);
+    }
+
+    @Override
+    public void deleteConversation(String conversationId, String apiKey, String userId) {
+        difyChatApi.deleteConversation(conversationId, apiKey, userId);
+    }
+
+    @Override
+    public MessageConversationsResponse renameConversation(RenameConversationRequest renameConversationRequest) {
+        return difyChatApi.renameConversation(renameConversationRequest);
+    }
+
+    @Override
+    public AppParametersResponseVO parameters(String apiKey) {
+        return difyChatApi.parameters(apiKey);
+    }
+
+    @Override
+    public void textToAudio(TextToAudioRequest request, HttpServletResponse response) {
+        try {
+            ResponseEntity<byte[]> responseEntity = difyChatApi.textToAudio(request);
+
+            String type = responseEntity.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
+            response.setContentType(type != null ? type : "audio/mpeg");
+
+            String contentDisposition = responseEntity.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION);
+            if (contentDisposition != null) {
+                response.setHeader(HttpHeaders.CONTENT_DISPOSITION, contentDisposition);
+            } else {
+                response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=audio.mp3");
+            }
+
+            if (responseEntity.getBody() != null) {
+                response.getOutputStream().write(responseEntity.getBody());
+                response.getOutputStream().flush();
+            }
+
+        } catch (IOException | WebClientResponseException e) {
+            log.error("textToAudio error: {}", e.getMessage());
+            throw new DiftChatException(DiftChatExceptionEnum.DIFY_API_ERROR);
+        }
+    }
+
+    @Override
+    public DifyTextVO audioToText(AudioToTextRequest request) {
+        return difyChatApi.audioToText(request);
+    }
+}

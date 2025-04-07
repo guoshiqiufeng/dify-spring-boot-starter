@@ -15,7 +15,6 @@
  */
 package io.github.guoshiqiufeng.dify.chat.dto.request;
 
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -29,7 +28,6 @@ import java.io.Serializable;
 public class MessagesCurrentRequest implements Serializable {
     private static final long serialVersionUID = 5790356634269119842L;
 
-    @NotEmpty(message = "appId不能为空")
     private String appId;
 
     private String conversationId;

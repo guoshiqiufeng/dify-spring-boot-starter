@@ -14,5 +14,6 @@ dependencies {
     testImplementation "org.springframework.boot:spring-boot-starter-test"
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation "io.projectreactor:reactor-test"
     testImplementation "${lib["hutool-json"]}"
 }

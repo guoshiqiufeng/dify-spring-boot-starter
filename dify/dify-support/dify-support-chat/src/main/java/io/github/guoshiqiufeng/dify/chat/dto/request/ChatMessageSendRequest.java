@@ -15,7 +15,6 @@
  */
 package io.github.guoshiqiufeng.dify.chat.dto.request;
 
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -44,7 +43,6 @@ public class ChatMessageSendRequest extends BaseChatRequest implements Serializa
     /**
      * 聊天内容
      */
-    @NotEmpty(message = "聊天内容不能为空")
     private String content;
 
     /**

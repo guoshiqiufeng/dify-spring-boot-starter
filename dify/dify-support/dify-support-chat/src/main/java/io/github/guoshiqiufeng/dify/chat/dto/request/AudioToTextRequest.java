@@ -15,7 +15,6 @@
  */
 package io.github.guoshiqiufeng.dify.chat.dto.request;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +31,5 @@ import java.io.Serializable;
 public class AudioToTextRequest extends BaseChatRequest implements Serializable {
     private static final long serialVersionUID = -7700945517933651361L;
 
-    @NotNull(message = "文件不能为空")
     private MultipartFile file;
 }

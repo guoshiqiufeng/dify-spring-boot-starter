@@ -25,6 +25,7 @@ import io.github.guoshiqiufeng.dify.chat.dto.request.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.*;
 import io.github.guoshiqiufeng.dify.chat.exception.DiftChatException;
 import io.github.guoshiqiufeng.dify.chat.exception.DiftChatExceptionEnum;
+import io.github.guoshiqiufeng.dify.chat.utils.MultipartInputStreamFileResource;
 import io.github.guoshiqiufeng.dify.chat.utils.WebClientUtil;
 import io.github.guoshiqiufeng.dify.core.enums.ResponseModeEnum;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
@@ -34,7 +35,6 @@ import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
@@ -48,7 +48,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Flux;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +60,7 @@ import java.util.Map;
  * @since 2025/3/4 10:21
  */
 @Slf4j
+@Deprecated(since = "0.8.0")
 public class DifyChatDefaultImpl implements DifyChat {
 
     private final ObjectMapper objectMapper;
@@ -483,25 +483,5 @@ public class DifyChatDefaultImpl implements DifyChat {
         }
     }
 
-    /**
-     * 处理 MultipartFile
-     */
-    private static class MultipartInputStreamFileResource extends InputStreamResource {
-        private final String filename;
 
-        public MultipartInputStreamFileResource(InputStream inputStream, String filename) {
-            super(inputStream);
-            this.filename = filename;
-        }
-
-        @Override
-        public String getFilename() {
-            return this.filename;
-        }
-
-        @Override
-        public long contentLength() {
-            return -1; // 表示长度未知
-        }
-    }
 }

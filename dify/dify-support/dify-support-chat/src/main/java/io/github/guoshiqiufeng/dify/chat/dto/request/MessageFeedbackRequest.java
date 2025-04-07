@@ -50,7 +50,7 @@ public class MessageFeedbackRequest extends BaseChatRequest implements Serializa
 
     @Getter
     @AllArgsConstructor
-    public static enum Rating {
+    public enum Rating {
         /**
          * 点赞
          */
