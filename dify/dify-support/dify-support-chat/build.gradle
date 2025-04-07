@@ -2,14 +2,10 @@ dependencies {
     api project(":dify:dify-core")
     api "${lib["hutool-core"]}"
 
-    implementation "jakarta.validation:jakarta.validation-api"
     implementation "jakarta.servlet:jakarta.servlet-api"
 
 
     implementation "com.fasterxml.jackson.core:jackson-databind"
 
-    annotationProcessor "org.springframework.boot:spring-boot-starter-actuator"
-    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
-
-    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation 'org.junit.jupiter:junit-jupiter'
 }
