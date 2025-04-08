@@ -940,11 +940,12 @@ DocumentMetaDataUpdateRequest
 
 **MetaData 对象结构**
 
-| 参数名  | 类型     | 描述    |
-|------|--------|-------|
-| id   | String | 元数据ID |
-| type | String | 元数据类型 |
-| name | String | 元数据名称 |
+| 参数名   | 类型     | 描述    |
+|-------|--------|-------|
+| id    | String | 元数据ID |
+| type  | String | 元数据类型 |
+| name  | String | 元数据名称 |
+| value | String | 元数据值  |
 
 #### 响应参数
 
