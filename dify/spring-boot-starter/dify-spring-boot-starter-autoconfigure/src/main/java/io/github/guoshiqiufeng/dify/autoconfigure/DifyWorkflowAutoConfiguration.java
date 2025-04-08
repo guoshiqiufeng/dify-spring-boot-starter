@@ -15,21 +15,18 @@
  */
 package io.github.guoshiqiufeng.dify.autoconfigure;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
-import io.github.guoshiqiufeng.dify.workflow.impl.DifyWorkflowDefaultImpl;
+import io.github.guoshiqiufeng.dify.workflow.DifyWorkflow;
+import io.github.guoshiqiufeng.dify.workflow.client.DifyWorkflowClient;
+import io.github.guoshiqiufeng.dify.workflow.impl.DifyWorkflowClientImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.netty.http.HttpProtocol;
-import reactor.netty.http.client.HttpClient;
 
 /**
  * @author yanghq
@@ -38,31 +35,47 @@ import reactor.netty.http.client.HttpClient;
  */
 @Slf4j
 @Configuration
-@ConditionalOnClass({DifyWorkflowDefaultImpl.class})
+@ConditionalOnClass({DifyWorkflowClient.class})
 public class DifyWorkflowAutoConfiguration {
 
-    @Bean(name = "difyWorkflowWebClient")
-    @ConditionalOnMissingBean(name = "difyWorkflowWebClient")
-    public WebClient difyWorkflowWebClient(DifyProperties properties) {
-        if (properties == null) {
-            log.error("Dify properties must not be null");
-            return null;
-        }
-        HttpClient httpClient = HttpClient.create()
-                .protocol(HttpProtocol.HTTP11);
+//    @Bean(name = "difyWorkflowWebClient")
+//    @ConditionalOnMissingBean(name = "difyWorkflowWebClient")
+//    public WebClient difyWorkflowWebClient(DifyProperties properties) {
+//        if (properties == null) {
+//            log.error("Dify properties must not be null");
+//            return null;
+//        }
+//        HttpClient httpClient = HttpClient.create()
+//                .protocol(HttpProtocol.HTTP11);
+//
+//        return WebClient.builder()
+//                .baseUrl(properties.getUrl())
+//                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+//                .clientConnector(new ReactorClientHttpConnector(httpClient))
+//                .build();
+//    }
+//
+//    @Bean
+//    @ConditionalOnMissingBean({DifyWorkflowDefaultImpl.class})
+//    public DifyWorkflowDefaultImpl difyWorkflowHandler(ObjectMapper objectMapper,
+//                                                       @Qualifier("difyWorkflowWebClient") WebClient difyDatasetWebClient) {
+//        return new DifyWorkflowDefaultImpl(objectMapper, difyDatasetWebClient);
+//    }
 
-        return WebClient.builder()
-                .baseUrl(properties.getUrl())
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .build();
+    @Bean
+    @ConditionalOnMissingBean(DifyWorkflowClient.class)
+    public DifyWorkflowClient difyWorkflowClient(DifyProperties properties,
+                                                 ObjectProvider<RestClient.Builder> restClientBuilderProvider,
+                                                 ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
+        return new DifyWorkflowClient(properties.getUrl(),
+                restClientBuilderProvider.getIfAvailable(RestClient::builder),
+                webClientBuilderProvider.getIfAvailable(WebClient::builder));
     }
 
     @Bean
-    @ConditionalOnMissingBean({DifyWorkflowDefaultImpl.class})
-    public DifyWorkflowDefaultImpl difyWorkflowHandler(ObjectMapper objectMapper,
-                                                       @Qualifier("difyWorkflowWebClient") WebClient difyDatasetWebClient) {
-        return new DifyWorkflowDefaultImpl(objectMapper, difyDatasetWebClient);
+    @ConditionalOnMissingBean({DifyWorkflow.class})
+    public DifyWorkflowClientImpl difyWorkflowHandler(DifyWorkflowClient difyWorkflowClient) {
+        return new DifyWorkflowClientImpl(difyWorkflowClient);
     }
 
 }
