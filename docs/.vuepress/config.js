@@ -70,6 +70,7 @@ export default defineUserConfig({
                                 '/guide/feature/chat',
                                 '/guide/feature/workflow',
                                 '/guide/feature/dataset',
+                                '/guide/feature/server',
                             ]
                         },
                         //{     text: '接收消息',
@@ -107,6 +108,7 @@ export default defineUserConfig({
                                     '/guide/feature/chat',
                                     '/guide/feature/workflow',
                                     '/guide/feature/dataset',
+                                    '/guide/feature/server',
                                 ]
                             },
                             // {
@@ -172,6 +174,7 @@ export default defineUserConfig({
                                 '/en/guide/feature/chat',
                                 '/en/guide/feature/workflow',
                                 '/en/guide/feature/dataset',
+                                '/en/guide/feature/server',
                             ]
                         },
                         // {
@@ -210,6 +213,7 @@ export default defineUserConfig({
                                     '/en/guide/feature/chat',
                                     '/en/guide/feature/workflow',
                                     '/en/guide/feature/dataset',
+                                    '/en/guide/feature/server',
                                 ]
                             },
                             // {
