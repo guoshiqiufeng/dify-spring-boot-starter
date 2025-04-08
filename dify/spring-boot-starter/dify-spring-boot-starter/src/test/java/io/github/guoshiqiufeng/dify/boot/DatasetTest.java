@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.boot;
 
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.json.JSONUtil;
 import io.github.guoshiqiufeng.dify.boot.base.BaseDatasetContainerTest;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
@@ -384,9 +385,10 @@ public class DatasetTest extends BaseDatasetContainerTest {
 
         List<DocumentMetaDataUpdateRequest.MetaData> dataList = new ArrayList<>();
         DocumentMetaDataUpdateRequest.MetaData metaData = new DocumentMetaDataUpdateRequest.MetaData();
-        metaData.setId("1");
+        metaData.setId(metaDataId);
         metaData.setType("string");
-        metaData.setName("test-value");
+        metaData.setName("updated-test-metadata");
+        metaData.setValue("test-value");
         dataList.add(metaData);
 
         operationData.setMetadataList(dataList);

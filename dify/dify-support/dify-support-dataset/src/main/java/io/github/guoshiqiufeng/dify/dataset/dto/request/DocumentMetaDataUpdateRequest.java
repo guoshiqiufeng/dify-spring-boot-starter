@@ -66,5 +66,7 @@ public class DocumentMetaDataUpdateRequest extends BaseDatasetRequest implements
         private String type;
 
         private String name;
+
+        private String value;
     }
 }
