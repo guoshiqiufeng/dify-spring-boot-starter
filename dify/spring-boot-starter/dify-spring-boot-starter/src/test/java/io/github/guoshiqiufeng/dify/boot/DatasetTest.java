@@ -202,6 +202,8 @@ public class DatasetTest extends BaseDatasetContainerTest {
         request.setDatasetId(datasetId);
         request.setDocumentId(documentTextId);
         request.setName("Updated Text Document");
+        request.setDocForm(DocFormEnum.hierarchical_model);
+        request.setDocLanguage("English");
 
         ProcessRule processRule = new ProcessRule();
         processRule.setMode(ModeEnum.automatic);

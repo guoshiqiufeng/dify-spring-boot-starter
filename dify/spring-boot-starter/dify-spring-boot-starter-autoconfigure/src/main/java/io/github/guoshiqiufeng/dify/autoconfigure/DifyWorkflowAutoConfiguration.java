@@ -61,7 +61,7 @@ public class DifyWorkflowAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean({DifyWorkflowDefaultImpl.class})
     public DifyWorkflowDefaultImpl difyWorkflowHandler(ObjectMapper objectMapper,
-                                                       @Qualifier("difyDatasetWebClient") WebClient difyDatasetWebClient) {
+                                                       @Qualifier("difyWorkflowWebClient") WebClient difyDatasetWebClient) {
         return new DifyWorkflowDefaultImpl(objectMapper, difyDatasetWebClient);
     }
 

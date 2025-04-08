@@ -26,66 +26,66 @@ import java.util.List;
 @Slf4j
 public class DifyChatClientImpl implements DifyChat {
 
-    private final DifyChatClient difyChatApi;
+    private final DifyChatClient difyChatClient;
 
-    public DifyChatClientImpl(DifyChatClient difyChatApi) {
-        this.difyChatApi = difyChatApi;
+    public DifyChatClientImpl(DifyChatClient difyChatClient) {
+        this.difyChatClient = difyChatClient;
     }
 
     @Override
     public ChatMessageSendResponse send(ChatMessageSendRequest sendRequest) {
-        return difyChatApi.chat(sendRequest);
+        return difyChatClient.chat(sendRequest);
     }
 
     @Override
     public Flux<ChatMessageSendResponse> sendChatMessageStream(ChatMessageSendRequest sendRequest) {
-        return difyChatApi.streamingChat(sendRequest);
+        return difyChatClient.streamingChat(sendRequest);
     }
 
     @Override
     public void stopMessagesStream(String apiKey, String taskId, String userId) {
-        difyChatApi.stopMessagesStream(apiKey, taskId, userId);
+        difyChatClient.stopMessagesStream(apiKey, taskId, userId);
     }
 
     @Override
     public MessageFeedbackResponse messageFeedback(MessageFeedbackRequest messageFeedbackRequest) {
-        return difyChatApi.messageFeedback(messageFeedbackRequest);
+        return difyChatClient.messageFeedback(messageFeedbackRequest);
     }
 
     @Override
     public DifyPageResult<MessageConversationsResponse> conversations(MessageConversationsRequest request) {
-        return difyChatApi.conversations(request);
+        return difyChatClient.conversations(request);
     }
 
     @Override
     public DifyPageResult<MessagesResponseVO> messages(MessagesRequest request) {
-        return difyChatApi.messages(request);
+        return difyChatClient.messages(request);
     }
 
     @Override
     public List<String> messagesSuggested(String messageId, String apiKey, String userId) {
-        return difyChatApi.messagesSuggested(messageId, apiKey, userId);
+        return difyChatClient.messagesSuggested(messageId, apiKey, userId);
     }
 
     @Override
     public void deleteConversation(String conversationId, String apiKey, String userId) {
-        difyChatApi.deleteConversation(conversationId, apiKey, userId);
+        difyChatClient.deleteConversation(conversationId, apiKey, userId);
     }
 
     @Override
     public MessageConversationsResponse renameConversation(RenameConversationRequest renameConversationRequest) {
-        return difyChatApi.renameConversation(renameConversationRequest);
+        return difyChatClient.renameConversation(renameConversationRequest);
     }
 
     @Override
     public AppParametersResponseVO parameters(String apiKey) {
-        return difyChatApi.parameters(apiKey);
+        return difyChatClient.parameters(apiKey);
     }
 
     @Override
     public void textToAudio(TextToAudioRequest request, HttpServletResponse response) {
         try {
-            ResponseEntity<byte[]> responseEntity = difyChatApi.textToAudio(request);
+            ResponseEntity<byte[]> responseEntity = difyChatClient.textToAudio(request);
 
             String type = responseEntity.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
             response.setContentType(type != null ? type : "audio/mpeg");
@@ -110,6 +110,6 @@ public class DifyChatClientImpl implements DifyChat {
 
     @Override
     public DifyTextVO audioToText(AudioToTextRequest request) {
-        return difyChatApi.audioToText(request);
+        return difyChatClient.audioToText(request);
     }
 }

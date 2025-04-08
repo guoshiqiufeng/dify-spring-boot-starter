@@ -15,23 +15,19 @@
  */
 package io.github.guoshiqiufeng.dify.autoconfigure;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
-import io.github.guoshiqiufeng.dify.dataset.impl.DifyDatasetDefaultImpl;
+import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
+import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;
+import io.github.guoshiqiufeng.dify.dataset.impl.DifyDatasetClientImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.netty.http.HttpProtocol;
-import reactor.netty.http.client.HttpClient;
-
-import java.util.Optional;
 
 /**
  * @author yanghq
@@ -40,36 +36,55 @@ import java.util.Optional;
  */
 @Slf4j
 @Configuration
-@ConditionalOnClass({DifyDatasetDefaultImpl.class})
+@ConditionalOnClass({DifyDatasetClient.class})
 public class DifyDatasetAutoConfiguration {
 
-    @Bean(name = "difyDatasetWebClient")
-    @ConditionalOnMissingBean(name = "difyDatasetWebClient")
-    public WebClient difyDatasetWebClient(DifyProperties properties) {
-        if (properties == null) {
-            log.error("Dify properties must not be null");
-            return null;
-        }
-        String apiKey = Optional.ofNullable(properties.getDataset())
-                .map(DifyProperties.Dataset::getApiKey)
-                .orElse("");
+//    @Bean(name = "difyDatasetWebClient")
+//    @ConditionalOnMissingBean(name = "difyDatasetWebClient")
+//    public WebClient difyDatasetWebClient(DifyProperties properties) {
+//        if (properties == null) {
+//            log.error("Dify properties must not be null");
+//            return null;
+//        }
+//        String apiKey = Optional.ofNullable(properties.getDataset())
+//                .map(DifyProperties.Dataset::getApiKey)
+//                .orElse("");
+//
+//        HttpClient httpClient = HttpClient.create()
+//                .protocol(HttpProtocol.HTTP11);
+//
+//        return WebClient.builder()
+//                .baseUrl(properties.getUrl())
+//                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
+//                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+//                .clientConnector(new ReactorClientHttpConnector(httpClient))
+//                .build();
+//    }
+//
+//    @Bean
+//    @ConditionalOnMissingBean({DifyDatasetDefaultImpl.class})
+//    public DifyDatasetDefaultImpl difyDatasetHandler(ObjectMapper objectMapper,
+//                                                     @Qualifier("difyDatasetWebClient") WebClient difyDatasetWebClient) {
+//        return new DifyDatasetDefaultImpl(objectMapper, difyDatasetWebClient);
+//    }
 
-        HttpClient httpClient = HttpClient.create()
-                .protocol(HttpProtocol.HTTP11);
-
-        return WebClient.builder()
-                .baseUrl(properties.getUrl())
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .build();
+    @Bean
+    @ConditionalOnMissingBean(DifyDatasetClient.class)
+    public DifyDatasetClient difyDatasetClient(DifyProperties properties,
+                                               ObjectProvider<RestClient.Builder> restClientBuilderProvider,
+                                               ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
+        String apikey = "Bearer " + properties.getDataset().getApiKey();
+        return new DifyDatasetClient(properties.getUrl(),
+                restClientBuilderProvider.getIfAvailable(RestClient::builder)
+                        .defaultHeader(HttpHeaders.AUTHORIZATION, apikey),
+                webClientBuilderProvider.getIfAvailable(WebClient::builder)
+                        .defaultHeader(HttpHeaders.AUTHORIZATION, apikey));
     }
 
     @Bean
-    @ConditionalOnMissingBean({DifyDatasetDefaultImpl.class})
-    public DifyDatasetDefaultImpl difyDatasetHandler(ObjectMapper objectMapper,
-                                                     @Qualifier("difyDatasetWebClient") WebClient difyDatasetWebClient) {
-        return new DifyDatasetDefaultImpl(objectMapper, difyDatasetWebClient);
+    @ConditionalOnMissingBean({DifyDataset.class})
+    public DifyDatasetClientImpl difyDataset(DifyDatasetClient difyDatasetClient) {
+        return new DifyDatasetClientImpl(difyDatasetClient);
     }
 
 }
