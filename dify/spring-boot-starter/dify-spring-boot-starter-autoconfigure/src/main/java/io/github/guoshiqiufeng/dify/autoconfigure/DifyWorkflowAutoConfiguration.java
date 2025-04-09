@@ -38,30 +38,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 @ConditionalOnClass({DifyWorkflowClient.class})
 public class DifyWorkflowAutoConfiguration {
 
-//    @Bean(name = "difyWorkflowWebClient")
-//    @ConditionalOnMissingBean(name = "difyWorkflowWebClient")
-//    public WebClient difyWorkflowWebClient(DifyProperties properties) {
-//        if (properties == null) {
-//            log.error("Dify properties must not be null");
-//            return null;
-//        }
-//        HttpClient httpClient = HttpClient.create()
-//                .protocol(HttpProtocol.HTTP11);
-//
-//        return WebClient.builder()
-//                .baseUrl(properties.getUrl())
-//                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-//                .clientConnector(new ReactorClientHttpConnector(httpClient))
-//                .build();
-//    }
-//
-//    @Bean
-//    @ConditionalOnMissingBean({DifyWorkflowDefaultImpl.class})
-//    public DifyWorkflowDefaultImpl difyWorkflowHandler(ObjectMapper objectMapper,
-//                                                       @Qualifier("difyWorkflowWebClient") WebClient difyDatasetWebClient) {
-//        return new DifyWorkflowDefaultImpl(objectMapper, difyDatasetWebClient);
-//    }
-
     @Bean
     @ConditionalOnMissingBean(DifyWorkflowClient.class)
     public DifyWorkflowClient difyWorkflowClient(DifyProperties properties,

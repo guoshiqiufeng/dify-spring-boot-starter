@@ -30,6 +30,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author yanghq
@@ -134,7 +135,7 @@ public class DifyServerClient extends BaseDifyClient {
     }
 
     private void appPages(String name, int page, List<AppsResponseVO> result) {
-        AppsResponseResultVO tmp = executeWithRetry(
+        AppsResponseResultVO response = executeWithRetry(
                 () -> restClient.get()
                         .uri(ServerUriConstant.APPS + "?name={name}&page={page}&limit=100", name, page)
                         .headers(this::addAuthorizationHeader)
@@ -143,11 +144,15 @@ public class DifyServerClient extends BaseDifyClient {
                         .body(AppsResponseResultVO.class)
         );
 
-        if (tmp == null) {
+        if (response == null) {
             return;
         }
-        result.addAll(tmp.getData());
-        if (tmp.getHasMore()) {
+        List<AppsResponseVO> data = response.getData();
+        if (data != null) {
+            result.addAll(data);
+        }
+
+        if (Boolean.TRUE.equals(response.getHasMore())) {
             appPages(name, page + 1, result);
         }
     }
@@ -169,10 +174,7 @@ public class DifyServerClient extends BaseDifyClient {
                 .retrieve()
                 .onStatus(responseErrorHandler)
                 .body(LoginResultResponseVO.class);
-        if (result != null && DifyResult.SUCCESS.equals(result.getResult())) {
-            return result.getData();
-        }
-        return null;
+        return processLoginResult(result);
     }
 
     LoginResponseVO refreshToken(String refreshToken) {
@@ -183,12 +185,19 @@ public class DifyServerClient extends BaseDifyClient {
                 .retrieve()
                 .onStatus(responseErrorHandler)
                 .body(LoginResultResponseVO.class);
-
-        if (result != null && DifyResult.SUCCESS.equals(result.getResult())) {
-            return result.getData();
-        }
-        return null;
+        return processLoginResult(result);
     }
 
-
+    /**
+     * Processes login/refresh response and extracts data
+     *
+     * @param result the login result
+     * @return the login response data or null
+     */
+    private LoginResponseVO processLoginResult(LoginResultResponseVO result) {
+        return Optional.ofNullable(result)
+                .filter(r -> DifyResult.SUCCESS.equals(r.getResult()))
+                .map(LoginResultResponseVO::getData)
+                .orElse(null);
+    }
 }

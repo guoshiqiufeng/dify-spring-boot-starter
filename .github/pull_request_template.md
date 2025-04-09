@@ -5,7 +5,8 @@ List any dependencies that are required for this change.
 
 > [!Tip]
 > Close issue syntax: `Fixes #<issue number>` or `Resolves #<issue number>`,
-> see [documentation](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue#linking-a-pull-request-to-an-issue-using-a-keyword)
+>
+see [documentation](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue#linking-a-pull-request-to-an-issue-using-a-keyword)
 > for more details.
 
 # Screenshots

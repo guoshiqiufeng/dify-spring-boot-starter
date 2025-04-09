@@ -39,35 +39,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 @ConditionalOnClass({DifyDatasetClient.class})
 public class DifyDatasetAutoConfiguration {
 
-//    @Bean(name = "difyDatasetWebClient")
-//    @ConditionalOnMissingBean(name = "difyDatasetWebClient")
-//    public WebClient difyDatasetWebClient(DifyProperties properties) {
-//        if (properties == null) {
-//            log.error("Dify properties must not be null");
-//            return null;
-//        }
-//        String apiKey = Optional.ofNullable(properties.getDataset())
-//                .map(DifyProperties.Dataset::getApiKey)
-//                .orElse("");
-//
-//        HttpClient httpClient = HttpClient.create()
-//                .protocol(HttpProtocol.HTTP11);
-//
-//        return WebClient.builder()
-//                .baseUrl(properties.getUrl())
-//                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
-//                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-//                .clientConnector(new ReactorClientHttpConnector(httpClient))
-//                .build();
-//    }
-//
-//    @Bean
-//    @ConditionalOnMissingBean({DifyDatasetDefaultImpl.class})
-//    public DifyDatasetDefaultImpl difyDatasetHandler(ObjectMapper objectMapper,
-//                                                     @Qualifier("difyDatasetWebClient") WebClient difyDatasetWebClient) {
-//        return new DifyDatasetDefaultImpl(objectMapper, difyDatasetWebClient);
-//    }
-
     @Bean
     @ConditionalOnMissingBean(DifyDatasetClient.class)
     public DifyDatasetClient difyDatasetClient(DifyProperties properties,

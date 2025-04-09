@@ -38,30 +38,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 @ConditionalOnClass({DifyChatClient.class})
 public class DifyChatAutoConfiguration {
 
-//    @Bean(name = "difyChatWebClient")
-//    @ConditionalOnMissingBean(name = "difyChatWebClient")
-//    public WebClient difyChatWebClient(DifyProperties properties) {
-//        if (properties == null) {
-//            log.error("Dify properties must not be null");
-//            return null;
-//        }
-//        HttpClient httpClient = HttpClient.create()
-//                .protocol(HttpProtocol.HTTP11);
-//
-//        return WebClient.builder()
-//                .baseUrl(properties.getUrl())
-//                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-//                .clientConnector(new ReactorClientHttpConnector(httpClient))
-//                .build();
-//    }
-//
-//    @Bean
-//    @ConditionalOnMissingBean({DifyChatDefaultImpl.class})
-//    public DifyChatDefaultImpl difyChatHandler(ObjectMapper objectMapper,
-//                                               @Qualifier("difyChatWebClient") WebClient difyChatWebClient) {
-//        return new DifyChatDefaultImpl(objectMapper, difyChatWebClient);
-//    }
-
     @Bean
     @ConditionalOnMissingBean(DifyChatClient.class)
     public DifyChatClient difyChatClient(DifyProperties properties,
