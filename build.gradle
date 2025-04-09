@@ -32,6 +32,13 @@ subprojects {
         options.release = 21
     }
 
+    repositories {
+        mavenLocal()
+        maven { url "https://maven.aliyun.com/repository/public" }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        mavenCentral()
+    }
+
     def onlyPom = project.name == "dify-bom"
 
     if (!onlyPom) {
