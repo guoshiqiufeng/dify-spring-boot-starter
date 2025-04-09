@@ -157,11 +157,14 @@ jobs:
         run: |
           cd dify/docker
           
+          # Download the plugin package
+          curl -o langgenius-ollama_0.0.4.difypkg https://github.com/guoshiqiufeng/dify-spring-boot-starter-examples/releases/download/v0.5.0/langgenius-ollama_0.0.4.difypkg
+          
           # Upload the plugin package
           echo "Uploading plugin package..."
           UPLOAD_RESPONSE=$(curl -v -X POST 'http://localhost/console/api/workspaces/current/plugin/upload/pkg' \
             -H 'Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}' \
-            -F 'pkg=@/home/runner/work/dify-spring-boot-starter/.github/workflows/langgenius-ollama_0.0.4.difypkg' \
+            -F 'pkg=@langgenius-ollama_0.0.4.difypkg' \
             --retry 5 --retry-delay 5)
           
           echo "Upload response: $UPLOAD_RESPONSE"
