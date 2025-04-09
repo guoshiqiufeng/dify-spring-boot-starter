@@ -1,11 +1,11 @@
 buildscript {
     repositories {
         mavenLocal()
-        maven { 
+        maven {
             url "https://maven.aliyun.com/repository/public"
             allowInsecureProtocol = true
         }
-        maven { 
+        maven {
             url "https://maven.aliyun.com/repository/gradle-plugin"
             allowInsecureProtocol = true
         }

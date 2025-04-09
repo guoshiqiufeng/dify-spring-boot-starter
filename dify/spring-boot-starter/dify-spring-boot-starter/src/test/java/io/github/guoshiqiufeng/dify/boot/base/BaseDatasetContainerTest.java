@@ -15,12 +15,10 @@
  */
 package io.github.guoshiqiufeng.dify.boot.base;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
 import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;
 import io.github.guoshiqiufeng.dify.dataset.impl.DifyDatasetClientImpl;
-import io.github.guoshiqiufeng.dify.dataset.impl.DifyDatasetDefaultImpl;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponseVO;
 import jakarta.annotation.Resource;
@@ -28,14 +26,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.netty.http.HttpProtocol;
-import reactor.netty.http.client.HttpClient;
 
 import java.time.Duration;
 import java.util.List;

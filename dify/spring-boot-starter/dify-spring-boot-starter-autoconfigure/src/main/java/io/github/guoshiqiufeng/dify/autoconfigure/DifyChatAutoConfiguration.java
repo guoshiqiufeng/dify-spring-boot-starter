@@ -65,8 +65,8 @@ public class DifyChatAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(DifyChatClient.class)
     public DifyChatClient difyChatClient(DifyProperties properties,
-                                      ObjectProvider<RestClient.Builder> restClientBuilderProvider,
-                                      ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
+                                         ObjectProvider<RestClient.Builder> restClientBuilderProvider,
+                                         ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
         return new DifyChatClient(properties.getUrl(),
                 restClientBuilderProvider.getIfAvailable(RestClient::builder),
                 webClientBuilderProvider.getIfAvailable(WebClient::builder));
