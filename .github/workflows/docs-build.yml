@@ -7,11 +7,13 @@ on: [ pull_request ]
 jobs:
   docs:
     runs-on: ubuntu-latest
+    # 添加条件检查，只有当 docs 目录有变更时才运行
+    if: ${{ contains(github.event.pull_request.changed_files, 'docs/') }}
 
     steps:
       - uses: actions/checkout@v4
         with:
-          # “最近更新时间” 等 git 日志相关信息，需要拉取全部提交记录
+          # "最近更新时间" 等 git 日志相关信息，需要拉取全部提交记录
           fetch-depth: 0
 
       - name: Init VuePress
