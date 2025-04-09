@@ -56,17 +56,5 @@ public class DocumentMetaDataUpdateRequest extends BaseDatasetRequest implements
         private List<MetaData> metadataList;
     }
 
-    @Data
-    public static class MetaData implements Serializable {
 
-        private static final long serialVersionUID = 1083376788375284035L;
-
-        private String id;
-
-        private String type;
-
-        private String name;
-
-        private String value;
-    }
 }

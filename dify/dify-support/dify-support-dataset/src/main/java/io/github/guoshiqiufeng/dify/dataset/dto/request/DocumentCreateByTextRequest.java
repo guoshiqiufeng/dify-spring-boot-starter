@@ -26,6 +26,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -57,7 +58,7 @@ public class DocumentCreateByTextRequest extends BaseDatasetRequest implements S
      */
     @JsonAlias("docMetadata")
     @JsonProperty("doc_metadata")
-    private Map<String, Object> docMetadata;
+    private List<MetaData> docMetadata;
 
     /**
      * 索引模式
