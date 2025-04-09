@@ -129,8 +129,28 @@ jobs:
         run: |
           cd dify/docker
           sudo apt-get update && sudo apt-get install -y jq
-          RESPONSE=$(curl -sSf -X POST 'http://localhost/console/api/login' -H 'Accept: */*' -H 'Content-Type: application/json' --data-raw '{"email":"admin@admin.com","password":"admin123456"}' --retry 5 --retry-delay 5)
-          TOKEN=$(echo $RESPONSE | jq -r '.data.access_token')
+          echo "Attempting to login..."
+          RESPONSE=$(curl -v -X POST 'http://localhost/console/api/login' \
+            -H 'Accept: */*' \
+            -H 'Content-Type: application/json' \
+            --data-raw '{"email":"admin@admin.com","password":"admin123456"}' \
+            --retry 5 --retry-delay 5)
+          
+          echo "Login response: $RESPONSE"
+          
+          if [ -z "$RESPONSE" ]; then
+            echo "Error: Failed to get response from login API"
+            exit 1
+          fi
+          
+          TOKEN=$(echo "$RESPONSE" | jq -r '.data.access_token')
+          if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
+            echo "Error: Failed to extract token from response"
+            echo "Response: $RESPONSE"
+            exit 1
+          fi
+          
+          echo "Successfully obtained token"
           echo "admin_token=$TOKEN" >> $GITHUB_OUTPUT
 
       - name: Add dify Ollama Plugin
@@ -141,6 +161,7 @@ jobs:
             -H 'Content-Type: application/json' \
             --data-raw '{"plugin_unique_identifiers":["langgenius/ollama:0.0.4@03ff7db65ec6cebcb6065a12b41751f4dbb55c0480a5eb65dbb14e4b9bfe302a"]}' \
             --retry 5 --retry-delay 5
+          docker logs -f docker-api-1
       - name: Wait for plugin to be installed
         run: |
           cd dify/docker
