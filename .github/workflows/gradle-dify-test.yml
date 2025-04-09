@@ -22,6 +22,16 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - name: Check marketplace access
+        run: |
+          MARKETPLACE_URL="https://marketplace.dify.ai/api/v1/plugins/download?unique_identifier=langgenius/ollama:0.0.4@03ff7db65ec6cebcb6065a12b41751f4dbb55c0480a5eb65dbb14e4b9bfe302a"
+          echo "Checking access to Dify marketplace URL..."
+          if ! curl -s -f -o /dev/null "$MARKETPLACE_URL"; then
+            echo "::error::Cannot access $MARKETPLACE_URL - Exiting action"
+            exit 1
+          fi
+          echo "Marketplace URL is accessible."
+
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -157,27 +167,12 @@ jobs:
         run: |
           cd dify/docker
           
-          # Download the plugin package
-          curl -o langgenius-ollama_0.0.4.difypkg https://github.com/guoshiqiufeng/dify-spring-boot-starter-examples/releases/download/v0.5.0/langgenius-ollama_0.0.4.difypkg
-          
-          # Upload the plugin package
-          echo "Uploading plugin package..."
-          UPLOAD_RESPONSE=$(curl -v -X POST 'http://localhost/console/api/workspaces/current/plugin/upload/pkg' \
-            -H 'Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}' \
-            -F 'pkg=@langgenius-ollama_0.0.4.difypkg' \
-            --retry 5 --retry-delay 5)
-          
-          echo "Upload response: $UPLOAD_RESPONSE"
-          
-          # Install the plugin
-          echo "Installing plugin..."
-          INSTALL_RESPONSE=$(curl -v -X POST 'http://localhost/console/api/workspaces/current/plugin/install/pkg' \
+          curl -sSf -X POST 'http://localhost/console/api/workspaces/current/plugin/install/marketplace' \
             -H 'Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}' \
             -H 'Content-Type: application/json' \
-            --data-raw '{"plugin_unique_identifiers":["langgenius/ollama:0.0.4@03ff7db65ec6cebcb6065a12b41751f4dbb55c0480a5eb65dbb14e4b9bfe302a"]}' \
-            --retry 5 --retry-delay 5)
-            
-          echo "Install response: $INSTALL_RESPONSE"
+            --data-raw '{"plugin_unique_identifiers":["langgenius/ollama:0.0.3@9ded90ac00e8510119a24be7396ba77191c9610d5e1e29f59d68fa1229822fc7"]}' \
+            --retry 5 --retry-delay 5
+
       - name: Wait for plugin to be installed
         run: |
           cd dify/docker
