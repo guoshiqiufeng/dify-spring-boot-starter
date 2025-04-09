@@ -156,12 +156,25 @@ jobs:
       - name: Add dify Ollama Plugin
         run: |
           cd dify/docker
-          curl -v -X POST 'http://localhost/console/api/workspaces/current/plugin/install/marketplace' \
+          
+          # Upload the plugin package
+          echo "Uploading plugin package..."
+          UPLOAD_RESPONSE=$(curl -v -X POST 'http://localhost/console/api/workspaces/current/plugin/upload/pkg' \
+            -H 'Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}' \
+            -F 'pkg=@langgenius-ollama_0.0.4.difypkg' \
+            --retry 5 --retry-delay 5)
+          
+          echo "Upload response: $UPLOAD_RESPONSE"
+          
+          # Install the plugin
+          echo "Installing plugin..."
+          INSTALL_RESPONSE=$(curl -v -X POST 'http://localhost/console/api/workspaces/current/plugin/install/pkg' \
             -H 'Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}' \
             -H 'Content-Type: application/json' \
             --data-raw '{"plugin_unique_identifiers":["langgenius/ollama:0.0.4@03ff7db65ec6cebcb6065a12b41751f4dbb55c0480a5eb65dbb14e4b9bfe302a"]}' \
-            --retry 5 --retry-delay 5
-          docker logs -f docker-api-1
+            --retry 5 --retry-delay 5)
+            
+          echo "Install response: $INSTALL_RESPONSE"
       - name: Wait for plugin to be installed
         run: |
           cd dify/docker
