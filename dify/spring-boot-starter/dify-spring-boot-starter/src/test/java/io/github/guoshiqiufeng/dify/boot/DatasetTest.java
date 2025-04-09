@@ -104,9 +104,9 @@ public class DatasetTest extends BaseDatasetContainerTest {
         request.setName("Text Document Test");
         request.setText("This is a test document content for API testing.");
         request.setDocType(DocTypeEnum.others);
-        request.setDocMetadata(Map.of("source", "test", "type", "text"));
+
         request.setIndexingTechnique(IndexingTechniqueEnum.HIGH_QUALITY);
-        request.setDocForm(DocFormEnum.hierarchical_model);
+        request.setDocForm(DocFormEnum.text_model);
         request.setDocLanguage("English");
 
         // Configure process rule
@@ -142,7 +142,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
         request.setDatasetId(datasetId);
         request.setFile(testFile);
         request.setDocType(DocTypeEnum.others);
-        request.setDocMetadata(Map.of("source", "file", "type", "text-file"));
+        // request.setDocMetadata(Map.of("source", "file", "type", "text-file"));
         request.setIndexingTechnique(IndexingTechniqueEnum.HIGH_QUALITY);
         request.setDocForm(DocFormEnum.hierarchical_model);
         request.setDocLanguage("English");
@@ -199,11 +199,26 @@ public class DatasetTest extends BaseDatasetContainerTest {
         assertNotNull(datasetId, "Dataset ID should be available from previous test");
         assertNotNull(documentTextId, "Document ID should be available from previous test");
 
+        // Test creating metadata
+        MetaDataCreateRequest createRequest = new MetaDataCreateRequest();
+        createRequest.setDatasetId(datasetId);
+        createRequest.setType("string");
+        createRequest.setName("test-create-metadata");
+
+        MetaDataResponse createResponse = difyDataset.createMetaData(createRequest);
+        assertNotNull(createResponse);
+        assertNotNull(createResponse.getId());
+
         DocumentUpdateByTextRequest request = new DocumentUpdateByTextRequest();
         request.setDatasetId(datasetId);
         request.setDocumentId(documentTextId);
         request.setName("Updated Text Document");
-
+        request.setDocMetadata(List.of(MetaData.builder()
+                .id(createResponse.getId())
+                .name(createRequest.getName())
+                .type(createRequest.getType())
+                .value("testDocumentUpdateByText")
+                .build()));
         ProcessRule processRule = new ProcessRule();
         processRule.setMode(ModeEnum.automatic);
         request.setProcessRule(processRule);
@@ -383,8 +398,8 @@ public class DatasetTest extends BaseDatasetContainerTest {
         DocumentMetaDataUpdateRequest.OperationData operationData = new DocumentMetaDataUpdateRequest.OperationData();
         operationData.setDocumentId(documentTextId);
 
-        List<DocumentMetaDataUpdateRequest.MetaData> dataList = new ArrayList<>();
-        DocumentMetaDataUpdateRequest.MetaData metaData = new DocumentMetaDataUpdateRequest.MetaData();
+        List<MetaData> dataList = new ArrayList<>();
+        MetaData metaData = new MetaData();
         metaData.setId(metaDataId);
         metaData.setType("string");
         metaData.setName("updated-test-metadata");
