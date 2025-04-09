@@ -47,6 +47,7 @@ import java.util.function.Function;
  * @since 2025/3/4 13:46
  */
 @Slf4j
+@Deprecated(since = "0.8.0")
 public class DifyServerRedisImpl implements DifyServer {
 
     private final DifyProperties difyProperties;

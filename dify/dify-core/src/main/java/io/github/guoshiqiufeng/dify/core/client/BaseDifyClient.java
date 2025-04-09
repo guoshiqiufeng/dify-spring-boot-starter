@@ -38,11 +38,15 @@ public abstract class BaseDifyClient {
     }
 
     public BaseDifyClient(String baseUrl) {
-        this(DEFAULT_BASE_URL, RestClient.builder(), WebClient.builder());
+        this(baseUrl, RestClient.builder(), WebClient.builder());
     }
 
     public BaseDifyClient(String baseUrl, RestClient.Builder restClientBuilder, WebClient.Builder webClientBuilder) {
-        this.responseErrorHandler = new DifyChatResponseErrorHandler();
+        this(baseUrl, restClientBuilder, webClientBuilder, new DifyChatResponseErrorHandler());
+    }
+
+    public BaseDifyClient(String baseUrl, RestClient.Builder restClientBuilder, WebClient.Builder webClientBuilder, ResponseErrorHandler responseErrorHandler) {
+        this.responseErrorHandler = responseErrorHandler;
 
         Consumer<HttpHeaders> defaultHeaders = headers -> {
             headers.setContentType(MediaType.APPLICATION_JSON);
