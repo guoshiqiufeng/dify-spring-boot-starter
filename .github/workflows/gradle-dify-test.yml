@@ -144,7 +144,7 @@ jobs:
           curl -sSf -X POST 'http://localhost/console/api/workspaces/current/plugin/install/marketplace' \
             -H 'Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}' \
             -H 'Content-Type: application/json' \
-            --data-raw '{"plugin_unique_identifiers":["langgenius/ollama:0.0.3@9ded90ac00e8510119a24be7396ba77191c9610d5e1e29f59d68fa1229822fc7"]}' \
+            --data-raw '{"plugin_unique_identifiers":["langgenius/ollama:0.0.4@03ff7db65ec6cebcb6065a12b41751f4dbb55c0480a5eb65dbb14e4b9bfe302a"]}' \
             --retry 5 --retry-delay 5
       - name: Wait for plugin to be installed
         run: |
