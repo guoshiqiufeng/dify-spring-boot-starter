@@ -13,33 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.dataset.dto.request;
+package io.github.guoshiqiufeng.dify.dataset.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import io.github.guoshiqiufeng.dify.dataset.dto.response.textembedding.TextEmbedding;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author yanghq
- * @version 1.0
- * @since 2025/4/09 17:17
+ * @version 0.8.0
+ * @since 2025/4/10 13:54
  */
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class MetaData implements Serializable {
+public class TextEmbeddingListResponse implements Serializable {
 
-    private static final long serialVersionUID = 1083376788375284035L;
+    private List<TextEmbedding> data;
 
-    private String id;
-
-    private String type;
-
-    private String name;
-
-    private String value;
 }

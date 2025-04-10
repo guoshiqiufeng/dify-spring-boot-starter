@@ -353,6 +353,14 @@ public class DifyDatasetClient extends BaseDifyClient {
                 .body(MetaDataListResponse.class);
     }
 
+    public TextEmbeddingListResponse listTextEmbedding() {
+        return restClient.get()
+                .uri(DatasetUriConstant.V1_TEXT_EMBEDDING_LIST_URL)
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(TextEmbeddingListResponse.class);
+    }
+
     private String toJson(Object request) {
         String body = null;
         try {
