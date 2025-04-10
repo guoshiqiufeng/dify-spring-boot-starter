@@ -13,6 +13,7 @@ subprojects {
     apply plugin: 'java-library'
     apply plugin: 'signing'
     apply plugin: 'maven-publish'
+    apply plugin: 'tech.yanand.maven-central-publish'
     apply plugin: "io.freefair.lombok"
     apply plugin: 'com.github.hierynomus.license'
     apply plugin: "io.spring.dependency-management"
@@ -146,9 +147,8 @@ subprojects {
     publishing {
         repositories {
             maven {
-                name = 'ossrh-staging-api'
-                url = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
-
+                name = "snapshots"
+                url = "https://central.sonatype.com/repository/maven-snapshots/"
                 credentials {
                     if (project.hasProperty('storedUsername') && project.hasProperty('storedPassword')) {
                         username project.storedUsername
@@ -156,6 +156,13 @@ subprojects {
                     }
                 }
             }
+        }
+        mavenCentral {
+            if (project.hasProperty('storedUsername') && project.hasProperty('storedPassword')) {
+                authToken = "${project.storedUsername}:${project.storedPassword}".bytes.encodeBase64().toString()
+            }
+            // 默认自动发布 AUTOMATIC
+            publishingType = 'USER_MANAGED'
         }
         publications {
             mavenJava(MavenPublication) {

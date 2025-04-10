@@ -1,1 +1,5 @@
-tasks.matching { it.group == 'publishing' }.each { it.enabled = false }
+tasks.matching {
+    it.name == 'publishToMavenCentralPortal'
+            || it.name == 'publishMavenJavaPublicationToLocalRepository'
+            || it.group == 'publishing'
+}.each { it.enabled = false }

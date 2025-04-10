@@ -57,4 +57,4 @@ jobs:
       # 发布项目
       - name: Publish
         run: |
-          gradle publish -x test
+          gradle publish publishToMavenCentralPortal -x test
