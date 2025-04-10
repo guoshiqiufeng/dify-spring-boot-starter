@@ -3,7 +3,11 @@ permissions:
   contents: read
   pull-requests: write
 
-on: [ pull_request ]
+on:
+  pull_request:
+    paths:
+      - 'dify/**'
+      - '.github/workflows/gradle-build.yml'
 
 jobs:
   build:

@@ -466,6 +466,16 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
                 .block();
     }
 
+    @Override
+    public TextEmbeddingListResponse listTextEmbedding() {
+        return webClient.get()
+                .uri(DatasetUriConstant.V1_TEXT_EMBEDDING_LIST_URL)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(TextEmbeddingListResponse.class)
+                .block();
+    }
+
     private String builderBody(Object request) {
         String body = null;
         try {

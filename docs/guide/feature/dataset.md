@@ -983,4 +983,93 @@ MetaDataListResponse
 | name      | String  | 元数据名称 |
 | userCount | Integer | 使用次数  |
 
+## 6. 嵌入模型
 
+### 6.1 获取嵌入模型列表
+
+#### 方法
+
+```java
+TextEmbeddingListResponse listTextEmbedding();
+```
+
+#### 请求参数
+
+无
+
+#### 响应参数
+
+TextEmbeddingListResponse
+
+| 参数名  | 类型                    | 描述     |
+|------|-----------------------|--------|
+| data | `List<TextEmbedding>` | 嵌入模型列表 |
+
+**TextEmbedding 对象结构**
+
+| 参数名       | 类型                         | 描述    |
+|-----------|----------------------------|-------|
+| provider  | String                     | 提供商名称 |
+| label     | TextEmbeddingLabel         | 标签信息  |
+| iconSmall | TextEmbeddingIcon          | 小图标   |
+| iconLarge | TextEmbeddingIcon          | 大图标   |
+| status    | String                     | 状态    |
+| models    | `List<TextEmbeddingModel>` | 模型列表  |
+
+**TextEmbeddingLabel 对象结构**
+
+| 参数名    | 类型     | 描述       |
+|--------|--------|----------|
+| zhHans | String | 中文简体标签   |
+| enUs   | String | 英文(美国)标签 |
+
+**TextEmbeddingIcon 对象结构**
+
+| 参数名    | 类型     | 描述         |
+|--------|--------|------------|
+| zhHans | String | 中文简体图标链接   |
+| enUs   | String | 英文(美国)图标链接 |
+
+**TextEmbeddingModel 对象结构**
+
+| 参数名                  | 类型                           | 描述       |
+|----------------------|------------------------------|----------|
+| model                | String                       | 模型标识符    |
+| label                | TextEmbeddingLabel           | 模型标签     |
+| modelType            | String                       | 模型类型     |
+| features             | `List<ModelFeatureEnum>`     | 特性列表     |
+| fetchFrom            | String                       | 获取来源     |
+| modelProperties      | TextEmbeddingModelProperties | 模型属性     |
+| deprecated           | Boolean                      | 是否已弃用    |
+| status               | ModelStatusEnum              | 状态       |
+| loadBalancingEnabled | Boolean                      | 是否启用负载均衡 |
+
+**TextEmbeddingModelProperties 对象结构**
+
+| 参数名         | 类型      | 描述    |
+|-------------|---------|-------|
+| contextSize | Integer | 上下文大小 |
+| maxChunks   | Integer | 最大块数量 |
+
+**ModelStatusEnum 枚举值**
+
+| 枚举值            | 代码值            | 描述   |
+|----------------|----------------|------|
+| ACTIVE         | active         | 激活   |
+| NO_CONFIGURE   | no-configure   | 未配置  |
+| QUOTA_EXCEEDED | quota-exceeded | 配额超出 |
+| NO_PERMISSION  | no-permission  | 无权限  |
+| DISABLED       | disabled       | 已禁用  |
+
+**ModelFeatureEnum 枚举值**
+
+| 枚举值              | 代码值              | 描述     |
+|------------------|------------------|--------|
+| TOOL_CALL        | tool-call        | 工具调用   |
+| MULTI_TOOL_CALL  | multi-tool-call  | 多工具调用  |
+| AGENT_THOUGHT    | agent-thought    | 代理思考   |
+| VISION           | vision           | 视觉     |
+| STREAM_TOOL_CALL | stream-tool-call | 流式工具调用 |
+| DOCUMENT         | document         | 文档     |
+| VIDEO            | video            | 视频     |
+| AUDIO            | audio            | 音频     |

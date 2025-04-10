@@ -2,14 +2,15 @@ name: docs build
 permissions:
   contents: write
   pull-requests: write
-on: [ pull_request ]
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - '.github/workflows/docs-build.yml'
 
 jobs:
   docs:
     runs-on: ubuntu-latest
-    # 添加条件检查，只有当 docs 目录有变更时才运行
-    if: ${{ contains(github.event.pull_request.changed_files, 'docs/') }}
-
     steps:
       - uses: actions/checkout@v4
         with:

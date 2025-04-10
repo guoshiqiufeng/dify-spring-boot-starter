@@ -145,4 +145,9 @@ public class DifyDatasetClientImpl implements DifyDataset {
     public MetaDataListResponse listMetaData(String datasetId) {
         return difyDatasetClient.listMetaData(datasetId);
     }
+
+    @Override
+    public TextEmbeddingListResponse listTextEmbedding() {
+        return difyDatasetClient.listTextEmbedding();
+    }
 }

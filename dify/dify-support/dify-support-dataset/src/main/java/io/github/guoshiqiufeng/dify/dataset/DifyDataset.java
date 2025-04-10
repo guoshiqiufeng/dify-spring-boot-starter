@@ -179,7 +179,6 @@ public interface DifyDataset {
      *
      * @param datasetId  数据集ID
      * @param metadataId 元数据ID
-     * @return 删除结果（包含删除状态和影响记录数）
      */
     void deleteMetaData(String datasetId, String metadataId);
 
@@ -194,7 +193,6 @@ public interface DifyDataset {
      * 更新文档关联的元数据
      *
      * @param request 文档元数据更新请求（需包含文档ID和元数据变更内容）
-     * @return 更新后的文档元数据详情
      */
     void updateDocumentMetaData(DocumentMetaDataUpdateRequest request);
 
@@ -205,5 +203,12 @@ public interface DifyDataset {
      * @return 元数据列表及分页信息
      */
     MetaDataListResponse listMetaData(String datasetId);
+
+    /**
+     * 获取嵌入模型列表
+     *
+     * @return 嵌入模型列表
+     */
+    TextEmbeddingListResponse listTextEmbedding();
 
 }

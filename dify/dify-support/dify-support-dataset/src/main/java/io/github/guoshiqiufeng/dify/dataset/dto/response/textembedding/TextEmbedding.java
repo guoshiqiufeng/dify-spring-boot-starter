@@ -13,33 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.dataset.dto.request;
+package io.github.guoshiqiufeng.dify.dataset.dto.response.textembedding;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author yanghq
- * @version 1.0
- * @since 2025/4/09 17:17
+ * @version 0.8.0
+ * @since 2025/4/10 14:01
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class MetaData implements Serializable {
+public class TextEmbedding implements Serializable {
 
-    private static final long serialVersionUID = 1083376788375284035L;
+    private static final long serialVersionUID = -7050862386720963430L;
+    private String provider;
 
-    private String id;
+    private TextEmbeddingLabel label;
 
-    private String type;
+    @JsonAlias("icon_small")
+    private TextEmbeddingIcon iconSmall;
 
-    private String name;
+    @JsonAlias("icon_large")
+    private TextEmbeddingIcon iconLarge;
 
-    private String value;
+    private String status;
+
+    private List<TextEmbeddingModel> models;
+
 }

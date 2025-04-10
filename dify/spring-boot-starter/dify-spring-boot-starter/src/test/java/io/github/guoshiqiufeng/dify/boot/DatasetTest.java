@@ -344,6 +344,14 @@ public class DatasetTest extends BaseDatasetContainerTest {
 
     @Test
     @Order(10)
+    @DisplayName("Test TextEmbedding")
+    public void testTextEmbedding() {
+        TextEmbeddingListResponse response = difyDataset.listTextEmbedding();
+        assertNotNull(response);
+    }
+
+    @Test
+    @Order(15)
     @DisplayName("Test retrieval")
     public void testRetrieval() {
         assertNotNull(datasetId, "Dataset ID should be available from previous test");
@@ -362,7 +370,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
     }
 
     @Test
-    @Order(11)
+    @Order(16)
     @DisplayName("Test metadata operations")
     public void testMetadataOperations() {
         assertNotNull(datasetId, "Dataset ID should be available from previous test");
@@ -432,7 +440,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
     }
 
     @Test
-    @Order(12)
+    @Order(19)
     @DisplayName("Test document deletion")
     public void testDocumentDeletion() {
         assertNotNull(datasetId, "Dataset ID should be available from previous test");
@@ -444,7 +452,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
     }
 
     @Test
-    @Order(13)
+    @Order(20)
     @DisplayName("Test dataset deletion")
     public void testDatasetDeletion() {
         assertNotNull(datasetId, "Dataset ID should be available from previous test");
