@@ -33,11 +33,12 @@ public interface DifyServer {
     /**
      * 获取所有应用列表
      *
-     * @param name 应用名称，用于过滤应用列表（可选，传入空字符串时表示不过滤）
+     * @param category 分类
+     * @param name     应用名称，用于过滤应用列表（可选，传入空字符串时表示不过滤）
      * @return 返回符合条件的应用列表，每个应用封装为 {@link AppsResponseVO} 对象
      * @throws IllegalArgumentException 如果传入的参数不符合预期格式或范围
      */
-    List<AppsResponseVO> apps(String name);
+    List<AppsResponseVO> apps(String category, String name);
 
     /**
      * 根据应用ID获取单个应用的详细信息
@@ -51,21 +52,21 @@ public interface DifyServer {
     /**
      * 根据应用ID获取该应用的所有API Key列表
      *
-     * @param id 应用的唯一标识符，不能为空
+     * @param appId 应用的唯一标识符，不能为空
      * @return 返回封装了API Key信息的列表，每个API Key封装为 {@link ApiKeyResponseVO} 对象
      * @throws NullPointerException 如果 id 为 null
      */
-    List<ApiKeyResponseVO> getAppApiKey(String id);
+    List<ApiKeyResponseVO> getAppApiKey(String appId);
 
     /**
      * 初始化应用的API Key
      * 如果应用尚未创建API Key，此方法将创建并返回新的API Key
      *
-     * @param id 应用的唯一标识符，不能为空
+     * @param appId 应用的唯一标识符，不能为空
      * @return 返回初始化后的API Key列表，每个API Key封装为 {@link ApiKeyResponseVO} 对象
      * @throws NullPointerException 如果 id 为 null
      */
-    List<ApiKeyResponseVO> initAppApiKey(String id);
+    List<ApiKeyResponseVO> initAppApiKey(String appId);
 
     /**
      * 获取知识库的API Key列表

@@ -54,7 +54,7 @@ public class DatasetCreateRequest extends BaseDatasetRequest implements Serializ
     /**
      * 权限
      */
-    private PermissionEnum permission;
+    private PermissionEnum permission = PermissionEnum.ONLY_ME;
 
     private ProviderEnum provider;
 

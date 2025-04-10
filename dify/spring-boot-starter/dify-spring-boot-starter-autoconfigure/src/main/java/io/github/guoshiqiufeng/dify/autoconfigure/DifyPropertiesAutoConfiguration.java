@@ -36,4 +36,26 @@ public class DifyPropertiesAutoConfiguration {
         return new DifyProperties();
     }
 
+
+    @Bean
+    @ConditionalOnMissingBean(DifyConnectionDetails.class)
+    public PropertiesDifyConnectionDetails difyConnectionDetails(DifyProperties properties) {
+        return new PropertiesDifyConnectionDetails(properties);
+    }
+
+    static class PropertiesDifyConnectionDetails implements DifyConnectionDetails {
+
+        private final DifyProperties properties;
+
+        PropertiesDifyConnectionDetails(DifyProperties properties) {
+            this.properties = properties;
+        }
+
+        @Override
+        public String getUrl() {
+            return this.properties.getUrl();
+        }
+
+    }
+
 }

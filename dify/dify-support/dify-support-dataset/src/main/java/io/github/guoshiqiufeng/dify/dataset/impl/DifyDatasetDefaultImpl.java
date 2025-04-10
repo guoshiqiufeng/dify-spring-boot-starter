@@ -41,6 +41,7 @@ import java.io.IOException;
  * @version 1.0
  * @since 2025/3/13 11:40
  */
+@Deprecated(since = "0.8.0")
 public class DifyDatasetDefaultImpl implements DifyDataset {
 
     private final ObjectMapper objectMapper;

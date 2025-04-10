@@ -15,21 +15,18 @@
  */
 package io.github.guoshiqiufeng.dify.autoconfigure;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.guoshiqiufeng.dify.chat.impl.DifyChatDefaultImpl;
+import io.github.guoshiqiufeng.dify.chat.DifyChat;
+import io.github.guoshiqiufeng.dify.chat.client.DifyChatClient;
+import io.github.guoshiqiufeng.dify.chat.impl.DifyChatClientImpl;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.netty.http.HttpProtocol;
-import reactor.netty.http.client.HttpClient;
 
 /**
  * @author yanghq
@@ -38,31 +35,23 @@ import reactor.netty.http.client.HttpClient;
  */
 @Slf4j
 @Configuration
-@ConditionalOnClass({DifyChatDefaultImpl.class})
+@ConditionalOnClass({DifyChatClient.class})
 public class DifyChatAutoConfiguration {
 
-    @Bean(name = "difyChatWebClient")
-    @ConditionalOnMissingBean(name = "difyChatWebClient")
-    public WebClient difyChatWebClient(DifyProperties properties) {
-        if (properties == null) {
-            log.error("Dify properties must not be null");
-            return null;
-        }
-        HttpClient httpClient = HttpClient.create()
-                .protocol(HttpProtocol.HTTP11);
-
-        return WebClient.builder()
-                .baseUrl(properties.getUrl())
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .build();
+    @Bean
+    @ConditionalOnMissingBean(DifyChatClient.class)
+    public DifyChatClient difyChatClient(DifyProperties properties,
+                                         ObjectProvider<RestClient.Builder> restClientBuilderProvider,
+                                         ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
+        return new DifyChatClient(properties.getUrl(),
+                restClientBuilderProvider.getIfAvailable(RestClient::builder),
+                webClientBuilderProvider.getIfAvailable(WebClient::builder));
     }
 
     @Bean
-    @ConditionalOnMissingBean({DifyChatDefaultImpl.class})
-    public DifyChatDefaultImpl difyChatHandler(ObjectMapper objectMapper,
-                                               @Qualifier("difyChatWebClient") WebClient difyChatWebClient) {
-        return new DifyChatDefaultImpl(objectMapper, difyChatWebClient);
+    @ConditionalOnMissingBean({DifyChat.class})
+    public DifyChatClientImpl difyChatHandler(DifyChatClient difyChatClient) {
+        return new DifyChatClientImpl(difyChatClient);
     }
 
 }

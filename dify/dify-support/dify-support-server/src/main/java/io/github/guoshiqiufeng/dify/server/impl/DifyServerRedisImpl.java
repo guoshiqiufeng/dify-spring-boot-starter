@@ -47,6 +47,7 @@ import java.util.function.Function;
  * @since 2025/3/4 13:46
  */
 @Slf4j
+@Deprecated(since = "0.8.0")
 public class DifyServerRedisImpl implements DifyServer {
 
     private final DifyProperties difyProperties;
@@ -80,17 +81,17 @@ public class DifyServerRedisImpl implements DifyServer {
      * 获取所有应用
      */
     @Override
-    public List<AppsResponseVO> apps(String name) {
+    public List<AppsResponseVO> apps(String category, String name) {
         List<AppsResponseVO> result = new ArrayList<>();
-        appPages(name, 1, result);
+        appPages(category, name, 1, result);
         return result;
     }
 
     /**
      * 获取应用列表
      */
-    private void appPages(String name, int page, List<AppsResponseVO> result) {
-        String uri = ServerUriConstant.APPS + "?name=" + name + "&page=" + page + "&limit=100";
+    private void appPages(String category, String name, int page, List<AppsResponseVO> result) {
+        String uri = ServerUriConstant.APPS + "?category=" + category + "&name=" + name + "&page=" + page + "&limit=100";
         AppsResponseResultVO tmp = getRequest(uri, AppsResponseResultVO.class);
         if (tmp == null) {
             return;
@@ -99,7 +100,7 @@ public class DifyServerRedisImpl implements DifyServer {
         result.addAll(tmp.getData());
 
         if (tmp.getHasMore()) {
-            appPages(name, page + 1, result);
+            appPages(category, name, page + 1, result);
         }
     }
 

@@ -15,10 +15,10 @@
  */
 package io.github.guoshiqiufeng.dify.boot.base;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
-import io.github.guoshiqiufeng.dify.dataset.impl.DifyDatasetDefaultImpl;
+import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;
+import io.github.guoshiqiufeng.dify.dataset.impl.DifyDatasetClientImpl;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponseVO;
 import jakarta.annotation.Resource;
@@ -26,13 +26,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.netty.http.HttpProtocol;
-import reactor.netty.http.client.HttpClient;
 
 import java.time.Duration;
 import java.util.List;
@@ -52,9 +49,6 @@ public abstract class BaseDatasetContainerTest implements RedisContainerTest {
     protected DifyServer difyServer;
 
     @Resource
-    private ObjectMapper objectMapper;
-
-    @Resource
     private StringRedisTemplate stringRedisTemplate;
 
     @Resource
@@ -66,9 +60,11 @@ public abstract class BaseDatasetContainerTest implements RedisContainerTest {
     public void setUp() {
         String apiKey = initializeApiKeyWithCache();
 
-        WebClient datasetWebClient = createDatasetWebClient(apiKey);
+        DifyDatasetClient difyDatasetClient = new DifyDatasetClient(difyProperties.getUrl(),
+                RestClient.builder().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey),
+                WebClient.builder().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey));
 
-        this.difyDataset = new DifyDatasetDefaultImpl(objectMapper, datasetWebClient);
+        this.difyDataset = new DifyDatasetClientImpl(difyDatasetClient);
     }
 
     private String initializeApiKeyWithCache() {
@@ -126,26 +122,4 @@ public abstract class BaseDatasetContainerTest implements RedisContainerTest {
                 });
     }
 
-    /**
-     * 创建WebClient
-     */
-    private WebClient createDatasetWebClient(String apiKey) {
-        return WebClient.builder()
-                .baseUrl(difyProperties.getUrl())
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .clientConnector(createHttpClientConnector())
-                .build();
-    }
-
-    /**
-     * 创建HTTP连接器
-     */
-    private ReactorClientHttpConnector createHttpClientConnector() {
-        return new ReactorClientHttpConnector(
-                HttpClient.create()
-                        .protocol(HttpProtocol.HTTP11)
-                        .responseTimeout(Duration.ofSeconds(10))
-        );
-    }
 }

@@ -49,6 +49,7 @@ import java.util.Map;
  * @since 2025/3/11 14:51
  */
 @Slf4j
+@Deprecated(since = "0.8.0")
 public class DifyWorkflowDefaultImpl implements DifyWorkflow {
 
     private final ObjectMapper objectMapper;
