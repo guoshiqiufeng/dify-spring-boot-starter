@@ -15,7 +15,6 @@
  */
 package io.github.guoshiqiufeng.dify.boot;
 
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.json.JSONUtil;
 import io.github.guoshiqiufeng.dify.boot.base.BaseDatasetContainerTest;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
@@ -40,7 +39,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 

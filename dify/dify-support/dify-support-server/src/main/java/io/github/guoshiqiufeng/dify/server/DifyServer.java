@@ -33,11 +33,12 @@ public interface DifyServer {
     /**
      * 获取所有应用列表
      *
-     * @param name 应用名称，用于过滤应用列表（可选，传入空字符串时表示不过滤）
+     * @param category 分类
+     * @param name     应用名称，用于过滤应用列表（可选，传入空字符串时表示不过滤）
      * @return 返回符合条件的应用列表，每个应用封装为 {@link AppsResponseVO} 对象
      * @throws IllegalArgumentException 如果传入的参数不符合预期格式或范围
      */
-    List<AppsResponseVO> apps(String name);
+    List<AppsResponseVO> apps(String category, String name);
 
     /**
      * 根据应用ID获取单个应用的详细信息

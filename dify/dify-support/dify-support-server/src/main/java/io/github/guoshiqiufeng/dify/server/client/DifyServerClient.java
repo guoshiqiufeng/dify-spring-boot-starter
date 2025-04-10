@@ -66,9 +66,9 @@ public class DifyServerClient extends BaseDifyClient {
         this.difyServerToken = difyServerToken;
     }
 
-    public List<AppsResponseVO> apps(String name) {
+    public List<AppsResponseVO> apps(String category, String name) {
         List<AppsResponseVO> result = new ArrayList<>();
-        appPages(name, 1, result);
+        appPages(category, name, 1, result);
         return result;
     }
 
@@ -134,10 +134,10 @@ public class DifyServerClient extends BaseDifyClient {
         return result != null ? new ArrayList<>(List.of(result)) : null;
     }
 
-    private void appPages(String name, int page, List<AppsResponseVO> result) {
+    private void appPages(String category, String name, int page, List<AppsResponseVO> result) {
         AppsResponseResultVO response = executeWithRetry(
                 () -> restClient.get()
-                        .uri(ServerUriConstant.APPS + "?name={name}&page={page}&limit=100", name, page)
+                        .uri(ServerUriConstant.APPS + "?category={category}name={name}&page={page}&limit=100", category, name, page)
                         .headers(this::addAuthorizationHeader)
                         .retrieve()
                         .onStatus(responseErrorHandler)
@@ -153,7 +153,7 @@ public class DifyServerClient extends BaseDifyClient {
         }
 
         if (Boolean.TRUE.equals(response.getHasMore())) {
-            appPages(name, page + 1, result);
+            appPages(category, name, page + 1, result);
         }
     }
 

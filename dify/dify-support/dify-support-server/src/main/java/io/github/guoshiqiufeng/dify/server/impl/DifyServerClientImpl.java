@@ -39,8 +39,8 @@ public class DifyServerClientImpl implements DifyServer {
     }
 
     @Override
-    public List<AppsResponseVO> apps(String name) {
-        return difyServerClient.apps(name);
+    public List<AppsResponseVO> apps(String category, String name) {
+        return difyServerClient.apps(category, name);
     }
 
     @Override

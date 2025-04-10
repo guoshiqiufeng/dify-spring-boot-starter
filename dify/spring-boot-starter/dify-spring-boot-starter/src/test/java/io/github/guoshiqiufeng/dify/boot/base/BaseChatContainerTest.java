@@ -42,7 +42,7 @@ public abstract class BaseChatContainerTest implements RedisContainerTest {
         if (apiKey != null) {
             return;
         }
-        List<AppsResponseVO> apps = difyServer.apps("");
+        List<AppsResponseVO> apps = difyServer.apps("chat", "");
         assert !apps.isEmpty();
         List<ApiKeyResponseVO> appApiKey = difyServer.getAppApiKey(apps.getFirst().getId());
         if (appApiKey.isEmpty()) {

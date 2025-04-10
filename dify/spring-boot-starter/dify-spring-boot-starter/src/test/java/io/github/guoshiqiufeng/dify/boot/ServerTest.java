@@ -51,7 +51,7 @@ public class ServerTest extends BaseServerContainerTest {
     @DisplayName("Test retrieving application list")
     public void appsTest() {
         // Test retrieving all applications
-        List<AppsResponseVO> allApps = difyServer.apps("");
+        List<AppsResponseVO> allApps = difyServer.apps("", "");
         log.debug("All applications: {}", JSONUtil.toJsonStr(allApps));
         assertNotNull(allApps, "Application list should not be null");
 
@@ -64,7 +64,7 @@ public class ServerTest extends BaseServerContainerTest {
         // Test filtering applications by name
         if (!allApps.isEmpty() && allApps.getFirst().getName() != null) {
             String nameFilter = allApps.getFirst().getName().substring(0, 1); // Use first character as filter
-            List<AppsResponseVO> filteredApps = difyServer.apps(nameFilter);
+            List<AppsResponseVO> filteredApps = difyServer.apps("", nameFilter);
             log.debug("Applications filtered by name '{}': {}", nameFilter, JSONUtil.toJsonStr(filteredApps));
             assertNotNull(filteredApps, "Filtered application list should not be null");
         }
@@ -76,7 +76,7 @@ public class ServerTest extends BaseServerContainerTest {
     public void appTest() {
         // Check if test application ID is available
         if (testAppId == null) {
-            List<AppsResponseVO> apps = difyServer.apps("");
+            List<AppsResponseVO> apps = difyServer.apps("", "");
             if (!apps.isEmpty()) {
                 testAppId = apps.getFirst().getId();
             } else {
@@ -98,7 +98,7 @@ public class ServerTest extends BaseServerContainerTest {
     public void appApiKeyTest() {
         // Check if test application ID is available
         if (testAppId == null) {
-            List<AppsResponseVO> apps = difyServer.apps("");
+            List<AppsResponseVO> apps = difyServer.apps("", "");
             if (!apps.isEmpty()) {
                 testAppId = apps.getFirst().getId();
             } else {

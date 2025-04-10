@@ -154,10 +154,10 @@ public class DifyChatClient extends BaseDifyClient {
         }
 
         return this.restClient.get()
-                .uri(ChatUriConstant.V1_MESSAGES_URI + "?conversation_id={conversationId}&user={user}&first_id={lastId}&limit={limit}",
+                .uri(ChatUriConstant.V1_MESSAGES_URI + "?conversation_id={conversationId}&user={user}&first_id={firstId}&limit={limit}",
                         request.getConversationId(),
                         request.getUserId(),
-                        request.getFirstId(),
+                        request.getFirstId() == null ? "" : request.getFirstId(),
                         request.getLimit())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
                 .retrieve()
