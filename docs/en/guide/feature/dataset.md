@@ -942,11 +942,12 @@ DocumentMetaDataUpdateRequest
 
 **MetaData Object Structure**
 
-| Parameter | Type   | Description   |
-|-----------|--------|---------------|
-| id        | String | Metadata ID   |
-| type      | String | Metadata type |
-| name      | String | Metadata name |
+| Parameter | Type   | Description    |
+|-----------|--------|----------------|
+| id        | String | Metadata ID    |
+| type      | String | Metadata type  |
+| name      | String | Metadata name  |
+| value     | String | Metadata value |
 
 #### Response Parameters
 
