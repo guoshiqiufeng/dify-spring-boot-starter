@@ -66,6 +66,7 @@ description:
 | 【DataSet】 启用/禁用内置元数据   | ✅  |
 | 【DataSet】 更新文档元数据      | ✅  |
 | 【DataSet】 查询知识库元数据列表   | ✅  |
+| 【DataSet】 获取嵌入模型列表     | ✅  |
 | 【SERVER】获取应用列表         | ✅  |
 | 【SERVER】获取应用信息         | ✅  |
 | 【SERVER】获取应用API密钥      | ✅  |

@@ -67,6 +67,7 @@ Implementation of the Redis messaging framework.
 | 【KNOWLEDGE】 Disable Or Enable Built-in Metadata       | ✅      |
 | 【KNOWLEDGE】 Update Documents Metadata                 | ✅      |
 | 【KNOWLEDGE】 Get Knowledge Metadata List               | ✅      |
+| 【KNOWLEDGE】 Get available embedding models            | ✅      |
 | 【SERVER】Get Applications List                         | ✅      |
 | 【SERVER】Get Application Information                   | ✅      |
 | 【SERVER】Get Application API Keys                      | ✅      |
