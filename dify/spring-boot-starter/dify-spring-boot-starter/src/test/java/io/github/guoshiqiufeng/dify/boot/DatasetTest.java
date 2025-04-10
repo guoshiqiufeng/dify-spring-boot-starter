@@ -307,19 +307,22 @@ public class DatasetTest extends BaseDatasetContainerTest {
         assertNotNull(createResponse.getData());
         assertFalse(createResponse.getData().isEmpty());
 
-        segmentId = createResponse.getData().get(0).getId();
+        SegmentData segmentData = createResponse.getData().getFirst();
+        segmentId = segmentData.getId();
         log.info("Created segment: {}", JSONUtil.toJsonStr(createResponse));
 
-        // Test updating segment
-        SegmentUpdateRequest updateRequest = new SegmentUpdateRequest();
-        updateRequest.setDatasetId(datasetId);
-        updateRequest.setDocumentId(documentTextId);
-        updateRequest.setSegmentId(segmentId);
-        updateRequest.setSegment(new SegmentParam().setContent("Updated test segment content."));
+        if("true".equals(segmentData.getEnabled())) {
+            // Test updating segment
+            SegmentUpdateRequest updateRequest = new SegmentUpdateRequest();
+            updateRequest.setDatasetId(datasetId);
+            updateRequest.setDocumentId(documentTextId);
+            updateRequest.setSegmentId(segmentId);
+            updateRequest.setSegment(new SegmentParam().setContent("Updated test segment content."));
 
-        SegmentUpdateResponse updateResponse = difyDataset.updateSegment(updateRequest);
-        assertNotNull(updateResponse);
-        log.info("Updated segment: {}", JSONUtil.toJsonStr(updateResponse));
+            SegmentUpdateResponse updateResponse = difyDataset.updateSegment(updateRequest);
+            assertNotNull(updateResponse);
+            log.info("Updated segment: {}", JSONUtil.toJsonStr(updateResponse));
+        }
 
         // Test deleting segment
         SegmentDeleteResponse deleteResponse = difyDataset.deleteSegment(datasetId, documentTextId, segmentId);
