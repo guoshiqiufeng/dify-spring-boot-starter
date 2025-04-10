@@ -12,6 +12,8 @@ The Server API provides comprehensive functionality for interacting with the Dif
 applications, retrieving and initializing API keys for both applications and datasets. All interfaces require a valid
 API key for authentication.
 Use the `DifyServer` interface instance.
+> By default, if the current environment contains redis, then use redis to persist the token, if not, then use the
+> default implementation to save the token (it will be lost if the service is restarted).
 
 ## 1. Application Management
 
