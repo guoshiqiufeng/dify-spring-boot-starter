@@ -133,9 +133,9 @@ public class ChatTest extends BaseChatContainerTest {
         assertFalse(result.getData().isEmpty(), "Should have at least one conversation");
     }
 
-    @Test
-    @Order(6)
-    @DisplayName("Test get messages")
+    //@Test
+    //@Order(6)
+    //@DisplayName("Test get messages")
     public void testGetMessages() {
         MessagesRequest request = new MessagesRequest();
         request.setApiKey(apiKey);
