@@ -330,8 +330,66 @@ public class DatasetTest extends BaseDatasetContainerTest {
         log.info("Deleted segment: {}", JSONUtil.toJsonStr(deleteResponse));
     }
 
+    //@Test
+    @Order(12)
+    @DisplayName("Test segment child operations")
+    public void testSegmentChildOperations() {
+        assertNotNull(datasetId, "Dataset ID should be available from previous test");
+        assertNotNull(documentTextId, "Document ID should be available from previous test");
+
+        // Test creating segment
+        SegmentCreateRequest createRequest = new SegmentCreateRequest();
+        createRequest.setDatasetId(datasetId);
+        createRequest.setDocumentId(documentTextId);
+
+        List<SegmentParam> segments = new ArrayList<>();
+        SegmentParam segmentParam = new SegmentParam();
+        segmentParam.setContent("This is a test segment content.");
+        segments.add(segmentParam);
+        createRequest.setSegments(segments);
+
+        SegmentResponse createResponse = difyDataset.createSegment(createRequest);
+        assertNotNull(createResponse);
+        assertNotNull(createResponse.getData());
+        String segmentId = createResponse.getData().getFirst().getId();
+
+        SegmentChildChunkCreateRequest childChunkCreateRequest = new SegmentChildChunkCreateRequest();
+        childChunkCreateRequest.setDatasetId(datasetId);
+        childChunkCreateRequest.setDocumentId(documentTextId);
+        childChunkCreateRequest.setSegmentId(segmentId);
+        childChunkCreateRequest.setContent("child chunk content");
+        SegmentChildChunkCreateResponse segmentChildChunk = difyDataset.createSegmentChildChunk(childChunkCreateRequest);
+        assertNotNull(segmentChildChunk);
+        String childChunkId = segmentChildChunk.getData().getId();
+
+        SegmentChildChunkPageRequest segmentChildChunkPageRequest = new SegmentChildChunkPageRequest();
+        segmentChildChunkPageRequest.setDatasetId(datasetId);
+        segmentChildChunkPageRequest.setDocumentId(documentTextId);
+        segmentChildChunkPageRequest.setSegmentId(segmentId);
+        DifyPageResult<SegmentChildChunkResponse> segmentChildChunkResponseDifyPageResult = difyDataset.pageSegmentChildChunk(segmentChildChunkPageRequest);
+        assertNotNull(segmentChildChunkResponseDifyPageResult);
+
+        SegmentChildChunkUpdateRequest childChunkUpdateRequest = new SegmentChildChunkUpdateRequest();
+        childChunkUpdateRequest.setDatasetId(datasetId);
+        childChunkUpdateRequest.setDocumentId(documentTextId);
+        childChunkUpdateRequest.setSegmentId(segmentId);
+
+        childChunkUpdateRequest.setChildChunkId(childChunkId);
+        childChunkUpdateRequest.setContent("child chunk updated content");
+        SegmentChildChunkUpdateResponse segmentChildChunkUpdate = difyDataset.updateSegmentChildChunk(childChunkUpdateRequest);
+        assertNotNull(segmentChildChunkUpdate);
+
+        SegmentChildChunkDeleteRequest childChunkDeleteRequest = new SegmentChildChunkDeleteRequest();
+        childChunkDeleteRequest.setDatasetId(datasetId);
+        childChunkDeleteRequest.setDocumentId(documentTextId);
+        childChunkDeleteRequest.setSegmentId(segmentId);
+        childChunkDeleteRequest.setChildChunkId(childChunkId);
+        SegmentChildChunkDeleteResponse segmentChildChunkDelete = difyDataset.deleteSegmentChildChunk(childChunkDeleteRequest);
+        assertNotNull(segmentChildChunkDelete);
+    }
+
     @Test
-    @Order(9)
+    @Order(13)
     @DisplayName("Test file upload info")
     public void testFileUploadInfo() {
         assertNotNull(datasetId, "Dataset ID should be available from previous test");
@@ -343,7 +401,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
     }
 
     @Test
-    @Order(10)
+    @Order(14)
     @DisplayName("Test TextEmbedding")
     public void testTextEmbedding() {
         TextEmbeddingListResponse response = difyDataset.listTextEmbedding();

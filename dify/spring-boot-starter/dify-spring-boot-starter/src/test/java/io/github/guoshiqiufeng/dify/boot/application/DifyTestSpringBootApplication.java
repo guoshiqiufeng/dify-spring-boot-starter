@@ -17,6 +17,8 @@ package io.github.guoshiqiufeng.dify.boot.application;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestClient;
 
 /**
  * @author yanghq
@@ -29,4 +31,10 @@ public class DifyTestSpringBootApplication {
     public static void main(String[] args) {
         SpringApplication.run(DifyTestSpringBootApplication.class, args);
     }
+
+    @Bean
+    public RestClient.Builder restClientBuilder() {
+        return RestClient.builder().requestInterceptor(new LoggingInterceptor());
+    }
+
 }

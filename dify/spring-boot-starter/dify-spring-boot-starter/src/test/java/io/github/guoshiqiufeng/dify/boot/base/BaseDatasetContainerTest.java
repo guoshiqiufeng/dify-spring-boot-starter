@@ -54,6 +54,9 @@ public abstract class BaseDatasetContainerTest implements RedisContainerTest {
     @Resource
     private DifyProperties difyProperties;
 
+    @Resource
+    private RestClient.Builder restClientBuilder;
+
     protected DifyDataset difyDataset;
 
     @BeforeEach
@@ -61,7 +64,7 @@ public abstract class BaseDatasetContainerTest implements RedisContainerTest {
         String apiKey = initializeApiKeyWithCache();
 
         DifyDatasetClient difyDatasetClient = new DifyDatasetClient(difyProperties.getUrl(),
-                RestClient.builder().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey),
+                restClientBuilder.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey),
                 WebClient.builder().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey));
 
         this.difyDataset = new DifyDatasetClientImpl(difyDatasetClient);

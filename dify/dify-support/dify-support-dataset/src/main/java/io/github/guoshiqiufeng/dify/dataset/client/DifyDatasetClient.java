@@ -263,6 +263,52 @@ public class DifyDatasetClient extends BaseDifyClient {
                 .body(SegmentUpdateResponse.class);
     }
 
+    public SegmentChildChunkCreateResponse createSegmentChildChunk(SegmentChildChunkCreateRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        Assert.notNull(request.getContent(), "content can not be null");
+        return restClient.post()
+                .uri(DatasetUriConstant.V1_DOCUMENTS_SEGMENTS_CHILD_CHUNKS_URL, request.getDatasetId(), request.getDocumentId(), request.getSegmentId())
+                .body(request)
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(SegmentChildChunkCreateResponse.class);
+    }
+
+    public DifyPageResult<SegmentChildChunkResponse> pageSegmentChildChunk(SegmentChildChunkPageRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        return restClient.get()
+                .uri(DatasetUriConstant.V1_DOCUMENTS_SEGMENTS_CHILD_CHUNKS_URL + "?keyword={keyword}&page={page}&limit={limit}",
+                        request.getDatasetId(), request.getDocumentId(), request.getSegmentId(),
+                        request.getKeyword(), request.getPage(), request.getLimit())
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(new ParameterizedTypeReference<DifyPageResult<SegmentChildChunkResponse>>() {
+                });
+    }
+
+    public SegmentChildChunkDeleteResponse deleteSegmentChildChunk(SegmentChildChunkDeleteRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        Assert.notNull(request.getChildChunkId(), "childChunkId can not be null");
+        return restClient.delete()
+                .uri(DatasetUriConstant.V1_DOCUMENTS_SEGMENTS_CHILD_CHUNK_URL,
+                        request.getDatasetId(), request.getDocumentId(), request.getSegmentId(), request.getChildChunkId())
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(SegmentChildChunkDeleteResponse.class);
+    }
+
+    public SegmentChildChunkUpdateResponse updateSegmentChildChunk(SegmentChildChunkUpdateRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        Assert.notNull(request.getChildChunkId(), "childChunkId can not be null");
+        return restClient.patch()
+                .uri(DatasetUriConstant.V1_DOCUMENTS_SEGMENTS_CHILD_CHUNK_URL,
+                        request.getDatasetId(), request.getDocumentId(), request.getSegmentId(), request.getChildChunkId())
+                .body(request)
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(SegmentChildChunkUpdateResponse.class);
+    }
+
 
     public UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId) {
         Assert.notNull(datasetId, "datasetId can not be null");

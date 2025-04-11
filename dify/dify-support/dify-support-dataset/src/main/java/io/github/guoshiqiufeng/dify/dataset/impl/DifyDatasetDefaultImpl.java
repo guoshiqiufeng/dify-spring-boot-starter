@@ -347,6 +347,49 @@ public class DifyDatasetDefaultImpl implements DifyDataset {
     }
 
     @Override
+    public SegmentChildChunkCreateResponse createSegmentChildChunk(SegmentChildChunkCreateRequest request) {
+        return webClient.post()
+                .uri(DatasetUriConstant.V1_DOCUMENTS_SEGMENTS_CHILD_CHUNKS_URL, request.getDatasetId(), request.getDocumentId(), request.getSegmentId())
+                .bodyValue(request)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(SegmentChildChunkCreateResponse.class).block();
+    }
+
+    @Override
+    public DifyPageResult<SegmentChildChunkResponse> pageSegmentChildChunk(SegmentChildChunkPageRequest request) {
+        return webClient.get()
+                .uri(DatasetUriConstant.V1_DOCUMENTS_SEGMENTS_CHILD_CHUNKS_URL + "?keyword={keyword}&page={page}&limit={limit}",
+                        request.getDatasetId(), request.getDocumentId(), request.getSegmentId(),
+                        request.getKeyword(), request.getPage(), request.getLimit())
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(new ParameterizedTypeReference<DifyPageResult<SegmentChildChunkResponse>>() {
+                }).block();
+    }
+
+    @Override
+    public SegmentChildChunkDeleteResponse deleteSegmentChildChunk(SegmentChildChunkDeleteRequest request) {
+        return webClient.delete()
+                .uri(DatasetUriConstant.V1_DOCUMENTS_SEGMENTS_CHILD_CHUNK_URL,
+                        request.getDatasetId(), request.getDocumentId(), request.getSegmentId(), request.getChildChunkId())
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(SegmentChildChunkDeleteResponse.class).block();
+    }
+
+    @Override
+    public SegmentChildChunkUpdateResponse updateSegmentChildChunk(SegmentChildChunkUpdateRequest request) {
+        return webClient.post()
+                .uri(DatasetUriConstant.V1_DOCUMENTS_SEGMENTS_CHILD_CHUNK_URL,
+                        request.getDatasetId(), request.getDocumentId(), request.getSegmentId(), request.getChildChunkId())
+                .bodyValue(request)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(SegmentChildChunkUpdateResponse.class).block();
+    }
+
+    @Override
     public UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId) {
         // 请求地址
         String url = DatasetUriConstant.V1_DOCUMENTS_UPLOAD_FILE;
