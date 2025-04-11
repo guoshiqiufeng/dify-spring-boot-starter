@@ -10,31 +10,31 @@ description:
 
 ### Webclient
 
-> Support for custom Webclient, overriding the default instance
+> Support for custom webClientBuilder, overriding the default instance
 
 ```java
 
 @Bean
-public WebClient webClient() {
+public WebClient.Builder webClientBuilder() {
     HttpClient httpClient = HttpClient.create()
             .protocol(HttpProtocol.HTTP11);
     return WebClient.builder()
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .clientConnector(new ReactorClientHttpConnector(httpClient))
-            .build();
+            ;
 }
 ```
 
 ### RestClient
 
-> Support for custom RestClient, overriding the default instance
+> Support for custom restClientBuilder, overriding the default instance
 
 ```java
 
 @Bean
-public RestClient restClient() {
+public RestClient.Builder restClientBuilder() {
     return RestClient.builder()
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .build();
+            ;
 }
 ```

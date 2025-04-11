@@ -729,9 +729,147 @@ SegmentUpdateResponse
 | answer   | String         | 分段答案  |
 | keywords | `List<String>` | 关键词列表 |
 
-## 4. 数据检索
+## 4 子分段管理
 
-### 4.1 检索数据
+子分段（Child Chunk）是分段（Segment）的下一级细分单元，用于更细粒度的内容组织和检索。
+
+### 4.1 创建子分段
+
+#### 方法
+
+```java
+SegmentChildChunkCreateResponse createSegmentChildChunk(SegmentChildChunkCreateRequest request);
+```
+
+#### 请求参数
+
+SegmentChildChunkCreateRequest
+
+| 参数名        | 类型     | 是否必须 | 描述     |
+|------------|--------|------|--------|
+| datasetId  | String | 是    | 知识库 id |
+| documentId | String | 是    | 文档 id  |
+| segmentId  | String | 是    | 分段 id  |
+| content    | String | 是    | 子分段内容  |
+
+#### 响应参数
+
+SegmentChildChunkCreateResponse
+
+| 参数名  | 类型                        | 描述    |
+|------|---------------------------|-------|
+| data | SegmentChildChunkResponse | 子分段数据 |
+
+**SegmentChildChunkResponse 对象结构**
+
+| 参数名           | 类型      | 描述      |
+|---------------|---------|---------|
+| id            | String  | 子分段 id  |
+| segmentId     | String  | 所属分段 id |
+| content       | String  | 子分段内容   |
+| wordCount     | Integer | 单词数量    |
+| tokens        | Integer | 令牌数量    |
+| indexNodeId   | String  | 索引节点ID  |
+| indexNodeHash | String  | 索引节点哈希  |
+| status        | String  | 状态      |
+| createdBy     | String  | 创建人     |
+| createdAt     | Long    | 创建时间戳   |
+| indexingAt    | Long    | 索引时间戳   |
+| completedAt   | Long    | 完成时间戳   |
+| error         | String  | 错误信息    |
+| stoppedAt     | Long    | 停止时间戳   |
+
+### 4.2 分页查询子分段列表
+
+#### 方法
+
+```java
+DifyPageResult<SegmentChildChunkResponse> pageSegmentChildChunk(SegmentChildChunkPageRequest request);
+```
+
+#### 请求参数
+
+SegmentChildChunkPageRequest
+
+| 参数名        | 类型      | 是否必须 | 描述     |
+|------------|---------|------|--------|
+| datasetId  | String  | 是    | 知识库 id |
+| documentId | String  | 是    | 文档 id  |
+| segmentId  | String  | 是    | 分段 id  |
+| keyword    | String  | 否    | 搜索关键词  |
+| page       | Integer | 否    | 页码     |
+| limit      | Integer | 否    | 每页记录数  |
+
+#### 响应参数
+
+`DifyPageResult<SegmentChildChunkResponse>`
+
+| 参数名   | 类型                                | 描述    |
+|-------|-----------------------------------|-------|
+| list  | `List<SegmentChildChunkResponse>` | 子分段列表 |
+| total | Long                              | 总记录数  |
+| page  | Integer                           | 当前页码  |
+| limit | Integer                           | 每页记录数 |
+| pages | Integer                           | 总页数   |
+
+### 4.3 更新子分段
+
+#### 方法
+
+```java
+SegmentChildChunkUpdateResponse updateSegmentChildChunk(SegmentChildChunkUpdateRequest request);
+```
+
+#### 请求参数
+
+SegmentChildChunkUpdateRequest
+
+| 参数名          | 类型     | 是否必须 | 描述     |
+|--------------|--------|------|--------|
+| datasetId    | String | 是    | 知识库 id |
+| documentId   | String | 是    | 文档 id  |
+| segmentId    | String | 是    | 分段 id  |
+| childChunkId | String | 是    | 子分段 id |
+| content      | String | 是    | 子分段内容  |
+
+#### 响应参数
+
+SegmentChildChunkUpdateResponse
+
+| 参数名  | 类型                        | 描述    |
+|------|---------------------------|-------|
+| data | SegmentChildChunkResponse | 子分段数据 |
+
+### 4.4 删除子分段
+
+#### 方法
+
+```java
+SegmentChildChunkDeleteResponse deleteSegmentChildChunk(SegmentChildChunkDeleteRequest request);
+```
+
+#### 请求参数
+
+SegmentChildChunkDeleteRequest
+
+| 参数名          | 类型     | 是否必须 | 描述     |
+|--------------|--------|------|--------|
+| datasetId    | String | 是    | 知识库 id |
+| documentId   | String | 是    | 文档 id  |
+| segmentId    | String | 是    | 分段 id  |
+| childChunkId | String | 是    | 子分段 id |
+
+#### 响应参数
+
+SegmentChildChunkDeleteResponse
+
+| 参数名    | 类型     | 描述           |
+|--------|--------|--------------|
+| result | String | 固定返回 success |
+
+## 5. 数据检索
+
+### 5.1 检索数据
 
 #### 方法
 
@@ -815,9 +953,9 @@ RetrieveResponse
 | name           | String | 文档名称  |
 | docType        | String | 文档类型  |
 
-## 5. 元数据管理
+## 6. 元数据管理
 
-### 5.1 创建元数据
+### 6.1 创建元数据
 
 #### 方法
 
@@ -845,7 +983,7 @@ MetaDataResponse
 | type | String | 元数据类型 |
 | name | String | 元数据名称 |
 
-### 5.2 更新元数据
+### 6.2 更新元数据
 
 #### 方法
 
@@ -865,9 +1003,9 @@ MetaDataUpdateRequest
 
 #### 响应参数
 
-MetaDataResponse 查看 5.1
+MetaDataResponse 查看 6.1
 
-### 5.3 删除元数据
+### 6.3 删除元数据
 
 #### 方法
 
@@ -886,7 +1024,7 @@ MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId);
 
 无
 
-### 5.4 元数据操作
+### 6.4 元数据操作
 
 #### 方法
 
@@ -914,7 +1052,7 @@ MetaDataActionRequest
 
 无
 
-### 5.5 更新文档元数据
+### 6.5 更新文档元数据
 
 #### 方法
 
@@ -951,7 +1089,7 @@ DocumentMetaDataUpdateRequest
 
 无
 
-### 5.6 获取元数据列表
+### 6.6 获取元数据列表
 
 #### 方法
 
@@ -983,9 +1121,9 @@ MetaDataListResponse
 | name      | String  | 元数据名称 |
 | userCount | Integer | 使用次数  |
 
-## 6. 嵌入模型
+## 7. 嵌入模型
 
-### 6.1 获取嵌入模型列表
+### 7.1 获取嵌入模型列表
 
 #### 方法
 
