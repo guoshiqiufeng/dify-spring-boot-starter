@@ -38,5 +38,5 @@ public class ProcessRule implements Serializable {
     /**
      * 自定义规则（自动模式下，该字段为空
      */
-    private CustomRule rule;
+    private CustomRule rules;
 }

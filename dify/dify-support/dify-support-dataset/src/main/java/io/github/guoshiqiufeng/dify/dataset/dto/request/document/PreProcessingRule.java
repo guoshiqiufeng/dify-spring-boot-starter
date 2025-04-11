@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.dataset.dto.request.document;
 
 import io.github.guoshiqiufeng.dify.dataset.enums.document.PreProcessingRuleTypeEnum;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -26,6 +27,7 @@ import java.io.Serializable;
  * @since 2025/3/13 15:24
  */
 @Data
+@AllArgsConstructor
 public class PreProcessingRule implements Serializable {
     private static final long serialVersionUID = 2662516999304017667L;
 

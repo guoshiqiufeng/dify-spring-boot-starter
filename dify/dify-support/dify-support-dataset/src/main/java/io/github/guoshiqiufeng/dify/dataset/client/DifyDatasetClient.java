@@ -138,8 +138,7 @@ public class DifyDatasetClient extends BaseDifyClient {
 
     public DocumentCreateResponse updateDocumentByText(DocumentUpdateByTextRequest request) {
         Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
-        Assert.notNull(request.getDocForm(), "docForm can not be null");
-        Assert.notNull(request.getDocLanguage(), "docLanguage can not be null");
+
         return restClient.post()
                 .uri(DatasetUriConstant.V1_DOCUMENT_UPDATE_BY_TEXT_URL, request.getDatasetId(), request.getDocumentId())
                 .body(request)

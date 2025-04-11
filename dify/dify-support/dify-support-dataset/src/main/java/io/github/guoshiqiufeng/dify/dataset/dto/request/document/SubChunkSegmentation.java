@@ -17,7 +17,9 @@ package io.github.guoshiqiufeng.dify.dataset.dto.request.document;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
@@ -27,13 +29,15 @@ import java.io.Serializable;
  * @since 2025/3/13 15:24
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class SubChunkSegmentation implements Serializable {
 
-    private String separator;
+    private String separator = "/n";
 
     @JsonAlias("maxTokens")
     @JsonProperty("max_tokens")
-    private Integer maxTokens;
+    private Integer maxTokens = 200;
 
     @JsonAlias("chunkOverlap")
     @JsonProperty("chunk_overlap")
