@@ -42,7 +42,7 @@ public class DifyServerClient extends BaseDifyClient {
 
     private final DifyProperties.Server difyServerProperties;
 
-    private DifyServerToken difyServerToken;
+    private final DifyServerToken difyServerToken;
 
     public DifyServerClient(DifyProperties.Server difyServerProperties) {
         this(difyServerProperties, new DifyServerTokenDefault());
@@ -60,8 +60,8 @@ public class DifyServerClient extends BaseDifyClient {
         this.difyServerToken = difyServerToken;
     }
 
-    public DifyServerClient(DifyProperties.Server difyServerProperties, DifyServerToken difyServerToken, String baseUrl, RestClient.Builder restClientBuilder, WebClient.Builder webClientBuilder) {
-        super(baseUrl, restClientBuilder, webClientBuilder);
+    public DifyServerClient(DifyProperties.Server difyServerProperties, DifyServerToken difyServerToken, String baseUrl, DifyProperties.ClientConfig clientConfig, RestClient.Builder restClientBuilder, WebClient.Builder webClientBuilder) {
+        super(baseUrl, clientConfig, restClientBuilder, webClientBuilder);
         this.difyServerProperties = difyServerProperties;
         this.difyServerToken = difyServerToken;
     }

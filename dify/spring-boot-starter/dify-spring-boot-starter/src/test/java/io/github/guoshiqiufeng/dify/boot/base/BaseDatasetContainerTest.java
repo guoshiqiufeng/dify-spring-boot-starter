@@ -64,6 +64,7 @@ public abstract class BaseDatasetContainerTest implements RedisContainerTest {
         String apiKey = initializeApiKeyWithCache();
 
         DifyDatasetClient difyDatasetClient = new DifyDatasetClient(difyProperties.getUrl(),
+                difyProperties.getClientConfig(),
                 restClientBuilder.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey),
                 WebClient.builder().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey));
 

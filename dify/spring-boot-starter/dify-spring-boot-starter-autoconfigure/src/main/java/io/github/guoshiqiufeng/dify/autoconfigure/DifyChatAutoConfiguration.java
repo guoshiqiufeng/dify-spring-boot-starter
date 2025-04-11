@@ -44,6 +44,7 @@ public class DifyChatAutoConfiguration {
                                          ObjectProvider<RestClient.Builder> restClientBuilderProvider,
                                          ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
         return new DifyChatClient(properties.getUrl(),
+                properties.getClientConfig(),
                 restClientBuilderProvider.getIfAvailable(RestClient::builder),
                 webClientBuilderProvider.getIfAvailable(WebClient::builder));
     }

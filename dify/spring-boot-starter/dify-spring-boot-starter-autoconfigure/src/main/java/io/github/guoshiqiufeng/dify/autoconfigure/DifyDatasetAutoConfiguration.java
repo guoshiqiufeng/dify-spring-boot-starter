@@ -46,6 +46,7 @@ public class DifyDatasetAutoConfiguration {
                                                ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
         String apikey = "Bearer " + properties.getDataset().getApiKey();
         return new DifyDatasetClient(properties.getUrl(),
+                properties.getClientConfig(),
                 restClientBuilderProvider.getIfAvailable(RestClient::builder)
                         .defaultHeader(HttpHeaders.AUTHORIZATION, apikey),
                 webClientBuilderProvider.getIfAvailable(WebClient::builder)
@@ -57,5 +58,6 @@ public class DifyDatasetAutoConfiguration {
     public DifyDatasetClientImpl difyDataset(DifyDatasetClient difyDatasetClient) {
         return new DifyDatasetClientImpl(difyDatasetClient);
     }
+
 
 }

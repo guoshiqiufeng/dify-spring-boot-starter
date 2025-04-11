@@ -18,6 +18,7 @@ package io.github.guoshiqiufeng.dify.workflow.client;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import io.github.guoshiqiufeng.dify.core.client.BaseDifyClient;
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.enums.ResponseModeEnum;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.request.ChatMessageVO;
@@ -54,8 +55,8 @@ public class DifyWorkflowClient extends BaseDifyClient {
         super(baseUrl);
     }
 
-    public DifyWorkflowClient(String baseUrl, RestClient.Builder restClientBuilder, WebClient.Builder webClientBuilder) {
-        super(baseUrl, restClientBuilder, webClientBuilder);
+    public DifyWorkflowClient(String baseUrl, DifyProperties.ClientConfig clientConfig, RestClient.Builder restClientBuilder, WebClient.Builder webClientBuilder) {
+        super(baseUrl, clientConfig, restClientBuilder, webClientBuilder);
     }
 
 

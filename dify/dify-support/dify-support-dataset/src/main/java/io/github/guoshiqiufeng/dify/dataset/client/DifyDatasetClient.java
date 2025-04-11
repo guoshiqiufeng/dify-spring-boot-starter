@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.guoshiqiufeng.dify.core.client.BaseDifyClient;
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.dataset.constant.DatasetUriConstant;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.*;
@@ -54,8 +55,8 @@ public class DifyDatasetClient extends BaseDifyClient {
         super(baseUrl);
     }
 
-    public DifyDatasetClient(String baseUrl, RestClient.Builder restClientBuilder, WebClient.Builder webClientBuilder) {
-        super(baseUrl, restClientBuilder, webClientBuilder);
+    public DifyDatasetClient(String baseUrl, DifyProperties.ClientConfig clientConfig, RestClient.Builder restClientBuilder, WebClient.Builder webClientBuilder) {
+        super(baseUrl, clientConfig, restClientBuilder, webClientBuilder);
     }
 
 

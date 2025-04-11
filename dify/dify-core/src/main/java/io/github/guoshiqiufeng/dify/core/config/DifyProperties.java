@@ -47,6 +47,11 @@ public class DifyProperties implements Serializable {
      */
     private Server server;
 
+    /**
+     * 请求配置
+     */
+    private ClientConfig clientConfig = new ClientConfig();
+
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
@@ -70,5 +75,14 @@ public class DifyProperties implements Serializable {
          * 密码
          */
         private String password;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ClientConfig implements Serializable {
+        private static final long serialVersionUID = -8070163136236819894L;
+
+        private Boolean skipNull = true;
     }
 }

@@ -44,6 +44,7 @@ public class DifyWorkflowAutoConfiguration {
                                                  ObjectProvider<RestClient.Builder> restClientBuilderProvider,
                                                  ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
         return new DifyWorkflowClient(properties.getUrl(),
+                properties.getClientConfig(),
                 restClientBuilderProvider.getIfAvailable(RestClient::builder),
                 webClientBuilderProvider.getIfAvailable(WebClient::builder));
     }
