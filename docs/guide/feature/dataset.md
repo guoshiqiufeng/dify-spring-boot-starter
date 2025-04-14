@@ -181,8 +181,16 @@ DocumentCreateByTextRequest
 
 | 字段名   | 类型         | 描述    |
 |-------|------------|-------|
-| mode  | String     | 处理模式  |
+| mode  | ModeEnum   | 处理模式  |
 | rules | CustomRule | 自定义规则 |
+
+**ModeEnum 对象结构**
+
+| 枚举值          | 描述             |
+|--------------|----------------|
+| automatic    | 自动             |
+| hierarchical | parent-child模式 |
+| custom       | 自定义            |
 
 **CustomRule 对象结构**
 

@@ -183,8 +183,16 @@ DocumentCreateByTextRequest
 
 | Field | Type       | Description     |
 |-------|------------|-----------------|
-| mode  | String     | Processing mode |
+| mode  | ModeEnum   | Processing mode |
 | rules | CustomRule | Custom rules    |
+
+**ModeEnum 对象结构**
+
+| Value        | Description    |
+|--------------|----------------|
+| automatic    | 自动             |
+| hierarchical | parent-child模式 |
+| custom       | 自定义            | 
 
 **CustomRule Object Structure**
 
