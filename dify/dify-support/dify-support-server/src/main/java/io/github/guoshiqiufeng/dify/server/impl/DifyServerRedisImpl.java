@@ -81,17 +81,17 @@ public class DifyServerRedisImpl implements DifyServer {
      * 获取所有应用
      */
     @Override
-    public List<AppsResponseVO> apps(String category, String name) {
+    public List<AppsResponseVO> apps(String mode, String name) {
         List<AppsResponseVO> result = new ArrayList<>();
-        appPages(category, name, 1, result);
+        appPages(mode, name, 1, result);
         return result;
     }
 
     /**
      * 获取应用列表
      */
-    private void appPages(String category, String name, int page, List<AppsResponseVO> result) {
-        String uri = ServerUriConstant.APPS + "?category=" + category + "&name=" + name + "&page=" + page + "&limit=100";
+    private void appPages(String mode, String name, int page, List<AppsResponseVO> result) {
+        String uri = ServerUriConstant.APPS + "?mode=" + mode + "&name=" + name + "&page=" + page + "&limit=100";
         AppsResponseResultVO tmp = getRequest(uri, AppsResponseResultVO.class);
         if (tmp == null) {
             return;
@@ -100,7 +100,7 @@ public class DifyServerRedisImpl implements DifyServer {
         result.addAll(tmp.getData());
 
         if (tmp.getHasMore()) {
-            appPages(category, name, page + 1, result);
+            appPages(mode, name, page + 1, result);
         }
     }
 
