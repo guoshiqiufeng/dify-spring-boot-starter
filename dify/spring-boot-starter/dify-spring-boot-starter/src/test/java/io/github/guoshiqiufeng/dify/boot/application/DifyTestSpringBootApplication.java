@@ -18,7 +18,10 @@ package io.github.guoshiqiufeng.dify.boot.application;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
+
+import java.time.Duration;
 
 /**
  * @author yanghq
@@ -34,7 +37,10 @@ public class DifyTestSpringBootApplication {
 
     @Bean
     public RestClient.Builder restClientBuilder() {
-        return RestClient.builder().requestInterceptor(new LoggingInterceptor());
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        factory.setConnectTimeout(Duration.ofSeconds(10));
+        factory.setReadTimeout(Duration.ofSeconds(60));
+        return RestClient.builder().requestInterceptor(new LoggingInterceptor()).requestFactory(factory);
     }
 
 }

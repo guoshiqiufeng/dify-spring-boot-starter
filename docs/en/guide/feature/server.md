@@ -22,13 +22,14 @@ Use the `DifyServer` interface instance.
 #### Method
 
 ```java
-List<AppsResponseVO> apps(String name);
+List<AppsResponseVO> apps(String mode, String name);
 ```
 
 #### Request Parameters
 
 | Parameter name | Type   | Required | Description                                                      |
 |----------------|--------|----------|------------------------------------------------------------------|
+| mode           | String | No       | mode chat\agent-chat\completion\advanced-chat\workflow           |
 | name           | String | No       | Application name, used to filter the application list (optional) |
 
 #### Response Parameters
