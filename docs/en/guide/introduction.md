@@ -59,6 +59,10 @@ Implementation of the Redis messaging framework.
 | 【KNOWLEDGE】 Get Chunks from a Document                | ✅      |  
 | 【KNOWLEDGE】 Delete a Chunk in a Document              | ✅      |  
 | 【KNOWLEDGE】 Update a Chunk in a Document              | ✅      |  
+| 【KNOWLEDGE】 Create Child Chunk                        | ✅      |  
+| 【KNOWLEDGE】Get Child Chunks                           | ✅      |  
+| 【KNOWLEDGE】 Delete Child Chunk                        | ✅      |  
+| 【KNOWLEDGE】 Update Child Chunk                        | ✅      |  
 | 【KNOWLEDGE】 Get Upload File                           | ✅      |  
 | 【KNOWLEDGE】 Retrieve Chunks from a Knowledge Base     | ✅      |  
 | 【KNOWLEDGE】 Create a Knowledge Metadata               | ✅      |

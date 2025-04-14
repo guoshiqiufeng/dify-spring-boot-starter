@@ -107,6 +107,26 @@ public class DifyDatasetClientImpl implements DifyDataset {
     }
 
     @Override
+    public SegmentChildChunkCreateResponse createSegmentChildChunk(SegmentChildChunkCreateRequest request) {
+        return difyDatasetClient.createSegmentChildChunk(request);
+    }
+
+    @Override
+    public DifyPageResult<SegmentChildChunkResponse> pageSegmentChildChunk(SegmentChildChunkPageRequest request) {
+        return difyDatasetClient.pageSegmentChildChunk(request);
+    }
+
+    @Override
+    public SegmentChildChunkDeleteResponse deleteSegmentChildChunk(SegmentChildChunkDeleteRequest request) {
+        return difyDatasetClient.deleteSegmentChildChunk(request);
+    }
+
+    @Override
+    public SegmentChildChunkUpdateResponse updateSegmentChildChunk(SegmentChildChunkUpdateRequest request) {
+        return difyDatasetClient.updateSegmentChildChunk(request);
+    }
+
+    @Override
     public UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId) {
         return difyDatasetClient.uploadFileInfo(datasetId, documentId);
     }

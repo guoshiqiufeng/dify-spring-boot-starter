@@ -64,6 +64,7 @@ public class DifyServerAutoConfiguration {
         return new DifyServerClient(properties.getServer(),
                 difyServerToken,
                 properties.getUrl(),
+                properties.getClientConfig(),
                 restClientBuilderProvider.getIfAvailable(RestClient::builder),
                 webClientBuilderProvider.getIfAvailable(WebClient::builder));
     }

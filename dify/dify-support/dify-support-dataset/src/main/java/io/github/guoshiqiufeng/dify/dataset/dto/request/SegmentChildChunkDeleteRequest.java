@@ -13,34 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.dataset.dto.request.document;
+package io.github.guoshiqiufeng.dify.dataset.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
 /**
  * @author yanghq
- * @version 1.0
- * @since 2025/3/13 15:24
+ * @version 0.8.0
+ * @since 2025/4/11 09:53
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class SubChunkSegmentation implements Serializable {
+public class SegmentChildChunkDeleteRequest extends BaseDatasetRequest implements Serializable {
 
-    private String separator = "/n";
+    private static final long serialVersionUID = 927938288064559455L;
 
-    @JsonAlias("maxTokens")
-    @JsonProperty("max_tokens")
-    private Integer maxTokens = 200;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonAlias("datasetId")
+    private String datasetId;
 
-    @JsonAlias("chunkOverlap")
-    @JsonProperty("chunk_overlap")
-    private Integer chunkOverlap;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonAlias("documentId")
+    private String documentId;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonAlias("segmentId")
+    private String segmentId;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonAlias("childChunkId")
+    private String childChunkId;
 }

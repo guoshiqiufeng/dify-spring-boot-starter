@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.core.client;
 
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -34,8 +35,8 @@ class BaseDifyClientTest {
             super(baseUrl);
         }
 
-        public TestDifyClient(String baseUrl, RestClient.Builder restClientBuilder, WebClient.Builder webClientBuilder) {
-            super(baseUrl, restClientBuilder, webClientBuilder);
+        public TestDifyClient(String baseUrl, DifyProperties.ClientConfig clientConfig, RestClient.Builder restClientBuilder, WebClient.Builder webClientBuilder) {
+            super(baseUrl, clientConfig, restClientBuilder, webClientBuilder);
         }
 
         // Expose protected fields for testing
@@ -69,7 +70,7 @@ class BaseDifyClientTest {
         RestClient.Builder restClientBuilder = RestClient.builder();
         WebClient.Builder webClientBuilder = WebClient.builder();
 
-        TestDifyClient client = new TestDifyClient(baseUrl, restClientBuilder, webClientBuilder);
+        TestDifyClient client = new TestDifyClient(baseUrl, new DifyProperties.ClientConfig(), restClientBuilder, webClientBuilder);
         assertNotNull(client.getRestClient());
         assertNotNull(client.getWebClient());
     }

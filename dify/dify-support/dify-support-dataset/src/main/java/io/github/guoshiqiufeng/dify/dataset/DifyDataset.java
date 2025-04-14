@@ -141,6 +141,38 @@ public interface DifyDataset {
     SegmentUpdateResponse updateSegment(SegmentUpdateRequest request);
 
     /**
+     * 创建子分段
+     *
+     * @param request 子分段创建请求对象，包含创建分段所需的信息。
+     * @return 返回子分段响应对象
+     */
+    SegmentChildChunkCreateResponse createSegmentChildChunk(SegmentChildChunkCreateRequest request);
+
+    /**
+     * 分页查询子分段列表
+     *
+     * @param request 子分段分页查询请求对象，包含分页参数和查询条件。
+     * @return 返回子分段分页查询响应对象
+     */
+    DifyPageResult<SegmentChildChunkResponse> pageSegmentChildChunk(SegmentChildChunkPageRequest request);
+
+    /**
+     * 删除指定子分段
+     *
+     * @param request 子分段删除请求对象
+     * @return 返回子分段删除响应对象
+     */
+    SegmentChildChunkDeleteResponse deleteSegmentChildChunk(SegmentChildChunkDeleteRequest request);
+
+    /**
+     * 更新子分段
+     *
+     * @param request 子分段更新请求对象，包含更新子分段所需的信息。
+     * @return 返回子分段更新响应对象
+     */
+    SegmentChildChunkUpdateResponse updateSegmentChildChunk(SegmentChildChunkUpdateRequest request);
+
+    /**
      * 获取上传文件信息。
      *
      * @param datasetId  知识库的唯一标识符。

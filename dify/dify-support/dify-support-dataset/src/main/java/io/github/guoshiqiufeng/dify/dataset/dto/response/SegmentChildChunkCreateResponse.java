@@ -13,34 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.dataset.dto.request.document;
+package io.github.guoshiqiufeng.dify.dataset.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
 /**
  * @author yanghq
- * @version 1.0
- * @since 2025/3/13 15:24
+ * @version 0.8.0
+ * @since 2025/4/11 09:34
  */
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class SubChunkSegmentation implements Serializable {
+public class SegmentChildChunkCreateResponse implements Serializable {
+    private static final long serialVersionUID = 2972643083546017485L;
 
-    private String separator = "/n";
-
-    @JsonAlias("maxTokens")
-    @JsonProperty("max_tokens")
-    private Integer maxTokens = 200;
-
-    @JsonAlias("chunkOverlap")
-    @JsonProperty("chunk_overlap")
-    private Integer chunkOverlap;
-
+    private SegmentChildChunkResponse data;
 }

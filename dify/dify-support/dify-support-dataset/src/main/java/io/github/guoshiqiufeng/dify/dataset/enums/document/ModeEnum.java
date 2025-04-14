@@ -30,5 +30,10 @@ public enum ModeEnum {
     /**
      * 自定义
      */
-    custom
+    custom,
+
+    /**
+     * parent-child 模式
+     */
+    hierarchical
 }

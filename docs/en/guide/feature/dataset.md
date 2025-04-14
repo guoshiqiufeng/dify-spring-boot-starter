@@ -183,8 +183,16 @@ DocumentCreateByTextRequest
 
 | Field | Type       | Description     |
 |-------|------------|-----------------|
-| mode  | String     | Processing mode |
+| mode  | ModeEnum   | Processing mode |
 | rules | CustomRule | Custom rules    |
+
+**ModeEnum 对象结构**
+
+| Value        | Description    |
+|--------------|----------------|
+| automatic    | 自动             |
+| hierarchical | parent-child模式 |
+| custom       | 自定义            | 
 
 **CustomRule Object Structure**
 
@@ -731,9 +739,148 @@ SegmentUpdateResponse
 | answer    | String         | Segment answer  |
 | keywords  | `List<String>` | Keyword list    |
 
-## 4. Data Retrieval
+## 4 Child Chunk Management
 
-### 4.1 Retrieve Data
+Child Chunks (Sub-segments) are the next level of granularity below segments, used for more fine-grained content
+organization and retrieval.
+
+### 4.1 Create Child Chunk
+
+#### Method
+
+```java
+SegmentChildChunkCreateResponse createSegmentChildChunk(SegmentChildChunkCreateRequest request);
+```
+
+#### Request Parameters
+
+SegmentChildChunkCreateRequest
+
+| Parameter  | Type   | Required | Description         |
+|------------|--------|----------|---------------------|
+| datasetId  | String | Yes      | Knowledge base ID   |
+| documentId | String | Yes      | Document ID         |
+| segmentId  | String | Yes      | Segment ID          |
+| content    | String | Yes      | Child chunk content |
+
+#### Response Parameters
+
+SegmentChildChunkCreateResponse
+
+| Parameter | Type                      | Description      |
+|-----------|---------------------------|------------------|
+| data      | SegmentChildChunkResponse | Child chunk data |
+
+**SegmentChildChunkResponse Object Structure**
+
+| Parameter     | Type    | Description          |
+|---------------|---------|----------------------|
+| id            | String  | Child chunk ID       |
+| segmentId     | String  | Parent segment ID    |
+| content       | String  | Child chunk content  |
+| wordCount     | Integer | Word count           |
+| tokens        | Integer | Token count          |
+| indexNodeId   | String  | Index node ID        |
+| indexNodeHash | String  | Index node hash      |
+| status        | String  | Status               |
+| createdBy     | String  | Created by           |
+| createdAt     | Long    | Creation timestamp   |
+| indexingAt    | Long    | Indexing timestamp   |
+| completedAt   | Long    | Completion timestamp |
+| error         | String  | Error message        |
+| stoppedAt     | Long    | Stop timestamp       |
+
+### 4.2 Paginated Query of Child Chunk List
+
+#### Method
+
+```java
+DifyPageResult<SegmentChildChunkResponse> pageSegmentChildChunk(SegmentChildChunkPageRequest request);
+```
+
+#### Request Parameters
+
+SegmentChildChunkPageRequest
+
+| Parameter  | Type    | Required | Description       |
+|------------|---------|----------|-------------------|
+| datasetId  | String  | Yes      | Knowledge base ID |
+| documentId | String  | Yes      | Document ID       |
+| segmentId  | String  | Yes      | Segment ID        |
+| keyword    | String  | No       | Search keyword    |
+| page       | Integer | No       | Page number       |
+| limit      | Integer | No       | Records per page  |
+
+#### Response Parameters
+
+`DifyPageResult<SegmentChildChunkResponse>`
+
+| Parameter | Type                              | Description      |
+|-----------|-----------------------------------|------------------|
+| list      | `List<SegmentChildChunkResponse>` | Child chunk list |
+| total     | Long                              | Total records    |
+| page      | Integer                           | Current page     |
+| limit     | Integer                           | Records per page |
+| pages     | Integer                           | Total pages      |
+
+### 4.3 Update Child Chunk
+
+#### Method
+
+```java
+SegmentChildChunkUpdateResponse updateSegmentChildChunk(SegmentChildChunkUpdateRequest request);
+```
+
+#### Request Parameters
+
+SegmentChildChunkUpdateRequest
+
+| Parameter    | Type   | Required | Description         |
+|--------------|--------|----------|---------------------|
+| datasetId    | String | Yes      | Knowledge base ID   |
+| documentId   | String | Yes      | Document ID         |
+| segmentId    | String | Yes      | Segment ID          |
+| childChunkId | String | Yes      | Child chunk ID      |
+| content      | String | Yes      | Child chunk content |
+
+#### Response Parameters
+
+SegmentChildChunkUpdateResponse
+
+| Parameter | Type                      | Description      |
+|-----------|---------------------------|------------------|
+| data      | SegmentChildChunkResponse | Child chunk data |
+
+### 4.4 Delete Child Chunk
+
+#### Method
+
+```java
+SegmentChildChunkDeleteResponse deleteSegmentChildChunk(SegmentChildChunkDeleteRequest request);
+```
+
+#### Request Parameters
+
+SegmentChildChunkDeleteRequest
+
+| Parameter    | Type   | Required | Description       |
+|--------------|--------|----------|-------------------|
+| datasetId    | String | Yes      | Knowledge base ID |
+| documentId   | String | Yes      | Document ID       |
+| segmentId    | String | Yes      | Segment ID        |
+| childChunkId | String | Yes      | Child chunk ID    |
+
+#### Response Parameters
+
+SegmentChildChunkDeleteResponse
+
+| Parameter | Type   | Description            |
+|-----------|--------|------------------------|
+| result    | String | Fixed return "success" |
+
+## 5. Data Retrieval
+
+### 5.1 Retrieve Data
 
 #### Method
 
@@ -817,9 +964,9 @@ RetrieveResponse
 | name           | String | Document name    |
 | docType        | String | Document type    |
 
-## 5. Metadata Management
+## 6. Metadata Management
 
-### 5.1 Create Metadata
+### 6.1 Create Metadata
 
 #### Method
 
@@ -847,7 +994,7 @@ MetaDataResponse
 | type      | String | Metadata type |
 | name      | String | Metadata name |
 
-### 5.2 Update Metadata
+### 6.2 Update Metadata
 
 #### Method
 
@@ -867,9 +1014,9 @@ MetaDataUpdateRequest
 
 #### Response Parameters
 
-MetaDataResponse See 5.1
+MetaDataResponse See 6.1
 
-### 5.3 Delete Metadata
+### 6.3 Delete Metadata
 
 #### Method
 
@@ -888,7 +1035,7 @@ MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId);
 
 not have
 
-### 5.4 Metadata Operations
+### 6.4 Metadata Operations
 
 #### Method
 
@@ -916,7 +1063,7 @@ MetaDataActionRequest
 
 not have
 
-### 5.5 Update Document Metadata
+### 6.5 Update Document Metadata
 
 #### Method
 
@@ -953,7 +1100,7 @@ DocumentMetaDataUpdateRequest
 
 not have
 
-### 5.6 Get Metadata List
+### 6.6 Get Metadata List
 
 #### Method
 
@@ -985,9 +1132,9 @@ MetaDataListResponse
 | name      | String  | Metadata name |
 | userCount | Integer | Usage count   |
 
-## 6. Embedding Models
+## 7. Embedding Models
 
-### 6.1 Get Embedding Model List
+### 7.1 Get Embedding Model List
 
 #### Method
 

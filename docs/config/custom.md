@@ -10,31 +10,31 @@ description:
 
 ### WebClient
 
-> 支持自定义 webclient，覆盖默认实例
+> 支持自定义 webClientBuilder，覆盖默认实例
 
 ```java
 
 @Bean
-public WebClient webClient() {
+public WebClient.Builder webClientBuilder() {
     HttpClient httpClient = HttpClient.create()
             .protocol(HttpProtocol.HTTP11);
     return WebClient.builder()
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .clientConnector(new ReactorClientHttpConnector(httpClient))
-            .build();
+            ;
 }
 ```
 
 ### RestClient
 
-> 支持自定义 restClient，覆盖默认实例
+> 支持自定义 restClientBuilder，覆盖默认实例
 
 ```java
 
 @Bean
-public RestClient restClient() {
+public RestClient.Builder restClientBuilder() {
     return RestClient.builder()
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .build();
+            ;
 }
 ```

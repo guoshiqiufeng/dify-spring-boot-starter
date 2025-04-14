@@ -58,6 +58,10 @@ description:
 | 【DataSet】 查询文档分段       | ✅  |
 | 【DataSet】 删除文档分段       | ✅  |
 | 【DataSet】 更新文档分段       | ✅  |
+| 【DataSet】 新增子分段        | ✅  |
+| 【DataSet】 查询文档子分段      | ✅  |
+| 【DataSet】 删除文档子分段      | ✅  |
+| 【DataSet】 更新文档子分段      | ✅  |
 | 【DataSet】 获取上传文件       | ✅  |
 | 【DataSet】 检索知识库        | ✅  |
 | 【DataSet】 新增元数据        | ✅  |

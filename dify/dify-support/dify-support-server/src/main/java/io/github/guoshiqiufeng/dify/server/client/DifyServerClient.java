@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.server.client;
 
+import cn.hutool.core.util.StrUtil;
 import io.github.guoshiqiufeng.dify.core.client.BaseDifyClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
@@ -42,7 +43,7 @@ public class DifyServerClient extends BaseDifyClient {
 
     private final DifyProperties.Server difyServerProperties;
 
-    private DifyServerToken difyServerToken;
+    private final DifyServerToken difyServerToken;
 
     public DifyServerClient(DifyProperties.Server difyServerProperties) {
         this(difyServerProperties, new DifyServerTokenDefault());
@@ -60,15 +61,15 @@ public class DifyServerClient extends BaseDifyClient {
         this.difyServerToken = difyServerToken;
     }
 
-    public DifyServerClient(DifyProperties.Server difyServerProperties, DifyServerToken difyServerToken, String baseUrl, RestClient.Builder restClientBuilder, WebClient.Builder webClientBuilder) {
-        super(baseUrl, restClientBuilder, webClientBuilder);
+    public DifyServerClient(DifyProperties.Server difyServerProperties, DifyServerToken difyServerToken, String baseUrl, DifyProperties.ClientConfig clientConfig, RestClient.Builder restClientBuilder, WebClient.Builder webClientBuilder) {
+        super(baseUrl, clientConfig, restClientBuilder, webClientBuilder);
         this.difyServerProperties = difyServerProperties;
         this.difyServerToken = difyServerToken;
     }
 
-    public List<AppsResponseVO> apps(String category, String name) {
+    public List<AppsResponseVO> apps(String mode, String name) {
         List<AppsResponseVO> result = new ArrayList<>();
-        appPages(category, name, 1, result);
+        appPages(mode, name, 1, result);
         return result;
     }
 
@@ -134,10 +135,15 @@ public class DifyServerClient extends BaseDifyClient {
         return result != null ? new ArrayList<>(List.of(result)) : null;
     }
 
-    private void appPages(String category, String name, int page, List<AppsResponseVO> result) {
+    private void appPages(String mode, String name, int page, List<AppsResponseVO> result) {
+        String uri = ServerUriConstant.APPS + "?name={name}&page={page}&limit=100";
+        if(StrUtil.isNotEmpty(mode)) {
+            uri += "&mode=" + mode;
+        }
+        String finalUri = uri;
         AppsResponseResultVO response = executeWithRetry(
                 () -> restClient.get()
-                        .uri(ServerUriConstant.APPS + "?category={category}name={name}&page={page}&limit=100", category, name, page)
+                        .uri(finalUri, name, page)
                         .headers(this::addAuthorizationHeader)
                         .retrieve()
                         .onStatus(responseErrorHandler)
@@ -153,7 +159,7 @@ public class DifyServerClient extends BaseDifyClient {
         }
 
         if (Boolean.TRUE.equals(response.getHasMore())) {
-            appPages(category, name, page + 1, result);
+            appPages(mode, name, page + 1, result);
         }
     }
 

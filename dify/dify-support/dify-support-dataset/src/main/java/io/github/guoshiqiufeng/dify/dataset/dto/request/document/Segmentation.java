@@ -17,7 +17,9 @@ package io.github.guoshiqiufeng.dify.dataset.dto.request.document;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
@@ -27,17 +29,19 @@ import java.io.Serializable;
  * @since 2025/3/13 15:25
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Segmentation implements Serializable {
 
     /**
      * 自定义分段标识符，目前仅允许设置一个分隔符。默认为 \n
      */
-    private String separator;
+    private String separator = "\\n";
 
     /**
      * 最大长度（token）默认为 1000
      */
     @JsonAlias("maxTokens")
     @JsonProperty("max_tokens")
-    private Integer maxTokens;
+    private Integer maxTokens = 1000;
 }

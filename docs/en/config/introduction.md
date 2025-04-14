@@ -49,3 +49,14 @@ dify:
 - Default value: ``
 - Not required.
 - Description: Knowledge base api-key, not required if you don't need to call the knowledge base.
+
+#### clientConfig
+
+> Configuration for initiating requests
+
+##### skipNull
+
+- Type：`Boolean`
+- Default value：`true`
+- Not required
+- Description：Whether to skip null fields, by default null fields are filtered out when submitting data

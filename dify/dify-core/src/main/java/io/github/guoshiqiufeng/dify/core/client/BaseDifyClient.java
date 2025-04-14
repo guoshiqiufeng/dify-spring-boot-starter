@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.core.client;
 
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -49,24 +50,36 @@ public abstract class BaseDifyClient {
     protected final WebClient webClient;
 
     public BaseDifyClient() {
-        this(DEFAULT_BASE_URL);
+        this(DEFAULT_BASE_URL, new DifyProperties.ClientConfig());
     }
 
     public BaseDifyClient(String baseUrl) {
-        this(baseUrl, RestClient.builder(), WebClient.builder());
+        this(baseUrl, new DifyProperties.ClientConfig());
     }
 
-    public BaseDifyClient(String baseUrl, RestClient.Builder restClientBuilder, WebClient.Builder webClientBuilder) {
-        this(baseUrl, restClientBuilder, webClientBuilder, new DifyChatResponseErrorHandler());
+    public BaseDifyClient(DifyProperties.ClientConfig clientConfig) {
+        this(DEFAULT_BASE_URL, clientConfig);
     }
 
-    public BaseDifyClient(String baseUrl, RestClient.Builder restClientBuilder, WebClient.Builder webClientBuilder, ResponseErrorHandler responseErrorHandler) {
+    public BaseDifyClient(String baseUrl, DifyProperties.ClientConfig clientConfig) {
+        this(baseUrl, clientConfig, RestClient.builder(), WebClient.builder());
+    }
+
+    public BaseDifyClient(String baseUrl, DifyProperties.ClientConfig clientConfig, RestClient.Builder restClientBuilder, WebClient.Builder webClientBuilder) {
+        this(baseUrl, clientConfig, restClientBuilder, webClientBuilder, new DifyChatResponseErrorHandler());
+    }
+
+    public BaseDifyClient(String baseUrl, DifyProperties.ClientConfig clientConfig, RestClient.Builder restClientBuilder, WebClient.Builder webClientBuilder, ResponseErrorHandler responseErrorHandler) {
         this.responseErrorHandler = responseErrorHandler;
 
         Consumer<HttpHeaders> defaultHeaders = headers -> {
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         };
+
+        if (clientConfig != null && clientConfig.getSkipNull()) {
+            DifyMessageConverters.messageConvertersConsumer().accept(restClientBuilder);
+        }
 
         this.restClient = restClientBuilder.baseUrl(baseUrl).defaultHeaders(defaultHeaders).build();
 

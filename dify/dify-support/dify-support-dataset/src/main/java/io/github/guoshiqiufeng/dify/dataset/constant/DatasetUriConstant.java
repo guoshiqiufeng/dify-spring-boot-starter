@@ -46,6 +46,10 @@ public interface DatasetUriConstant {
 
     String V1_DOCUMENTS_SEGMENT_URL = V1_DOCUMENT_URL + "/segments/{segmentId}";
 
+    String V1_DOCUMENTS_SEGMENTS_CHILD_CHUNKS_URL = V1_DOCUMENTS_SEGMENT_URL + "/child_chunks";
+
+    String V1_DOCUMENTS_SEGMENTS_CHILD_CHUNK_URL = V1_DOCUMENTS_SEGMENT_URL + "/child_chunks/{child_chunk_id}";
+
     String V1_DOCUMENTS_UPLOAD_FILE = V1_DOCUMENT_URL + "/upload-file";
 
     String V1_DATASETS_RETRIEVE_URL = V1_DATASET_URL + "/retrieve";

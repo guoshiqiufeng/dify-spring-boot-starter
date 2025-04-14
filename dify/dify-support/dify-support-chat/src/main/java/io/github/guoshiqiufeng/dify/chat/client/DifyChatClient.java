@@ -23,6 +23,7 @@ import io.github.guoshiqiufeng.dify.chat.dto.response.*;
 import io.github.guoshiqiufeng.dify.chat.utils.MultipartInputStreamFileResource;
 import io.github.guoshiqiufeng.dify.chat.utils.WebClientUtil;
 import io.github.guoshiqiufeng.dify.core.client.BaseDifyClient;
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.enums.ResponseModeEnum;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
@@ -62,8 +63,8 @@ public class DifyChatClient extends BaseDifyClient {
         super(baseUrl);
     }
 
-    public DifyChatClient(String baseUrl, RestClient.Builder restClientBuilder, WebClient.Builder webClientBuilder) {
-        super(baseUrl, restClientBuilder, webClientBuilder);
+    public DifyChatClient(String baseUrl, DifyProperties.ClientConfig clientConfig, RestClient.Builder restClientBuilder, WebClient.Builder webClientBuilder) {
+        super(baseUrl, clientConfig, restClientBuilder, webClientBuilder);
     }
 
     public ChatMessageSendResponse chat(ChatMessageSendRequest chatRequest) {

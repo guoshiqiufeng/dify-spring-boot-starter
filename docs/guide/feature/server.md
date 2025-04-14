@@ -20,14 +20,15 @@ API 密钥进行身份验证。
 #### 方法
 
 ```java
-List<AppsResponseVO> apps(String name);
+List<AppsResponseVO> apps(String mode, String name);
 ```
 
 #### 请求参数
 
-| 参数名  | 类型     | 是否必须 | 描述                             |
-|------|--------|------|--------------------------------|
-| name | String | 否    | 应用名称，用于过滤应用列表（可选，传入空字符串时表示不过滤） |
+| 参数名  | 类型     | 是否必须 | 描述                                                   |
+|------|--------|------|------------------------------------------------------|
+| mode | String | 否    | 模式 chat\agent-chat\completion\advanced-chat\workflow |
+| name | String | 否    | 应用名称，用于过滤应用列表（可选，传入空字符串时表示不过滤）                       |
 
 #### 响应参数
 

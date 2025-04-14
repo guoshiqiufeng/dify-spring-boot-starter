@@ -20,14 +20,13 @@ import io.github.guoshiqiufeng.dify.boot.base.BaseDatasetContainerTest;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.dataset.dto.RetrievalModel;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.*;
-import io.github.guoshiqiufeng.dify.dataset.dto.request.document.ProcessRule;
+import io.github.guoshiqiufeng.dify.dataset.dto.request.document.*;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.*;
 import io.github.guoshiqiufeng.dify.dataset.enums.IndexingTechniqueEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.MetaDataActionEnum;
+import io.github.guoshiqiufeng.dify.dataset.enums.RerankingModeEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.SearchMethodEnum;
-import io.github.guoshiqiufeng.dify.dataset.enums.document.DocFormEnum;
-import io.github.guoshiqiufeng.dify.dataset.enums.document.DocTypeEnum;
-import io.github.guoshiqiufeng.dify.dataset.enums.document.ModeEnum;
+import io.github.guoshiqiufeng.dify.dataset.enums.document.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.http.MediaType;
@@ -71,12 +70,6 @@ public class DatasetTest extends BaseDatasetContainerTest {
     @Order(1)
     @DisplayName("Test dataset creation and listing")
     public void testDatasetOperations() {
-        // Test dataset listing
-        DatasetPageRequest pageRequest = new DatasetPageRequest();
-        DifyPageResult<DatasetResponse> pageResult = difyDataset.page(pageRequest);
-        assertNotNull(pageResult);
-        log.info("Dataset page: {}", JSONUtil.toJsonStr(pageResult));
-
         // Test dataset creation
         DatasetCreateRequest createRequest = new DatasetCreateRequest();
         createRequest.setName("api-test-dataset");
@@ -89,6 +82,12 @@ public class DatasetTest extends BaseDatasetContainerTest {
 
         // Store dataset ID for subsequent tests
         datasetId = response.getId();
+
+        // Test dataset listing
+        DatasetPageRequest pageRequest = new DatasetPageRequest();
+        DifyPageResult<DatasetResponse> pageResult = difyDataset.page(pageRequest);
+        assertNotNull(pageResult);
+        log.info("Dataset page: {}", JSONUtil.toJsonStr(pageResult));
     }
 
     @Test
@@ -109,7 +108,14 @@ public class DatasetTest extends BaseDatasetContainerTest {
 
         // Configure process rule
         ProcessRule processRule = new ProcessRule();
-        processRule.setMode(ModeEnum.automatic);
+        processRule.setMode(ModeEnum.hierarchical);
+        CustomRule rule = new CustomRule();
+        rule.setPreProcessingRules(List.of(new PreProcessingRule(PreProcessingRuleTypeEnum.remove_urls_emails, true),
+                new PreProcessingRule(PreProcessingRuleTypeEnum.remove_extra_spaces, false)));
+        rule.setSegmentation(new Segmentation());
+        rule.setParentMode(ParentModeEnum.PARAGRAPH);
+        rule.setSubChunkSegmentation(new SubChunkSegmentation());
+        processRule.setRules(rule);
         request.setProcessRule(processRule);
 
         // Configure retrieval model
@@ -191,37 +197,26 @@ public class DatasetTest extends BaseDatasetContainerTest {
     }
 
     @Test
-    @Order(5)
+    @Order(12)
     @DisplayName("Test document update by text")
     public void testDocumentUpdateByText() throws InterruptedException {
         assertNotNull(datasetId, "Dataset ID should be available from previous test");
         assertNotNull(documentTextId, "Document ID should be available from previous test");
 
-        // Test creating metadata
-        MetaDataCreateRequest createRequest = new MetaDataCreateRequest();
-        createRequest.setDatasetId(datasetId);
-        createRequest.setType("string");
-        createRequest.setName("test-create-metadata");
-
-        MetaDataResponse createResponse = difyDataset.createMetaData(createRequest);
-        assertNotNull(createResponse);
-        assertNotNull(createResponse.getId());
-
         DocumentUpdateByTextRequest request = new DocumentUpdateByTextRequest();
         request.setDatasetId(datasetId);
         request.setDocumentId(documentTextId);
         request.setName("Updated Text Document");
-        request.setDocForm(DocFormEnum.hierarchical_model);
-        request.setDocLanguage("English");
 
-        request.setDocMetadata(List.of(MetaData.builder()
-                .id(createResponse.getId())
-                .name(createRequest.getName())
-                .type(createRequest.getType())
-                .value("testDocumentUpdateByText")
-                .build()));
         ProcessRule processRule = new ProcessRule();
-        processRule.setMode(ModeEnum.automatic);
+        processRule.setMode(ModeEnum.hierarchical);
+        CustomRule rule = new CustomRule();
+        rule.setPreProcessingRules(List.of(new PreProcessingRule(PreProcessingRuleTypeEnum.remove_urls_emails, true),
+                new PreProcessingRule(PreProcessingRuleTypeEnum.remove_extra_spaces, false)));
+        rule.setSegmentation(new Segmentation());
+        rule.setParentMode(ParentModeEnum.PARAGRAPH);
+        rule.setSubChunkSegmentation(new SubChunkSegmentation());
+        processRule.setRules(rule);
         request.setProcessRule(processRule);
 
         // Add a slight delay to ensure previous operations have completed
@@ -233,12 +228,15 @@ public class DatasetTest extends BaseDatasetContainerTest {
     }
 
     @Test
-    @Order(6)
+    @Order(11)
     @DisplayName("Test document update by file")
-    public void testDocumentUpdateByFile() {
+    public void testDocumentUpdateByFile() throws InterruptedException {
         assertNotNull(datasetId, "Dataset ID should be available from previous test");
         assertNotNull(documentFileId, "Document File ID should be available from previous test");
         assertNotNull(testFile, "Test file should be available");
+
+        // Add a slight delay to ensure previous operations have completed
+        Thread.sleep(500);
 
         DocumentUpdateByFileRequest request = new DocumentUpdateByFileRequest();
         request.setDatasetId(datasetId);
@@ -331,7 +329,91 @@ public class DatasetTest extends BaseDatasetContainerTest {
     }
 
     @Test
-    @Order(9)
+    @Order(10)
+    @DisplayName("Test segment child operations")
+    public void testSegmentChildOperations() throws InterruptedException {
+        assertNotNull(datasetId, "Dataset ID should be available from previous test");
+
+        DocumentCreateByTextRequest request = new DocumentCreateByTextRequest();
+        request.setDatasetId(datasetId);
+        request.setName("Text Document segment Test");
+        request.setText("This is a test document segment content for API testing.");
+        request.setDocType(DocTypeEnum.others);
+
+        request.setIndexingTechnique(IndexingTechniqueEnum.HIGH_QUALITY);
+        request.setDocForm(DocFormEnum.hierarchical_model);
+        request.setDocLanguage("English");
+
+        // Configure process rule
+        ProcessRule processRule = new ProcessRule();
+        processRule.setMode(ModeEnum.custom);
+        CustomRule rule = new CustomRule();
+        rule.setPreProcessingRules(List.of(new PreProcessingRule(PreProcessingRuleTypeEnum.remove_urls_emails, true)));
+        rule.setSegmentation(new Segmentation());
+        rule.setParentMode(ParentModeEnum.PARAGRAPH);
+        rule.setSubChunkSegmentation(new SubChunkSegmentation());
+        processRule.setRules(rule);
+        request.setProcessRule(processRule);
+
+        // Configure retrieval model
+        request.setRetrievalModel(createRetrievalModel());
+        request.setEmbeddingModel("bge-m3:latest");
+        request.setEmbeddingModelProvider("langgenius/ollama/ollama");
+
+        // Create document
+        DocumentCreateResponse response = difyDataset.createDocumentByText(request);
+        assertNotNull(response);
+        String documentId = response.getDocument().getId();
+        // Wait for indexing to complete
+        Thread.sleep(1500);
+
+        SegmentCreateRequest segmentCreateRequest = new SegmentCreateRequest();
+        segmentCreateRequest.setDatasetId(datasetId);
+        segmentCreateRequest.setDocumentId(documentId);
+        segmentCreateRequest.setSegments(List.of(new SegmentParam().setContent("This is a test document segment content for API testing.")));
+
+        SegmentResponse createResponse = difyDataset.createSegment(segmentCreateRequest);
+        assertNotNull(createResponse);
+        assertNotNull(createResponse.getData());
+        String segmentId = createResponse.getData().getFirst().getId();
+
+        SegmentChildChunkPageRequest segmentChildChunkPageRequest = new SegmentChildChunkPageRequest();
+        segmentChildChunkPageRequest.setDatasetId(datasetId);
+        segmentChildChunkPageRequest.setDocumentId(documentId);
+        segmentChildChunkPageRequest.setSegmentId(segmentId);
+        DifyPageResult<SegmentChildChunkResponse> segmentChildChunkResponseDifyPageResult = difyDataset.pageSegmentChildChunk(segmentChildChunkPageRequest);
+        assertNotNull(segmentChildChunkResponseDifyPageResult);
+
+        SegmentChildChunkCreateRequest childChunkCreateRequest = new SegmentChildChunkCreateRequest();
+        childChunkCreateRequest.setDatasetId(datasetId);
+        childChunkCreateRequest.setDocumentId(documentId);
+        childChunkCreateRequest.setSegmentId(segmentId);
+        childChunkCreateRequest.setContent("child chunk content");
+        SegmentChildChunkCreateResponse segmentChildChunk = difyDataset.createSegmentChildChunk(childChunkCreateRequest);
+        assertNotNull(segmentChildChunk);
+        String childChunkId = segmentChildChunk.getData().getId();
+
+        SegmentChildChunkUpdateRequest childChunkUpdateRequest = new SegmentChildChunkUpdateRequest();
+        childChunkUpdateRequest.setDatasetId(datasetId);
+        childChunkUpdateRequest.setDocumentId(documentId);
+        childChunkUpdateRequest.setSegmentId(segmentId);
+
+        childChunkUpdateRequest.setChildChunkId(childChunkId);
+        childChunkUpdateRequest.setContent("child chunk updated content");
+        SegmentChildChunkUpdateResponse segmentChildChunkUpdate = difyDataset.updateSegmentChildChunk(childChunkUpdateRequest);
+        assertNotNull(segmentChildChunkUpdate);
+
+        SegmentChildChunkDeleteRequest childChunkDeleteRequest = new SegmentChildChunkDeleteRequest();
+        childChunkDeleteRequest.setDatasetId(datasetId);
+        childChunkDeleteRequest.setDocumentId(documentId);
+        childChunkDeleteRequest.setSegmentId(segmentId);
+        childChunkDeleteRequest.setChildChunkId(childChunkId);
+        SegmentChildChunkDeleteResponse segmentChildChunkDelete = difyDataset.deleteSegmentChildChunk(childChunkDeleteRequest);
+        assertNotNull(segmentChildChunkDelete);
+    }
+
+    @Test
+    @Order(13)
     @DisplayName("Test file upload info")
     public void testFileUploadInfo() {
         assertNotNull(datasetId, "Dataset ID should be available from previous test");
@@ -343,7 +425,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
     }
 
     @Test
-    @Order(10)
+    @Order(14)
     @DisplayName("Test TextEmbedding")
     public void testTextEmbedding() {
         TextEmbeddingListResponse response = difyDataset.listTextEmbedding();
@@ -468,6 +550,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
         RetrievalModel model = new RetrievalModel();
         model.setSearchMethod(SearchMethodEnum.hybrid_search);
         model.setRerankingEnable(false);
+        model.setRerankingMode(RerankingModeEnum.weighted_score);
 
         RetrievalModel.RerankingModelWeight weights = new RetrievalModel.RerankingModelWeight();
 
