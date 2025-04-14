@@ -33,7 +33,7 @@ import java.util.List;
 public class DocumentMetaDataUpdateRequest extends BaseDatasetRequest implements Serializable {
     private static final long serialVersionUID = -7793337783067712263L;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+
     @JsonAlias("datasetId")
     private String datasetId;
 

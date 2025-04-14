@@ -38,7 +38,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class DocumentCreateByFileRequest extends BaseDatasetRequest implements Serializable {
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+
     @JsonAlias("datasetId")
     private String datasetId;
 
@@ -46,7 +46,6 @@ public class DocumentCreateByFileRequest extends BaseDatasetRequest implements S
     @JsonAlias("originalDocumentId")
     private String originalDocumentId;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @JsonAlias("file")
     private MultipartFile file;
 

@@ -37,7 +37,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class DocumentCreateByTextRequest extends BaseDatasetRequest implements Serializable {
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+
     @JsonAlias("datasetId")
     private String datasetId;
 

@@ -121,6 +121,7 @@ public class DifyDatasetClient extends BaseDifyClient {
                     .header("Content-Type", contentType);
 
             // 添加JSON数据部分
+            request.setFile(null);
             builder.part("data", toJson(request))
                     .header("Content-Type", MediaType.APPLICATION_JSON_VALUE);
         } catch (IOException e) {
@@ -165,6 +166,7 @@ public class DifyDatasetClient extends BaseDifyClient {
                     .header("Content-Type", contentType);
 
             // 添加JSON数据部分
+            request.setFile(null);
             builder.part("data", toJson(request))
                     .header("Content-Type", MediaType.APPLICATION_JSON_VALUE);
         } catch (IOException e) {
