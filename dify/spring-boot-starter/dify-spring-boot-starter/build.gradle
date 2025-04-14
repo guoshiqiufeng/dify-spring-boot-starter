@@ -15,5 +15,6 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation "io.projectreactor:reactor-test"
+    testImplementation "org.apache.httpcomponents.client5:httpclient5"
     testImplementation "${lib["hutool-json"]}"
 }
