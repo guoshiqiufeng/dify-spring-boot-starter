@@ -16,7 +16,6 @@
 package io.github.guoshiqiufeng.dify.dataset.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -37,19 +36,19 @@ public class SegmentChildChunkDeleteRequest extends BaseDatasetRequest implement
 
     private static final long serialVersionUID = 927938288064559455L;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+
     @JsonAlias("datasetId")
     private String datasetId;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+
     @JsonAlias("documentId")
     private String documentId;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+
     @JsonAlias("segmentId")
     private String segmentId;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+
     @JsonAlias("childChunkId")
     private String childChunkId;
 }

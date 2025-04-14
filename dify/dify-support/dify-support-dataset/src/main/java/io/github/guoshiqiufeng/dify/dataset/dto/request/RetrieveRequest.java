@@ -33,7 +33,7 @@ import java.io.Serializable;
 public class RetrieveRequest extends BaseDatasetRequest implements Serializable {
     private static final long serialVersionUID = -4555074954659951949L;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+
     @JsonAlias("datasetId")
     private String datasetId;
 

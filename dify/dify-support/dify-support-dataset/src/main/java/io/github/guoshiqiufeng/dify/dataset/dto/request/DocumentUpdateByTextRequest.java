@@ -36,11 +36,11 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class DocumentUpdateByTextRequest extends BaseDatasetRequest implements Serializable {
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+
     @JsonAlias("datasetId")
     private String datasetId;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+
     @JsonAlias("documentId")
     private String documentId;
 

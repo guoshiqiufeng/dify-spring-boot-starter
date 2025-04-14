@@ -16,7 +16,6 @@
 package io.github.guoshiqiufeng.dify.dataset.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -32,19 +31,19 @@ import java.io.Serializable;
 public class SegmentChildChunkUpdateRequest extends BaseDatasetRequest implements Serializable {
     private static final long serialVersionUID = 7291412940243621065L;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+
     @JsonAlias("datasetId")
     private String datasetId;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+
     @JsonAlias("documentId")
     private String documentId;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+
     @JsonAlias("segmentId")
     private String segmentId;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+
     @JsonAlias("childChunkId")
     private String childChunkId;
 

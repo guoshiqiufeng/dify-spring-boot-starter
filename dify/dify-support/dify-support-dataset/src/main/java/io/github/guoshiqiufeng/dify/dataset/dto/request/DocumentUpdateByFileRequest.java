@@ -38,17 +38,16 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class DocumentUpdateByFileRequest extends BaseDatasetRequest implements Serializable {
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+
     @JsonAlias("datasetId")
     private String datasetId;
 
     private String name;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+
     @JsonAlias("documentId")
     private String documentId;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @JsonAlias("file")
     private MultipartFile file;
 
