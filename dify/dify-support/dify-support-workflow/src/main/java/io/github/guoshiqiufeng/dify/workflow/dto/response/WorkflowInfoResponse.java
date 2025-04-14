@@ -116,6 +116,10 @@ public class WorkflowInfoResponse implements Serializable {
                 return null;
             }
             try {
+                return Long.parseLong(dateStr.trim());
+            } catch (NumberFormatException ignored) {
+            }
+            try {
                 Date date = SDF_THREAD_LOCAL.get().parse(dateStr);
                 return date.getTime();
             } catch (ParseException e) {

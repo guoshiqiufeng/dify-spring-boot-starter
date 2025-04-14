@@ -15,7 +15,6 @@
  */
 package io.github.guoshiqiufeng.dify.server.client;
 
-import cn.hutool.core.util.StrUtil;
 import io.github.guoshiqiufeng.dify.core.client.BaseDifyClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
@@ -136,14 +135,15 @@ public class DifyServerClient extends BaseDifyClient {
     }
 
     private void appPages(String mode, String name, int page, List<AppsResponseVO> result) {
-        String uri = ServerUriConstant.APPS + "?name={name}&page={page}&limit=100";
-        if(StrUtil.isNotEmpty(mode)) {
-            uri += "&mode=" + mode;
-        }
-        String finalUri = uri;
         AppsResponseResultVO response = executeWithRetry(
                 () -> restClient.get()
-                        .uri(finalUri, name, page)
+                        .uri(uriBuilder -> uriBuilder
+                                .path(ServerUriConstant.APPS)
+                                .queryParam("page", page)
+                                .queryParam("limit", 100)
+                                .queryParamIfPresent("mode", Optional.ofNullable(mode))
+                                .queryParamIfPresent("name", Optional.ofNullable(name))
+                                .build())
                         .headers(this::addAuthorizationHeader)
                         .retrieve()
                         .onStatus(responseErrorHandler)

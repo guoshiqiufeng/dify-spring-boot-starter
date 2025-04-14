@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author yanghq
@@ -139,8 +140,13 @@ public class DifyChatClient extends BaseDifyClient {
         }
 
         return this.restClient.get()
-                .uri(ChatUriConstant.V1_CONVERSATIONS_URI + "?user={userId}&last_id={lastId}&limit={limit}&sort_by={sortBy}",
-                        request.getUserId(), request.getLastId(), request.getLimit(), request.getSortBy())
+                .uri(uriBuilder -> uriBuilder
+                        .path(ChatUriConstant.V1_CONVERSATIONS_URI)
+                        .queryParam("sort_by", request.getSortBy())
+                        .queryParam("limit", request.getLimit())
+                        .queryParamIfPresent("user", Optional.ofNullable(request.getUserId()))
+                        .queryParamIfPresent("last_id", Optional.ofNullable(request.getLastId()))
+                        .build())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
                 .retrieve()
                 .onStatus(responseErrorHandler)
@@ -155,11 +161,15 @@ public class DifyChatClient extends BaseDifyClient {
         }
 
         return this.restClient.get()
-                .uri(ChatUriConstant.V1_MESSAGES_URI + "?conversation_id={conversationId}&user={user}&first_id={firstId}&limit={limit}",
-                        request.getConversationId(),
-                        request.getUserId(),
-                        request.getFirstId() == null ? "" : request.getFirstId(),
-                        request.getLimit())
+                .uri(uriBuilder -> uriBuilder
+                        .path(ChatUriConstant.V1_MESSAGES_URI)
+                        .queryParam("conversation_id", request.getConversationId())
+                        .queryParam("limit", request.getLimit())
+                        // 条件参数：status（为空时忽略）
+                        .queryParamIfPresent("first_id", Optional.ofNullable(request.getFirstId()))
+                        // 条件参数：keyword（为空时忽略）
+                        .queryParamIfPresent("user", Optional.ofNullable(request.getUserId()))
+                        .build())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
                 .retrieve()
                 .onStatus(responseErrorHandler)

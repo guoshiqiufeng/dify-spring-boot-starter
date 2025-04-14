@@ -38,6 +38,7 @@ import reactor.core.publisher.Flux;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author yanghq
@@ -114,9 +115,13 @@ public class DifyWorkflowClient extends BaseDifyClient {
             request.setLimit(20);
         }
         return restClient.get()
-                .uri(WorkflowConstant.WORKFLOW_LOGS_URL + "?page={page}&limit={limit}&status={status}&keyword={keyword}",
-                        request.getPage(), request.getLimit(),
-                        request.getStatus(), request.getKeyword()
+                .uri(uriBuilder -> uriBuilder
+                        .path(WorkflowConstant.WORKFLOW_LOGS_URL)
+                        .queryParam("page", request.getPage())
+                        .queryParam("limit", request.getLimit())
+                        .queryParamIfPresent("status", Optional.ofNullable(request.getStatus()))
+                        .queryParamIfPresent("keyword", Optional.ofNullable(request.getKeyword()))
+                        .build()
                 )
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
                 .retrieve()
