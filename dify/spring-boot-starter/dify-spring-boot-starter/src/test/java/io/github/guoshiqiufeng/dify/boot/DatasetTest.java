@@ -228,7 +228,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
     }
 
     @Test
-    @Order(6)
+    @Order(11)
     @DisplayName("Test document update by file")
     public void testDocumentUpdateByFile() throws InterruptedException {
         assertNotNull(datasetId, "Dataset ID should be available from previous test");
