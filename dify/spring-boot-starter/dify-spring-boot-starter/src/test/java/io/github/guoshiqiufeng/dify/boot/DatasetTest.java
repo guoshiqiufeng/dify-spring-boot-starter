@@ -108,7 +108,14 @@ public class DatasetTest extends BaseDatasetContainerTest {
 
         // Configure process rule
         ProcessRule processRule = new ProcessRule();
-        processRule.setMode(ModeEnum.automatic);
+        processRule.setMode(ModeEnum.hierarchical);
+        CustomRule rule = new CustomRule();
+        rule.setPreProcessingRules(List.of(new PreProcessingRule(PreProcessingRuleTypeEnum.remove_urls_emails, true),
+                new PreProcessingRule(PreProcessingRuleTypeEnum.remove_extra_spaces, false)));
+        rule.setSegmentation(new Segmentation());
+        rule.setParentMode(ParentModeEnum.PARAGRAPH);
+        rule.setSubChunkSegmentation(new SubChunkSegmentation());
+        processRule.setRules(rule);
         request.setProcessRule(processRule);
 
         // Configure retrieval model
@@ -190,7 +197,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
     }
 
     @Test
-    @Order(5)
+    @Order(12)
     @DisplayName("Test document update by text")
     public void testDocumentUpdateByText() throws InterruptedException {
         assertNotNull(datasetId, "Dataset ID should be available from previous test");
@@ -202,7 +209,14 @@ public class DatasetTest extends BaseDatasetContainerTest {
         request.setName("Updated Text Document");
 
         ProcessRule processRule = new ProcessRule();
-        processRule.setMode(ModeEnum.automatic);
+        processRule.setMode(ModeEnum.hierarchical);
+        CustomRule rule = new CustomRule();
+        rule.setPreProcessingRules(List.of(new PreProcessingRule(PreProcessingRuleTypeEnum.remove_urls_emails, true),
+                new PreProcessingRule(PreProcessingRuleTypeEnum.remove_extra_spaces, false)));
+        rule.setSegmentation(new Segmentation());
+        rule.setParentMode(ParentModeEnum.PARAGRAPH);
+        rule.setSubChunkSegmentation(new SubChunkSegmentation());
+        processRule.setRules(rule);
         request.setProcessRule(processRule);
 
         // Add a slight delay to ensure previous operations have completed
@@ -216,10 +230,13 @@ public class DatasetTest extends BaseDatasetContainerTest {
     @Test
     @Order(6)
     @DisplayName("Test document update by file")
-    public void testDocumentUpdateByFile() {
+    public void testDocumentUpdateByFile() throws InterruptedException {
         assertNotNull(datasetId, "Dataset ID should be available from previous test");
         assertNotNull(documentFileId, "Document File ID should be available from previous test");
         assertNotNull(testFile, "Test file should be available");
+
+        // Add a slight delay to ensure previous operations have completed
+        Thread.sleep(500);
 
         DocumentUpdateByFileRequest request = new DocumentUpdateByFileRequest();
         request.setDatasetId(datasetId);
@@ -311,7 +328,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
         log.info("Deleted segment: {}", JSONUtil.toJsonStr(deleteResponse));
     }
 
-    // @Test
+    @Test
     @Order(10)
     @DisplayName("Test segment child operations")
     public void testSegmentChildOperations() throws InterruptedException {
