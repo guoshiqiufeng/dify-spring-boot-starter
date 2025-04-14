@@ -144,8 +144,8 @@ public class DifyChatClient extends BaseDifyClient {
                         .path(ChatUriConstant.V1_CONVERSATIONS_URI)
                         .queryParam("sort_by", request.getSortBy())
                         .queryParam("limit", request.getLimit())
-                        .queryParamIfPresent("user", Optional.ofNullable(request.getUserId()))
-                        .queryParamIfPresent("last_id", Optional.ofNullable(request.getLastId()))
+                        .queryParamIfPresent("user", Optional.ofNullable(request.getUserId()).filter(m -> !m.isEmpty()))
+                        .queryParamIfPresent("last_id", Optional.ofNullable(request.getLastId()).filter(m -> !m.isEmpty()))
                         .build())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
                 .retrieve()
@@ -166,9 +166,9 @@ public class DifyChatClient extends BaseDifyClient {
                         .queryParam("conversation_id", request.getConversationId())
                         .queryParam("limit", request.getLimit())
                         // 条件参数：status（为空时忽略）
-                        .queryParamIfPresent("first_id", Optional.ofNullable(request.getFirstId()))
+                        .queryParamIfPresent("first_id", Optional.ofNullable(request.getFirstId()).filter(m -> !m.isEmpty()))
                         // 条件参数：keyword（为空时忽略）
-                        .queryParamIfPresent("user", Optional.ofNullable(request.getUserId()))
+                        .queryParamIfPresent("user", Optional.ofNullable(request.getUserId()).filter(m -> !m.isEmpty()))
                         .build())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
                 .retrieve()
