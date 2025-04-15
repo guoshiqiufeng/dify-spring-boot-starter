@@ -53,7 +53,7 @@ public class DifyChatClientImpl implements DifyChat {
     }
 
     @Override
-    public Flux<ChatMessageSendResponse> sendChatMessageStream(ChatMessageSendRequest sendRequest) {
+    public Flux<ChatMessageSendCompletionResponse> sendChatMessageStream(ChatMessageSendRequest sendRequest) {
         return difyChatClient.streamingChat(sendRequest);
     }
 

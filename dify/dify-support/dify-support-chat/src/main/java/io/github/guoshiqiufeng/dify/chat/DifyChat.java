@@ -47,7 +47,7 @@ public interface DifyChat {
      * @param sendRequest 消息发送请求对象，包含消息内容等信息
      * @return Flux<ChatMessageSendResponse> 消息流，实时返回消息发送的结果
      */
-    Flux<ChatMessageSendResponse> sendChatMessageStream(ChatMessageSendRequest sendRequest);
+    Flux<ChatMessageSendCompletionResponse> sendChatMessageStream(ChatMessageSendRequest sendRequest);
 
     /**
      * 停止消息流
