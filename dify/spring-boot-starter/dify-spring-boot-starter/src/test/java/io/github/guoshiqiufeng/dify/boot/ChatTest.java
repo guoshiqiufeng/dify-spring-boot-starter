@@ -18,10 +18,7 @@ package io.github.guoshiqiufeng.dify.boot;
 import io.github.guoshiqiufeng.dify.boot.base.BaseChatContainerTest;
 import io.github.guoshiqiufeng.dify.chat.DifyChat;
 import io.github.guoshiqiufeng.dify.chat.dto.request.*;
-import io.github.guoshiqiufeng.dify.chat.dto.response.AppParametersResponseVO;
-import io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendResponse;
-import io.github.guoshiqiufeng.dify.chat.dto.response.MessageConversationsResponse;
-import io.github.guoshiqiufeng.dify.chat.dto.response.MessageFeedbackResponse;
+import io.github.guoshiqiufeng.dify.chat.dto.response.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.parameter.Enabled;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
@@ -86,7 +83,7 @@ public class ChatTest extends BaseChatContainerTest {
         chatMessageSendRequest.setUserId(userId);
         chatMessageSendRequest.setConversationId(conversationId);
 
-        Flux<ChatMessageSendResponse> responseFlux = difyChat.sendChatMessageStream(chatMessageSendRequest);
+        Flux<ChatMessageSendCompletionResponse> responseFlux = difyChat.sendChatMessageStream(chatMessageSendRequest);
 
         StepVerifier.create(responseFlux.take(1))
                 .assertNext(response -> {

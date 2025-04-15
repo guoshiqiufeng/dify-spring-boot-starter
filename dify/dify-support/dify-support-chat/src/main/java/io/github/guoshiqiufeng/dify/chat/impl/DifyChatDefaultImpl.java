@@ -126,7 +126,7 @@ public class DifyChatDefaultImpl implements DifyChat {
      * 发送消息获取消息流
      */
     @Override
-    public Flux<ChatMessageSendResponse> sendChatMessageStream(ChatMessageSendRequest sendRequest) {
+    public Flux<ChatMessageSendCompletionResponse> sendChatMessageStream(ChatMessageSendRequest sendRequest) {
         // 请求地址 url + /v1/chat-messages 请求方式 POST , stream 流
         String url = ChatUriConstant.V1_CHAT_MESSAGES_URI;
 
@@ -140,7 +140,7 @@ public class DifyChatDefaultImpl implements DifyChat {
                 .bodyValue(body)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
-                .bodyToFlux(ChatMessageSendResponse.class)
+                .bodyToFlux(ChatMessageSendCompletionResponse.class)
                 .doOnError(e -> log.error("Error while sending chat message: {}", e.getMessage()));
     }
 

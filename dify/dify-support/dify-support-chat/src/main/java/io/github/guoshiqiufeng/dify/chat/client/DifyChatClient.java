@@ -82,7 +82,7 @@ public class DifyChatClient extends BaseDifyClient {
                 .body(ChatMessageSendResponse.class);
     }
 
-    public Flux<ChatMessageSendResponse> streamingChat(ChatMessageSendRequest chatRequest) {
+    public Flux<ChatMessageSendCompletionResponse> streamingChat(ChatMessageSendRequest chatRequest) {
         Assert.notNull(chatRequest, REQUEST_BODY_NULL_ERROR);
 
         ChatMessageVO chatMessage = builderChatMessage(ResponseModeEnum.streaming, chatRequest);
@@ -93,7 +93,7 @@ public class DifyChatClient extends BaseDifyClient {
                 .body(Mono.just(chatMessage), ChatMessageVO.class)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
-                .bodyToFlux(ChatMessageSendResponse.class);
+                .bodyToFlux(ChatMessageSendCompletionResponse.class);
     }
 
     public void stopMessagesStream(String apiKey, String taskId, String userId) {
