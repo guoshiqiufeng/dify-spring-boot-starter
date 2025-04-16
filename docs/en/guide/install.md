@@ -11,7 +11,7 @@ const version = inject('version');
 # Install
 
 [dify-spring-boot-starter](https://github.com/guoshiqiufeng/dify-spring-boot-starter) Based on JDK21, support SpringBoot
-3.x.
+3.x、2.x.
 
 ## SpringBoot 3.x
 
@@ -170,6 +170,168 @@ implementation 'io.github.guoshiqiufeng.dify:dify-spring-boot-starter-workflow:{
 
 ```groovy:no-line-numbers:no-v-pre
 implementation group: 'io.github.guoshiqiufeng.dify', name: 'dify-spring-boot-starter-workflow', version: '{{version}}'
+```
+
+  </CodeGroupItem>
+</CodeGroup>
+
+## SpringBoot 2.x
+
+### All-dependent installation
+
+<CodeGroup>
+  <CodeGroupItem title="Maven" active>
+
+```xml:no-line-numbers:no-v-pre
+<dependency>
+    <groupId>io.github.guoshiqiufeng.dify</groupId>
+    <artifactId>dify-spring-boot2-starter</artifactId>
+    <version>{{version}}</version>
+</dependency>
+```
+
+  </CodeGroupItem>
+
+  <CodeGroupItem title="Gradle (Short)" active>
+
+```groovy:no-line-numbers:no-v-pre
+implementation 'io.github.guoshiqiufeng.dify:dify-spring-boot2-starter:{{version}}'
+```
+
+  </CodeGroupItem>
+
+  <CodeGroupItem title="Gradle">
+
+```groovy:no-line-numbers:no-v-pre
+implementation group: 'io.github.guoshiqiufeng.dify', name: 'dify-spring-boot2-starter', version: '{{version}}'
+```
+
+  </CodeGroupItem>
+</CodeGroup>
+
+### Chat
+
+<CodeGroup>
+  <CodeGroupItem title="Maven" active>
+
+```xml:no-line-numbers:no-v-pre
+<dependency>
+    <groupId>io.github.guoshiqiufeng.dify</groupId>
+    <artifactId>dify-spring-boot2-starter-chat</artifactId>
+    <version>{{version}}</version>
+</dependency>
+```
+
+  </CodeGroupItem>
+
+  <CodeGroupItem title="Gradle (Short)" active>
+
+```groovy:no-line-numbers:no-v-pre
+implementation 'io.github.guoshiqiufeng.dify:dify-spring-boot2-starter-chat:{{version}}'
+```
+
+  </CodeGroupItem>
+
+  <CodeGroupItem title="Gradle">
+
+```groovy:no-line-numbers:no-v-pre
+implementation group: 'io.github.guoshiqiufeng.dify', name: 'dify-spring-boot2-starter-chat', version: '{{version}}'
+```
+
+  </CodeGroupItem>
+</CodeGroup>
+
+### Knowledge
+
+<CodeGroup>
+  <CodeGroupItem title="Maven" active>
+
+```xml:no-line-numbers:no-v-pre
+<dependency>
+    <groupId>io.github.guoshiqiufeng.dify</groupId>
+    <artifactId>dify-spring-boot2-starter-dataset</artifactId>
+    <version>{{version}}</version>
+</dependency>
+```
+
+  </CodeGroupItem>
+
+  <CodeGroupItem title="Gradle (Short)" active>
+
+```groovy:no-line-numbers:no-v-pre
+implementation 'io.github.guoshiqiufeng.dify:dify-spring-boot2-starter-dataset:{{version}}'
+```
+
+  </CodeGroupItem>
+
+  <CodeGroupItem title="Gradle">
+
+```groovy:no-line-numbers:no-v-pre
+implementation group: 'io.github.guoshiqiufeng.dify', name: 'dify-spring-boot2-starter-dataset', version: '{{version}}'
+```
+
+  </CodeGroupItem>
+</CodeGroup>
+
+### Server
+
+<CodeGroup>
+  <CodeGroupItem title="Maven" active>
+
+```xml:no-line-numbers:no-v-pre
+<dependency>
+    <groupId>io.github.guoshiqiufeng.dify</groupId>
+    <artifactId>dify-spring-boot2-starter-server</artifactId>
+    <version>{{version}}</version>
+</dependency>
+```
+
+  </CodeGroupItem>
+
+  <CodeGroupItem title="Gradle (Short)" active>
+
+```groovy:no-line-numbers:no-v-pre
+implementation 'io.github.guoshiqiufeng.dify:dify-spring-boot2-starter-server:{{version}}'
+```
+
+  </CodeGroupItem>
+
+  <CodeGroupItem title="Gradle">
+
+```groovy:no-line-numbers:no-v-pre
+implementation group: 'io.github.guoshiqiufeng.dify', name: 'dify-spring-boot2-starter-server', version: '{{version}}'
+```
+
+  </CodeGroupItem>
+</CodeGroup>
+
+### Workflow
+
+<CodeGroup>
+  <CodeGroupItem title="Maven" active>
+
+```xml:no-line-numbers:no-v-pre
+<dependency>
+    <groupId>io.github.guoshiqiufeng.dify</groupId>
+    <artifactId>dify-spring-boot2-starter-workflow</artifactId>
+    <version>{{version}}</version>
+</dependency>
+```
+
+  </CodeGroupItem>
+
+  <CodeGroupItem title="Gradle (Short)" active>
+
+```groovy:no-line-numbers:no-v-pre
+implementation 'io.github.guoshiqiufeng.dify:dify-spring-boot2-starter-workflow:{{version}}'
+```
+
+  </CodeGroupItem>
+
+  <CodeGroupItem title="Gradle">
+
+```groovy:no-line-numbers:no-v-pre
+implementation group: 'io.github.guoshiqiufeng.dify', name: 'dify-spring-boot2-starter-workflow', version: '{{version}}'
 ```
 
   </CodeGroupItem>

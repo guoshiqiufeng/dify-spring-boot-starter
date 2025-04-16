@@ -16,6 +16,7 @@ const version = inject('version');
 ## 初始化
 
 创建一个空的Spring Boot 工程，这里我们使用 3.2.0 版本。
+> 若使用 2.x 版本Spring Boot 请参考 [安装](install.md)。
 
 ## 添加依赖
 

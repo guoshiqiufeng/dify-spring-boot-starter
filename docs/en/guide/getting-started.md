@@ -17,6 +17,7 @@ features.
 ## Initialization
 
 Create an empty Spring Boot project，Here we are using version 3.2.0 .
+> If you are using the 2.x version of Spring Boot, please refer to the [install](install.md)。
 
 ## Adding Dependencies
 
