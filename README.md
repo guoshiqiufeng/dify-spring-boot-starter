@@ -16,12 +16,16 @@ https://guoshiqiufeng.github.io/dify-spring-boot-starter/en
 
 ### Development Framework
 
-- Spring Boot 3
+- Spring Boot 3/2
 
 ### Running the minimum version
 
+- Spring Boot 2
+- Java 8
+
+### Recommended Running Versions
+
 - Spring Boot 3
-- Java 17
 
 ### Features
 

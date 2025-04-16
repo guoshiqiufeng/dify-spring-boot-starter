@@ -4,6 +4,8 @@ dependencies {
     implementation project(":dify:dify-support:dify-support-server")
     implementation project(":dify:dify-support:dify-support-workflow")
 
+    api project(":dify:dify-client:dify-client-spring6")
+
     api 'org.springframework.boot:spring-boot-starter-reactor-netty'
 
     implementation "org.springframework.boot:spring-boot-starter-data-redis"

@@ -16,12 +16,16 @@
 
 ### 开发框架
 
-- Spring Boot 3
+- Spring Boot 3/2
 
 ### 运行最低版本
 
+- Spring Boot 2
+- Java 8
+
+### 推荐运行版本
+
 - Spring Boot 3
-- Java 17
 
 ### 功能
 
@@ -50,11 +54,21 @@
 
 #### 引入starter依赖
 
+- springboot3
 ```xml
 
 <dependency>
     <groupId>io.github.guoshiqiufeng.dify</groupId>
     <artifactId>dify-spring-boot-starter</artifactId>
+</dependency>
+```
+
+- springboot2
+```xml
+
+<dependency>
+    <groupId>io.github.guoshiqiufeng.dify</groupId>
+    <artifactId>dify-spring-boot2-starter</artifactId>
 </dependency>
 ```
 

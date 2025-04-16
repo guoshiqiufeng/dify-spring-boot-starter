@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.autoconfigure;
 
+import io.github.guoshiqiufeng.dify.client.spring6.server.DifyServerDefaultClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
@@ -61,7 +62,7 @@ public class DifyServerAutoConfiguration {
                                              DifyServerToken difyServerToken,
                                              ObjectProvider<RestClient.Builder> restClientBuilderProvider,
                                              ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
-        return new DifyServerClient(properties.getServer(),
+        return new DifyServerDefaultClient(properties.getServer(),
                 difyServerToken,
                 properties.getUrl(),
                 properties.getClientConfig(),

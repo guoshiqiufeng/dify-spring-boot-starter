@@ -1,0 +1,18 @@
+dependencies {
+    implementation project(":dify:dify-support:dify-support-chat")
+    implementation project(":dify:dify-support:dify-support-dataset")
+    implementation project(":dify:dify-support:dify-support-server")
+    implementation project(":dify:dify-support:dify-support-workflow")
+
+    api project(":dify:dify-client:dify-client-spring5")
+
+    api 'org.springframework.boot:spring-boot-starter-reactor-netty'
+
+    implementation "org.springframework.boot:spring-boot-starter-data-redis"
+
+    implementation "org.springframework.boot:spring-boot-autoconfigure"
+    annotationProcessor "org.springframework.boot:spring-boot-starter-actuator"
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+}

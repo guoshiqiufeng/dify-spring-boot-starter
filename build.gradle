@@ -26,7 +26,7 @@ subprojects {
     }
 
     compileJava {
-        options.release = 17
+        options.release = 8
     }
 
     compileTestJava {
@@ -36,7 +36,6 @@ subprojects {
     repositories {
         mavenLocal()
         maven { url "https://maven.aliyun.com/repository/public" }
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         mavenCentral()
     }
 
@@ -45,7 +44,11 @@ subprojects {
     if (!onlyPom) {
         dependencyManagement {
             imports {
-                mavenBom "org.springframework.boot:spring-boot-dependencies:${springBoot3Version}"
+                if (project.name.contains("spring5") || project.name.contains("core") || project.name.contains("support") || project.name.contains("spring-boot2-starter")) {
+                    mavenBom "org.springframework.boot:spring-boot-dependencies:${springBoot2Version}"
+                } else if (project.name.contains("spring-boot-starter") || project.name.contains("spring6")) {
+                    mavenBom "org.springframework.boot:spring-boot-dependencies:${springBoot3Version}"
+                }
                 mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
             }
             dependencies {

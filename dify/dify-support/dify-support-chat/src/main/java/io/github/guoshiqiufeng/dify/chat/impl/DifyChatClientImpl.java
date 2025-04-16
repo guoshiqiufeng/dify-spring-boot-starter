@@ -19,18 +19,11 @@ import io.github.guoshiqiufeng.dify.chat.DifyChat;
 import io.github.guoshiqiufeng.dify.chat.client.DifyChatClient;
 import io.github.guoshiqiufeng.dify.chat.dto.request.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.*;
-import io.github.guoshiqiufeng.dify.chat.exception.DiftChatException;
-import io.github.guoshiqiufeng.dify.chat.exception.DiftChatExceptionEnum;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -97,31 +90,31 @@ public class DifyChatClientImpl implements DifyChat {
         return difyChatClient.parameters(apiKey);
     }
 
-    @Override
-    public void textToAudio(TextToAudioRequest request, HttpServletResponse response) {
-        try {
-            ResponseEntity<byte[]> responseEntity = difyChatClient.textToAudio(request);
-
-            String type = responseEntity.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
-            response.setContentType(type != null ? type : "audio/mpeg");
-
-            String contentDisposition = responseEntity.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION);
-            if (contentDisposition != null) {
-                response.setHeader(HttpHeaders.CONTENT_DISPOSITION, contentDisposition);
-            } else {
-                response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=audio.mp3");
-            }
-
-            if (responseEntity.getBody() != null) {
-                response.getOutputStream().write(responseEntity.getBody());
-                response.getOutputStream().flush();
-            }
-
-        } catch (IOException | WebClientResponseException e) {
-            log.error("textToAudio error: {}", e.getMessage());
-            throw new DiftChatException(DiftChatExceptionEnum.DIFY_API_ERROR);
-        }
-    }
+//    @Override
+//    public void textToAudio(TextToAudioRequest request, HttpServletResponse response) {
+//        try {
+//            ResponseEntity<byte[]> responseEntity = difyChatClient.textToAudio(request);
+//
+//            String type = responseEntity.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
+//            response.setContentType(type != null ? type : "audio/mpeg");
+//
+//            String contentDisposition = responseEntity.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION);
+//            if (contentDisposition != null) {
+//                response.setHeader(HttpHeaders.CONTENT_DISPOSITION, contentDisposition);
+//            } else {
+//                response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=audio.mp3");
+//            }
+//
+//            if (responseEntity.getBody() != null) {
+//                response.getOutputStream().write(responseEntity.getBody());
+//                response.getOutputStream().flush();
+//            }
+//
+//        } catch (IOException | WebClientResponseException e) {
+//            log.error("textToAudio error: {}", e.getMessage());
+//            throw new DiftChatException(DiftChatExceptionEnum.DIFY_API_ERROR);
+//        }
+//    }
 
     @Override
     public DifyTextVO audioToText(AudioToTextRequest request) {

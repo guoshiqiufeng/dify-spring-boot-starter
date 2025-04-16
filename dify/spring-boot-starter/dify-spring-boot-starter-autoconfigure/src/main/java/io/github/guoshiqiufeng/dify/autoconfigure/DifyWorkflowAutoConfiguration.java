@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.autoconfigure;
 
+import io.github.guoshiqiufeng.dify.client.spring6.workflow.DifyWorkflowDefaultClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.workflow.DifyWorkflow;
 import io.github.guoshiqiufeng.dify.workflow.client.DifyWorkflowClient;
@@ -43,7 +44,7 @@ public class DifyWorkflowAutoConfiguration {
     public DifyWorkflowClient difyWorkflowClient(DifyProperties properties,
                                                  ObjectProvider<RestClient.Builder> restClientBuilderProvider,
                                                  ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
-        return new DifyWorkflowClient(properties.getUrl(),
+        return new DifyWorkflowDefaultClient(properties.getUrl(),
                 properties.getClientConfig(),
                 restClientBuilderProvider.getIfAvailable(RestClient::builder),
                 webClientBuilderProvider.getIfAvailable(WebClient::builder));

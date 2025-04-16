@@ -37,7 +37,7 @@ public abstract class DifyServerToken {
      * @param headers          HTTP headers to be populated with authorization information
      * @param difyServerClient client instance containing necessary configuration
      */
-    abstract void addAuthorizationHeader(HttpHeaders headers, DifyServerClient difyServerClient);
+    public abstract void addAuthorizationHeader(HttpHeaders headers, DifyServerClient difyServerClient);
 
     /**
      * Executes the given request supplier with automatic retry mechanism.
@@ -50,7 +50,7 @@ public abstract class DifyServerToken {
      * @throws RuntimeException when max retry attempts are exhausted
      * @throws Exception        when non-retryable errors occur
      */
-    <T> T executeWithRetry(RequestSupplier<T> supplier, DifyServerClient difyServerClient) {
+    public <T> T executeWithRetry(RequestSupplier<T> supplier, DifyServerClient difyServerClient) {
         int retryCount = 0;
         while (retryCount < MAX_RETRY_ATTEMPTS) {
             try {

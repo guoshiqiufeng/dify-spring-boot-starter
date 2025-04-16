@@ -41,7 +41,7 @@ public class DifyServerTokenRedis extends DifyServerToken {
     }
 
     @Override
-    void addAuthorizationHeader(HttpHeaders headers, DifyServerClient difyServerClient) {
+    public void addAuthorizationHeader(HttpHeaders headers, DifyServerClient difyServerClient) {
         String accessToken = redisTemplate.opsForValue().get(DifyRedisKey.ACCESS_TOKEN);
         if (StrUtil.isEmpty(accessToken)) {
             accessToken = obtainToken(difyServerClient);

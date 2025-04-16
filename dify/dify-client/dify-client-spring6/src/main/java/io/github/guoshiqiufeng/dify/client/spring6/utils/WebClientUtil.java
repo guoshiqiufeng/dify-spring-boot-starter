@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.chat.utils;
+package io.github.guoshiqiufeng.dify.client.spring6.utils;
 
 import io.github.guoshiqiufeng.dify.chat.exception.DiftChatException;
 import io.github.guoshiqiufeng.dify.chat.exception.DiftChatExceptionEnum;

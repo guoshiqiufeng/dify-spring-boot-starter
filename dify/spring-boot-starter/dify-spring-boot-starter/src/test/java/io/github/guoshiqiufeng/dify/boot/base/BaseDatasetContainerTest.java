@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.boot.base;
 
+import io.github.guoshiqiufeng.dify.client.spring6.dataset.DifyDatasetDefaultClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
 import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;
@@ -63,7 +64,7 @@ public abstract class BaseDatasetContainerTest implements RedisContainerTest {
     public void setUp() {
         String apiKey = initializeApiKeyWithCache();
 
-        DifyDatasetClient difyDatasetClient = new DifyDatasetClient(difyProperties.getUrl(),
+        DifyDatasetClient difyDatasetClient = new DifyDatasetDefaultClient(difyProperties.getUrl(),
                 difyProperties.getClientConfig(),
                 restClientBuilder.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey),
                 WebClient.builder().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey));

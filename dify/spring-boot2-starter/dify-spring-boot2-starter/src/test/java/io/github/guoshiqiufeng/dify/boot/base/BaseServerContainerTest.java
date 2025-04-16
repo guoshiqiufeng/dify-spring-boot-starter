@@ -13,34 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.chat.utils;
+package io.github.guoshiqiufeng.dify.boot.base;
 
-import org.springframework.core.io.InputStreamResource;
-
-import java.io.InputStream;
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * 处理 MultipartFile
- *
  * @author yanghq
- * @version 0.8.0
- * @since 2025/4/7 16:20
+ * @version 1.0
+ * @since 2025/4/1 13:27
  */
-public class MultipartInputStreamFileResource extends InputStreamResource {
-    private final String filename;
+@Slf4j
+public abstract class BaseServerContainerTest implements RedisContainerTest {
 
-    public MultipartInputStreamFileResource(InputStream inputStream, String filename) {
-        super(inputStream);
-        this.filename = filename;
-    }
-
-    @Override
-    public String getFilename() {
-        return this.filename;
-    }
-
-    @Override
-    public long contentLength() {
-        return -1;
-    }
 }
