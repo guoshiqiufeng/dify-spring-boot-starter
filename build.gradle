@@ -166,6 +166,7 @@ subprojects {
             }
             // 默认自动发布 AUTOMATIC
             publishingType = 'USER_MANAGED'
+            maxWait = 600
         }
         publications {
             mavenJava(MavenPublication) {
