@@ -27,4 +27,6 @@ import java.io.Serializable;
 @Data
 public class BaseDatasetRequest implements Serializable {
 
+    private String apiKey;
+
 }

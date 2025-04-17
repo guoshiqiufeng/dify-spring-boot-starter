@@ -33,7 +33,7 @@ public interface DifyDatasetClient {
     DifyPageResult<DatasetResponse> page(DatasetPageRequest request);
 
 
-    void delete(String datasetId);
+    void delete(String datasetId, String apikey);
 
 
     DocumentCreateResponse createDocumentByText(DocumentCreateByTextRequest request);
@@ -54,7 +54,7 @@ public interface DifyDatasetClient {
     DocumentIndexingStatusResponse indexingStatus(DocumentIndexingStatusRequest request);
 
 
-    DocumentDeleteResponse deleteDocument(String datasetId, String documentId);
+    DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apikey);
 
 
     SegmentResponse createSegment(SegmentCreateRequest request);
@@ -63,7 +63,7 @@ public interface DifyDatasetClient {
     SegmentResponse pageSegment(SegmentPageRequest request);
 
 
-    SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId);
+    SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apikey);
 
 
     SegmentUpdateResponse updateSegment(SegmentUpdateRequest request);
@@ -77,7 +77,7 @@ public interface DifyDatasetClient {
     SegmentChildChunkUpdateResponse updateSegmentChildChunk(SegmentChildChunkUpdateRequest request);
 
 
-    UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId);
+    UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, String apikey);
 
 
     RetrieveResponse retrieve(RetrieveRequest request);
@@ -89,7 +89,7 @@ public interface DifyDatasetClient {
     MetaDataResponse updateMetaData(MetaDataUpdateRequest request);
 
 
-    void deleteMetaData(String datasetId, String metadataId);
+    void deleteMetaData(String datasetId, String metadataId, String apikey);
 
 
     void actionMetaData(MetaDataActionRequest request);
@@ -98,8 +98,8 @@ public interface DifyDatasetClient {
     void updateDocumentMetaData(DocumentMetaDataUpdateRequest request);
 
 
-    MetaDataListResponse listMetaData(String datasetId);
+    MetaDataListResponse listMetaData(String datasetId, String apikey);
 
-    TextEmbeddingListResponse listTextEmbedding();
+    TextEmbeddingListResponse listTextEmbedding(String apikey);
 
 }
