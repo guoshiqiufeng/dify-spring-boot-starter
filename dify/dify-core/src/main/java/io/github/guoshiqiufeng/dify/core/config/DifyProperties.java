@@ -40,12 +40,12 @@ public class DifyProperties implements Serializable {
     /**
      * 知识库
      */
-    private Dataset dataset;
+    private Dataset dataset = new Dataset();
 
     /**
      * 后台服务
      */
-    private Server server;
+    private Server server = new Server();
 
     /**
      * 请求配置
