@@ -62,6 +62,7 @@ public class DifyWorkflowDefaultClient extends BaseDifyDefaultClient implements 
     }
 
 
+    @Override
     public WorkflowRunResponse runWorkflow(WorkflowRunRequest request) {
         ChatMessageVO chatMessage = builderChatMessage(ResponseModeEnum.blocking, request);
         return restClient.post()
@@ -74,6 +75,7 @@ public class DifyWorkflowDefaultClient extends BaseDifyDefaultClient implements 
     }
 
 
+    @Override
     public Flux<WorkflowRunStreamResponse> runWorkflowStream(WorkflowRunRequest request) {
         ChatMessageVO chatMessage = builderChatMessage(ResponseModeEnum.streaming, request);
 
@@ -87,6 +89,7 @@ public class DifyWorkflowDefaultClient extends BaseDifyDefaultClient implements 
     }
 
 
+    @Override
     public WorkflowInfoResponse info(String workflowRunId, String apiKey) {
         return restClient.get()
                 .uri(WorkflowConstant.WORKFLOW_RUN_URL + "/{workflowRunId}", workflowRunId)
@@ -97,6 +100,7 @@ public class DifyWorkflowDefaultClient extends BaseDifyDefaultClient implements 
     }
 
 
+    @Override
     public WorkflowStopResponse stopWorkflowStream(String apiKey, String taskId, String userId) {
         return restClient.post()
                 .uri(WorkflowConstant.WORKFLOW_TASKS_URL + "/{taskId}/stop", taskId)
@@ -108,6 +112,7 @@ public class DifyWorkflowDefaultClient extends BaseDifyDefaultClient implements 
     }
 
 
+    @Override
     public DifyPageResult<WorkflowLogs> logs(WorkflowLogsRequest request) {
         if (request.getPage() == null) {
             request.setPage(1);

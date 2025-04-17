@@ -141,6 +141,7 @@ public interface DifyDataset {
     default SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId) {
         return deleteSegment(datasetId, documentId, segmentId, null);
     }
+
     SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apikey);
 
     /**
@@ -193,6 +194,7 @@ public interface DifyDataset {
     default UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId) {
         return uploadFileInfo(datasetId, documentId, null);
     }
+
     UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, String apikey);
 
     /**
@@ -255,6 +257,7 @@ public interface DifyDataset {
     default MetaDataListResponse listMetaData(String datasetId) {
         return listMetaData(datasetId, null);
     }
+
     MetaDataListResponse listMetaData(String datasetId, String apikey);
 
     /**
@@ -265,6 +268,7 @@ public interface DifyDataset {
     default TextEmbeddingListResponse listTextEmbedding() {
         return listTextEmbedding(null);
     }
+
     TextEmbeddingListResponse listTextEmbedding(String apikey);
 
 }
