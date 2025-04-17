@@ -42,17 +42,13 @@ import org.springframework.web.reactive.function.client.WebClient;
  */
 @Slf4j
 @Configuration
-@AutoConfigureAfter(RedisAutoConfiguration.class)
+@AutoConfigureAfter(DifyServerRedisTokenAutoConfiguration.class)
 @ConditionalOnClass({DifyServerClient.class})
 public class DifyServerAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(DifyServerToken.class)
-    public DifyServerToken difyServerToken(ObjectProvider<RedisTemplate<String, String>> redisTemplateProvider) {
-        RedisTemplate<String, String> redisTemplate = redisTemplateProvider.getIfAvailable();
-        if (redisTemplate != null) {
-            return new DifyServerTokenRedis(redisTemplate);
-        }
+    public DifyServerToken difyServerToken() {
         return new DifyServerTokenDefault();
     }
 
