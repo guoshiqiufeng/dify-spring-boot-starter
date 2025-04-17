@@ -48,7 +48,7 @@ public interface DifyDataset {
      * @param datasetId 知识库的唯一标识符。
      */
     default void delete(String datasetId) {
-        delete(datasetId);
+        delete(datasetId, null);
     }
 
     void delete(String datasetId, String apikey);
