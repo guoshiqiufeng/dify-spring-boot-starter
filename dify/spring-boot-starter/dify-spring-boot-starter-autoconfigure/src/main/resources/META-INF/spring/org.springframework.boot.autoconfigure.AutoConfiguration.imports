@@ -1,5 +1,6 @@
 io.github.guoshiqiufeng.dify.autoconfigure.DifyPropertiesAutoConfiguration
 io.github.guoshiqiufeng.dify.autoconfigure.DifyChatAutoConfiguration
 io.github.guoshiqiufeng.dify.autoconfigure.DifyDatasetAutoConfiguration
+io.github.guoshiqiufeng.dify.autoconfigure.DifyServerRedisTokenAutoConfiguration
 io.github.guoshiqiufeng.dify.autoconfigure.DifyServerAutoConfiguration
 io.github.guoshiqiufeng.dify.autoconfigure.DifyWorkflowAutoConfiguration
