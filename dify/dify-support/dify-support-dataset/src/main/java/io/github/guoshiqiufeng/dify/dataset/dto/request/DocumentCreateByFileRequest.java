@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.guoshiqiufeng.dify.dataset.dto.RetrievalModel;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.document.ProcessRule;
+import io.github.guoshiqiufeng.dify.dataset.dto.request.file.FileOperation;
 import io.github.guoshiqiufeng.dify.dataset.enums.IndexingTechniqueEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.document.DocFormEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.document.DocTypeEnum;
@@ -36,7 +37,7 @@ import java.util.List;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class DocumentCreateByFileRequest extends BaseDatasetRequest implements Serializable {
+public class DocumentCreateByFileRequest extends BaseDatasetRequest implements FileOperation, Serializable {
 
 
     @JsonAlias("datasetId")

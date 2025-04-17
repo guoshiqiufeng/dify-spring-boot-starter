@@ -15,9 +15,6 @@
  */
 package io.github.guoshiqiufeng.dify.client.spring6.dataset;
 
-import cn.hutool.core.util.StrUtil;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.guoshiqiufeng.dify.client.spring6.base.BaseDifyDefaultClient;
 import io.github.guoshiqiufeng.dify.client.spring6.utils.DatasetHeaderUtils;
@@ -27,8 +24,7 @@ import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;
 import io.github.guoshiqiufeng.dify.dataset.constant.DatasetUriConstant;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.*;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.*;
-import io.github.guoshiqiufeng.dify.dataset.exception.DiftDatasetException;
-import io.github.guoshiqiufeng.dify.dataset.exception.DiftDatasetExceptionEnum;
+import io.github.guoshiqiufeng.dify.dataset.utils.MultipartBodyUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
@@ -36,8 +32,6 @@ import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import java.io.IOException;
 
 /**
  * @author yanghq
@@ -116,28 +110,7 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
     @Override
     public DocumentCreateResponse createDocumentByFile(DocumentCreateByFileRequest request) {
         Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
-        MultipartBodyBuilder builder = new MultipartBodyBuilder();
-
-        try {
-            // 获取文件内容和类型
-            byte[] fileContent = request.getFile().getBytes();
-            String contentType = request.getFile().getContentType();
-            if (StrUtil.isEmpty(contentType)) {
-                contentType = MediaType.TEXT_PLAIN_VALUE;
-            }
-
-            // 添加文件部分
-            builder.part("file", fileContent)
-                    .header("Content-Disposition", "form-data; name=\"file\"; filename=\"" + request.getFile().getOriginalFilename() + "\"")
-                    .header("Content-Type", contentType);
-
-            // 添加JSON数据部分
-            request.setFile(null);
-            builder.part("data", toJson(request))
-                    .header("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        MultipartBodyBuilder builder = MultipartBodyUtil.getMultipartBodyBuilder(request.getFile(), request);
         return restClient.post()
                 .uri(DatasetUriConstant.V1_DOCUMENT_CREATE_BY_FILE_URL, request.getDatasetId())
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request).accept(h))
@@ -166,27 +139,7 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
     @Override
     public DocumentCreateResponse updateDocumentByFile(DocumentUpdateByFileRequest request) {
         Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
-        MultipartBodyBuilder builder = new MultipartBodyBuilder();
-        try {
-            // 获取文件内容和类型
-            byte[] fileContent = request.getFile().getBytes();
-            String contentType = request.getFile().getContentType();
-            if (StrUtil.isEmpty(contentType)) {
-                contentType = MediaType.TEXT_PLAIN_VALUE;
-            }
-
-            // 添加文件部分
-            builder.part("file", fileContent)
-                    .header("Content-Disposition", "form-data; name=\"file\"; filename=\"" + request.getFile().getOriginalFilename() + "\"")
-                    .header("Content-Type", contentType);
-
-            // 添加JSON数据部分
-            request.setFile(null);
-            builder.part("data", toJson(request))
-                    .header("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        MultipartBodyBuilder builder = MultipartBodyUtil.getMultipartBodyBuilder(request.getFile(), request);
 
         // 使用 restClient 发送 POST 请求
         return restClient.post()
@@ -465,14 +418,4 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
                 .body(TextEmbeddingListResponse.class);
     }
 
-    private String toJson(Object request) {
-        String body = null;
-        try {
-            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            body = objectMapper.writeValueAsString(request);
-        } catch (JsonProcessingException e) {
-            throw new DiftDatasetException(DiftDatasetExceptionEnum.DIFY_DATA_PARSING_FAILURE);
-        }
-        return body;
-    }
 }
