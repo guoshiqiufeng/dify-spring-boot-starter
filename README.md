@@ -54,11 +54,23 @@ https://guoshiqiufeng.github.io/dify-spring-boot-starter/en
 
 #### Introducing starter dependencies
 
+- springboot3
+
 ```xml
 
 <dependency>
     <groupId>io.github.guoshiqiufeng.dify</groupId>
     <artifactId>dify-spring-boot-starter</artifactId>
+</dependency>
+```
+
+- springboot2
+
+```xml
+
+<dependency>
+    <groupId>io.github.guoshiqiufeng.dify</groupId>
+    <artifactId>dify-spring-boot2-starter</artifactId>
 </dependency>
 ```
 
