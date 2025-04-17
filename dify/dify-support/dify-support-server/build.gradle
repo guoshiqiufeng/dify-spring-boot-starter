@@ -1,9 +1,9 @@
 dependencies {
     api project(":dify:dify-core")
+    api "${lib["hutool-core"]}"
 
     implementation "io.projectreactor:reactor-core"
-
-    api "${lib["hutool-core"]}"
+    implementation "org.springframework:spring-webflux"
 
     implementation "org.springframework.boot:spring-boot-starter-data-redis"
 
