@@ -232,7 +232,7 @@ MessageConversationsResponse
 #### 方法
 
 ```java
-void textToAudio(TextToAudioRequest request, HttpServletResponse response);
+ResponseEntity<byte[]> textToAudio(TextToAudioRequest request);
 ```
 
 #### 请求参数
@@ -247,6 +247,37 @@ void textToAudio(TextToAudioRequest request, HttpServletResponse response);
 #### 响应参数
 
 返回音频文件流
+
+#### 使用示例
+
+```java
+import java.io.IOException;
+
+private void textToAudio(TextToAudioRequest request, HttpServletResponse response) {
+    try {
+        ResponseEntity<byte[]> responseEntity = difyChat.textToAudio(request);
+
+        String type = responseEntity.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
+        response.setContentType(type != null ? type : "audio/mpeg");
+
+        String contentDisposition = responseEntity.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION);
+        if (contentDisposition != null) {
+            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, contentDisposition);
+        } else {
+            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=audio.mp3");
+        }
+
+        if (responseEntity.getBody() != null) {
+            response.getOutputStream().write(responseEntity.getBody());
+            response.getOutputStream().flush();
+        }
+
+    } catch (Exception e) {
+        log.error("textToAudio error: {}", e.getMessage());
+        throw new RuntimeException("textToAudio error");
+    }
+}
+```
 
 ### 3.2 语音转文本
 
