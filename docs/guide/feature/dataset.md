@@ -113,6 +113,7 @@ DatasetResponse 查看 1.1
 
 ```java
 void delete(String datasetId);
+
 void delete(String datasetId, String apikey);
 ```
 
@@ -515,6 +516,7 @@ DocumentIndexingStatusResponse
 
 ```java
 DocumentDeleteResponse deleteDocument(String datasetId, String documentId);
+
 DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apikey);
 ```
 
@@ -539,6 +541,7 @@ DocumentDeleteResponse
 
 ```java
 UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId);
+
 UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, String apikey);
 ```
 
@@ -670,6 +673,7 @@ SegmentResponse
 
 ```java
 SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId);
+
 SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apikey);
 ```
 
@@ -1024,6 +1028,7 @@ MetaDataResponse 查看 6.1
 
 ```java
 MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId);
+
 MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId, String apikey);
 ```
 
@@ -1109,6 +1114,7 @@ DocumentMetaDataUpdateRequest
 
 ```java
 MetaDataListResponse listMetaData(String datasetId);
+
 MetaDataListResponse listMetaData(String datasetId, String apikey);
 ```
 
@@ -1144,6 +1150,7 @@ MetaDataListResponse
 
 ```java
 TextEmbeddingListResponse listTextEmbedding();
+
 TextEmbeddingListResponse listTextEmbedding(String apikey);
 ```
 

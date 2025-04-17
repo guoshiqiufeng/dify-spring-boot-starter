@@ -15,8 +15,6 @@
  */
 package io.github.guoshiqiufeng.dify.client.spring6.utils;
 
-import io.github.guoshiqiufeng.dify.chat.exception.DiftChatException;
-import io.github.guoshiqiufeng.dify.chat.exception.DiftChatExceptionEnum;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -34,10 +32,14 @@ public class WebClientUtil {
     public Mono<? extends Throwable> exceptionFunction(ClientResponse clientResponse) {
         return clientResponse.bodyToMono(String.class)
                 .flatMap(errorBody -> {
-                            log.error("webClient error: {}", errorBody);
-                            return Mono.error(new DiftChatException(DiftChatExceptionEnum.DIFY_API_ERROR));
-                        }
-                );
+                    String url = clientResponse.request().getURI().getPath();
+                    String method = clientResponse.request().getMethod().name();
+                    int statusCode = clientResponse.statusCode().value();
+
+                    log.warn("URI: {}, Method: {}, Status: [{}] {}", url, method, statusCode, errorBody);
+
+                    return Mono.error(new RuntimeException(String.format("[%d] %s", statusCode, errorBody)));
+                });
     }
 
 }
