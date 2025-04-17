@@ -8,7 +8,9 @@ description:
 
 ## Client
 
-### Webclient
+> springboot3 uses WebClient + RestClient, springboot2 uses WebClient.
+
+### WebClient
 
 > Support for custom webClientBuilder, overriding the default instance
 

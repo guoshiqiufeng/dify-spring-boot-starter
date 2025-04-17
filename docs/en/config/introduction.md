@@ -4,7 +4,7 @@ title: Using configurations
 description: 
 ---
 
-## Spring Boot 3
+## Spring Boot 2/3
 
 ```yaml
 dify:

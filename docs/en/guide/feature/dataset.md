@@ -12,7 +12,9 @@ The Knowledge Base service interface provides comprehensive knowledge base manag
 including core functions such as knowledge base creation, document management, segment management, and data retrieval.
 All interfaces require valid API keys for authentication.
 Use the `DifyDataset` interface instance.
-> All of the following interfaces include apikey. The apikey field is optional and defaults to the apikey in the configuration file when empty.
+> All of the following interfaces include apikey. The apikey field is optional and defaults to the apikey in the
+> configuration file when empty.
+
 ## 1. Knowledge Base Management
 
 ### 1.1 Create Knowledge Base

@@ -250,7 +250,6 @@ void textToAudio(TextToAudioRequest request);
 
 Returns an audio file stream
 
-
 #### Usage example
 
 ```java
