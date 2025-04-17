@@ -12,7 +12,7 @@ The Knowledge Base service interface provides comprehensive knowledge base manag
 including core functions such as knowledge base creation, document management, segment management, and data retrieval.
 All interfaces require valid API keys for authentication.
 Use the `DifyDataset` interface instance.
-
+> All of the following interfaces include apikey. The apikey field is optional and defaults to the apikey in the configuration file when empty.
 ## 1. Knowledge Base Management
 
 ### 1.1 Create Knowledge Base
@@ -114,6 +114,7 @@ DatasetResponse See 1.1
 
 ```java
 void delete(String datasetId);
+void delete(String datasetId, String apikey);
 ```
 
 #### Request Parameters
@@ -515,6 +516,7 @@ DocumentIndexingStatusResponse
 
 ```java
 DocumentDeleteResponse deleteDocument(String datasetId, String documentId);
+DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apikey);
 ```
 
 #### Request Parameters
@@ -538,6 +540,7 @@ DocumentDeleteResponse
 
 ```java
 UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId);
+UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, String apikey);
 ```
 
 #### Request Parameters
@@ -668,6 +671,7 @@ SegmentResponse
 
 ```java
 SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId);
+SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apikey);
 ```
 
 #### Request Parameters
@@ -1022,6 +1026,7 @@ MetaDataResponse See 6.1
 
 ```java
 MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId);
+MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId, String apikey);
 ```
 
 #### Request Parameters
@@ -1106,6 +1111,7 @@ not have
 
 ```java
 MetaDataListResponse listMetaData(String datasetId);
+MetaDataListResponse listMetaData(String datasetId, String apikey);
 ```
 
 #### Request Parameters
@@ -1140,6 +1146,7 @@ MetaDataListResponse
 
 ```java
 TextEmbeddingListResponse listTextEmbedding();
+TextEmbeddingListResponse listTextEmbedding(String apikey);
 ```
 
 #### Request Parameters
