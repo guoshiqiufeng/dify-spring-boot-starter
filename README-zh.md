@@ -16,12 +16,16 @@
 
 ### 开发框架
 
-- Spring Boot 3
+- Spring Boot 3/2
 
 ### 运行最低版本
 
+- Spring Boot 2
+- Java 8
+
+### 推荐运行版本
+
 - Spring Boot 3
-- Java 17
 
 ### 功能
 
@@ -50,6 +54,8 @@
 
 #### 引入starter依赖
 
+- springboot3
+
 ```xml
 
 <dependency>
@@ -58,7 +64,19 @@
 </dependency>
 ```
 
-#### yml 配置
+- springboot2
+
+```xml
+
+<dependency>
+    <groupId>io.github.guoshiqiufeng.dify</groupId>
+    <artifactId>dify-spring-boot2-starter</artifactId>
+</dependency>
+```
+
+#### 自动加载
+
+##### yml 配置
 
 ```yaml
 dify:
@@ -70,7 +88,7 @@ dify:
     api-key: dataset-aaabbbcccdddeeefffggghhh # 请替换为实际的知识库api-key, 若不需要调用知识库可不填
 ```
 
-#### 获取消息建议
+##### 获取消息建议
 
 ```java
 
@@ -85,6 +103,21 @@ public class DifyChatService {
         return difyChat.messagesSuggested(messageId, apiKey, userId);
     }
 }
+```
+
+#### 构造器
+
+```java
+DifyServer difyServer = DifyServerBuilder.create(
+        DifyServerBuilder.DifyServerClientBuilder
+                .builder()
+                .baseUrl("https://your-dify-api.example.com")
+                .serverProperties(new DifyProperties.Server("admin@example.com", "password"))
+                .serverToken(new DifyServerTokenDefault())
+                .clientConfig(new DifyProperties.ClientConfig())
+                .restClientBuilder(RestClient.builder())
+                .webClientBuilder(WebClient.builder())
+                .build());
 ```
 
 更多使用参考查看

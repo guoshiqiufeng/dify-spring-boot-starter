@@ -19,7 +19,7 @@ import io.github.guoshiqiufeng.dify.chat.dto.request.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.*;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
-import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
@@ -120,10 +120,9 @@ public interface DifyChat {
     /**
      * 文本转语音
      *
-     * @param request  文本转语音请求对象，包含文本内容等信息
-     * @param response HTTP响应对象，用于返回生成的语音文件
+     * @param request 文本转语音请求对象，包含文本内容等信息
      */
-    void textToAudio(TextToAudioRequest request, HttpServletResponse response);
+    ResponseEntity<byte[]> textToAudio(TextToAudioRequest request);
 
     /**
      * 语音转文本

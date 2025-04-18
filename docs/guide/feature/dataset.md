@@ -10,6 +10,7 @@ description:
 
 知识库服务接口提供完整的知识库管理功能集成能力，包含知识库创建、文档管理、分段管理、数据检索等核心功能。所有接口均需要有效的API密钥进行身份验证。
 使用`DifyDataset`接口实例。
+> 以下所有接口都包含apikey，apikey 字段为选填，为空时默认使用配置文件中的 apikey
 
 ## 1. 知识库管理
 
@@ -112,6 +113,8 @@ DatasetResponse 查看 1.1
 
 ```java
 void delete(String datasetId);
+
+void delete(String datasetId, String apikey);
 ```
 
 #### 请求参数
@@ -513,6 +516,8 @@ DocumentIndexingStatusResponse
 
 ```java
 DocumentDeleteResponse deleteDocument(String datasetId, String documentId);
+
+DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apikey);
 ```
 
 #### 请求参数
@@ -536,6 +541,8 @@ DocumentDeleteResponse
 
 ```java
 UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId);
+
+UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, String apikey);
 ```
 
 #### 请求参数
@@ -666,6 +673,8 @@ SegmentResponse
 
 ```java
 SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId);
+
+SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apikey);
 ```
 
 #### 请求参数
@@ -1019,6 +1028,8 @@ MetaDataResponse 查看 6.1
 
 ```java
 MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId);
+
+MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId, String apikey);
 ```
 
 #### 请求参数
@@ -1103,6 +1114,8 @@ DocumentMetaDataUpdateRequest
 
 ```java
 MetaDataListResponse listMetaData(String datasetId);
+
+MetaDataListResponse listMetaData(String datasetId, String apikey);
 ```
 
 #### 请求参数
@@ -1137,6 +1150,8 @@ MetaDataListResponse
 
 ```java
 TextEmbeddingListResponse listTextEmbedding();
+
+TextEmbeddingListResponse listTextEmbedding(String apikey);
 ```
 
 #### 请求参数

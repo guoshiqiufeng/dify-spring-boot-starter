@@ -28,20 +28,31 @@ rootProject.name = 'root'
 include 'dify'
 include 'dify:dify-core'
 
+include 'dify:dify-client'
+include 'dify:dify-client:dify-client-spring5'
+include 'dify:dify-client:dify-client-spring6'
+
 include 'dify:dify-support'
 include 'dify:dify-support:dify-support-chat'
 include 'dify:dify-support:dify-support-dataset'
 include 'dify:dify-support:dify-support-server'
 include 'dify:dify-support:dify-support-workflow'
 
-// include 'dify:dify-spring-boot-starter'
+include 'dify:spring-boot-starter'
 include 'dify:spring-boot-starter:dify-spring-boot-starter-autoconfigure'
 include 'dify:spring-boot-starter:dify-spring-boot-starter-chat'
 include 'dify:spring-boot-starter:dify-spring-boot-starter-dataset'
 include 'dify:spring-boot-starter:dify-spring-boot-starter-server'
 include 'dify:spring-boot-starter:dify-spring-boot-starter-workflow'
-
 include 'dify:spring-boot-starter:dify-spring-boot-starter'
+
+include 'dify:spring-boot2-starter'
+include 'dify:spring-boot2-starter:dify-spring-boot2-starter-autoconfigure'
+include 'dify:spring-boot2-starter:dify-spring-boot2-starter-chat'
+include 'dify:spring-boot2-starter:dify-spring-boot2-starter-dataset'
+include 'dify:spring-boot2-starter:dify-spring-boot2-starter-server'
+include 'dify:spring-boot2-starter:dify-spring-boot2-starter-workflow'
+include 'dify:spring-boot2-starter:dify-spring-boot2-starter'
 
 include 'bom'
 include 'bom:dify-bom'

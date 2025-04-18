@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.autoconfigure;
 
+import io.github.guoshiqiufeng.dify.client.spring6.dataset.DifyDatasetDefaultClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
 import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;
@@ -45,7 +46,7 @@ public class DifyDatasetAutoConfiguration {
                                                ObjectProvider<RestClient.Builder> restClientBuilderProvider,
                                                ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
         String apikey = "Bearer " + properties.getDataset().getApiKey();
-        return new DifyDatasetClient(properties.getUrl(),
+        return new DifyDatasetDefaultClient(properties.getUrl(),
                 properties.getClientConfig(),
                 restClientBuilderProvider.getIfAvailable(RestClient::builder)
                         .defaultHeader(HttpHeaders.AUTHORIZATION, apikey),

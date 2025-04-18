@@ -18,6 +18,7 @@ package io.github.guoshiqiufeng.dify.autoconfigure;
 import io.github.guoshiqiufeng.dify.chat.DifyChat;
 import io.github.guoshiqiufeng.dify.chat.client.DifyChatClient;
 import io.github.guoshiqiufeng.dify.chat.impl.DifyChatClientImpl;
+import io.github.guoshiqiufeng.dify.client.spring6.chat.DifyChatDefaultClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
@@ -43,7 +44,7 @@ public class DifyChatAutoConfiguration {
     public DifyChatClient difyChatClient(DifyProperties properties,
                                          ObjectProvider<RestClient.Builder> restClientBuilderProvider,
                                          ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
-        return new DifyChatClient(properties.getUrl(),
+        return new DifyChatDefaultClient(properties.getUrl(),
                 properties.getClientConfig(),
                 restClientBuilderProvider.getIfAvailable(RestClient::builder),
                 webClientBuilderProvider.getIfAvailable(WebClient::builder));

@@ -1,0 +1,20 @@
+dependencies {
+    api project(":dify:spring-boot2-starter:dify-spring-boot2-starter-autoconfigure")
+
+    api project(":dify:dify-support:dify-support-chat")
+    api project(":dify:dify-support:dify-support-dataset")
+    api project(":dify:dify-support:dify-support-server")
+    api project(":dify:dify-support:dify-support-workflow")
+
+    implementation "org.springframework.boot:spring-boot-starter-data-redis"
+
+    annotationProcessor "org.springframework.boot:spring-boot-starter-actuator"
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation "io.projectreactor:reactor-test"
+    testImplementation "org.apache.httpcomponents.client5:httpclient5"
+    testImplementation "${lib["hutool-json"]}"
+}

@@ -15,22 +15,20 @@
  */
 package io.github.guoshiqiufeng.dify.autoconfigure;
 
+import io.github.guoshiqiufeng.dify.client.spring6.server.DifyServerDefaultClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
-import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenRedis;
 import io.github.guoshiqiufeng.dify.server.impl.DifyServerClientImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -57,7 +55,7 @@ public class DifyServerAutoConfiguration {
                                              DifyServerToken difyServerToken,
                                              ObjectProvider<RestClient.Builder> restClientBuilderProvider,
                                              ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
-        return new DifyServerClient(properties.getServer(),
+        return new DifyServerDefaultClient(properties.getServer(),
                 difyServerToken,
                 properties.getUrl(),
                 properties.getClientConfig(),

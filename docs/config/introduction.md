@@ -4,7 +4,7 @@ title: 使用配置
 description: 
 ---
 
-## Spring Boot 3
+## Spring Boot 2/3
 
 ```yaml
 dify:

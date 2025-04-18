@@ -8,6 +8,8 @@ description:
 
 ## Client
 
+> springboot3 使用 WebClient + RestClient，springboot2 使用 WebClient
+
 ### WebClient
 
 > 支持自定义 webClientBuilder，覆盖默认实例

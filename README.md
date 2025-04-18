@@ -16,12 +16,16 @@ https://guoshiqiufeng.github.io/dify-spring-boot-starter/en
 
 ### Development Framework
 
-- Spring Boot 3
+- Spring Boot 3/2
 
 ### Running the minimum version
 
+- Spring Boot 2
+- Java 8
+
+### Recommended Running Versions
+
 - Spring Boot 3
-- Java 17
 
 ### Features
 
@@ -50,6 +54,8 @@ https://guoshiqiufeng.github.io/dify-spring-boot-starter/en
 
 #### Introducing starter dependencies
 
+- springboot3
+
 ```xml
 
 <dependency>
@@ -58,7 +64,19 @@ https://guoshiqiufeng.github.io/dify-spring-boot-starter/en
 </dependency>
 ```
 
-#### yml configuration
+- springboot2
+
+```xml
+
+<dependency>
+    <groupId>io.github.guoshiqiufeng.dify</groupId>
+    <artifactId>dify-spring-boot2-starter</artifactId>
+</dependency>
+```
+
+#### autoloading
+
+##### yml configuration
 
 ```yaml
 dify:
@@ -70,7 +88,7 @@ dify:
     api-key: dataset-aaabbbcccdddeeefffggghhh # Please replace with the actual Dify dataset API key, if you don't need to call the dataset-related interfaces can not be filled in!
 ```
 
-#### Get message suggestions
+##### Get message suggestions
 
 ```java
 
@@ -85,6 +103,21 @@ public class DifyChatService {
         return difyChat.messagesSuggested(messageId, apiKey, userId);
     }
 }
+```
+
+#### Builder
+
+```java
+DifyServer difyServer = DifyServerBuilder.create(
+        DifyServerBuilder.DifyServerClientBuilder
+                .builder()
+                .baseUrl("https://your-dify-api.example.com")
+                .serverProperties(new DifyProperties.Server("admin@example.com", "password"))
+                .serverToken(new DifyServerTokenDefault())
+                .clientConfig(new DifyProperties.ClientConfig())
+                .restClientBuilder(RestClient.builder())
+                .webClientBuilder(WebClient.builder())
+                .build());
 ```
 
 For more usage references check the

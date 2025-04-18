@@ -1,0 +1,11 @@
+dify:
+  url: http://localhost
+  server:
+    email: admin@admin.com
+    password: admin123456
+  dataset:
+    api-key: dataset-aaabbbcccdddeeefffggghhh
+logging:
+  level:
+    root: ERROR
+    io.github.guoshiqiufeng.dify: DEBUG
