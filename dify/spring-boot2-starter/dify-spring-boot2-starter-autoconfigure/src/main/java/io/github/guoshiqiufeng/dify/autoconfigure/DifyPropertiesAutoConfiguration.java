@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * @author yanghq
- * @version 1.0
+ * @version 0.9.0
  * @since 2025/3/18 17:29
  */
 @Configuration

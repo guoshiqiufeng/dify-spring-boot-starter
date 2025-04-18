@@ -116,7 +116,7 @@ DatasetResponse See 1.1
 
 ```java
 void delete(String datasetId);
-void delete(String datasetId, String apikey);
+void delete(String datasetId, String apiKey);
 ```
 
 #### Request Parameters
@@ -518,7 +518,7 @@ DocumentIndexingStatusResponse
 
 ```java
 DocumentDeleteResponse deleteDocument(String datasetId, String documentId);
-DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apikey);
+DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apiKey);
 ```
 
 #### Request Parameters
@@ -542,7 +542,7 @@ DocumentDeleteResponse
 
 ```java
 UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId);
-UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, String apikey);
+UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, String apiKey);
 ```
 
 #### Request Parameters
@@ -673,7 +673,7 @@ SegmentResponse
 
 ```java
 SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId);
-SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apikey);
+SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apiKey);
 ```
 
 #### Request Parameters
@@ -1028,7 +1028,7 @@ MetaDataResponse See 6.1
 
 ```java
 MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId);
-MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId, String apikey);
+MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId, String apiKey);
 ```
 
 #### Request Parameters
@@ -1113,7 +1113,7 @@ not have
 
 ```java
 MetaDataListResponse listMetaData(String datasetId);
-MetaDataListResponse listMetaData(String datasetId, String apikey);
+MetaDataListResponse listMetaData(String datasetId, String apiKey);
 ```
 
 #### Request Parameters

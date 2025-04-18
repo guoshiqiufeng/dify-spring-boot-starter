@@ -15,8 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.autoconfigure;
 
+import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
-import io.github.guoshiqiufeng.dify.server.client.DifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenRedis;
 import org.springframework.beans.factory.ObjectProvider;
@@ -41,8 +41,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 public class DifyServerRedisTokenAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean(DifyServerToken.class)
-    public DifyServerToken difyServerToken(ObjectProvider<RedisTemplate<String, String>> redisTemplateProvider) {
+    @ConditionalOnMissingBean(BaseDifyServerToken.class)
+    public BaseDifyServerToken difyServerToken(ObjectProvider<RedisTemplate<String, String>> redisTemplateProvider) {
         RedisTemplate<String, String> redisTemplate = redisTemplateProvider.getIfAvailable();
         if (redisTemplate != null) {
             return new DifyServerTokenRedis(redisTemplate);

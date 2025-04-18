@@ -18,8 +18,8 @@ package io.github.guoshiqiufeng.dify.autoconfigure;
 import io.github.guoshiqiufeng.dify.client.spring6.server.DifyServerDefaultClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
+import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
-import io.github.guoshiqiufeng.dify.server.client.DifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
 import io.github.guoshiqiufeng.dify.server.impl.DifyServerClientImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -44,15 +44,15 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class DifyServerAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean(DifyServerToken.class)
-    public DifyServerToken difyServerToken() {
+    @ConditionalOnMissingBean(BaseDifyServerToken.class)
+    public BaseDifyServerToken difyServerToken() {
         return new DifyServerTokenDefault();
     }
 
     @Bean
     @ConditionalOnMissingBean(DifyServerClient.class)
     public DifyServerClient difyServerClient(DifyProperties properties,
-                                             DifyServerToken difyServerToken,
+                                             BaseDifyServerToken difyServerToken,
                                              ObjectProvider<RestClient.Builder> restClientBuilderProvider,
                                              ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
         return new DifyServerDefaultClient(properties.getServer(),

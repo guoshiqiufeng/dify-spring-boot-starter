@@ -47,8 +47,8 @@ public class DifyDatasetClientImpl implements DifyDataset {
     }
 
     @Override
-    public void delete(String datasetId, String apikey) {
-        difyDatasetClient.delete(datasetId, apikey);
+    public void delete(String datasetId, String apiKey) {
+        difyDatasetClient.delete(datasetId, apiKey);
     }
 
     @Override
@@ -82,8 +82,8 @@ public class DifyDatasetClientImpl implements DifyDataset {
     }
 
     @Override
-    public DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apikey) {
-        return difyDatasetClient.deleteDocument(datasetId, documentId, apikey);
+    public DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apiKey) {
+        return difyDatasetClient.deleteDocument(datasetId, documentId, apiKey);
     }
 
     @Override
@@ -97,8 +97,8 @@ public class DifyDatasetClientImpl implements DifyDataset {
     }
 
     @Override
-    public SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apikey) {
-        return difyDatasetClient.deleteSegment(datasetId, documentId, segmentId, apikey);
+    public SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apiKey) {
+        return difyDatasetClient.deleteSegment(datasetId, documentId, segmentId, apiKey);
     }
 
     @Override
@@ -127,8 +127,8 @@ public class DifyDatasetClientImpl implements DifyDataset {
     }
 
     @Override
-    public UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, String apikey) {
-        return difyDatasetClient.uploadFileInfo(datasetId, documentId, apikey);
+    public UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, String apiKey) {
+        return difyDatasetClient.uploadFileInfo(datasetId, documentId, apiKey);
     }
 
     @Override
@@ -147,8 +147,8 @@ public class DifyDatasetClientImpl implements DifyDataset {
     }
 
     @Override
-    public void deleteMetaData(String datasetId, String metadataId, String apikey) {
-        difyDatasetClient.deleteMetaData(datasetId, metadataId, apikey);
+    public void deleteMetaData(String datasetId, String metadataId, String apiKey) {
+        difyDatasetClient.deleteMetaData(datasetId, metadataId, apiKey);
     }
 
     @Override
@@ -162,12 +162,12 @@ public class DifyDatasetClientImpl implements DifyDataset {
     }
 
     @Override
-    public MetaDataListResponse listMetaData(String datasetId, String apikey) {
-        return difyDatasetClient.listMetaData(datasetId, apikey);
+    public MetaDataListResponse listMetaData(String datasetId, String apiKey) {
+        return difyDatasetClient.listMetaData(datasetId, apiKey);
     }
 
     @Override
-    public TextEmbeddingListResponse listTextEmbedding(String apikey) {
-        return difyDatasetClient.listTextEmbedding(apikey);
+    public TextEmbeddingListResponse listTextEmbedding(String apiKey) {
+        return difyDatasetClient.listTextEmbedding(apiKey);
     }
 }

@@ -51,7 +51,13 @@ public interface DifyDataset {
         delete(datasetId, null);
     }
 
-    void delete(String datasetId, String apikey);
+    /**
+     * 删除指定 知识库。
+     *
+     * @param datasetId 知识库的唯一标识符。
+     * @param apiKey    知识库的唯一标识符。
+     */
+    void delete(String datasetId, String apiKey);
 
     /**
      * 通过文本创建文档。
@@ -112,7 +118,15 @@ public interface DifyDataset {
         return deleteDocument(datasetId, documentId, null);
     }
 
-    DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apikey);
+    /**
+     * 删除指定文档。
+     *
+     * @param datasetId  知识库的唯一标识符。
+     * @param documentId 文档的唯一标识符。
+     * @param apiKey     apiKey
+     * @return 返回文档删除响应对象。
+     */
+    DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apiKey);
 
     /**
      * 创建分段。
@@ -142,7 +156,16 @@ public interface DifyDataset {
         return deleteSegment(datasetId, documentId, segmentId, null);
     }
 
-    SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apikey);
+    /**
+     * 删除指定分段。
+     *
+     * @param datasetId  知识库的唯一标识符。
+     * @param documentId 文档的唯一标识符。
+     * @param segmentId  分段的唯一标识符。
+     * @param apiKey     apiKey
+     * @return 返回分段删除响应对象。
+     */
+    SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apiKey);
 
     /**
      * 更新分段。
@@ -195,7 +218,15 @@ public interface DifyDataset {
         return uploadFileInfo(datasetId, documentId, null);
     }
 
-    UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, String apikey);
+    /**
+     * 获取上传文件信息。
+     *
+     * @param datasetId  知识库的唯一标识符。
+     * @param documentId 文档的唯一标识符。
+     * @param apiKey     apiKey
+     * @return 返回上传文件信息响应对象。
+     */
+    UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, String apiKey);
 
     /**
      * 检索数据。
@@ -232,7 +263,14 @@ public interface DifyDataset {
         deleteMetaData(datasetId, metadataId, null);
     }
 
-    void deleteMetaData(String datasetId, String metadataId, String apikey);
+    /**
+     * 删除元数据
+     *
+     * @param datasetId  数据集ID
+     * @param metadataId 元数据ID
+     * @param apiKey     apiKey
+     */
+    void deleteMetaData(String datasetId, String metadataId, String apiKey);
 
     /**
      * 执行元数据业务操作（如启用/禁用等）
@@ -258,7 +296,14 @@ public interface DifyDataset {
         return listMetaData(datasetId, null);
     }
 
-    MetaDataListResponse listMetaData(String datasetId, String apikey);
+    /**
+     * 获取数据集元数据列表
+     *
+     * @param datasetId 数据集ID
+     * @param apiKey    apiKey
+     * @return 元数据列表及分页信息
+     */
+    MetaDataListResponse listMetaData(String datasetId, String apiKey);
 
     /**
      * 获取嵌入模型列表
@@ -269,6 +314,12 @@ public interface DifyDataset {
         return listTextEmbedding(null);
     }
 
-    TextEmbeddingListResponse listTextEmbedding(String apikey);
+    /**
+     * 获取嵌入模型列表
+     *
+     * @param apiKey apiKey
+     * @return 嵌入模型列表
+     */
+    TextEmbeddingListResponse listTextEmbedding(String apiKey);
 
 }

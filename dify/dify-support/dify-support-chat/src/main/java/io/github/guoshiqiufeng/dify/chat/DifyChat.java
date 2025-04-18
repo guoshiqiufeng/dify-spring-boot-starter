@@ -121,6 +121,7 @@ public interface DifyChat {
      * 文本转语音
      *
      * @param request 文本转语音请求对象，包含文本内容等信息
+     * @return 语音文件流
      */
     ResponseEntity<byte[]> textToAudio(TextToAudioRequest request);
 

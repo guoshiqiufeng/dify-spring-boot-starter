@@ -23,25 +23,75 @@ import io.github.guoshiqiufeng.dify.server.dto.response.LoginResponseVO;
 import java.util.List;
 
 /**
+ * Dify Server Client Interface
+ * Provides methods to interact with Dify's server API for managing applications,
+ * API keys, authentication, and related operations.
+ *
  * @author yanghq
  * @version 0.8.0
  * @since 2025/4/9 10:14
  */
 public interface DifyServerClient {
 
+    /**
+     * Retrieves a list of applications based on mode and name filter
+     *
+     * @param mode The application mode to filter by (e.g., "completion", "chat")
+     * @param name The application name to search for
+     * @return List of application responses matching the criteria
+     */
     List<AppsResponseVO> apps(String mode, String name);
 
+    /**
+     * Retrieves detailed information about a specific application
+     *
+     * @param appId The ID of the application to retrieve
+     * @return The application response containing detailed information
+     */
     AppsResponseVO app(String appId);
 
+    /**
+     * Retrieves existing API keys for a specific application
+     *
+     * @param appId The ID of the application to get API keys for
+     * @return List of API key responses associated with the application
+     */
     List<ApiKeyResponseVO> getAppApiKey(String appId);
 
+    /**
+     * Initializes or regenerates API keys for a specific application
+     *
+     * @param appId The ID of the application to initialize API keys for
+     * @return List of newly generated API key responses
+     */
     List<ApiKeyResponseVO> initAppApiKey(String appId);
 
+    /**
+     * Retrieves existing API keys for datasets
+     *
+     * @return List of dataset API key responses
+     */
     List<DatasetApiKeyResponseVO> getDatasetApiKey();
 
+    /**
+     * Initializes or regenerates API keys for datasets
+     *
+     * @return List of newly generated dataset API key responses
+     */
     List<DatasetApiKeyResponseVO> initDatasetApiKey();
 
+    /**
+     * Authenticates with the Dify server and returns login credentials
+     *
+     * @return Login response containing access token and refresh token
+     */
     LoginResponseVO login();
 
+    /**
+     * Refreshes an authentication token to maintain session validity
+     *
+     * @param refreshToken The refresh token used to obtain a new access token
+     * @return Login response containing new access token and refresh token
+     */
     LoginResponseVO refreshToken(String refreshToken);
 }

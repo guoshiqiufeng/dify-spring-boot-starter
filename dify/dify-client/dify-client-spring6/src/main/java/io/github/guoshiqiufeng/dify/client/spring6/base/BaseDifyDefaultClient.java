@@ -89,11 +89,13 @@ public abstract class BaseDifyDefaultClient extends BaseDifyClient {
     private static class DifyChatResponseErrorHandler implements ResponseErrorHandler {
 
 
+        @Override
         public boolean hasError(ClientHttpResponse response) throws IOException {
             return response.getStatusCode().isError();
         }
 
 
+        @Override
         public void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException {
             if (response.getStatusCode().isError()) {
                 int statusCode = response.getStatusCode().value();

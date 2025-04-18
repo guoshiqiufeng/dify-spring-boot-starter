@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
  * @since 2025/4/9 13:28
  */
 @Slf4j
-public class DifyServerTokenRedis extends DifyServerToken {
+public class DifyServerTokenRedis extends BaseDifyServerToken {
 
     private static final long TOKEN_EXPIRE_MINUTES = 60;
 

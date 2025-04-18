@@ -27,7 +27,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @since 2025/4/9 13:29
  */
 @Slf4j
-public class DifyServerTokenDefault extends DifyServerToken {
+public class DifyServerTokenDefault extends BaseDifyServerToken {
 
     private String accessToken;
 

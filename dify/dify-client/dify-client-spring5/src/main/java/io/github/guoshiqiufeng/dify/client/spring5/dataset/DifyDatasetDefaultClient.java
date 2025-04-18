@@ -81,11 +81,11 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
 
 
     @Override
-    public void delete(String datasetId, String apikey) {
+    public void delete(String datasetId, String apiKey) {
         Assert.notNull(datasetId, "datasetId can not be null");
         webClient.delete()
                 .uri(DatasetUriConstant.V1_DATASETS_URL + "/{datasetId}", datasetId)
-                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apikey).accept(h))
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
                 .retrieve()
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(Void.class).block();
@@ -179,12 +179,12 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
 
 
     @Override
-    public DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apikey) {
+    public DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apiKey) {
         Assert.notNull(datasetId, "datasetId can not be null");
         Assert.notNull(documentId, "documentId can not be null");
         return webClient.delete()
                 .uri(DatasetUriConstant.V1_DOCUMENT_URL, datasetId, documentId)
-                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apikey).accept(h))
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
                 .retrieve()
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(DocumentDeleteResponse.class).block();
@@ -220,14 +220,14 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
 
 
     @Override
-    public SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apikey) {
+    public SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apiKey) {
         Assert.notNull(datasetId, "datasetId can not be null");
         Assert.notNull(documentId, "documentId can not be null");
         Assert.notNull(segmentId, "segmentId can not be null");
 
         return webClient.delete()
                 .uri(DatasetUriConstant.V1_DOCUMENTS_SEGMENT_URL, datasetId, documentId, segmentId)
-                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apikey).accept(h))
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
                 .retrieve()
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(SegmentDeleteResponse.class).block();
@@ -302,13 +302,13 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
 
 
     @Override
-    public UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, String apikey) {
+    public UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, String apiKey) {
         Assert.notNull(datasetId, "datasetId can not be null");
         Assert.notNull(documentId, "documentId can not be null");
 
         return webClient.get()
                 .uri(DatasetUriConstant.V1_DOCUMENTS_UPLOAD_FILE, datasetId, documentId)
-                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apikey).accept(h))
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
                 .retrieve()
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(new ParameterizedTypeReference<UploadFileInfoResponse>() {
@@ -355,13 +355,13 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
 
 
     @Override
-    public void deleteMetaData(String datasetId, String metadataId, String apikey) {
+    public void deleteMetaData(String datasetId, String metadataId, String apiKey) {
         Assert.notNull(datasetId, "datasetId can not be null");
         Assert.notNull(metadataId, "metadataId can not be null");
 
         webClient.delete()
                 .uri(DatasetUriConstant.V1_METADATA_DELETE_URL, datasetId, metadataId)
-                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apikey).accept(h))
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
                 .retrieve()
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(void.class).block();
@@ -395,21 +395,21 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
 
 
     @Override
-    public MetaDataListResponse listMetaData(String datasetId, String apikey) {
+    public MetaDataListResponse listMetaData(String datasetId, String apiKey) {
         Assert.notNull(datasetId, "datasetId can not be null");
         return webClient.get()
                 .uri(DatasetUriConstant.V1_METADATA_LIST_URL, datasetId)
-                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apikey).accept(h))
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
                 .retrieve()
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(MetaDataListResponse.class).block();
     }
 
     @Override
-    public TextEmbeddingListResponse listTextEmbedding(String apikey) {
+    public TextEmbeddingListResponse listTextEmbedding(String apiKey) {
         return webClient.get()
                 .uri(DatasetUriConstant.V1_TEXT_EMBEDDING_LIST_URL)
-                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apikey).accept(h))
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
                 .retrieve()
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(TextEmbeddingListResponse.class).block();

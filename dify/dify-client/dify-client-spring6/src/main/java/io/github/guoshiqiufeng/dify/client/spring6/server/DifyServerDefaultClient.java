@@ -18,8 +18,8 @@ package io.github.guoshiqiufeng.dify.client.spring6.server;
 import io.github.guoshiqiufeng.dify.client.spring6.base.BaseDifyDefaultClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
+import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
-import io.github.guoshiqiufeng.dify.server.client.DifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
 import io.github.guoshiqiufeng.dify.server.client.RequestSupplier;
 import io.github.guoshiqiufeng.dify.server.constant.ServerUriConstant;
@@ -46,25 +46,25 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
 
     private final DifyProperties.Server difyServerProperties;
 
-    private final DifyServerToken difyServerToken;
+    private final BaseDifyServerToken difyServerToken;
 
     public DifyServerDefaultClient(DifyProperties.Server difyServerProperties) {
         this(difyServerProperties, new DifyServerTokenDefault());
     }
 
-    public DifyServerDefaultClient(DifyProperties.Server difyServerProperties, DifyServerToken difyServerToken) {
+    public DifyServerDefaultClient(DifyProperties.Server difyServerProperties, BaseDifyServerToken difyServerToken) {
         super();
         this.difyServerProperties = difyServerProperties;
         this.difyServerToken = difyServerToken;
     }
 
-    public DifyServerDefaultClient(DifyProperties.Server difyServerProperties, DifyServerToken difyServerToken, String baseUrl) {
+    public DifyServerDefaultClient(DifyProperties.Server difyServerProperties, BaseDifyServerToken difyServerToken, String baseUrl) {
         super(baseUrl);
         this.difyServerProperties = difyServerProperties;
         this.difyServerToken = difyServerToken;
     }
 
-    public DifyServerDefaultClient(DifyProperties.Server difyServerProperties, DifyServerToken difyServerToken, String baseUrl, DifyProperties.ClientConfig clientConfig, RestClient.Builder restClientBuilder, WebClient.Builder webClientBuilder) {
+    public DifyServerDefaultClient(DifyProperties.Server difyServerProperties, BaseDifyServerToken difyServerToken, String baseUrl, DifyProperties.ClientConfig clientConfig, RestClient.Builder restClientBuilder, WebClient.Builder webClientBuilder) {
         super(baseUrl, clientConfig, restClientBuilder, webClientBuilder);
         this.difyServerProperties = difyServerProperties;
         this.difyServerToken = difyServerToken;

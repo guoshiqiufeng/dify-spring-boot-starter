@@ -24,7 +24,7 @@ import org.springframework.http.HttpHeaders;
  * @since 2025/4/9 13:28
  */
 @Slf4j
-public abstract class DifyServerToken {
+public abstract class BaseDifyServerToken {
 
     /**
      * 最大重试次数

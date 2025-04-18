@@ -16,13 +16,24 @@
 package io.github.guoshiqiufeng.dify.server.client;
 
 /**
- * 请求执行器接口
- *
+ * Request Supplier Interface
+ * A functional interface that represents a supplier of requests to the Dify API.
+ * This interface is used to defer or lazily execute API requests and handle
+ * generic request execution in a functional programming style.
+ * 
+ * @param <T> The type of result produced by this supplier
+ * 
  * @author yanghq
  * @version 0.8.0
  * @since 2025/4/09 15:44
  */
 @FunctionalInterface
 public interface RequestSupplier<T> {
+    
+    /**
+     * Gets a result from this supplier
+     * 
+     * @return A result of type T
+     */
     T get();
 }

@@ -30,7 +30,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * @author yanghq
- * @version 1.0
+ * @version 0.9.0
  * @since 2025/3/18 16:17
  */
 @Slf4j
