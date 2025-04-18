@@ -15,4 +15,5 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-databind"
 
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.springframework.boot:spring-boot-starter-reactor-netty'
 }
