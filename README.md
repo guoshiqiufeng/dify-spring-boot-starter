@@ -74,7 +74,9 @@ https://guoshiqiufeng.github.io/dify-spring-boot-starter/en
 </dependency>
 ```
 
-#### yml configuration
+#### autoloading
+
+##### yml configuration
 
 ```yaml
 dify:
@@ -86,7 +88,7 @@ dify:
     api-key: dataset-aaabbbcccdddeeefffggghhh # Please replace with the actual Dify dataset API key, if you don't need to call the dataset-related interfaces can not be filled in!
 ```
 
-#### Get message suggestions
+##### Get message suggestions
 
 ```java
 
@@ -101,6 +103,21 @@ public class DifyChatService {
         return difyChat.messagesSuggested(messageId, apiKey, userId);
     }
 }
+```
+
+#### Builder
+
+```java
+DifyServer difyServer = DifyServerBuilder.create(
+        DifyServerBuilder.DifyServerClientBuilder
+                .builder()
+                .baseUrl("https://your-dify-api.example.com")
+                .serverProperties(new DifyProperties.Server("admin@example.com", "password"))
+                .serverToken(new DifyServerTokenDefault())
+                .clientConfig(new DifyProperties.ClientConfig())
+                .restClientBuilder(RestClient.builder())
+                .webClientBuilder(WebClient.builder())
+                .build());
 ```
 
 For more usage references check the
