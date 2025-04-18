@@ -24,7 +24,7 @@ public abstract class BaseDifyClient {
 
     public static final String REQUEST_BODY_NULL_ERROR = "The request body can not be null.";
 
-    protected static final String DEFAULT_BASE_URL = "http://localhost";
+    public static final String DEFAULT_BASE_URL = "http://localhost";
 
 
 }
