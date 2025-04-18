@@ -65,7 +65,7 @@
 ```
 
 - springboot2
-
+> dify-spring-boot-starter v0.9.0 以上版本可用
 ```xml
 
 <dependency>
@@ -106,6 +106,7 @@ public class DifyChatService {
 ```
 
 #### 构造器
+> dify-spring-boot-starter v0.9.0 以上版本可用
 
 ```java
 DifyServer difyServer = DifyServerBuilder.create(

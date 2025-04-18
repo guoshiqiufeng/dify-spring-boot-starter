@@ -65,7 +65,7 @@ https://guoshiqiufeng.github.io/dify-spring-boot-starter/en
 ```
 
 - springboot2
-
+> dify-spring-boot-starter v0.9.0 or above is available.
 ```xml
 
 <dependency>
@@ -106,7 +106,7 @@ public class DifyChatService {
 ```
 
 #### Builder
-
+> dify-spring-boot-starter v0.9.0 or above is available.
 ```java
 DifyServer difyServer = DifyServerBuilder.create(
         DifyServerBuilder.DifyServerClientBuilder
