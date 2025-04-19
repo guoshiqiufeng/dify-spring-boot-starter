@@ -61,7 +61,7 @@ public abstract class BaseDifyDefaultClient extends BaseDifyClient {
     }
 
     public BaseDifyDefaultClient(String baseUrl, DifyProperties.ClientConfig clientConfig, WebClient.Builder webClientBuilder) {
-        this(baseUrl, clientConfig, webClientBuilder, new DifyChatResponseErrorHandler());
+        this(baseUrl, clientConfig, webClientBuilder, new DifyResponseErrorHandler());
     }
 
     public BaseDifyDefaultClient(String baseUrl, DifyProperties.ClientConfig clientConfig, WebClient.Builder webClientBuilder, ResponseErrorHandler responseErrorHandler) {
@@ -79,7 +79,7 @@ public abstract class BaseDifyDefaultClient extends BaseDifyClient {
         this.webClient = webClientBuilder.baseUrl(baseUrl).defaultHeaders(defaultHeaders).build();
     }
 
-    private static class DifyChatResponseErrorHandler implements ResponseErrorHandler {
+    private static class DifyResponseErrorHandler implements ResponseErrorHandler {
 
 
         @Override
