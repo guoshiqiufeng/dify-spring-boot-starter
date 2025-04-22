@@ -60,6 +60,7 @@ export default defineUserConfig({
                                 '/guide/getting-started',
                                 '/guide/install',
                                 '/guide/config',
+                                '/guide/builder',
                                 // '/guide/annotation',
                             ]
                         },
@@ -101,6 +102,7 @@ export default defineUserConfig({
                             '/guide/getting-started',
                             '/guide/install',
                             '/guide/config',
+                            '/guide/builder',
                             // '/guide/annotation',
                             {
                                 text: '功能',
@@ -164,6 +166,7 @@ export default defineUserConfig({
                                 '/en/guide/getting-started',
                                 '/en/guide/install',
                                 '/en/guide/config',
+                                '/en/guide/builder',
                                 // '/en/guide/annotation',
                             ]
                         },
@@ -206,6 +209,7 @@ export default defineUserConfig({
                             '/en/guide/getting-started',
                             '/en/guide/install',
                             '/en/guide/config',
+                            '/en/guide/builder',
                             // '/en/guide/annotation',
                             {
                                 text: 'Features',
