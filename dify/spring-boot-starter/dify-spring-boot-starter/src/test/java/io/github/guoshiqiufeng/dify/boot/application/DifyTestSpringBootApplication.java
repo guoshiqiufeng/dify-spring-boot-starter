@@ -15,6 +15,9 @@
  */
 package io.github.guoshiqiufeng.dify.boot.application;
 
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -37,7 +40,10 @@ public class DifyTestSpringBootApplication {
 
     @Bean
     public RestClient.Builder restClientBuilder() {
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        HttpClient httpClient = HttpClientBuilder.create()
+                .setConnectionManager(new PoolingHttpClientConnectionManager())
+                .build();
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClient);
         factory.setConnectTimeout(Duration.ofSeconds(10));
         factory.setReadTimeout(Duration.ofSeconds(60));
         return RestClient.builder().requestInterceptor(new LoggingInterceptor()).requestFactory(factory);
