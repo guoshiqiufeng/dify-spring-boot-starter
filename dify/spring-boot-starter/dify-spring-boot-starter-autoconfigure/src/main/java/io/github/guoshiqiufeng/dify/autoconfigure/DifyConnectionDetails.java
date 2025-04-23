@@ -22,10 +22,10 @@ import org.springframework.boot.autoconfigure.service.connection.ConnectionDetai
  * Provides connection information required to establish a connection to the Dify API.
  * This interface is used by the Spring Boot auto-configuration to set up Dify clients
  * with the appropriate connection settings.
- * 
+ * <p>
  * This interface extends Spring Boot's ConnectionDetails to integrate with
  * the standard connection management framework.
- * 
+ *
  * @author yanghq
  * @version 0.8.0
  * @since 2025/4/7 16:53
@@ -34,7 +34,7 @@ public interface DifyConnectionDetails extends ConnectionDetails {
 
     /**
      * Retrieves the URL of the Dify API server
-     * 
+     *
      * @return The base URL string for the Dify API endpoint
      */
     String getUrl();

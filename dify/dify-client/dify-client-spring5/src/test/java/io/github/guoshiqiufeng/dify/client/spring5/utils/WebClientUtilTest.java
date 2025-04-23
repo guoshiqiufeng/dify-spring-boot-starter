@@ -47,9 +47,9 @@ public class WebClientUtilTest {
         StepVerifier.create(result.flatMap(Mono::error))
                 .expectErrorMatches(throwable ->
                         throwable instanceof RuntimeException &&
-                        throwable.getMessage().contains("400") &&
-                        throwable.getMessage().contains("Bad Request") &&
-                        throwable.getMessage().contains("Bad Request Error"))
+                                throwable.getMessage().contains("400") &&
+                                throwable.getMessage().contains("Bad Request") &&
+                                throwable.getMessage().contains("Bad Request Error"))
                 .verify();
     }
 
@@ -68,9 +68,9 @@ public class WebClientUtilTest {
         StepVerifier.create(result.flatMap(Mono::error))
                 .expectErrorMatches(throwable ->
                         throwable instanceof RuntimeException &&
-                        throwable.getMessage().contains("404") &&
-                        throwable.getMessage().contains("Not Found") &&
-                        throwable.getMessage().contains("Resource Not Found"))
+                                throwable.getMessage().contains("404") &&
+                                throwable.getMessage().contains("Not Found") &&
+                                throwable.getMessage().contains("Resource Not Found"))
                 .verify();
     }
 
@@ -89,8 +89,8 @@ public class WebClientUtilTest {
         StepVerifier.create(result.flatMap(Mono::error))
                 .expectErrorMatches(throwable ->
                         throwable instanceof RuntimeException &&
-                        throwable.getMessage().contains("500") &&
-                        throwable.getMessage().contains("Internal Server Error"))
+                                throwable.getMessage().contains("500") &&
+                                throwable.getMessage().contains("Internal Server Error"))
                 .verify();
     }
 
@@ -109,8 +109,8 @@ public class WebClientUtilTest {
         StepVerifier.create(result.flatMap(Mono::error))
                 .expectErrorMatches(throwable ->
                         throwable instanceof RuntimeException &&
-                        throwable.getMessage().contains("400") &&
-                        throwable.getMessage().contains("Bad Request"))
+                                throwable.getMessage().contains("400") &&
+                                throwable.getMessage().contains("Bad Request"))
                 .verify();
     }
 }

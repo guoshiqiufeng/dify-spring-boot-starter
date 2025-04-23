@@ -20,8 +20,10 @@
     "cpus": 2
   },
   "containerEnv": {
-    "GRADLE_USER_HOME": "/home/vscode", // required because the java feature is not setting this correctly
-    "M2": "/home/vscode" // required because the java feature is not setting this correctly
+    "GRADLE_USER_HOME": "/home/vscode",
+    // required because the java feature is not setting this correctly
+    "M2": "/home/vscode"
+    // required because the java feature is not setting this correctly
   },
   "features": {
     "azure-cli": "latest",

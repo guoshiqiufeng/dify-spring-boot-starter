@@ -21,7 +21,8 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author yanghq
@@ -37,14 +38,14 @@ public class MultipartInputStreamFileResourceTest {
         byte[] testData = "Test content".getBytes();
         InputStream inputStream = new ByteArrayInputStream(testData);
         String filename = "test-file.txt";
-        
+
         // Create the resource
         MultipartInputStreamFileResource resource = new MultipartInputStreamFileResource(inputStream, filename);
-        
+
         // Verify the filename is set correctly
         assertEquals(filename, resource.getFilename(), "Filename should match the one provided in constructor");
     }
-    
+
     @Test
     @DisplayName("Test contentLength returns -1")
     public void testContentLengthReturnsNegativeOne() {
@@ -52,28 +53,28 @@ public class MultipartInputStreamFileResourceTest {
         byte[] testData = "Test content".getBytes();
         InputStream inputStream = new ByteArrayInputStream(testData);
         String filename = "test-file.txt";
-        
+
         // Create the resource
         MultipartInputStreamFileResource resource = new MultipartInputStreamFileResource(inputStream, filename);
-        
+
         // Verify contentLength returns -1 as specified in the implementation
         assertEquals(-1, resource.contentLength(), "contentLength should return -1");
     }
-    
+
     @Test
     @DisplayName("Test with null filename")
     public void testWithNullFilename() {
         // Create test data
         byte[] testData = "Test content".getBytes();
         InputStream inputStream = new ByteArrayInputStream(testData);
-        
+
         // Create the resource with null filename
         MultipartInputStreamFileResource resource = new MultipartInputStreamFileResource(inputStream, null);
-        
+
         // Verify the filename is null
         assertNull(resource.getFilename(), "Filename should be null");
     }
-    
+
     @Test
     @DisplayName("Test with empty filename")
     public void testWithEmptyFilename() {
@@ -81,10 +82,10 @@ public class MultipartInputStreamFileResourceTest {
         byte[] testData = "Test content".getBytes();
         InputStream inputStream = new ByteArrayInputStream(testData);
         String filename = "";
-        
+
         // Create the resource with empty filename
         MultipartInputStreamFileResource resource = new MultipartInputStreamFileResource(inputStream, filename);
-        
+
         // Verify the filename is empty
         assertEquals("", resource.getFilename(), "Filename should be empty string");
     }

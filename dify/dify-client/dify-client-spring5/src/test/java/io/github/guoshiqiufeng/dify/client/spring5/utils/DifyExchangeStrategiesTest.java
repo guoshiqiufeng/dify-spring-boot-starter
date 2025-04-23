@@ -17,12 +17,12 @@ package io.github.guoshiqiufeng.dify.client.spring5.utils;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.function.Consumer;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author yanghq
@@ -37,38 +37,38 @@ public class DifyExchangeStrategiesTest {
         Consumer<WebClient.Builder> consumer = DifyExchangeStrategies.exchangeStrategies();
         assertNotNull(consumer, "Exchange strategies consumer should not be null");
     }
-    
+
     @Test
     @DisplayName("Test exchangeStrategies can be applied to WebClient.Builder")
     public void testExchangeStrategiesCanBeAppliedToWebClientBuilder() {
         Consumer<WebClient.Builder> consumer = DifyExchangeStrategies.exchangeStrategies();
-        
+
         // Create a WebClient.Builder
         WebClient.Builder builder = WebClient.builder();
-        
+
         // Apply the consumer to the builder
-        assertDoesNotThrow(() -> consumer.accept(builder), 
+        assertDoesNotThrow(() -> consumer.accept(builder),
                 "Applying exchange strategies to WebClient.Builder should not throw an exception");
-        
+
         // Create a WebClient instance to verify it works
         WebClient webClient = builder.build();
         assertNotNull(webClient, "WebClient should be created successfully");
     }
-    
+
     @Test
     @DisplayName("Test exchangeStrategies configures ObjectMapper correctly")
     public void testExchangeStrategiesConfiguresObjectMapperCorrectly() {
         // This test is more of a verification that the code runs without errors
         // since we can't easily inspect the internal configuration of the ObjectMapper
-        
+
         Consumer<WebClient.Builder> consumer = DifyExchangeStrategies.exchangeStrategies();
         WebClient.Builder builder = WebClient.builder();
         consumer.accept(builder);
-        
+
         // Build the WebClient and verify it was created successfully
         WebClient webClient = builder.build();
         assertNotNull(webClient, "WebClient should be created successfully");
-        
+
         // We can't directly test the ObjectMapper configuration, but we can verify
         // that the ExchangeStrategies were applied to the WebClient
         // This is a bit of a smoke test

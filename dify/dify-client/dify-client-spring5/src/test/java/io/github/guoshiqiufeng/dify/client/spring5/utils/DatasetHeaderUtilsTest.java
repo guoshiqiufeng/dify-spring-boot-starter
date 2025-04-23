@@ -35,7 +35,8 @@ public class DatasetHeaderUtilsTest {
     @DisplayName("Test getHttpHeadersConsumer with BaseDatasetRequest")
     public void testGetHttpHeadersConsumerWithRequest() {
         // Create a mock request with API key
-        BaseDatasetRequest request = new BaseDatasetRequest() {};
+        BaseDatasetRequest request = new BaseDatasetRequest() {
+        };
         request.setApiKey("test-api-key");
 
         // Get the consumer
@@ -55,7 +56,8 @@ public class DatasetHeaderUtilsTest {
     @DisplayName("Test getHttpHeadersConsumer with BaseDatasetRequest - empty API key")
     public void testGetHttpHeadersConsumerWithRequestEmptyApiKey() {
         // Create a mock request with empty API key
-        BaseDatasetRequest request = new BaseDatasetRequest() {};
+        BaseDatasetRequest request = new BaseDatasetRequest() {
+        };
         request.setApiKey("");
 
         // Get the consumer
@@ -73,7 +75,8 @@ public class DatasetHeaderUtilsTest {
     @DisplayName("Test getHttpHeadersConsumer with BaseDatasetRequest - null API key")
     public void testGetHttpHeadersConsumerWithRequestNullApiKey() {
         // Create a mock request with null API key
-        BaseDatasetRequest request = new BaseDatasetRequest() {};
+        BaseDatasetRequest request = new BaseDatasetRequest() {
+        };
         request.setApiKey(null);
 
         // Get the consumer
