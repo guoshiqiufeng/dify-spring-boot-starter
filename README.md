@@ -1,18 +1,30 @@
 ## dify-spring-boot-starter
 
-[![Maven central](https://img.shields.io/maven-central/v/io.github.guoshiqiufeng.dify/dify-spring-boot-starter.svg?style=flat-square)](https://search.maven.org/search?q=g:io.github.guoshiqiufeng.dify%20AND%20a:dify-spring-boot-starter)
-[![License](https://img.shields.io/:license-apache-brightgreen.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
-[![CodeQL](https://github.com/guoshiqiufeng/dify-spring-boot-starter/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/guoshiqiufeng/dify-spring-boot-starter/actions/workflows/github-code-scanning/codeql)
+<div style="text-align: center">
+  <a href="https://guoshiqiufeng.github.io/dify-spring-boot-starter/en">Documentation</a> ·
+  <a href="https://github.com/guoshiqiufeng/dify-spring-boot-starter-examples">Examples</a>
+</div>
+
+<p style="text-align: center">
+<a href="https://search.maven.org/search?q=g:io.github.guoshiqiufeng.dify%20AND%20a:dify-spring-boot-starter" target="_blank">
+        <img alt="Maven central" src="https://img.shields.io/maven-central/v/io.github.guoshiqiufeng.dify/dify-spring-boot-starter.svg?style=flat-square">
+</a>
+<a href="https://www.apache.org/licenses/LICENSE-2.0.html" target="_blank">
+        <img alt="License" src="https://img.shields.io/:license-apache-brightgreen.svg?style=flat-square">
+</a>
+<a href="https://github.com/guoshiqiufeng/dify-spring-boot-starter/actions/workflows/github-code-scanning/codeql" target="_blank">
+        <img alt="CodeQL" src="https://github.com/guoshiqiufeng/dify-spring-boot-starter/actions/workflows/github-code-scanning/codeql/badge.svg">
+</a>
+<a href="https://github.com/guoshiqiufeng/dify-spring-boot-starter/actions/workflows/github-code-scanning/codeql" target="_blank">
+        <img alt="codecov" src="https://codecov.io/gh/guoshiqiufeng/dify-spring-boot-starter/graph/badge.svg?token=NVQ2SGEQ79">
+</a>
+</p>
 
 Read in other languages: [简体中文](README-zh.md)
 
 ### Introduction
 
 Provide springboot starter for dify to simplify development.
-
-### Documentation
-
-https://guoshiqiufeng.github.io/dify-spring-boot-starter/en
 
 ### Development Framework
 
