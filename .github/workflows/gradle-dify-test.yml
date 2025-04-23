@@ -247,4 +247,9 @@ jobs:
       - name: Run Gradle tests
         run: |
           cd dify-spring-boot-starter
-          gradle test --info
+          gradle jacocoTestReport
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
