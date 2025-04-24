@@ -15,8 +15,6 @@
  */
 package io.github.guoshiqiufeng.dify.springboot2.autoconfigure;
 
-import io.github.guoshiqiufeng.dify.autoconfigure.DifyPropertiesAutoConfiguration;
-import io.github.guoshiqiufeng.dify.autoconfigure.DifyServerAutoConfiguration;
 import io.github.guoshiqiufeng.dify.client.spring5.server.DifyServerDefaultClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.server.DifyServer;

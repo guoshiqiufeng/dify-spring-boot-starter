@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.autoconfigure;
+package io.github.guoshiqiufeng.dify.springboot.autoconfigure;
 
-import io.github.guoshiqiufeng.dify.client.spring5.dataset.DifyDatasetDefaultClient;
+import io.github.guoshiqiufeng.dify.client.spring6.dataset.DifyDatasetDefaultClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
 import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;
@@ -27,11 +27,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * @author yanghq
- * @version 0.9.0
+ * @version 1.0
  * @since 2025/3/18 16:17
  */
 @Slf4j
@@ -42,10 +43,13 @@ public class DifyDatasetAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(DifyDatasetClient.class)
     public DifyDatasetClient difyDatasetClient(DifyProperties properties,
+                                               ObjectProvider<RestClient.Builder> restClientBuilderProvider,
                                                ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
         String apikey = "Bearer " + properties.getDataset().getApiKey();
         return new DifyDatasetDefaultClient(properties.getUrl(),
                 properties.getClientConfig(),
+                restClientBuilderProvider.getIfAvailable(RestClient::builder)
+                        .defaultHeader(HttpHeaders.AUTHORIZATION, apikey),
                 webClientBuilderProvider.getIfAvailable(WebClient::builder)
                         .defaultHeader(HttpHeaders.AUTHORIZATION, apikey));
     }

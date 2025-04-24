@@ -15,7 +15,6 @@
  */
 package io.github.guoshiqiufeng.dify.springboot.autoconfigure;
 
-import io.github.guoshiqiufeng.dify.autoconfigure.DifyServerRedisTokenAutoConfiguration;
 import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;

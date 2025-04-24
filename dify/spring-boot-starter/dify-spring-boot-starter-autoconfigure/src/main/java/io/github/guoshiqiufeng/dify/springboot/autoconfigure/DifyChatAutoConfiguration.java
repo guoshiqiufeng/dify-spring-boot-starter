@@ -13,44 +13,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.autoconfigure;
+package io.github.guoshiqiufeng.dify.springboot.autoconfigure;
 
-import io.github.guoshiqiufeng.dify.client.spring5.workflow.DifyWorkflowDefaultClient;
+import io.github.guoshiqiufeng.dify.chat.DifyChat;
+import io.github.guoshiqiufeng.dify.chat.client.DifyChatClient;
+import io.github.guoshiqiufeng.dify.chat.impl.DifyChatClientImpl;
+import io.github.guoshiqiufeng.dify.client.spring6.chat.DifyChatDefaultClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
-import io.github.guoshiqiufeng.dify.workflow.DifyWorkflow;
-import io.github.guoshiqiufeng.dify.workflow.client.DifyWorkflowClient;
-import io.github.guoshiqiufeng.dify.workflow.impl.DifyWorkflowClientImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * @author yanghq
- * @version 0.9.0
+ * @version 1.0
  * @since 2025/3/18 16:17
  */
 @Slf4j
 @Configuration
-@ConditionalOnClass({DifyWorkflowClient.class})
-public class DifyWorkflowAutoConfiguration {
+@ConditionalOnClass({DifyChatClient.class})
+public class DifyChatAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean(DifyWorkflowClient.class)
-    public DifyWorkflowClient difyWorkflowClient(DifyProperties properties,
-                                                 ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
-        return new DifyWorkflowDefaultClient(properties.getUrl(),
+    @ConditionalOnMissingBean(DifyChatClient.class)
+    public DifyChatClient difyChatClient(DifyProperties properties,
+                                         ObjectProvider<RestClient.Builder> restClientBuilderProvider,
+                                         ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
+        return new DifyChatDefaultClient(properties.getUrl(),
                 properties.getClientConfig(),
+                restClientBuilderProvider.getIfAvailable(RestClient::builder),
                 webClientBuilderProvider.getIfAvailable(WebClient::builder));
     }
 
     @Bean
-    @ConditionalOnMissingBean({DifyWorkflow.class})
-    public DifyWorkflowClientImpl difyWorkflowHandler(DifyWorkflowClient difyWorkflowClient) {
-        return new DifyWorkflowClientImpl(difyWorkflowClient);
+    @ConditionalOnMissingBean({DifyChat.class})
+    public DifyChatClientImpl difyChatHandler(DifyChatClient difyChatClient) {
+        return new DifyChatClientImpl(difyChatClient);
     }
 
 }
