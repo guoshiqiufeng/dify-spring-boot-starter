@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.autoconfigure;
+package io.github.guoshiqiufeng.dify.springboot.autoconfigure;
 
-import io.github.guoshiqiufeng.dify.client.spring5.server.DifyServerDefaultClient;
+import io.github.guoshiqiufeng.dify.client.spring6.server.DifyServerDefaultClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
@@ -29,11 +29,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * @author yanghq
- * @version 0.9.0
+ * @version 1.0
  * @since 2025/3/18 16:17
  */
 @Slf4j
@@ -52,11 +53,13 @@ public class DifyServerAutoConfiguration {
     @ConditionalOnMissingBean(DifyServerClient.class)
     public DifyServerClient difyServerClient(DifyProperties properties,
                                              BaseDifyServerToken difyServerToken,
+                                             ObjectProvider<RestClient.Builder> restClientBuilderProvider,
                                              ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
         return new DifyServerDefaultClient(properties.getServer(),
                 difyServerToken,
                 properties.getUrl(),
                 properties.getClientConfig(),
+                restClientBuilderProvider.getIfAvailable(RestClient::builder),
                 webClientBuilderProvider.getIfAvailable(WebClient::builder));
     }
 

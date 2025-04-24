@@ -15,8 +15,6 @@
  */
 package io.github.guoshiqiufeng.dify.springboot.autoconfigure;
 
-import io.github.guoshiqiufeng.dify.autoconfigure.DifyDatasetAutoConfiguration;
-import io.github.guoshiqiufeng.dify.autoconfigure.DifyPropertiesAutoConfiguration;
 import io.github.guoshiqiufeng.dify.client.spring6.dataset.DifyDatasetDefaultClient;
 import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
 import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;

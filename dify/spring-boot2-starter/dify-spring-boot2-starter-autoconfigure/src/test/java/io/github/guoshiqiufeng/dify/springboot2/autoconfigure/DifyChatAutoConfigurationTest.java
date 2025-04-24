@@ -15,8 +15,6 @@
  */
 package io.github.guoshiqiufeng.dify.springboot2.autoconfigure;
 
-import io.github.guoshiqiufeng.dify.autoconfigure.DifyChatAutoConfiguration;
-import io.github.guoshiqiufeng.dify.autoconfigure.DifyPropertiesAutoConfiguration;
 import io.github.guoshiqiufeng.dify.chat.DifyChat;
 import io.github.guoshiqiufeng.dify.chat.client.DifyChatClient;
 import io.github.guoshiqiufeng.dify.chat.impl.DifyChatClientImpl;

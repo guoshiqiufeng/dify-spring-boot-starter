@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.autoconfigure;
+package io.github.guoshiqiufeng.dify.springboot.autoconfigure;
 
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * @author yanghq
- * @version 0.9.0
+ * @version 1.0
  * @since 2025/3/18 17:29
  */
 @Configuration

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.autoconfigure;
+package io.github.guoshiqiufeng.dify.springboot2.autoconfigure;
 
 import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
@@ -31,7 +31,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 /**
  * @author yanghq
- * @version 1.0
+ * @version 0.9.0
  * @since 2025/4/17 09:30
  */
 @Configuration
