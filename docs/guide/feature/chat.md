@@ -440,3 +440,49 @@ FileUploadResponse
 | mimeType  | String  | 文件MIME类型 |
 | createdBy | String  | 创建人      |
 | createdAt | Long    | 创建时间戳    |
+
+### 3.5 获取应用信息
+
+#### 方法
+
+```java
+AppInfoResponse info(String apiKey);
+```
+
+#### 请求参数
+
+| 参数名    | 类型     | 是否必须 | 描述     |
+|--------|--------|------|--------|
+| apiKey | String | 是    | apiKey |
+
+#### 响应参数
+
+AppInfoResponse
+
+| 参数名         | 类型             | 描述     |
+|-------------|----------------|--------|
+| name        | String         | 应用名称   |
+| description | String         | 应用描述   |
+| tags        | `List<String>` | 应用标签列表 |
+
+### 3.6 获取应用元数据
+
+#### 方法
+
+```java
+AppMetaResponse meta(String apiKey);
+```
+
+#### 请求参数
+
+| 参数名    | 类型     | 是否必须 | 描述     |
+|--------|--------|------|--------|
+| apiKey | String | 是    | apiKey |
+
+#### 响应参数
+
+AppMetaResponse
+
+| 参数名       | 类型                    | 描述     |
+|-----------|-----------------------|--------|
+| toolIcons | `Map<String, Object>` | 工具图标映射 |

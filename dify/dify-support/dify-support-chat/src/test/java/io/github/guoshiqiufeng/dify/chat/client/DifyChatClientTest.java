@@ -29,7 +29,9 @@ import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -356,5 +358,48 @@ class DifyChatClientTest {
         assertEquals(expectedResponse.getId(), actualResponse.getId());
         assertEquals(expectedResponse.getName(), actualResponse.getName());
         verify(difyChatClient, times(1)).fileUpload(request);
+    }
+
+    @Test
+    void testInfo() {
+        // Arrange
+        String apiKey = "test-api-key";
+
+        AppInfoResponse expectedResponse = new AppInfoResponse();
+        expectedResponse.setName("My App");
+        expectedResponse.setDescription("This is my app.");
+
+        when(difyChatClient.info(any())).thenReturn(expectedResponse);
+
+        // Act
+        AppInfoResponse actualResponse = difyChatClient.info(apiKey);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getName(), actualResponse.getName());
+        assertEquals(expectedResponse.getDescription(), actualResponse.getDescription());
+        verify(difyChatClient, times(1)).info(apiKey);
+    }
+
+    @Test
+    void testMeta() {
+        // Arrange
+        String apiKey = "test-api-key";
+
+        AppMetaResponse expectedResponse = new AppMetaResponse();
+        Map<String, Object> maps = new HashMap<>(1);
+        maps.put("tools", "tools icon url");
+        maps.put("api", Map.of("background", "#252525"));
+        expectedResponse.setToolIcons(maps);
+
+        when(difyChatClient.meta(any())).thenReturn(expectedResponse);
+
+        // Act
+        AppMetaResponse actualResponse = difyChatClient.meta(apiKey);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getToolIcons(), actualResponse.getToolIcons());
+        verify(difyChatClient, times(1)).meta(apiKey);
     }
 }

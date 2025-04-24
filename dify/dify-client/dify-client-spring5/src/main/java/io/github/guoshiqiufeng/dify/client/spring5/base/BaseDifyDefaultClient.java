@@ -104,4 +104,14 @@ public abstract class BaseDifyDefaultClient extends BaseDifyClient {
         }
 
     }
+
+    /**
+     * Gets the WebClient instance used by this client.
+     * This method is primarily intended for testing purposes.
+     *
+     * @return the WebClient instance
+     */
+    public WebClient getWebClient() {
+        return this.webClient;
+    }
 }

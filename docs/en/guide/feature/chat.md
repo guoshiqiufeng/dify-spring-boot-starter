@@ -443,3 +443,49 @@ FileUploadResponse
 | createdBy      | String  | Creator            |
 | createdAt      | Long    | Creation timestamp |
 
+### 3.5 Get Application Info
+
+#### Method
+
+```java
+AppInfoResponse info(String apiKey);
+```
+
+#### Request Parameters
+
+| Parameter name | Type   | Required | Description |
+|----------------|--------|----------|-------------|
+| apiKey         | String | Yes      | apiKey      |
+
+#### Response Parameters
+
+AppInfoResponse
+
+| Parameter name | Type           | Description             |
+|----------------|----------------|-------------------------|
+| name           | String         | Application name        |
+| description    | String         | Application description |
+| tags           | `List<String>` | Application tags list   |
+
+### 3.6 Get Application Metadata
+
+#### Method
+
+```java
+AppMetaResponse meta(String apiKey);
+```
+
+#### Request Parameters
+
+| Parameter name | Type   | Required | Description |
+|----------------|--------|----------|-------------|
+| apiKey         | String | Yes      | apiKey      |
+
+#### Response Parameters
+
+AppMetaResponse
+
+| Parameter name | Type                  | Description        |
+|----------------|-----------------------|--------------------|
+| toolIcons      | `Map<String, Object>` | Tool icons mapping |
+

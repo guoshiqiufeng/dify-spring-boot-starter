@@ -328,6 +328,28 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
                 .body(FileUploadResponse.class);
     }
 
+    @Override
+    public AppInfoResponse info(String apiKey) {
+        Assert.notNull(apiKey, "apiKey must not be null");
+        return restClient.get()
+                .uri(DatasetUriConstant.V1_INFO)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(AppInfoResponse.class);
+    }
+
+    @Override
+    public AppMetaResponse meta(String apiKey) {
+        Assert.notNull(apiKey, "apiKey must not be null");
+        return restClient.get()
+                .uri(DatasetUriConstant.V1_META)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(AppMetaResponse.class);
+    }
+
     private ChatMessageVO builderChatMessage(ResponseModeEnum responseMode, ChatMessageSendRequest sendRequest) {
         ChatMessageVO chatMessage = new ChatMessageVO();
         chatMessage.setResponseMode(responseMode);

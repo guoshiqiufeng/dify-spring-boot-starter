@@ -141,4 +141,23 @@ public interface DifyChat {
      * @since 0.10.0
      */
     FileUploadResponse fileUpload(FileUploadRequest request);
+
+    /**
+     * app info
+     *
+     * @param apiKey The API key for authentication and retrieving app parameters
+     * @return Application info
+     * @since 0.10.0
+     */
+    AppInfoResponse info(String apiKey);
+
+    /**
+     * app meta
+     *
+     * @param apiKey The API key for authentication and retrieving app parameters
+     * @return Application meta
+     * @since 0.10.0
+     */
+    AppMetaResponse meta(String apiKey);
+
 }
