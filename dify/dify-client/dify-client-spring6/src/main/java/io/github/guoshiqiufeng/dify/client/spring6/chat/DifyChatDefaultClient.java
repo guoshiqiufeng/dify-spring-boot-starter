@@ -330,6 +330,7 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
 
     @Override
     public AppInfoResponse info(String apiKey) {
+        Assert.notNull(apiKey, "apiKey must not be null");
         return restClient.get()
                 .uri(DatasetUriConstant.V1_INFO)
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
@@ -340,6 +341,7 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
 
     @Override
     public AppMetaResponse meta(String apiKey) {
+        Assert.notNull(apiKey, "apiKey must not be null");
         return restClient.get()
                 .uri(DatasetUriConstant.V1_META)
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))

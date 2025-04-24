@@ -19,15 +19,13 @@ import io.github.guoshiqiufeng.dify.chat.dto.request.FileUploadRequest;
 import io.github.guoshiqiufeng.dify.chat.dto.response.AppInfoResponse;
 import io.github.guoshiqiufeng.dify.chat.dto.response.AppMetaResponse;
 import io.github.guoshiqiufeng.dify.chat.dto.response.FileUploadResponse;
+import io.github.guoshiqiufeng.dify.client.spring5.BaseClientTest;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.dataset.constant.DatasetUriConstant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
@@ -36,7 +34,6 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
@@ -46,47 +43,13 @@ import static org.mockito.Mockito.*;
  * @version 0.10.0
  * @since 2025/4/24 14:29
  */
-public class DifyChatDefaultClientTest {
+public class DifyChatDefaultClientTest extends BaseClientTest {
 
     private DifyChatDefaultClient difyChatDefaultClient;
 
-    @Mock
-    private WebClient webClientMock;
-
-    @Mock
-    private WebClient.Builder webClientBuilderMock;
-
-    @Mock
-    private WebClient.RequestHeadersSpec requestHeadersSpecMock;
-
-    @Mock
-    private WebClient.RequestBodyUriSpec requestBodyUriSpecMock;
-
-    @Mock
-    private WebClient.RequestBodySpec requestBodySpecMock;
-
-    @Mock
-    private WebClient.ResponseSpec responseSpecMock;
-
     @BeforeEach
     public void setup() {
-        MockitoAnnotations.openMocks(this);
-
-        // Setup WebClient.Builder behavior for proper chaining
-        when(webClientBuilderMock.baseUrl(anyString())).thenReturn(webClientBuilderMock);
-        when(webClientBuilderMock.defaultHeaders(any())).thenReturn(webClientBuilderMock);
-        when(webClientBuilderMock.defaultCookies(any())).thenReturn(webClientBuilderMock);
-        when(webClientBuilderMock.build()).thenReturn(webClientMock);
-
-        // Setup WebClient mock behavior chain
-        when(webClientMock.post()).thenReturn(requestBodyUriSpecMock);
-        when(requestBodyUriSpecMock.uri(anyString())).thenReturn(requestBodySpecMock);
-        when(requestBodySpecMock.headers(any())).thenReturn(requestBodySpecMock);
-        when(requestBodySpecMock.contentType(any())).thenReturn(requestBodySpecMock);
-        when(requestBodySpecMock.bodyValue(any())).thenReturn(requestHeadersSpecMock);
-        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
-        when(responseSpecMock.onStatus(any(), any())).thenReturn(responseSpecMock);
-
+        super.setup();
         // Create real client with mocked WebClient
         DifyProperties.ClientConfig clientConfig = new DifyProperties.ClientConfig();
         difyChatDefaultClient = new DifyChatDefaultClient("https://api.dify.ai", clientConfig, webClientBuilderMock);
@@ -171,8 +134,8 @@ public class DifyChatDefaultClientTest {
         assertEquals(expectedResponse.getDescription(), actualResponse.getDescription());
 
         // Verify WebClient interactions
-        verify(webClientMock).post();
-        verify(requestBodyUriSpecMock).uri(DatasetUriConstant.V1_INFO);
+        verify(webClientMock).get();
+        verify(requestHeadersUriSpecMock).uri(DatasetUriConstant.V1_INFO);
 
         // Verify response handling
         verify(responseSpecMock).bodyToMono(AppInfoResponse.class);
@@ -200,8 +163,8 @@ public class DifyChatDefaultClientTest {
         assertEquals(expectedResponse.getToolIcons(), actualResponse.getToolIcons());
 
         // Verify WebClient interactions
-        verify(webClientMock).post();
-        verify(requestBodyUriSpecMock).uri(DatasetUriConstant.V1_META);
+        verify(webClientMock).get();
+        verify(requestHeadersUriSpecMock).uri(DatasetUriConstant.V1_META);
 
         // Verify response handling
         verify(responseSpecMock).bodyToMono(AppMetaResponse.class);
