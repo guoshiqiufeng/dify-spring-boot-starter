@@ -410,3 +410,33 @@ Select 对象结构:
 | defaultValue | String         | 默认值     |
 | type         | String         | 下拉类型    |
 | options      | `List<String>` | 选项列表    | 
+
+### 3.4 文件上传
+
+#### 方法
+
+```java
+FileUploadResponse fileUpload(FileUploadRequest request);
+```
+
+#### 请求参数
+
+| 参数名    | 类型            | 是否必须 | 描述     |
+|--------|---------------|------|--------|
+| apiKey | String        | 是    | apiKey |
+| userId | String        | 是    | 用户 id  |
+| file   | MultipartFile | 是    | 上传文件   |
+
+#### 响应参数
+
+FileUploadResponse
+
+| 参数名       | 类型      | 描述       |
+|-----------|---------|----------|
+| id        | String  | 文件 id    |
+| name      | String  | 文件名称     |
+| size      | Integer | 文件大小(字节) |
+| extension | String  | 文件后缀     |
+| mimeType  | String  | 文件MIME类型 |
+| createdBy | String  | 创建人      |
+| createdAt | Long    | 创建时间戳    |

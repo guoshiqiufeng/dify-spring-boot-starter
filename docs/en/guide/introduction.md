@@ -41,6 +41,9 @@ Implementation of the Redis messaging framework.
 | 【CHAT】Getting Application Parameters                  | ✅      |    
 | 【CHAT】text-to-speech                                  | ✅      |    
 | 【CHAT】speech-to-text                                  | ✅      |  
+| 【CHAT】File Upload                                     | ✅      |    
+| 【CHAT】Get Application Basic Information               | 🚧     |    
+| 【CHAT】Get Application Meta Information                | 🚧     |    
 | 【WORKFLOW】 Run Workflow                               | ✅      |   
 | 【WORKFLOW】 Run Workflow Stream                        | ✅      |   
 | 【WORKFLOW】 Stop Workflow Stream                       | ✅      |  

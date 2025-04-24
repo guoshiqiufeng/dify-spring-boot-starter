@@ -3,7 +3,7 @@ coverage:
     project:
       default:
         threshold: 20%
-        
+
 fixes:
   - "dify-spring-boot-starter/::"  # Remove the project name prefix from paths
 

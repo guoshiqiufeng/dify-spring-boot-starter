@@ -412,3 +412,34 @@ Select Object Structure:
 | defaultValue   | String         | Default value         |
 | type           | String         | Dropdown type         |
 | options        | `List<String>` | Options list          |
+
+### 3.4 File Upload
+
+#### Method
+
+```java
+FileUploadResponse fileUpload(FileUploadRequest request);
+```
+
+#### Request Parameters
+
+| Parameter name | Type          | Required | Description    |
+|----------------|---------------|----------|----------------|
+| apiKey         | String        | Yes      | apiKey         |
+| userId         | String        | Yes      | userId         |
+| file           | MultipartFile | Yes      | File to upload |
+
+#### Response Parameters
+
+FileUploadResponse
+
+| Parameter name | Type    | Description        |
+|----------------|---------|--------------------|
+| id             | String  | File id            |
+| name           | String  | File name          |
+| size           | Integer | File size (bytes)  |
+| extension      | String  | File extension     |
+| mimeType       | String  | File MIME type     |
+| createdBy      | String  | Creator            |
+| createdAt      | Long    | Creation timestamp |
+

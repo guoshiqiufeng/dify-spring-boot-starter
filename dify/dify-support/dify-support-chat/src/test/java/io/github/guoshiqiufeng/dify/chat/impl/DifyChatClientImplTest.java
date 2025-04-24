@@ -26,6 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
@@ -331,5 +332,31 @@ class DifyChatClientImplTest {
         assertEquals(expectedResponse.getOpeningStatement(), actualResponse.getOpeningStatement());
         assertEquals(expectedResponse.getSpeechToText(), actualResponse.getSpeechToText());
         verify(difyChatClient, times(1)).parameters(apiKey);
+    }
+
+    @Test
+    void testFileUpload() {
+        // Arrange
+        String apiKey = "test-api-key";
+
+        FileUploadRequest request = new FileUploadRequest();
+        request.setFile(mock(MultipartFile.class));
+        request.setUserId("0524");
+        request.setApiKey(apiKey);
+
+        FileUploadResponse expectedResponse = new FileUploadResponse();
+        expectedResponse.setId("72fa9618-8f89-4a37-9b33-7e1178a24a67");
+        expectedResponse.setName("example.png");
+
+        when(difyChatClient.fileUpload(any(FileUploadRequest.class))).thenReturn(expectedResponse);
+
+        // Act
+        FileUploadResponse actualResponse = difyChat.fileUpload(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getName(), actualResponse.getName());
+        verify(difyChatClient, times(1)).fileUpload(request);
     }
 }

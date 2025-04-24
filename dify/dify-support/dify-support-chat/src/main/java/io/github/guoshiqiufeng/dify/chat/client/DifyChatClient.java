@@ -136,4 +136,12 @@ public interface DifyChatClient {
      */
     AppParametersResponseVO parameters(String apiKey);
 
+    /**
+     * file upload
+     *
+     * @param request file upload param
+     * @return file upload response
+     * @since 0.10.0
+     */
+    FileUploadResponse fileUpload(FileUploadRequest request);
 }

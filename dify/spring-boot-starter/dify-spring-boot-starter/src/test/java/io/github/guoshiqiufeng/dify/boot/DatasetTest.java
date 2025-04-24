@@ -575,7 +575,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
     /**
      * Create a test file for document upload tests
      */
-    private static MultipartFile createTestFile(String fileName, String contentType) throws IOException {
+    public static MultipartFile createTestFile(String fileName, String contentType) throws IOException {
         InputStream inputStream = DatasetTest.class.getClassLoader().getResourceAsStream(fileName);
         if (inputStream == null) {
             // Create a simple file if the test.txt resource doesn't exist

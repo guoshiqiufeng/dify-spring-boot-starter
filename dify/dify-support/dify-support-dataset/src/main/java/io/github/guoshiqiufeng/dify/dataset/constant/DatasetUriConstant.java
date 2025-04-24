@@ -67,4 +67,6 @@ public interface DatasetUriConstant {
     String V1_METADATA_LIST_URL = V1_METADATA_CREATE_URL;
 
     String V1_TEXT_EMBEDDING_LIST_URL = V1_URL + "/workspaces/current/models/model-types/text-embedding";
+
+    String V1_FILES_UPLOAD = V1_URL + "/files/upload";
 }
