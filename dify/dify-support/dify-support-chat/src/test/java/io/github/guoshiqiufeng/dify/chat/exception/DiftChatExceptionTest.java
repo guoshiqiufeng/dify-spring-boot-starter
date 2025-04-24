@@ -32,10 +32,6 @@ class DiftChatExceptionTest {
     void testExceptionMessage() {
         DiftChatException exception = new DiftChatException(DiftChatExceptionEnum.DIFY_TTS_IS_NOT_ENABLED);
 
-        String expectedMessage = String.format("%s[%d]",
-                DiftChatExceptionEnum.DIFY_TTS_IS_NOT_ENABLED.getMsg(),
-                DiftChatExceptionEnum.DIFY_TTS_IS_NOT_ENABLED.getCode());
-
-        assertEquals(expectedMessage, exception.getMessage());
+        assertEquals(DiftChatExceptionEnum.DIFY_TTS_IS_NOT_ENABLED.getMsg(), exception.getMessage());
     }
 }
