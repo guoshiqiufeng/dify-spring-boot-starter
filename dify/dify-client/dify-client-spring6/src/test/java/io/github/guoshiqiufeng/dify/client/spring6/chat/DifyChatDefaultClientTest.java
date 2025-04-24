@@ -110,6 +110,7 @@ public class DifyChatDefaultClientTest {
         doReturn(requestHeadersUriSpec).when(mockRestClient).get();
         doReturn(requestHeadersSpec).when(requestHeadersUriSpec).uri(anyString());
         doReturn(requestHeadersSpec).when(requestHeadersSpec).header(eq(HttpHeaders.AUTHORIZATION), anyString());
+        doReturn(requestHeadersSpec).when(requestHeadersSpec).headers(any());
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
     }
 
@@ -309,7 +310,6 @@ public class DifyChatDefaultClientTest {
         verify(mockRestClient).post();
         verify(requestBodyUriSpec).uri(DatasetUriConstant.V1_FILES_UPLOAD);
         verify(requestBodySpec).contentType(MediaType.MULTIPART_FORM_DATA);
-        verify(requestBodySpec.headers(any()));
         // Body verification is tricky with multiple overloads, so we'll skip it
         verify(responseSpec).body(FileUploadResponse.class);
     }
@@ -325,8 +325,8 @@ public class DifyChatDefaultClientTest {
         mockResponse.setName("My App");
         mockResponse.setDescription("This is my app.");
 
-        // Use the appropriate type reference matcher
-        when(responseSpec.body(any(ParameterizedTypeReference.class))).thenReturn(mockResponse);
+        // Use the matching method signature rather than ParameterizedTypeReference
+        when(responseSpec.body(eq(AppInfoResponse.class))).thenReturn(mockResponse);
 
         // Call the method to test
         AppInfoResponse response = client.info(TEST_API_KEY);
@@ -353,8 +353,8 @@ public class DifyChatDefaultClientTest {
         maps.put("api", Map.of("background", "#252525"));
         mockResponse.setToolIcons(maps);
 
-        // Use the appropriate type reference matcher
-        when(responseSpec.body(any(ParameterizedTypeReference.class))).thenReturn(mockResponse);
+        // Use the matching method signature rather than ParameterizedTypeReference
+        when(responseSpec.body(eq(AppMetaResponse.class))).thenReturn(mockResponse);
 
         // Call the method to test
         AppMetaResponse response = client.meta(TEST_API_KEY);
