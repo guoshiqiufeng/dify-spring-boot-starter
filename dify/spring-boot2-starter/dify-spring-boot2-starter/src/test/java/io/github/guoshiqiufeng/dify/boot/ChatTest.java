@@ -202,4 +202,19 @@ public class ChatTest extends BaseChatContainerTest {
         request.setUserId(userId);
         difyChat.fileUpload(request);
     }
+
+    @Test
+    @Order(21)
+    @DisplayName("Test info")
+    public void testInfo() {
+        AppInfoResponse info = difyChat.info(apiKey);
+        assertNotNull(info);
+    }
+
+    @Test
+    @Order(22)
+    @DisplayName("Test meta")
+    public void testMeta() {
+        AppMetaResponse meta = difyChat.meta(apiKey);
+    }
 }

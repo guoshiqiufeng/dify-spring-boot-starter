@@ -105,4 +105,14 @@ public class DifyChatClientImpl implements DifyChat {
     public FileUploadResponse fileUpload(FileUploadRequest request) {
         return difyChatClient.fileUpload(request);
     }
+
+    @Override
+    public AppInfoResponse info(String apiKey) {
+        return difyChatClient.info(apiKey);
+    }
+
+    @Override
+    public AppMetaResponse meta(String apiKey) {
+        return difyChatClient.meta(apiKey);
+    }
 }

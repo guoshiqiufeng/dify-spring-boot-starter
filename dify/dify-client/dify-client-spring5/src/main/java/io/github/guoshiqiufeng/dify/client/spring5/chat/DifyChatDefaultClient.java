@@ -325,6 +325,26 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
                 .bodyToMono(FileUploadResponse.class).block();
     }
 
+    @Override
+    public AppInfoResponse info(String apiKey) {
+        return webClient.get()
+                .uri(DatasetUriConstant.V1_INFO)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
+                .retrieve()
+                .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(AppInfoResponse.class).block();
+    }
+
+    @Override
+    public AppMetaResponse meta(String apiKey) {
+        return webClient.get()
+                .uri(DatasetUriConstant.V1_META)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
+                .retrieve()
+                .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(AppMetaResponse.class).block();
+    }
+
     private ChatMessageVO builderChatMessage(ResponseModeEnum responseMode, ChatMessageSendRequest sendRequest) {
         ChatMessageVO chatMessage = new ChatMessageVO();
         chatMessage.setResponseMode(responseMode);
