@@ -1,3 +1,12 @@
+subprojects {
+    dependencies {
+        testImplementation "org.mockito:mockito-core:${mockitoVersion}"
+        testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
+        testImplementation "net.bytebuddy:byte-buddy:${bytebuddyVersion}"
+        testImplementation "net.bytebuddy:byte-buddy-agent:${bytebuddyVersion}"
+        testImplementation "io.projectreactor:reactor-test"
+    }
+}
 tasks.matching {
     it.name == 'publishToMavenCentralPortal'
             || it.name == 'publishMavenJavaPublicationToLocalRepository'

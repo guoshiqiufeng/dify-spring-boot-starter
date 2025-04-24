@@ -7,7 +7,9 @@ ext {
             springBoot3Version = '3.4.4',
             springBoot2Version = '2.7.18',
             hutoolVersion = '5.8.36',
-            testcontainersVersion = '1.20.6'
+            testcontainersVersion = '1.20.6',
+            mockitoVersion = '5.17.0',
+            bytebuddyVersion = '1.15.11'
     ]
 
     lib = [
