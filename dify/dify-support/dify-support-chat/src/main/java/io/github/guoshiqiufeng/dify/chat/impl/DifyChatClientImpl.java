@@ -100,4 +100,9 @@ public class DifyChatClientImpl implements DifyChat {
     public DifyTextVO audioToText(AudioToTextRequest request) {
         return difyChatClient.audioToText(request);
     }
+
+    @Override
+    public FileUploadResponse fileUpload(FileUploadRequest request) {
+        return difyChatClient.fileUpload(request);
+    }
 }

@@ -25,9 +25,12 @@ import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
+import org.springframework.http.MediaType;
+import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -187,5 +190,16 @@ public class ChatTest extends BaseChatContainerTest {
     @DisplayName("Test delete conversation")
     public void testDeleteConversation() {
         difyChat.deleteConversation(conversationId, apiKey, userId);
+    }
+
+    @Test
+    @Order(20)
+    @DisplayName("Test file upload")
+    public void testFileUpload() throws IOException {
+        MultipartFile testFile = DatasetTest.createTestFile("chat.txt", MediaType.TEXT_PLAIN_VALUE);
+        FileUploadRequest request = new FileUploadRequest(testFile);
+        request.setApiKey(apiKey);
+        request.setUserId(userId);
+        difyChat.fileUpload(request);
     }
 }

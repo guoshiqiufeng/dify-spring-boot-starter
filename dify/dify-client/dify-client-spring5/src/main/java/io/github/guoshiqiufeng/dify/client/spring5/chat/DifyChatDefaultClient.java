@@ -21,7 +21,10 @@ import io.github.guoshiqiufeng.dify.chat.client.DifyChatClient;
 import io.github.guoshiqiufeng.dify.chat.constant.ChatUriConstant;
 import io.github.guoshiqiufeng.dify.chat.dto.request.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.*;
+import io.github.guoshiqiufeng.dify.chat.exception.DiftChatException;
+import io.github.guoshiqiufeng.dify.chat.exception.DiftChatExceptionEnum;
 import io.github.guoshiqiufeng.dify.client.spring5.base.BaseDifyDefaultClient;
+import io.github.guoshiqiufeng.dify.client.spring5.utils.DatasetHeaderUtils;
 import io.github.guoshiqiufeng.dify.client.spring5.utils.MultipartInputStreamFileResource;
 import io.github.guoshiqiufeng.dify.client.spring5.utils.WebClientUtil;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
@@ -30,8 +33,10 @@ import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
 import io.github.guoshiqiufeng.dify.core.pojo.request.ChatMessageVO;
 import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
+import io.github.guoshiqiufeng.dify.dataset.constant.DatasetUriConstant;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
@@ -281,6 +286,43 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(new ParameterizedTypeReference<AppParametersResponseVO>() {
                 }).block();
+    }
+
+    @Override
+    public FileUploadResponse fileUpload(FileUploadRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        Assert.notNull(request.getFile(), "file must not be null");
+        Assert.notNull(request.getUserId(), "userId must not be null");
+        Assert.notNull(request.getApiKey(), "apiKey must not be null");
+
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+
+        try {
+            // Get file content and type
+            byte[] fileContent = request.getFile().getBytes();
+            String contentType = request.getFile().getContentType();
+            contentType = (StrUtil.isEmpty(contentType)) ? MediaType.TEXT_PLAIN_VALUE : contentType;
+
+            // Add file part
+            builder.part("file", fileContent)
+                    .header("Content-Disposition",
+                            "form-data; name=\"file\"; filename=\"" + request.getFile().getOriginalFilename() + "\"")
+                    .header("Content-Type", contentType);
+            request.setFile(null);
+
+            builder.part("user", request.getUserId());
+        } catch (IOException e) {
+            throw new DiftChatException(DiftChatExceptionEnum.DIFY_DATA_PARSING_FAILURE);
+        }
+
+        return webClient.post()
+                .uri(DatasetUriConstant.V1_FILES_UPLOAD)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request.getApiKey()).accept(h))
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .bodyValue(builder.build())
+                .retrieve()
+                .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(FileUploadResponse.class).block();
     }
 
     private ChatMessageVO builderChatMessage(ResponseModeEnum responseMode, ChatMessageSendRequest sendRequest) {

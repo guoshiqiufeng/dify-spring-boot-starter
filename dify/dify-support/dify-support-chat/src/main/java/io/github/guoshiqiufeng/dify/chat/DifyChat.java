@@ -132,4 +132,13 @@ public interface DifyChat {
      * @return DifyTextVO 文本响应对象，包含转换后的文本内容
      */
     DifyTextVO audioToText(AudioToTextRequest request);
+
+    /**
+     * 上传文件
+     *
+     * @param request 上传文件请求对象
+     * @return 上传文件结果
+     * @since 0.10.0
+     */
+    FileUploadResponse fileUpload(FileUploadRequest request);
 }
