@@ -16,19 +16,25 @@
 package io.github.guoshiqiufeng.dify.client.spring6.chat;
 
 import io.github.guoshiqiufeng.dify.chat.dto.request.ChatMessageSendRequest;
+import io.github.guoshiqiufeng.dify.chat.dto.request.FileUploadRequest;
 import io.github.guoshiqiufeng.dify.chat.dto.request.RenameConversationRequest;
 import io.github.guoshiqiufeng.dify.chat.dto.response.AppParametersResponseVO;
 import io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendResponse;
+import io.github.guoshiqiufeng.dify.chat.dto.response.FileUploadResponse;
 import io.github.guoshiqiufeng.dify.chat.dto.response.MessageConversationsResponse;
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.enums.ResponseModeEnum;
 import io.github.guoshiqiufeng.dify.core.pojo.request.ChatMessageVO;
+import io.github.guoshiqiufeng.dify.dataset.constant.DatasetUriConstant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
@@ -249,5 +255,100 @@ public class DifyChatDefaultClientTest {
         assertEquals("New Conversation Name", capturedBody.get("name"));
         assertEquals(false, capturedBody.get("auto_generate"));
         assertEquals("user-123", capturedBody.get("user"));
+    }
+
+    @Test
+    public void testFileUpload() {
+        // Create mock objects with more specific names to avoid confusion
+        RestClient mockClient = mock(RestClient.class);
+        RestClient.RequestBodyUriSpec mockUriSpec = mock(RestClient.RequestBodyUriSpec.class);
+        RestClient.RequestBodySpec mockBodySpec = mock(RestClient.RequestBodySpec.class);
+        RestClient.ResponseSpec mockResponseSpec = mock(RestClient.ResponseSpec.class);
+
+        // Create builder that returns our mocked client
+        RestClient.Builder mockClientBuilder = mock(RestClient.Builder.class);
+        when(mockClientBuilder.baseUrl(anyString())).thenReturn(mockClientBuilder);
+        when(mockClientBuilder.defaultHeaders(any())).thenReturn(mockClientBuilder);
+        when(mockClientBuilder.defaultCookies(any())).thenReturn(mockClientBuilder);
+        when(mockClientBuilder.build()).thenReturn(mockClient);
+
+        // Test data setup
+        String apiKey = "test-api-key";
+        String userId = "test-user-id";
+        String fileName = "test-file.txt";
+        String fileContent = "Test file content";
+        String fileId = "file-123456";
+
+        // Create mock file
+        MultipartFile mockFile = mock(MultipartFile.class);
+        when(mockFile.getOriginalFilename()).thenReturn(fileName);
+        when(mockFile.getContentType()).thenReturn("text/plain");
+        try {
+            when(mockFile.getBytes()).thenReturn(fileContent.getBytes());
+            when(mockFile.getInputStream()).thenReturn(new java.io.ByteArrayInputStream(fileContent.getBytes()));
+        } catch (java.io.IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Create request
+        FileUploadRequest request = new FileUploadRequest();
+        request.setApiKey(apiKey);
+        request.setUserId(userId);
+        request.setFile(mockFile);
+
+        // Create expected response
+        FileUploadResponse expectedResponse = new FileUploadResponse();
+        expectedResponse.setId(fileId);
+        expectedResponse.setName(fileName);
+        expectedResponse.setSize(fileContent.length());
+        expectedResponse.setMimeType("text/plain");
+
+        // Setup mock chain - THE KEY FIX: Use Mockito.any() instead of any() to ensure proper type matching
+        when(mockClient.post()).thenReturn(mockUriSpec);
+        when(mockUriSpec.uri(eq(DatasetUriConstant.V1_FILES_UPLOAD))).thenReturn(mockBodySpec);
+        when(mockBodySpec.header(eq(HttpHeaders.AUTHORIZATION), anyString())).thenReturn(mockBodySpec);
+        when(mockBodySpec.headers(any())).thenReturn(mockBodySpec);
+        when(mockBodySpec.contentType(eq(MediaType.MULTIPART_FORM_DATA))).thenReturn(mockBodySpec);
+
+        // Multiple body() mocks to catch different argument types
+        when(mockBodySpec.body(Mockito.any())).thenReturn(mockBodySpec);
+        when(mockBodySpec.body(Mockito.any(Object.class))).thenReturn(mockBodySpec);
+        when(mockBodySpec.body(Mockito.any(Map.class))).thenReturn(mockBodySpec);
+
+        // Make sure retrieve returns the response spec
+        when(mockBodySpec.retrieve()).thenReturn(mockResponseSpec);
+        when(mockResponseSpec.onStatus(any())).thenReturn(mockResponseSpec);
+        when(mockResponseSpec.body(eq(FileUploadResponse.class))).thenReturn(expectedResponse);
+
+        // Create the client instance with our mocks
+        DifyChatDefaultClient client = new DifyChatDefaultClient(
+                "https://api.dify.ai",
+                new DifyProperties.ClientConfig(),
+                mockClientBuilder,
+                WebClient.builder()
+        );
+
+        // Execute the method under test
+        FileUploadResponse actualResponse = client.fileUpload(request);
+
+        // Verify response
+        assertNotNull(actualResponse);
+        assertEquals(fileId, actualResponse.getId());
+        assertEquals(fileName, actualResponse.getName());
+        assertEquals(fileContent.length(), actualResponse.getSize());
+        assertEquals("text/plain", actualResponse.getMimeType());
+
+        // Verify basic interactions
+        verify(mockClient).post();
+        verify(mockUriSpec).uri(DatasetUriConstant.V1_FILES_UPLOAD);
+        verify(mockBodySpec).contentType(MediaType.MULTIPART_FORM_DATA);
+
+        // Capture the actual body to help diagnose issues
+        ArgumentCaptor<Object> bodyCaptor = ArgumentCaptor.forClass(Object.class);
+        verify(mockBodySpec).body(bodyCaptor.capture());
+        // Debug output of the actual body type would be helpful for future debugging
+        // System.out.println("Body class: " + bodyCaptor.getValue().getClass().getName());
+
+        verify(mockResponseSpec).body(FileUploadResponse.class);
     }
 }
