@@ -1,0 +1,921 @@
+/*
+ * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.github.guoshiqiufeng.dify.dataset.client;
+
+import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
+import io.github.guoshiqiufeng.dify.dataset.dto.RetrievalModel;
+import io.github.guoshiqiufeng.dify.dataset.dto.request.*;
+import io.github.guoshiqiufeng.dify.dataset.dto.response.*;
+import io.github.guoshiqiufeng.dify.dataset.dto.response.textembedding.TextEmbedding;
+import io.github.guoshiqiufeng.dify.dataset.enums.IndexingTechniqueEnum;
+import io.github.guoshiqiufeng.dify.dataset.enums.MetaDataActionEnum;
+import io.github.guoshiqiufeng.dify.dataset.enums.RerankingModeEnum;
+import io.github.guoshiqiufeng.dify.dataset.enums.SearchMethodEnum;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
+
+/**
+ * Tests for {@link DifyDatasetClient}.
+ *
+ * @author yanghq
+ * @version 0.10.0
+ * @since 2025/4/23 14:27
+ */
+class DifyDatasetClientTest {
+
+    private static DifyDatasetClient difyDatasetClient;
+
+    @BeforeAll
+    public static void setup() {
+        difyDatasetClient = Mockito.mock(DifyDatasetClient.class);
+    }
+
+    @Test
+    void testCreate() {
+        // Arrange
+        DatasetCreateRequest request = new DatasetCreateRequest();
+        request.setName("Test Dataset");
+        request.setDescription("Dataset for testing");
+        request.setIndexingTechnique(IndexingTechniqueEnum.HIGH_QUALITY);
+
+        DatasetResponse expectedResponse = new DatasetResponse();
+        expectedResponse.setId("dataset_123");
+        expectedResponse.setName("Test Dataset");
+        expectedResponse.setDescription("Dataset for testing");
+
+        when(difyDatasetClient.create(any(DatasetCreateRequest.class))).thenReturn(expectedResponse);
+
+        // Act
+        DatasetResponse actualResponse = difyDatasetClient.create(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getName(), actualResponse.getName());
+        assertEquals(expectedResponse.getDescription(), actualResponse.getDescription());
+        verify(difyDatasetClient, times(1)).create(any(DatasetCreateRequest.class));
+    }
+
+    @Test
+    void testPage() {
+        // Arrange
+        DatasetPageRequest request = new DatasetPageRequest();
+        request.setLimit(10);
+        request.setPage(1);
+
+        DatasetResponse dataset = new DatasetResponse();
+        dataset.setId("dataset_123");
+        dataset.setName("Test Dataset");
+
+        DifyPageResult<DatasetResponse> expectedResult = new DifyPageResult<>();
+        expectedResult.setData(List.of(dataset));
+        expectedResult.setLimit(10);
+        expectedResult.setHasMore(false);
+
+        when(difyDatasetClient.page(any(DatasetPageRequest.class))).thenReturn(expectedResult);
+
+        // Act
+        DifyPageResult<DatasetResponse> actualResult = difyDatasetClient.page(request);
+
+        // Assert
+        assertNotNull(actualResult);
+        assertEquals(expectedResult.getLimit(), actualResult.getLimit());
+        assertEquals(expectedResult.getHasMore(), actualResult.getHasMore());
+        assertEquals(expectedResult.getData().size(), actualResult.getData().size());
+        assertEquals(expectedResult.getData().get(0).getId(), actualResult.getData().get(0).getId());
+        verify(difyDatasetClient, times(1)).page(any(DatasetPageRequest.class));
+    }
+
+    @Test
+    void testDelete() {
+        // Arrange
+        String datasetId = "dataset_123";
+        String apiKey = "test_api_key";
+
+        doNothing().when(difyDatasetClient).delete(anyString(), anyString());
+
+        // Act
+        difyDatasetClient.delete(datasetId, apiKey);
+
+        // Assert
+        verify(difyDatasetClient, times(1)).delete(datasetId, apiKey);
+    }
+
+    @Test
+    void testCreateDocumentByText() {
+        // Arrange
+        DocumentCreateByTextRequest request = new DocumentCreateByTextRequest();
+        request.setDatasetId("dataset_123");
+        request.setName("Test Document");
+        request.setText("This is a test document content");
+        request.setIndexingTechnique(IndexingTechniqueEnum.HIGH_QUALITY);
+
+        DocumentInfo documentInfo = new DocumentInfo();
+        documentInfo.setId("doc_456");
+        documentInfo.setName("Test Document");
+
+        DocumentCreateResponse expectedResponse = new DocumentCreateResponse();
+        expectedResponse.setDocument(documentInfo);
+        expectedResponse.setBatch("batch_123");
+
+        when(difyDatasetClient.createDocumentByText(any(DocumentCreateByTextRequest.class)))
+                .thenReturn(expectedResponse);
+
+        // Act
+        DocumentCreateResponse actualResponse = difyDatasetClient.createDocumentByText(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertNotNull(actualResponse.getDocument());
+        assertEquals(expectedResponse.getDocument().getId(), actualResponse.getDocument().getId());
+        assertEquals(expectedResponse.getBatch(), actualResponse.getBatch());
+        verify(difyDatasetClient, times(1)).createDocumentByText(any(DocumentCreateByTextRequest.class));
+    }
+
+    @Test
+    void testCreateDocumentByFile() {
+        // Arrange
+        DocumentCreateByFileRequest request = new DocumentCreateByFileRequest();
+        request.setDatasetId("dataset_123");
+        request.setOriginalDocumentId("original_doc_123");
+        request.setFile(mock(MultipartFile.class));
+        request.setIndexingTechnique(IndexingTechniqueEnum.HIGH_QUALITY);
+
+        DocumentInfo documentInfo = new DocumentInfo();
+        documentInfo.setId("doc_789");
+        documentInfo.setName("Test File Document");
+
+        DocumentCreateResponse expectedResponse = new DocumentCreateResponse();
+        expectedResponse.setDocument(documentInfo);
+        expectedResponse.setBatch("batch_456");
+
+        when(difyDatasetClient.createDocumentByFile(any(DocumentCreateByFileRequest.class)))
+                .thenReturn(expectedResponse);
+
+        // Act
+        DocumentCreateResponse actualResponse = difyDatasetClient.createDocumentByFile(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertNotNull(actualResponse.getDocument());
+        assertEquals(expectedResponse.getDocument().getId(), actualResponse.getDocument().getId());
+        assertEquals(expectedResponse.getBatch(), actualResponse.getBatch());
+        verify(difyDatasetClient, times(1)).createDocumentByFile(any(DocumentCreateByFileRequest.class));
+    }
+
+    @Test
+    void testUpdateDocumentByText() {
+        // Arrange
+        DocumentUpdateByTextRequest request = new DocumentUpdateByTextRequest();
+        request.setDatasetId("dataset_123");
+        request.setDocumentId("doc_456");
+        request.setText("Updated content for the test document");
+        request.setIndexingTechnique(IndexingTechniqueEnum.HIGH_QUALITY);
+
+        DocumentInfo documentInfo = new DocumentInfo();
+        documentInfo.setId("doc_456");
+        documentInfo.setName("Test Document");
+
+        DocumentCreateResponse expectedResponse = new DocumentCreateResponse();
+        expectedResponse.setDocument(documentInfo);
+        expectedResponse.setBatch("batch_789");
+
+        when(difyDatasetClient.updateDocumentByText(any(DocumentUpdateByTextRequest.class)))
+                .thenReturn(expectedResponse);
+
+        // Act
+        DocumentCreateResponse actualResponse = difyDatasetClient.updateDocumentByText(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertNotNull(actualResponse.getDocument());
+        assertEquals(expectedResponse.getDocument().getId(), actualResponse.getDocument().getId());
+        assertEquals(expectedResponse.getBatch(), actualResponse.getBatch());
+        verify(difyDatasetClient, times(1)).updateDocumentByText(any(DocumentUpdateByTextRequest.class));
+    }
+
+    @Test
+    void testUpdateDocumentByFile() {
+        // Arrange
+        DocumentUpdateByFileRequest request = new DocumentUpdateByFileRequest();
+        request.setDatasetId("dataset_123");
+        request.setDocumentId("doc_789");
+        request.setName("Updated File Document");
+        request.setFile(mock(MultipartFile.class));
+        request.setIndexingTechnique(IndexingTechniqueEnum.HIGH_QUALITY);
+
+        DocumentInfo documentInfo = new DocumentInfo();
+        documentInfo.setId("doc_789");
+        documentInfo.setName("Updated File Document");
+
+        DocumentCreateResponse expectedResponse = new DocumentCreateResponse();
+        expectedResponse.setDocument(documentInfo);
+        expectedResponse.setBatch("batch_101");
+
+        when(difyDatasetClient.updateDocumentByFile(any(DocumentUpdateByFileRequest.class)))
+                .thenReturn(expectedResponse);
+
+        // Act
+        DocumentCreateResponse actualResponse = difyDatasetClient.updateDocumentByFile(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertNotNull(actualResponse.getDocument());
+        assertEquals(expectedResponse.getDocument().getId(), actualResponse.getDocument().getId());
+        assertEquals(expectedResponse.getBatch(), actualResponse.getBatch());
+        verify(difyDatasetClient, times(1)).updateDocumentByFile(any(DocumentUpdateByFileRequest.class));
+    }
+
+    @Test
+    void testPageDocument() {
+        // Arrange
+        DatasetPageDocumentRequest request = new DatasetPageDocumentRequest();
+        request.setDatasetId("dataset_123");
+        request.setLimit(20);
+        request.setPage(1);
+
+        DocumentInfo document = new DocumentInfo();
+        document.setId("doc_456");
+        document.setName("Test Document");
+
+        DifyPageResult<DocumentInfo> expectedResult = new DifyPageResult<>();
+        expectedResult.setData(List.of(document));
+        expectedResult.setLimit(20);
+        expectedResult.setHasMore(false);
+
+        when(difyDatasetClient.pageDocument(any(DatasetPageDocumentRequest.class)))
+                .thenReturn(expectedResult);
+
+        // Act
+        DifyPageResult<DocumentInfo> actualResult = difyDatasetClient.pageDocument(request);
+
+        // Assert
+        assertNotNull(actualResult);
+        assertEquals(expectedResult.getLimit(), actualResult.getLimit());
+        assertEquals(expectedResult.getData().size(), actualResult.getData().size());
+        assertEquals(expectedResult.getData().get(0).getId(), actualResult.getData().get(0).getId());
+        verify(difyDatasetClient, times(1)).pageDocument(any(DatasetPageDocumentRequest.class));
+    }
+
+    @Test
+    void testIndexingStatus() {
+        // Arrange
+        DocumentIndexingStatusRequest request = new DocumentIndexingStatusRequest();
+        request.setDatasetId("dataset_123");
+        request.setBatch("batch_123");
+
+        DocumentIndexingStatusResponse.ProcessingStatus processingStatus = new DocumentIndexingStatusResponse.ProcessingStatus();
+        processingStatus.setId("doc_456");
+        processingStatus.setIndexingStatus("completed");
+        processingStatus.setCompletedSegments(10);
+        processingStatus.setTotalSegments(10);
+
+        DocumentIndexingStatusResponse expectedResponse = new DocumentIndexingStatusResponse();
+        expectedResponse.setData(List.of(processingStatus));
+
+        when(difyDatasetClient.indexingStatus(any(DocumentIndexingStatusRequest.class)))
+                .thenReturn(expectedResponse);
+
+        // Act
+        DocumentIndexingStatusResponse actualResponse = difyDatasetClient.indexingStatus(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertNotNull(actualResponse.getData());
+        assertEquals(1, actualResponse.getData().size());
+        assertEquals(processingStatus.getId(), actualResponse.getData().get(0).getId());
+        assertEquals(processingStatus.getIndexingStatus(), actualResponse.getData().get(0).getIndexingStatus());
+        verify(difyDatasetClient, times(1)).indexingStatus(any(DocumentIndexingStatusRequest.class));
+    }
+
+    @Test
+    void testDeleteDocument() {
+        // Arrange
+        String datasetId = "dataset_123";
+        String documentId = "doc_456";
+        String apiKey = "test_api_key";
+
+        DocumentDeleteResponse expectedResponse = new DocumentDeleteResponse();
+        expectedResponse.setResult("success");
+
+        when(difyDatasetClient.deleteDocument(anyString(), anyString(), anyString()))
+                .thenReturn(expectedResponse);
+
+        // Act
+        DocumentDeleteResponse actualResponse = difyDatasetClient.deleteDocument(datasetId, documentId, apiKey);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getResult(), actualResponse.getResult());
+        verify(difyDatasetClient, times(1)).deleteDocument(datasetId, documentId, apiKey);
+    }
+
+    @Test
+    void testCreateSegment() {
+        // Arrange
+        SegmentCreateRequest request = new SegmentCreateRequest();
+        request.setDatasetId("dataset_123");
+        request.setDocumentId("doc_456");
+        request.setApiKey("test_api_key");
+
+        SegmentParam segmentParam = new SegmentParam();
+        segmentParam.setContent("Segment content");
+        segmentParam.setAnswer("Segment answer");
+        segmentParam.setKeywords(List.of("keyword1", "keyword2"));
+        request.setSegments(List.of(segmentParam));
+
+        SegmentData segmentData = new SegmentData();
+        segmentData.setId("seg_789");
+        segmentData.setContent("Segment content");
+
+        SegmentResponse expectedResponse = new SegmentResponse();
+        expectedResponse.setData(List.of(segmentData));
+        expectedResponse.setDocForm("text");
+
+        when(difyDatasetClient.createSegment(any(SegmentCreateRequest.class)))
+                .thenReturn(expectedResponse);
+
+        // Act
+        SegmentResponse actualResponse = difyDatasetClient.createSegment(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertNotNull(actualResponse.getData());
+        assertEquals(1, actualResponse.getData().size());
+        assertEquals(segmentData.getId(), actualResponse.getData().get(0).getId());
+        assertEquals(expectedResponse.getDocForm(), actualResponse.getDocForm());
+        verify(difyDatasetClient, times(1)).createSegment(any(SegmentCreateRequest.class));
+    }
+
+    @Test
+    void testPageSegment() {
+        // Arrange
+        SegmentPageRequest request = new SegmentPageRequest();
+        request.setDatasetId("dataset_123");
+        request.setDocumentId("doc_456");
+        request.setApiKey("test_api_key");
+        request.setKeyword("search term");
+        request.setStatus("enabled");
+
+        SegmentData segmentData = new SegmentData();
+        segmentData.setId("seg_789");
+        segmentData.setContent("Segment content");
+
+        SegmentResponse expectedResponse = new SegmentResponse();
+        expectedResponse.setData(List.of(segmentData));
+        expectedResponse.setDocForm("text");
+
+        when(difyDatasetClient.pageSegment(any(SegmentPageRequest.class)))
+                .thenReturn(expectedResponse);
+
+        // Act
+        SegmentResponse actualResponse = difyDatasetClient.pageSegment(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertNotNull(actualResponse.getData());
+        assertEquals(1, actualResponse.getData().size());
+        assertEquals(segmentData.getId(), actualResponse.getData().get(0).getId());
+        assertEquals(expectedResponse.getDocForm(), actualResponse.getDocForm());
+        verify(difyDatasetClient, times(1)).pageSegment(any(SegmentPageRequest.class));
+    }
+
+    @Test
+    void testDeleteSegment() {
+        // Arrange
+        String datasetId = "dataset_123";
+        String documentId = "doc_456";
+        String segmentId = "seg_789";
+        String apiKey = "test_api_key";
+
+        SegmentDeleteResponse expectedResponse = new SegmentDeleteResponse();
+        expectedResponse.setResult("success");
+
+        when(difyDatasetClient.deleteSegment(anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(expectedResponse);
+
+        // Act
+        SegmentDeleteResponse actualResponse = difyDatasetClient.deleteSegment(datasetId, documentId, segmentId, apiKey);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getResult(), actualResponse.getResult());
+        verify(difyDatasetClient, times(1)).deleteSegment(datasetId, documentId, segmentId, apiKey);
+    }
+
+    @Test
+    void testUpdateSegment() {
+        // Arrange
+        SegmentUpdateRequest request = new SegmentUpdateRequest();
+        request.setDatasetId("dataset_123");
+        request.setDocumentId("doc_456");
+        request.setSegmentId("seg_789");
+        request.setApiKey("test_api_key");
+
+        SegmentUpdateParam segmentParam = new SegmentUpdateParam();
+        segmentParam.setContent("Updated segment content");
+        segmentParam.setAnswer("Updated segment answer");
+        segmentParam.setKeywords(List.of("updated_keyword1", "updated_keyword2"));
+        segmentParam.setEnabled(true);
+        segmentParam.setRegenerateChildChunks(true);
+        request.setSegment(segmentParam);
+
+        SegmentData segmentData = new SegmentData();
+        segmentData.setId("seg_789");
+        segmentData.setContent("Updated segment content");
+
+        SegmentUpdateResponse expectedResponse = new SegmentUpdateResponse();
+        expectedResponse.setData(segmentData);
+        expectedResponse.setDocForm("text");
+
+        when(difyDatasetClient.updateSegment(any(SegmentUpdateRequest.class)))
+                .thenReturn(expectedResponse);
+
+        // Act
+        SegmentUpdateResponse actualResponse = difyDatasetClient.updateSegment(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertNotNull(actualResponse.getData());
+        assertEquals(segmentData.getId(), actualResponse.getData().getId());
+        assertEquals(expectedResponse.getDocForm(), actualResponse.getDocForm());
+        verify(difyDatasetClient, times(1)).updateSegment(any(SegmentUpdateRequest.class));
+    }
+
+    @Test
+    void testCreateSegmentChildChunk() {
+        // Arrange
+        SegmentChildChunkCreateRequest request = new SegmentChildChunkCreateRequest();
+        request.setDatasetId("dataset_123");
+        request.setDocumentId("doc_456");
+        request.setSegmentId("seg_789");
+        request.setContent("Child chunk content");
+        request.setApiKey("test_api_key");
+
+        SegmentChildChunkResponse childChunk = new SegmentChildChunkResponse();
+        childChunk.setId("chunk_123");
+        childChunk.setContent("Child chunk content");
+
+        SegmentChildChunkCreateResponse expectedResponse = new SegmentChildChunkCreateResponse();
+        expectedResponse.setData(childChunk);
+
+        when(difyDatasetClient.createSegmentChildChunk(any(SegmentChildChunkCreateRequest.class)))
+                .thenReturn(expectedResponse);
+
+        // Act
+        SegmentChildChunkCreateResponse actualResponse = difyDatasetClient.createSegmentChildChunk(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertNotNull(actualResponse.getData());
+        assertEquals(expectedResponse.getData().getId(), actualResponse.getData().getId());
+        assertEquals(expectedResponse.getData().getContent(), actualResponse.getData().getContent());
+        verify(difyDatasetClient, times(1)).createSegmentChildChunk(any(SegmentChildChunkCreateRequest.class));
+    }
+
+    @Test
+    void testPageSegmentChildChunk() {
+        // Arrange
+        SegmentChildChunkPageRequest request = new SegmentChildChunkPageRequest();
+        request.setDatasetId("dataset_123");
+        request.setDocumentId("doc_456");
+        request.setSegmentId("seg_789");
+        request.setLimit(10);
+        request.setPage(1);
+        request.setApiKey("test_api_key");
+
+        SegmentChildChunkResponse childChunk = new SegmentChildChunkResponse();
+        childChunk.setId("chunk_123");
+        childChunk.setContent("Child chunk content");
+
+        DifyPageResult<SegmentChildChunkResponse> expectedResult = new DifyPageResult<>();
+        expectedResult.setData(List.of(childChunk));
+        expectedResult.setLimit(10);
+        expectedResult.setHasMore(false);
+
+        when(difyDatasetClient.pageSegmentChildChunk(any(SegmentChildChunkPageRequest.class)))
+                .thenReturn(expectedResult);
+
+        // Act
+        DifyPageResult<SegmentChildChunkResponse> actualResult = difyDatasetClient.pageSegmentChildChunk(request);
+
+        // Assert
+        assertNotNull(actualResult);
+        assertEquals(expectedResult.getLimit(), actualResult.getLimit());
+        assertEquals(expectedResult.getData().size(), actualResult.getData().size());
+        assertEquals(expectedResult.getData().get(0).getId(), actualResult.getData().get(0).getId());
+        verify(difyDatasetClient, times(1)).pageSegmentChildChunk(any(SegmentChildChunkPageRequest.class));
+    }
+
+    @Test
+    void testDeleteSegmentChildChunk() {
+        // Arrange
+        SegmentChildChunkDeleteRequest request = new SegmentChildChunkDeleteRequest();
+        request.setDatasetId("dataset_123");
+        request.setDocumentId("doc_456");
+        request.setSegmentId("seg_789");
+        request.setChildChunkId("chunk_123");
+        request.setApiKey("test_api_key");
+
+        SegmentChildChunkDeleteResponse expectedResponse = new SegmentChildChunkDeleteResponse();
+        expectedResponse.setResult("success");
+
+        when(difyDatasetClient.deleteSegmentChildChunk(any(SegmentChildChunkDeleteRequest.class)))
+                .thenReturn(expectedResponse);
+
+        // Act
+        SegmentChildChunkDeleteResponse actualResponse = difyDatasetClient.deleteSegmentChildChunk(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getResult(), actualResponse.getResult());
+        verify(difyDatasetClient, times(1)).deleteSegmentChildChunk(any(SegmentChildChunkDeleteRequest.class));
+    }
+
+    @Test
+    void testUpdateSegmentChildChunk() {
+        // Arrange
+        SegmentChildChunkUpdateRequest request = new SegmentChildChunkUpdateRequest();
+        request.setDatasetId("dataset_123");
+        request.setDocumentId("doc_456");
+        request.setSegmentId("seg_789");
+        request.setChildChunkId("chunk_123");
+        request.setContent("Updated child chunk content");
+        request.setApiKey("test_api_key");
+
+        SegmentChildChunkResponse childChunk = new SegmentChildChunkResponse();
+        childChunk.setId("chunk_123");
+        childChunk.setContent("Updated child chunk content");
+
+        SegmentChildChunkUpdateResponse expectedResponse = new SegmentChildChunkUpdateResponse();
+        expectedResponse.setData(childChunk);
+
+        when(difyDatasetClient.updateSegmentChildChunk(any(SegmentChildChunkUpdateRequest.class)))
+                .thenReturn(expectedResponse);
+
+        // Act
+        SegmentChildChunkUpdateResponse actualResponse = difyDatasetClient.updateSegmentChildChunk(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertNotNull(actualResponse.getData());
+        assertEquals(expectedResponse.getData().getId(), actualResponse.getData().getId());
+        assertEquals(expectedResponse.getData().getContent(), actualResponse.getData().getContent());
+        verify(difyDatasetClient, times(1)).updateSegmentChildChunk(any(SegmentChildChunkUpdateRequest.class));
+    }
+
+    @Test
+    void testUploadFileInfo() {
+        // Arrange
+        String datasetId = "dataset_123";
+        String documentId = "doc_456";
+        String apiKey = "test_api_key";
+
+        UploadFileInfoResponse expectedResponse = new UploadFileInfoResponse();
+        expectedResponse.setId("file_789");
+        expectedResponse.setName("test-file.pdf");
+        expectedResponse.setSize(1024);
+        expectedResponse.setExtension("pdf");
+        expectedResponse.setUrl("https://example.com/files/file_789");
+        expectedResponse.setDownloadUrl("https://example.com/files/download/file_789");
+        expectedResponse.setMimeType("application/pdf");
+        expectedResponse.setCreatedBy("user123");
+        expectedResponse.setCreatedAt(System.currentTimeMillis());
+
+        when(difyDatasetClient.uploadFileInfo(anyString(), anyString(), anyString()))
+                .thenReturn(expectedResponse);
+
+        // Act
+        UploadFileInfoResponse actualResponse = difyDatasetClient.uploadFileInfo(datasetId, documentId, apiKey);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getName(), actualResponse.getName());
+        assertEquals(expectedResponse.getSize(), actualResponse.getSize());
+        assertEquals(expectedResponse.getExtension(), actualResponse.getExtension());
+        assertEquals(expectedResponse.getUrl(), actualResponse.getUrl());
+        assertEquals(expectedResponse.getDownloadUrl(), actualResponse.getDownloadUrl());
+        assertEquals(expectedResponse.getMimeType(), actualResponse.getMimeType());
+        assertEquals(expectedResponse.getCreatedBy(), actualResponse.getCreatedBy());
+        assertEquals(expectedResponse.getCreatedAt(), actualResponse.getCreatedAt());
+        verify(difyDatasetClient, times(1)).uploadFileInfo(datasetId, documentId, apiKey);
+    }
+
+    @Test
+    void testRetrieve() {
+        // Arrange
+        RetrieveRequest request = new RetrieveRequest();
+        request.setQuery("Test query");
+
+        // 创建检索模型设置
+        RetrievalModel retrievalModel = new RetrievalModel();
+        retrievalModel.setSearchMethod(SearchMethodEnum.hybrid_search);
+        retrievalModel.setTopK(5);
+        retrievalModel.setRerankingEnable(true);
+        retrievalModel.setRerankingMode(RerankingModeEnum.weighted_score);
+        request.setRetrievalModel(retrievalModel);
+
+        request.setDatasetId("dataset_123");
+        request.setApiKey("test_api_key");
+
+        // 创建响应内容
+        RetrieveResponse expectedResponse = new RetrieveResponse();
+
+        // 设置查询信息
+        RetrieveResponse.RetrieveQuery query = new RetrieveResponse.RetrieveQuery();
+        query.setContent("Test query");
+        expectedResponse.setQuery(query);
+
+        // 设置检索记录
+        List<RetrieveResponse.RetrieveRecord> records = new ArrayList<>();
+
+        // 创建检索片段
+        RetrieveResponse.Segment segment = new RetrieveResponse.Segment();
+        segment.setId("seg_123");
+        segment.setPosition(1);
+        segment.setDocumentId("doc_456");
+        segment.setContent("Relevant content");
+        segment.setKeywords(List.of("test", "query", "relevant"));
+        segment.setWordCount(3);
+        segment.setTokens(15);
+        segment.setEnabled("true");
+        segment.setStatus("available");
+
+        // 创建文档信息
+        RetrieveResponse.Document document = new RetrieveResponse.Document();
+        document.setId("doc_456");
+        document.setDataSourceType("text");
+        document.setName("Test Document");
+        document.setDocType("pdf");
+        segment.setDocument(document);
+
+        // 创建检索记录
+        RetrieveResponse.RetrieveRecord record = new RetrieveResponse.RetrieveRecord();
+        record.setSegment(segment);
+        record.setScore(0.95f);
+
+        // 创建TSNE位置
+        RetrieveResponse.TsnePosition tsnePosition = new RetrieveResponse.TsnePosition();
+        tsnePosition.setX(0.5f);
+        tsnePosition.setY(0.7f);
+        record.setTsnePosition(tsnePosition);
+
+        records.add(record);
+        expectedResponse.setRecords(records);
+
+        when(difyDatasetClient.retrieve(any(RetrieveRequest.class)))
+                .thenReturn(expectedResponse);
+
+        // Act
+        RetrieveResponse actualResponse = difyDatasetClient.retrieve(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertNotNull(actualResponse.getQuery());
+        assertEquals("Test query", actualResponse.getQuery().getContent());
+
+        assertNotNull(actualResponse.getRecords());
+        assertEquals(1, actualResponse.getRecords().size());
+
+        RetrieveResponse.RetrieveRecord actualRecord = actualResponse.getRecords().get(0);
+        assertEquals(0.95f, actualRecord.getScore());
+        assertNotNull(actualRecord.getTsnePosition());
+        assertEquals(0.5f, actualRecord.getTsnePosition().getX());
+        assertEquals(0.7f, actualRecord.getTsnePosition().getY());
+
+        RetrieveResponse.Segment actualSegment = actualRecord.getSegment();
+        assertNotNull(actualSegment);
+        assertEquals("seg_123", actualSegment.getId());
+        assertEquals("Relevant content", actualSegment.getContent());
+        assertEquals("doc_456", actualSegment.getDocumentId());
+
+        assertNotNull(actualSegment.getDocument());
+        assertEquals("doc_456", actualSegment.getDocument().getId());
+        assertEquals("Test Document", actualSegment.getDocument().getName());
+
+        verify(difyDatasetClient, times(1)).retrieve(any(RetrieveRequest.class));
+    }
+
+    @Test
+    void testCreateMetaData() {
+        // Arrange
+        MetaDataCreateRequest request = new MetaDataCreateRequest();
+        request.setDatasetId("dataset_123");
+        request.setName("category");
+        request.setType("string");
+        request.setApiKey("test_api_key");
+
+        // 注意：根据MetaDataCreateRequest.java的定义，它不包含setMetaData方法
+        // 类中只有datasetId, type和name字段
+
+        MetaDataResponse expectedResponse = new MetaDataResponse();
+        expectedResponse.setId("meta_123");
+        expectedResponse.setName("category");
+
+        when(difyDatasetClient.createMetaData(any(MetaDataCreateRequest.class)))
+                .thenReturn(expectedResponse);
+
+        // Act
+        MetaDataResponse actualResponse = difyDatasetClient.createMetaData(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getName(), actualResponse.getName());
+        verify(difyDatasetClient, times(1)).createMetaData(any(MetaDataCreateRequest.class));
+    }
+
+    @Test
+    void testUpdateMetaData() {
+        // Arrange
+        MetaDataUpdateRequest request = new MetaDataUpdateRequest();
+        request.setDatasetId("dataset_123");
+        request.setMetaDataId("meta_123");
+        request.setName("Updated Metadata");
+        request.setApiKey("test_api_key");
+
+        MetaDataResponse expectedResponse = new MetaDataResponse();
+        expectedResponse.setId("meta_123");
+        expectedResponse.setName("Updated Metadata");
+
+        when(difyDatasetClient.updateMetaData(any(MetaDataUpdateRequest.class)))
+                .thenReturn(expectedResponse);
+
+        // Act
+        MetaDataResponse actualResponse = difyDatasetClient.updateMetaData(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getName(), actualResponse.getName());
+        verify(difyDatasetClient, times(1)).updateMetaData(any(MetaDataUpdateRequest.class));
+    }
+
+    @Test
+    void testDeleteMetaData() {
+        // Arrange
+        String datasetId = "dataset_123";
+        String metadataId = "meta_123";
+        String apiKey = "test_api_key";
+
+        doNothing().when(difyDatasetClient).deleteMetaData(anyString(), anyString(), anyString());
+
+        // Act
+        difyDatasetClient.deleteMetaData(datasetId, metadataId, apiKey);
+
+        // Assert
+        verify(difyDatasetClient, times(1)).deleteMetaData(datasetId, metadataId, apiKey);
+    }
+
+    @Test
+    void testActionMetaData() {
+        // Arrange
+        MetaDataActionRequest request = new MetaDataActionRequest();
+        request.setDatasetId("dataset_123");
+        request.setAction(MetaDataActionEnum.enable);
+        request.setApiKey("test_api_key");
+
+        doNothing().when(difyDatasetClient).actionMetaData(any(MetaDataActionRequest.class));
+
+        // Act
+        difyDatasetClient.actionMetaData(request);
+
+        // Assert
+        verify(difyDatasetClient, times(1)).actionMetaData(any(MetaDataActionRequest.class));
+    }
+
+    @Test
+    void testUpdateDocumentMetaData() {
+        // Arrange
+        DocumentMetaDataUpdateRequest request = new DocumentMetaDataUpdateRequest();
+        request.setDatasetId("dataset_123");
+        request.setApiKey("test_api_key");
+
+        // 创建操作数据
+        DocumentMetaDataUpdateRequest.OperationData operationData = new DocumentMetaDataUpdateRequest.OperationData();
+        operationData.setDocumentId("doc_456");
+
+        // 添加元数据列表
+        List<MetaData> metadataList = new ArrayList<>();
+        MetaData metaData = new MetaData();
+        metaData.setId("meta_123");
+        metaData.setType("string");
+        metaData.setName("category");
+        metaData.setValue("Technical");
+        metadataList.add(metaData);
+
+        operationData.setMetadataList(metadataList);
+
+        // 设置操作数据
+        request.setOperationData(List.of(operationData));
+
+        doNothing().when(difyDatasetClient).updateDocumentMetaData(any(DocumentMetaDataUpdateRequest.class));
+
+        // Act
+        difyDatasetClient.updateDocumentMetaData(request);
+
+        // Assert
+        verify(difyDatasetClient, times(1)).updateDocumentMetaData(any(DocumentMetaDataUpdateRequest.class));
+    }
+
+    @Test
+    void testListMetaData() {
+        // Arrange
+        String datasetId = "dataset_123";
+        String apiKey = "test_api_key";
+
+        MetaDataListResponse expectedResponse = new MetaDataListResponse();
+        expectedResponse.setBuiltInFieldEnabled(true);
+
+        // 创建文档元数据列表
+        List<MetaDataListResponse.DocMetadata> docMetadataList = new ArrayList<>();
+
+        MetaDataListResponse.DocMetadata docMetadata = new MetaDataListResponse.DocMetadata();
+        docMetadata.setId("meta_123");
+        docMetadata.setType("string");
+        docMetadata.setName("category");
+        docMetadata.setUserCount(5);
+
+        docMetadataList.add(docMetadata);
+        expectedResponse.setDocMetadata(docMetadataList);
+
+        when(difyDatasetClient.listMetaData(anyString(), anyString()))
+                .thenReturn(expectedResponse);
+
+        // Act
+        MetaDataListResponse actualResponse = difyDatasetClient.listMetaData(datasetId, apiKey);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getBuiltInFieldEnabled(), actualResponse.getBuiltInFieldEnabled());
+        assertNotNull(actualResponse.getDocMetadata());
+        assertEquals(expectedResponse.getDocMetadata().size(), actualResponse.getDocMetadata().size());
+        assertEquals(expectedResponse.getDocMetadata().get(0).getId(), actualResponse.getDocMetadata().get(0).getId());
+        assertEquals(expectedResponse.getDocMetadata().get(0).getName(), actualResponse.getDocMetadata().get(0).getName());
+        assertEquals(expectedResponse.getDocMetadata().get(0).getType(), actualResponse.getDocMetadata().get(0).getType());
+        assertEquals(expectedResponse.getDocMetadata().get(0).getUserCount(), actualResponse.getDocMetadata().get(0).getUserCount());
+        verify(difyDatasetClient, times(1)).listMetaData(datasetId, apiKey);
+    }
+
+    @Test
+    void testListTextEmbedding() {
+        // Arrange
+        String apiKey = "test_api_key";
+
+        List<TextEmbedding> embeddingList = new ArrayList<>();
+
+        TextEmbedding embedding1 = new TextEmbedding();
+        embedding1.setProvider("openai");
+        embedding1.setStatus("active");
+
+        TextEmbedding embedding2 = new TextEmbedding();
+        embedding2.setProvider("anthropic");
+        embedding2.setStatus("active");
+
+        embeddingList.add(embedding1);
+        embeddingList.add(embedding2);
+
+        TextEmbeddingListResponse expectedResponse = new TextEmbeddingListResponse();
+        expectedResponse.setData(embeddingList);
+
+        when(difyDatasetClient.listTextEmbedding(anyString()))
+                .thenReturn(expectedResponse);
+
+        // Act
+        TextEmbeddingListResponse actualResponse = difyDatasetClient.listTextEmbedding(apiKey);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertNotNull(actualResponse.getData());
+        assertEquals(expectedResponse.getData().size(), actualResponse.getData().size());
+        assertEquals("openai", actualResponse.getData().get(0).getProvider());
+        assertEquals("anthropic", actualResponse.getData().get(1).getProvider());
+        assertEquals("active", actualResponse.getData().get(0).getStatus());
+        verify(difyDatasetClient, times(1)).listTextEmbedding(apiKey);
+    }
+}

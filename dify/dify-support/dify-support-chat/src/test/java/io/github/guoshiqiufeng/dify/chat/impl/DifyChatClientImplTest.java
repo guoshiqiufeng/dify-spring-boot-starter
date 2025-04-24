@@ -13,14 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.chat.client;
+package io.github.guoshiqiufeng.dify.chat.impl;
 
+import io.github.guoshiqiufeng.dify.chat.DifyChat;
+import io.github.guoshiqiufeng.dify.chat.client.DifyChatClient;
 import io.github.guoshiqiufeng.dify.chat.dto.request.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.parameter.Enabled;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
@@ -31,25 +33,25 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
- * Tests for {@link DifyChatClient}.
+ * Tests for {@link DifyChatClientImpl}.
  *
  * @author yanghq
  * @version 0.10.0
- * @since 2025/4/23 14:12
+ * @since 2025/4/24 08:12
  */
-class DefaultDifyChatClientTest {
+class DifyChatClientImplTest {
 
+    private DifyChat difyChat;
 
-    private static DifyChatClient difyChatClient;
+    private DifyChatClient difyChatClient;
 
-    @BeforeAll
-    public static void setup() {
+    @BeforeEach
+    void setUp() {
         difyChatClient = Mockito.mock(DifyChatClient.class);
+        difyChat = new DifyChatClientImpl(difyChatClient);
     }
 
     @Test
@@ -66,7 +68,7 @@ class DefaultDifyChatClientTest {
         when(difyChatClient.chat(any(ChatMessageSendRequest.class))).thenReturn(expectedResponse);
 
         // Act
-        ChatMessageSendResponse actualResponse = difyChatClient.chat(request);
+        ChatMessageSendResponse actualResponse = difyChat.send(request);
 
         // Assert
         assertNotNull(actualResponse);
@@ -97,7 +99,7 @@ class DefaultDifyChatClientTest {
         when(difyChatClient.streamingChat(any(ChatMessageSendRequest.class))).thenReturn(expectedFlux);
 
         // Act
-        Flux<ChatMessageSendCompletionResponse> actualFlux = difyChatClient.streamingChat(request);
+        Flux<ChatMessageSendCompletionResponse> actualFlux = difyChat.sendChatMessageStream(request);
 
         // Assert using StepVerifier
         StepVerifier.create(actualFlux)
@@ -118,7 +120,7 @@ class DefaultDifyChatClientTest {
         doNothing().when(difyChatClient).stopMessagesStream(anyString(), anyString(), anyString());
 
         // Act
-        difyChatClient.stopMessagesStream(apiKey, taskId, userId);
+        difyChat.stopMessagesStream(apiKey, taskId, userId);
 
         // Assert
         verify(difyChatClient, times(1)).stopMessagesStream(apiKey, taskId, userId);
@@ -137,7 +139,7 @@ class DefaultDifyChatClientTest {
         when(difyChatClient.messageFeedback(any(MessageFeedbackRequest.class))).thenReturn(expectedResponse);
 
         // Act
-        MessageFeedbackResponse actualResponse = difyChatClient.messageFeedback(request);
+        MessageFeedbackResponse actualResponse = difyChat.messageFeedback(request);
 
         // Assert
         assertNotNull(actualResponse);
@@ -163,7 +165,7 @@ class DefaultDifyChatClientTest {
         when(difyChatClient.conversations(any(MessageConversationsRequest.class))).thenReturn(expectedResult);
 
         // Act
-        DifyPageResult<MessageConversationsResponse> actualResult = difyChatClient.conversations(request);
+        DifyPageResult<MessageConversationsResponse> actualResult = difyChat.conversations(request);
 
         // Assert
         assertNotNull(actualResult);
@@ -193,7 +195,7 @@ class DefaultDifyChatClientTest {
         when(difyChatClient.messages(any(MessagesRequest.class))).thenReturn(expectedResult);
 
         // Act
-        DifyPageResult<MessagesResponseVO> actualResult = difyChatClient.messages(request);
+        DifyPageResult<MessagesResponseVO> actualResult = difyChat.messages(request);
 
         // Assert
         assertNotNull(actualResult);
@@ -219,7 +221,7 @@ class DefaultDifyChatClientTest {
         when(difyChatClient.messagesSuggested(anyString(), anyString(), anyString())).thenReturn(expectedSuggestions);
 
         // Act
-        List<String> actualSuggestions = difyChatClient.messagesSuggested(messageId, apiKey, userId);
+        List<String> actualSuggestions = difyChat.messagesSuggested(messageId, apiKey, userId);
 
         // Assert
         assertNotNull(actualSuggestions);
@@ -240,7 +242,7 @@ class DefaultDifyChatClientTest {
         doNothing().when(difyChatClient).deleteConversation(anyString(), anyString(), anyString());
 
         // Act
-        difyChatClient.deleteConversation(conversationId, apiKey, userId);
+        difyChat.deleteConversation(conversationId, apiKey, userId);
 
         // Assert
         verify(difyChatClient, times(1)).deleteConversation(conversationId, apiKey, userId);
@@ -258,7 +260,7 @@ class DefaultDifyChatClientTest {
         when(difyChatClient.textToAudio(any(TextToAudioRequest.class))).thenReturn(expectedResponse);
 
         // Act
-        ResponseEntity<byte[]> actualResponse = difyChatClient.textToAudio(request);
+        ResponseEntity<byte[]> actualResponse = difyChat.textToAudio(request);
 
         // Assert
         assertNotNull(actualResponse);
@@ -279,7 +281,7 @@ class DefaultDifyChatClientTest {
         when(difyChatClient.audioToText(any(AudioToTextRequest.class))).thenReturn(expectedResponse);
 
         // Act
-        DifyTextVO actualResponse = difyChatClient.audioToText(request);
+        DifyTextVO actualResponse = difyChat.audioToText(request);
 
         // Assert
         assertNotNull(actualResponse);
@@ -301,7 +303,7 @@ class DefaultDifyChatClientTest {
         when(difyChatClient.renameConversation(any(RenameConversationRequest.class))).thenReturn(expectedResponse);
 
         // Act
-        MessageConversationsResponse actualResponse = difyChatClient.renameConversation(request);
+        MessageConversationsResponse actualResponse = difyChat.renameConversation(request);
 
         // Assert
         assertNotNull(actualResponse);
@@ -322,7 +324,7 @@ class DefaultDifyChatClientTest {
         when(difyChatClient.parameters(anyString())).thenReturn(expectedResponse);
 
         // Act
-        AppParametersResponseVO actualResponse = difyChatClient.parameters(apiKey);
+        AppParametersResponseVO actualResponse = difyChat.parameters(apiKey);
 
         // Assert
         assertNotNull(actualResponse);

@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.dataset.client;
+package io.github.guoshiqiufeng.dify.dataset.impl;
 
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
+import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
+import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;
 import io.github.guoshiqiufeng.dify.dataset.dto.RetrievalModel;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.*;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.*;
@@ -39,19 +41,20 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
- * Tests for {@link DifyDatasetClient}.
+ * Tests for {@link DifyDatasetClientImpl}.
  *
  * @author yanghq
  * @version 0.10.0
- * @since 2025/4/23 14:27
+ * @since 2025/4/24 10:14
  */
-class DefaultDifyDatasetClientTest {
-
+public class DifyDatasetClientImplTest {
     private static DifyDatasetClient difyDatasetClient;
+    private static DifyDataset difyDataset;
 
     @BeforeAll
     public static void setup() {
         difyDatasetClient = Mockito.mock(DifyDatasetClient.class);
+        difyDataset = new DifyDatasetClientImpl(difyDatasetClient);
     }
 
     @Test
@@ -70,7 +73,7 @@ class DefaultDifyDatasetClientTest {
         when(difyDatasetClient.create(any(DatasetCreateRequest.class))).thenReturn(expectedResponse);
 
         // Act
-        DatasetResponse actualResponse = difyDatasetClient.create(request);
+        DatasetResponse actualResponse = difyDataset.create(request);
 
         // Assert
         assertNotNull(actualResponse);
@@ -99,7 +102,7 @@ class DefaultDifyDatasetClientTest {
         when(difyDatasetClient.page(any(DatasetPageRequest.class))).thenReturn(expectedResult);
 
         // Act
-        DifyPageResult<DatasetResponse> actualResult = difyDatasetClient.page(request);
+        DifyPageResult<DatasetResponse> actualResult = difyDataset.page(request);
 
         // Assert
         assertNotNull(actualResult);
@@ -119,7 +122,7 @@ class DefaultDifyDatasetClientTest {
         doNothing().when(difyDatasetClient).delete(anyString(), anyString());
 
         // Act
-        difyDatasetClient.delete(datasetId, apiKey);
+        difyDataset.delete(datasetId, apiKey);
 
         // Assert
         verify(difyDatasetClient, times(1)).delete(datasetId, apiKey);
@@ -146,7 +149,7 @@ class DefaultDifyDatasetClientTest {
                 .thenReturn(expectedResponse);
 
         // Act
-        DocumentCreateResponse actualResponse = difyDatasetClient.createDocumentByText(request);
+        DocumentCreateResponse actualResponse = difyDataset.createDocumentByText(request);
 
         // Assert
         assertNotNull(actualResponse);
@@ -177,7 +180,7 @@ class DefaultDifyDatasetClientTest {
                 .thenReturn(expectedResponse);
 
         // Act
-        DocumentCreateResponse actualResponse = difyDatasetClient.createDocumentByFile(request);
+        DocumentCreateResponse actualResponse = difyDataset.createDocumentByFile(request);
 
         // Assert
         assertNotNull(actualResponse);
@@ -208,7 +211,7 @@ class DefaultDifyDatasetClientTest {
                 .thenReturn(expectedResponse);
 
         // Act
-        DocumentCreateResponse actualResponse = difyDatasetClient.updateDocumentByText(request);
+        DocumentCreateResponse actualResponse = difyDataset.updateDocumentByText(request);
 
         // Assert
         assertNotNull(actualResponse);
@@ -240,7 +243,7 @@ class DefaultDifyDatasetClientTest {
                 .thenReturn(expectedResponse);
 
         // Act
-        DocumentCreateResponse actualResponse = difyDatasetClient.updateDocumentByFile(request);
+        DocumentCreateResponse actualResponse = difyDataset.updateDocumentByFile(request);
 
         // Assert
         assertNotNull(actualResponse);
@@ -271,7 +274,7 @@ class DefaultDifyDatasetClientTest {
                 .thenReturn(expectedResult);
 
         // Act
-        DifyPageResult<DocumentInfo> actualResult = difyDatasetClient.pageDocument(request);
+        DifyPageResult<DocumentInfo> actualResult = difyDataset.pageDocument(request);
 
         // Assert
         assertNotNull(actualResult);
@@ -301,7 +304,7 @@ class DefaultDifyDatasetClientTest {
                 .thenReturn(expectedResponse);
 
         // Act
-        DocumentIndexingStatusResponse actualResponse = difyDatasetClient.indexingStatus(request);
+        DocumentIndexingStatusResponse actualResponse = difyDataset.indexingStatus(request);
 
         // Assert
         assertNotNull(actualResponse);
@@ -326,7 +329,7 @@ class DefaultDifyDatasetClientTest {
                 .thenReturn(expectedResponse);
 
         // Act
-        DocumentDeleteResponse actualResponse = difyDatasetClient.deleteDocument(datasetId, documentId, apiKey);
+        DocumentDeleteResponse actualResponse = difyDataset.deleteDocument(datasetId, documentId, apiKey);
 
         // Assert
         assertNotNull(actualResponse);
@@ -360,7 +363,7 @@ class DefaultDifyDatasetClientTest {
                 .thenReturn(expectedResponse);
 
         // Act
-        SegmentResponse actualResponse = difyDatasetClient.createSegment(request);
+        SegmentResponse actualResponse = difyDataset.createSegment(request);
 
         // Assert
         assertNotNull(actualResponse);
@@ -393,7 +396,7 @@ class DefaultDifyDatasetClientTest {
                 .thenReturn(expectedResponse);
 
         // Act
-        SegmentResponse actualResponse = difyDatasetClient.pageSegment(request);
+        SegmentResponse actualResponse = difyDataset.pageSegment(request);
 
         // Assert
         assertNotNull(actualResponse);
@@ -419,7 +422,7 @@ class DefaultDifyDatasetClientTest {
                 .thenReturn(expectedResponse);
 
         // Act
-        SegmentDeleteResponse actualResponse = difyDatasetClient.deleteSegment(datasetId, documentId, segmentId, apiKey);
+        SegmentDeleteResponse actualResponse = difyDataset.deleteSegment(datasetId, documentId, segmentId, apiKey);
 
         // Assert
         assertNotNull(actualResponse);
@@ -456,7 +459,7 @@ class DefaultDifyDatasetClientTest {
                 .thenReturn(expectedResponse);
 
         // Act
-        SegmentUpdateResponse actualResponse = difyDatasetClient.updateSegment(request);
+        SegmentUpdateResponse actualResponse = difyDataset.updateSegment(request);
 
         // Assert
         assertNotNull(actualResponse);
@@ -487,7 +490,7 @@ class DefaultDifyDatasetClientTest {
                 .thenReturn(expectedResponse);
 
         // Act
-        SegmentChildChunkCreateResponse actualResponse = difyDatasetClient.createSegmentChildChunk(request);
+        SegmentChildChunkCreateResponse actualResponse = difyDataset.createSegmentChildChunk(request);
 
         // Assert
         assertNotNull(actualResponse);
@@ -521,7 +524,7 @@ class DefaultDifyDatasetClientTest {
                 .thenReturn(expectedResult);
 
         // Act
-        DifyPageResult<SegmentChildChunkResponse> actualResult = difyDatasetClient.pageSegmentChildChunk(request);
+        DifyPageResult<SegmentChildChunkResponse> actualResult = difyDataset.pageSegmentChildChunk(request);
 
         // Assert
         assertNotNull(actualResult);
@@ -548,7 +551,7 @@ class DefaultDifyDatasetClientTest {
                 .thenReturn(expectedResponse);
 
         // Act
-        SegmentChildChunkDeleteResponse actualResponse = difyDatasetClient.deleteSegmentChildChunk(request);
+        SegmentChildChunkDeleteResponse actualResponse = difyDataset.deleteSegmentChildChunk(request);
 
         // Assert
         assertNotNull(actualResponse);
@@ -578,7 +581,7 @@ class DefaultDifyDatasetClientTest {
                 .thenReturn(expectedResponse);
 
         // Act
-        SegmentChildChunkUpdateResponse actualResponse = difyDatasetClient.updateSegmentChildChunk(request);
+        SegmentChildChunkUpdateResponse actualResponse = difyDataset.updateSegmentChildChunk(request);
 
         // Assert
         assertNotNull(actualResponse);
@@ -610,7 +613,7 @@ class DefaultDifyDatasetClientTest {
                 .thenReturn(expectedResponse);
 
         // Act
-        UploadFileInfoResponse actualResponse = difyDatasetClient.uploadFileInfo(datasetId, documentId, apiKey);
+        UploadFileInfoResponse actualResponse = difyDataset.uploadFileInfo(datasetId, documentId, apiKey);
 
         // Assert
         assertNotNull(actualResponse);
@@ -692,7 +695,7 @@ class DefaultDifyDatasetClientTest {
                 .thenReturn(expectedResponse);
 
         // Act
-        RetrieveResponse actualResponse = difyDatasetClient.retrieve(request);
+        RetrieveResponse actualResponse = difyDataset.retrieve(request);
 
         // Assert
         assertNotNull(actualResponse);
@@ -741,7 +744,7 @@ class DefaultDifyDatasetClientTest {
                 .thenReturn(expectedResponse);
 
         // Act
-        MetaDataResponse actualResponse = difyDatasetClient.createMetaData(request);
+        MetaDataResponse actualResponse = difyDataset.createMetaData(request);
 
         // Assert
         assertNotNull(actualResponse);
@@ -767,7 +770,7 @@ class DefaultDifyDatasetClientTest {
                 .thenReturn(expectedResponse);
 
         // Act
-        MetaDataResponse actualResponse = difyDatasetClient.updateMetaData(request);
+        MetaDataResponse actualResponse = difyDataset.updateMetaData(request);
 
         // Assert
         assertNotNull(actualResponse);
@@ -786,7 +789,7 @@ class DefaultDifyDatasetClientTest {
         doNothing().when(difyDatasetClient).deleteMetaData(anyString(), anyString(), anyString());
 
         // Act
-        difyDatasetClient.deleteMetaData(datasetId, metadataId, apiKey);
+        difyDataset.deleteMetaData(datasetId, metadataId, apiKey);
 
         // Assert
         verify(difyDatasetClient, times(1)).deleteMetaData(datasetId, metadataId, apiKey);
@@ -803,7 +806,7 @@ class DefaultDifyDatasetClientTest {
         doNothing().when(difyDatasetClient).actionMetaData(any(MetaDataActionRequest.class));
 
         // Act
-        difyDatasetClient.actionMetaData(request);
+        difyDataset.actionMetaData(request);
 
         // Assert
         verify(difyDatasetClient, times(1)).actionMetaData(any(MetaDataActionRequest.class));
@@ -837,7 +840,7 @@ class DefaultDifyDatasetClientTest {
         doNothing().when(difyDatasetClient).updateDocumentMetaData(any(DocumentMetaDataUpdateRequest.class));
 
         // Act
-        difyDatasetClient.updateDocumentMetaData(request);
+        difyDataset.updateDocumentMetaData(request);
 
         // Assert
         verify(difyDatasetClient, times(1)).updateDocumentMetaData(any(DocumentMetaDataUpdateRequest.class));
@@ -868,7 +871,7 @@ class DefaultDifyDatasetClientTest {
                 .thenReturn(expectedResponse);
 
         // Act
-        MetaDataListResponse actualResponse = difyDatasetClient.listMetaData(datasetId, apiKey);
+        MetaDataListResponse actualResponse = difyDataset.listMetaData(datasetId, apiKey);
 
         // Assert
         assertNotNull(actualResponse);
@@ -907,7 +910,7 @@ class DefaultDifyDatasetClientTest {
                 .thenReturn(expectedResponse);
 
         // Act
-        TextEmbeddingListResponse actualResponse = difyDatasetClient.listTextEmbedding(apiKey);
+        TextEmbeddingListResponse actualResponse = difyDataset.listTextEmbedding(apiKey);
 
         // Assert
         assertNotNull(actualResponse);
