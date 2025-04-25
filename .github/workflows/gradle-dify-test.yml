@@ -7,7 +7,7 @@ on:
   pull_request:
     paths:
       - 'dify/**'
-      - '.github/workflows/gradle-build.yml'
+      - '.github/workflows/gradle-dify-test.yml'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -251,5 +251,11 @@ jobs:
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
