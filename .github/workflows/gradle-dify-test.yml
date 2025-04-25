@@ -198,7 +198,7 @@ jobs:
               PLUGIN_FOUND=true
             else
               echo "Plugin not yet installed (attempt $ATTEMPT/$MAX_ATTEMPTS). Waiting..."
-              sleep 5
+              sleep 1
               ATTEMPT=$((ATTEMPT+1))
             fi
           done
