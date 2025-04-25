@@ -254,8 +254,16 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Upload test results to Codecov
+      #- name: Upload test results to Codecov
+      #  if: ${{ !cancelled() }}
+      #  uses: codecov/test-results-action@v1
+      #  with:
+      #    token: ${{ secrets.CODECOV_TOKEN }}
+          
+      - name: Upload test results to Codecov shell
         if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+        run: |
+          cd dify-spring-boot-starter
+          curl -Os https://cli.codecov.io/latest/linux/codecov
+          sudo chmod +x codecov
+          ./codecov do-upload -C ${{ github.sha }} --report-type test_results -t ${{ secrets.CODECOV_TOKEN }}
