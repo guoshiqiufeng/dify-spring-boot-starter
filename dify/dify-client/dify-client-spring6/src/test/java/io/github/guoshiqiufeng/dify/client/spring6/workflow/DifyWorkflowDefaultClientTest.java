@@ -15,6 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.client.spring6.workflow;
 
+import io.github.guoshiqiufeng.dify.client.spring6.BaseClientTest;
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.enums.ResponseModeEnum;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.request.ChatMessageVO;
@@ -23,27 +25,25 @@ import io.github.guoshiqiufeng.dify.workflow.dto.request.WorkflowLogsRequest;
 import io.github.guoshiqiufeng.dify.workflow.dto.request.WorkflowRunRequest;
 import io.github.guoshiqiufeng.dify.workflow.dto.response.*;
 import io.github.guoshiqiufeng.dify.workflow.enums.StreamEventEnum;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
@@ -51,36 +51,25 @@ import static org.mockito.Mockito.*;
  * @version 0.8.0
  * @since 2025/4/21 16:10
  */
+@SuppressWarnings("unchecked")
 @DisplayName("DifyWorkflowDefaultClient Tests")
-public class DifyWorkflowDefaultClientTest {
+public class DifyWorkflowDefaultClientTest extends BaseClientTest {
+    private static final String BASE_URL = "https://api.dify.ai";
+
+    private DifyWorkflowDefaultClient client;
+
+    @BeforeEach
+    public void setup() {
+        super.setup();
+        client = new DifyWorkflowDefaultClient(BASE_URL, new DifyProperties.ClientConfig(), restClientMock.getRestClientBuilder(), webClientMock.getWebClientBuilder());
+    }
 
     @Test
     @DisplayName("Test runWorkflow method with valid request")
     public void testRunWorkflow() {
-        // Create mock objects
-        RestClient.RequestBodyUriSpec requestBodyUriSpec = Mockito.mock(RestClient.RequestBodyUriSpec.class);
-        RestClient.RequestBodySpec requestBodySpec = Mockito.mock(RestClient.RequestBodySpec.class);
-        RestClient.ResponseSpec responseSpec = Mockito.mock(RestClient.ResponseSpec.class);
-        RestClient.Builder mockRestClientBuilder = Mockito.mock(RestClient.Builder.class);
-        RestClient mockRestClient = Mockito.mock(RestClient.class);
-        WebClient.Builder mockWebClientBuilder = Mockito.mock(WebClient.Builder.class);
-        WebClient mockWebClient = Mockito.mock(WebClient.class);
-
-        // Setup mock behavior
-        when(mockRestClientBuilder.baseUrl(anyString())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.defaultHeaders(any())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.build()).thenReturn(mockRestClient);
-
-        when(mockWebClientBuilder.baseUrl(anyString())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.defaultHeaders(any())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.build()).thenReturn(mockWebClient);
-
-        doReturn(requestBodyUriSpec).when(mockRestClient).post();
-        when(requestBodyUriSpec.uri(eq(WorkflowConstant.WORKFLOW_RUN_URL))).thenReturn(requestBodySpec);
-        doReturn(requestBodySpec).when(requestBodySpec).header(eq(HttpHeaders.AUTHORIZATION), anyString());
-        doReturn(requestBodySpec).when(requestBodySpec).body(any(ChatMessageVO.class));
-        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.onStatus(any())).thenReturn(responseSpec);
+        RestClient.RequestBodySpec requestBodySpec = restClientMock.getRequestBodySpec();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestBodyUriSpec requestBodyUriSpec = restClientMock.getRequestBodyUriSpec();
 
         // Mock the workflow response
         WorkflowRunResponse mockResponse = new WorkflowRunResponse();
@@ -88,10 +77,6 @@ public class DifyWorkflowDefaultClientTest {
         mockResponse.setWorkflowRunId("workflow-run-123");
 
         when(responseSpec.body(WorkflowRunResponse.class)).thenReturn(mockResponse);
-
-        // Create the client with mocked dependencies
-        String baseUrl = "https://api.dify.ai";
-        DifyWorkflowDefaultClient client = new DifyWorkflowDefaultClient(baseUrl, null, mockRestClientBuilder, mockWebClientBuilder);
 
         // Create a workflow run request
         WorkflowRunRequest request = new WorkflowRunRequest();
@@ -127,30 +112,9 @@ public class DifyWorkflowDefaultClientTest {
     @Test
     @DisplayName("Test runWorkflowStream method with valid request")
     public void testRunWorkflowStream() {
-        // Create mock objects
-        WebClient.RequestBodyUriSpec requestBodyUriSpec = Mockito.mock(WebClient.RequestBodyUriSpec.class);
-        WebClient.RequestBodySpec requestBodySpec = Mockito.mock(WebClient.RequestBodySpec.class);
-        WebClient.ResponseSpec responseSpec = Mockito.mock(WebClient.ResponseSpec.class);
-        RestClient.Builder mockRestClientBuilder = Mockito.mock(RestClient.Builder.class);
-        RestClient mockRestClient = Mockito.mock(RestClient.class);
-        WebClient.Builder mockWebClientBuilder = Mockito.mock(WebClient.Builder.class);
-        WebClient mockWebClient = Mockito.mock(WebClient.class);
-
-        // Setup mock behavior
-        when(mockRestClientBuilder.baseUrl(anyString())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.defaultHeaders(any())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.build()).thenReturn(mockRestClient);
-
-        when(mockWebClientBuilder.baseUrl(anyString())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.defaultHeaders(any())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.build()).thenReturn(mockWebClient);
-
-        doReturn(requestBodyUriSpec).when(mockWebClient).post();
-        when(requestBodyUriSpec.uri(eq(WorkflowConstant.WORKFLOW_RUN_URL))).thenReturn(requestBodySpec);
-        doReturn(requestBodySpec).when(requestBodySpec).header(eq(HttpHeaders.AUTHORIZATION), anyString());
-        doReturn(requestBodySpec).when(requestBodySpec).bodyValue(any(ChatMessageVO.class));
-        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
-        doReturn(responseSpec).when(responseSpec).onStatus(any(Predicate.class), any(Function.class));
+        WebClient.RequestBodySpec requestBodySpec = webClientMock.getRequestBodySpec();
+        WebClient.ResponseSpec responseSpec = webClientMock.getResponseSpec();
+        WebClient.RequestBodyUriSpec requestBodyUriSpec = webClientMock.getRequestBodyUriSpec();
 
         // Mock the stream response
         WorkflowRunStreamResponse mockStreamResponse1 = new WorkflowRunStreamResponse();
@@ -163,10 +127,6 @@ public class DifyWorkflowDefaultClientTest {
 
         Flux<WorkflowRunStreamResponse> mockFlux = Flux.just(mockStreamResponse1, mockStreamResponse2);
         doReturn(mockFlux).when(responseSpec).bodyToFlux(WorkflowRunStreamResponse.class);
-
-        // Create the client with mocked dependencies
-        String baseUrl = "https://api.dify.ai";
-        DifyWorkflowDefaultClient client = new DifyWorkflowDefaultClient(baseUrl, null, mockRestClientBuilder, mockWebClientBuilder);
 
         // Create a workflow run request
         WorkflowRunRequest request = new WorkflowRunRequest();
@@ -219,39 +179,15 @@ public class DifyWorkflowDefaultClientTest {
     @Test
     @DisplayName("Test info method with valid workflowRunId")
     public void testInfo() {
-        // Create mock objects
-        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = Mockito.mock(RestClient.RequestHeadersUriSpec.class);
-        RestClient.RequestHeadersSpec<?> requestHeadersSpec = Mockito.mock(RestClient.RequestHeadersSpec.class);
-        RestClient.ResponseSpec responseSpec = Mockito.mock(RestClient.ResponseSpec.class);
-        RestClient.Builder mockRestClientBuilder = Mockito.mock(RestClient.Builder.class);
-        RestClient mockRestClient = Mockito.mock(RestClient.class);
-        WebClient.Builder mockWebClientBuilder = Mockito.mock(WebClient.Builder.class);
-        WebClient mockWebClient = Mockito.mock(WebClient.class);
-
-        // Setup mock behavior
-        when(mockRestClientBuilder.baseUrl(anyString())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.defaultHeaders(any())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.build()).thenReturn(mockRestClient);
-
-        when(mockWebClientBuilder.baseUrl(anyString())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.defaultHeaders(any())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.build()).thenReturn(mockWebClient);
-
-        doReturn(requestHeadersUriSpec).when(mockRestClient).get();
-        doReturn(requestHeadersSpec).when(requestHeadersUriSpec).uri(anyString(), anyString());
-        doReturn(requestHeadersSpec).when(requestHeadersSpec).header(eq(HttpHeaders.AUTHORIZATION), anyString());
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.onStatus(any())).thenReturn(responseSpec);
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
 
         // Mock the info response
         WorkflowInfoResponse mockResponse = new WorkflowInfoResponse();
         mockResponse.setId("workflow-run-123");
         mockResponse.setStatus("completed");
         when(responseSpec.body(WorkflowInfoResponse.class)).thenReturn(mockResponse);
-
-        // Create the client with mocked dependencies
-        String baseUrl = "https://api.dify.ai";
-        DifyWorkflowDefaultClient client = new DifyWorkflowDefaultClient(baseUrl, null, mockRestClientBuilder, mockWebClientBuilder);
 
         // Call the method to test
         String workflowRunId = "workflow-run-123";
@@ -271,39 +207,14 @@ public class DifyWorkflowDefaultClientTest {
     @Test
     @DisplayName("Test stopWorkflowStream method with valid parameters")
     public void testStopWorkflowStream() {
-        // Create mock objects
-        RestClient.RequestBodyUriSpec requestBodyUriSpec = Mockito.mock(RestClient.RequestBodyUriSpec.class);
-        RestClient.RequestBodySpec requestBodySpec = Mockito.mock(RestClient.RequestBodySpec.class);
-        RestClient.ResponseSpec responseSpec = Mockito.mock(RestClient.ResponseSpec.class);
-        RestClient.Builder mockRestClientBuilder = Mockito.mock(RestClient.Builder.class);
-        RestClient mockRestClient = Mockito.mock(RestClient.class);
-        WebClient.Builder mockWebClientBuilder = Mockito.mock(WebClient.Builder.class);
-        WebClient mockWebClient = Mockito.mock(WebClient.class);
-
-        // Setup mock behavior
-        when(mockRestClientBuilder.baseUrl(anyString())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.defaultHeaders(any())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.build()).thenReturn(mockRestClient);
-
-        when(mockWebClientBuilder.baseUrl(anyString())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.defaultHeaders(any())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.build()).thenReturn(mockWebClient);
-
-        doReturn(requestBodyUriSpec).when(mockRestClient).post();
-        doReturn(requestBodySpec).when(requestBodyUriSpec).uri(anyString(), anyString());
-        doReturn(requestBodySpec).when(requestBodySpec).header(eq(HttpHeaders.AUTHORIZATION), anyString());
-        doReturn(requestBodySpec).when(requestBodySpec).body(any(Map.class));
-        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.onStatus(any())).thenReturn(responseSpec);
+        RestClient.RequestBodySpec requestBodySpec = restClientMock.getRequestBodySpec();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestBodyUriSpec requestBodyUriSpec = restClientMock.getRequestBodyUriSpec();
 
         // Mock the stop response
         WorkflowStopResponse mockResponse = new WorkflowStopResponse();
         mockResponse.setResult("success");
         when(responseSpec.body(WorkflowStopResponse.class)).thenReturn(mockResponse);
-
-        // Create the client with mocked dependencies
-        String baseUrl = "https://api.dify.ai";
-        DifyWorkflowDefaultClient client = new DifyWorkflowDefaultClient(baseUrl, null, mockRestClientBuilder, mockWebClientBuilder);
 
         // Call the method to test
         String apiKey = "wf-api-key-123";
@@ -330,31 +241,9 @@ public class DifyWorkflowDefaultClientTest {
     @Test
     @DisplayName("Test logs method with valid request")
     public void testLogs() {
-        // Create mock objects
-        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = Mockito.mock(RestClient.RequestHeadersUriSpec.class);
-        RestClient.RequestHeadersSpec<?> requestHeadersSpec = Mockito.mock(RestClient.RequestHeadersSpec.class);
-        RestClient.ResponseSpec responseSpec = Mockito.mock(RestClient.ResponseSpec.class);
-        RestClient.Builder mockRestClientBuilder = Mockito.mock(RestClient.Builder.class);
-        RestClient mockRestClient = Mockito.mock(RestClient.class);
-        WebClient.Builder mockWebClientBuilder = Mockito.mock(WebClient.Builder.class);
-        WebClient mockWebClient = Mockito.mock(WebClient.class);
-
-        URI mockUri = URI.create("https://api.dify.ai/workflow/logs?page=1&limit=20");
-
-        // Setup mock behavior
-        when(mockRestClientBuilder.baseUrl(anyString())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.defaultHeaders(any())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.build()).thenReturn(mockRestClient);
-
-        when(mockWebClientBuilder.baseUrl(anyString())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.defaultHeaders(any())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.build()).thenReturn(mockWebClient);
-
-        doReturn(requestHeadersUriSpec).when(mockRestClient).get();
-        doReturn(requestHeadersSpec).when(requestHeadersUriSpec).uri(any(Function.class));
-        doReturn(requestHeadersSpec).when(requestHeadersSpec).header(eq(HttpHeaders.AUTHORIZATION), anyString());
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.onStatus(any())).thenReturn(responseSpec);
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
 
         // Mock the logs response
         DifyPageResult<WorkflowLogs> mockResponse = new DifyPageResult<>();
@@ -373,10 +262,6 @@ public class DifyWorkflowDefaultClientTest {
 
         mockResponse.setData(logs);
         doReturn(mockResponse).when(responseSpec).body(any(ParameterizedTypeReference.class));
-
-        // Create the client with mocked dependencies
-        String baseUrl = "https://api.dify.ai";
-        DifyWorkflowDefaultClient client = new DifyWorkflowDefaultClient(baseUrl, null, mockRestClientBuilder, mockWebClientBuilder);
 
         // Create logs request
         WorkflowLogsRequest request = new WorkflowLogsRequest();

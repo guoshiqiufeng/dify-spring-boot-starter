@@ -17,10 +17,12 @@ package io.github.guoshiqiufeng.dify.client.spring5;
 
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * @author yanghq
@@ -62,7 +64,12 @@ public abstract class BaseClientTest {
         // Setup WebClient mock behavior chain for POST
         when(webClientMock.post()).thenReturn(requestBodyUriSpecMock);
         when(requestBodyUriSpecMock.uri(anyString())).thenReturn(requestBodySpecMock);
-        when(requestBodySpecMock.headers(any())).thenReturn(requestBodySpecMock);
+        when(requestBodyUriSpecMock.uri(anyString(), any(Object[].class))).thenReturn(requestBodySpecMock);
+        when(requestBodyUriSpecMock.uri(anyString(), any(Object.class))).thenReturn(requestBodySpecMock);
+        // Handle header method properly
+        when(requestBodySpecMock.header(anyString(), any(String[].class))).thenReturn(requestBodySpecMock);
+        when(requestBodySpecMock.header(anyString(), anyString())).thenReturn(requestBodySpecMock);
+        doReturn(requestBodySpecMock).when(requestBodySpecMock).headers(any(Consumer.class));
         when(requestBodySpecMock.contentType(any())).thenReturn(requestBodySpecMock);
         when(requestBodySpecMock.bodyValue(any())).thenReturn(requestHeadersSpecMock);
         when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
@@ -70,10 +77,29 @@ public abstract class BaseClientTest {
         // Setup WebClient mock behavior chain for GET
         when(webClientMock.get()).thenReturn(requestHeadersUriSpecMock);
         when(requestHeadersUriSpecMock.uri(anyString())).thenReturn(requestHeadersSpecMock);
-        when(requestHeadersSpecMock.headers(any())).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersUriSpecMock.uri(anyString(), any(Object[].class))).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersUriSpecMock.uri(anyString(), any(Object.class))).thenReturn(requestHeadersSpecMock);
+        // Add mock for uri function builder
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenReturn(requestHeadersSpecMock);
+
+        when(requestHeadersSpecMock.header(anyString(), any(String[].class))).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersSpecMock.header(anyString(), anyString())).thenReturn(requestHeadersSpecMock);
+        doReturn(requestHeadersSpecMock).when(requestHeadersSpecMock).headers(any(Consumer.class));
         when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
 
-        when(responseSpecMock.onStatus(any(), any())).thenReturn(responseSpecMock);
+        // Setup WebClient mock behavior chain for DELETE
+        when(webClientMock.delete()).thenReturn(requestHeadersUriSpecMock);
 
+        // Setup WebClient mock behavior chain for PATCH
+        when(webClientMock.patch()).thenReturn(requestBodyUriSpecMock);
+
+        // Setup method() for custom HTTP methods
+        when(webClientMock.method(any())).thenReturn(requestBodyUriSpecMock);
+
+        // Make sure retrieve() always returns responseSpecMock
+        when(requestBodySpecMock.retrieve()).thenReturn(responseSpecMock);
+
+        // Ensure response handling works
+        when(responseSpecMock.onStatus(any(), any())).thenReturn(responseSpecMock);
     }
 }
