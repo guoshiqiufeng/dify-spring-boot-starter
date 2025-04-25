@@ -18,6 +18,7 @@ package io.github.guoshiqiufeng.dify.client.spring5;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -78,6 +79,8 @@ public abstract class BaseClientTest {
         when(requestHeadersUriSpecMock.uri(anyString())).thenReturn(requestHeadersSpecMock);
         when(requestHeadersUriSpecMock.uri(anyString(), any(Object[].class))).thenReturn(requestHeadersSpecMock);
         when(requestHeadersUriSpecMock.uri(anyString(), any(Object.class))).thenReturn(requestHeadersSpecMock);
+        // Add mock for uri function builder
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenReturn(requestHeadersSpecMock);
 
         when(requestHeadersSpecMock.header(anyString(), any(String[].class))).thenReturn(requestHeadersSpecMock);
         when(requestHeadersSpecMock.header(anyString(), anyString())).thenReturn(requestHeadersSpecMock);
@@ -89,6 +92,9 @@ public abstract class BaseClientTest {
 
         // Setup WebClient mock behavior chain for PATCH
         when(webClientMock.patch()).thenReturn(requestBodyUriSpecMock);
+
+        // Setup method() for custom HTTP methods
+        when(webClientMock.method(any())).thenReturn(requestBodyUriSpecMock);
 
         // Make sure retrieve() always returns responseSpecMock
         when(requestBodySpecMock.retrieve()).thenReturn(responseSpecMock);

@@ -16,14 +16,15 @@
 package io.github.guoshiqiufeng.dify.client.spring6.chat;
 
 import io.github.guoshiqiufeng.dify.chat.constant.ChatUriConstant;
-import io.github.guoshiqiufeng.dify.chat.dto.request.ChatMessageSendRequest;
-import io.github.guoshiqiufeng.dify.chat.dto.request.FileUploadRequest;
-import io.github.guoshiqiufeng.dify.chat.dto.request.RenameConversationRequest;
+import io.github.guoshiqiufeng.dify.chat.dto.request.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.*;
 import io.github.guoshiqiufeng.dify.client.spring6.BaseClientTest;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.enums.ResponseModeEnum;
+import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
+import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
 import io.github.guoshiqiufeng.dify.core.pojo.request.ChatMessageVO;
+import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
 import io.github.guoshiqiufeng.dify.dataset.constant.DatasetUriConstant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,7 +32,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,8 +43,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -310,5 +312,342 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         // Verify interactions with mocks
         verify(restClient).get();
         verify(requestHeadersUriSpec).uri(DatasetUriConstant.V1_META);
+    }
+
+    @Test
+    public void testChatAndFile() {
+        RestClient restClient = restClientMock.getRestClient();
+        RestClient.RequestBodySpec requestBodySpec = restClientMock.getRequestBodySpec();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestBodyUriSpec requestBodyUriSpec = restClientMock.getRequestBodyUriSpec();
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String userId = "test-user-id";
+        String content = "Hello, how are you?";
+        String conversationId = "conv-123456";
+
+        // Create request
+        ChatMessageSendRequest request = new ChatMessageSendRequest();
+        request.setApiKey(apiKey);
+        request.setUserId(userId);
+        request.setContent(content);
+        request.setConversationId(conversationId);
+        request.setInputs(new HashMap<>());
+        ChatMessageSendRequest.ChatMessageFile workflowFile = new ChatMessageSendRequest.ChatMessageFile();
+        workflowFile.setUrl("https://file.com");
+        workflowFile.setType("image");
+        request.setFiles(List.of(workflowFile));
+        // Create expected response
+        ChatMessageSendResponse expectedResponse = new ChatMessageSendResponse();
+        expectedResponse.setId("msg-123456");
+        expectedResponse.setConversationId(conversationId);
+        expectedResponse.setAnswer("I'm doing well, thank you for asking!");
+
+        // Mock response
+        when(responseSpec.body(ChatMessageSendResponse.class)).thenReturn(expectedResponse);
+
+        // Execute the method
+        ChatMessageSendResponse actualResponse = client.chat(request);
+
+        // Verify results
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getConversationId(), actualResponse.getConversationId());
+        assertEquals(expectedResponse.getAnswer(), actualResponse.getAnswer());
+
+        // Verify WebClient interactions
+        verify(restClient).post();
+        verify(requestBodyUriSpec).uri(ChatUriConstant.V1_CHAT_MESSAGES_URI);
+        verify(requestBodySpec).body(any(ChatMessageVO.class));
+        verify(responseSpec).body(ChatMessageSendResponse.class);
+    }
+
+    @Test
+    public void testConversations() {
+        RestClient restClient = restClientMock.getRestClient();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String userId = "test-user-id";
+        String sortBy = "-updated_at";
+        Integer limit = 20;
+
+        // Create request
+        MessageConversationsRequest request = new MessageConversationsRequest();
+        request.setApiKey(apiKey);
+        request.setUserId(userId);
+        request.setSortBy(sortBy);
+        request.setLimit(limit);
+
+        // Create expected response
+        DifyPageResult<MessageConversationsResponse> expectedResponse = new DifyPageResult<>();
+        List<MessageConversationsResponse> items = new ArrayList<>();
+        MessageConversationsResponse item = new MessageConversationsResponse();
+        item.setId("conv-123456");
+        item.setName("Test Conversation");
+        items.add(item);
+        expectedResponse.setData(items);
+        expectedResponse.setHasMore(false);
+
+        // Mock response
+        when(responseSpec.body(any(ParameterizedTypeReference.class)))
+                .thenReturn(expectedResponse);
+
+        // Execute the method
+        DifyPageResult<MessageConversationsResponse> actualResponse = client.conversations(request);
+
+        // Verify results
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getData().size(), actualResponse.getData().size());
+        assertEquals(expectedResponse.getData().get(0).getId(), actualResponse.getData().get(0).getId());
+        assertEquals(expectedResponse.getData().get(0).getName(), actualResponse.getData().get(0).getName());
+
+        // Verify WebClient interactions
+        verify(restClient).get();
+        verify(responseSpec).body(any(ParameterizedTypeReference.class));
+    }
+
+    @Test
+    public void testMessages() {
+        RestClient restClient = restClientMock.getRestClient();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String userId = "test-user-id";
+        String conversationId = "conv-123456";
+        Integer limit = 20;
+
+        // Create request
+        MessagesRequest request = new MessagesRequest();
+        request.setApiKey(apiKey);
+        request.setUserId(userId);
+        request.setConversationId(conversationId);
+        request.setLimit(limit);
+
+        // Create expected response
+        DifyPageResult<MessagesResponseVO> expectedResponse = new DifyPageResult<>();
+        List<MessagesResponseVO> items = new ArrayList<>();
+        MessagesResponseVO item = new MessagesResponseVO();
+        item.setId("msg-123456");
+        item.setConversationId(conversationId);
+        item.setAnswer("This is a test message");
+        items.add(item);
+        expectedResponse.setData(items);
+        expectedResponse.setHasMore(false);
+
+        // Mock response
+        when(responseSpec.body(any(ParameterizedTypeReference.class)))
+                .thenReturn(expectedResponse);
+
+        // Execute the method
+        DifyPageResult<MessagesResponseVO> actualResponse = client.messages(request);
+
+        // Verify results
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getData().size(), actualResponse.getData().size());
+        assertEquals(expectedResponse.getData().get(0).getId(), actualResponse.getData().get(0).getId());
+        assertEquals(expectedResponse.getData().get(0).getConversationId(), actualResponse.getData().get(0).getConversationId());
+        assertEquals(expectedResponse.getData().get(0).getAnswer(), actualResponse.getData().get(0).getAnswer());
+
+        // Verify WebClient interactions
+        verify(restClient).get();
+        verify(responseSpec).body(any(ParameterizedTypeReference.class));
+    }
+
+    @Test
+    public void testMessagesSuggested() {
+        RestClient restClient = restClientMock.getRestClient();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String userId = "test-user-id";
+        String messageId = "msg-123456";
+
+        // Create expected response
+        DifyResult<List<String>> expectedResponse = new DifyResult<>();
+        List<String> suggestions = new ArrayList<>();
+        suggestions.add("Tell me more about this");
+        suggestions.add("What are the alternatives?");
+        expectedResponse.setData(suggestions);
+
+        // Mock response
+        when(responseSpec.body(any(ParameterizedTypeReference.class)))
+                .thenReturn(expectedResponse);
+
+        // Execute the method
+        List<String> actualResponse = client.messagesSuggested(messageId, apiKey, userId);
+
+        // Verify results
+        assertNotNull(actualResponse);
+        assertEquals(2, actualResponse.size());
+        assertEquals("Tell me more about this", actualResponse.get(0));
+        assertEquals("What are the alternatives?", actualResponse.get(1));
+
+        // Verify WebClient interactions
+        verify(restClient).get();
+        verify(requestHeadersUriSpec).uri(
+                ChatUriConstant.V1_MESSAGES_URI + "/{messageId}/suggested?user={user}",
+                messageId,
+                userId
+        );
+        verify(responseSpec).body(any(ParameterizedTypeReference.class));
+    }
+
+    @Test
+    public void testDeleteConversation() {
+        RestClient restClient = restClientMock.getRestClient();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestBodyUriSpec requestBodyUriSpec = restClientMock.getRequestBodyUriSpec();
+        RestClient.RequestBodySpec requestBodySpec = restClientMock.getRequestBodySpec();
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String userId = "test-user-id";
+        String conversationId = "conv-123456";
+
+        // Execute the method
+        client.deleteConversation(conversationId, apiKey, userId);
+
+        // Verify WebClient interactions
+        verify(restClient).method(HttpMethod.DELETE);
+        verify(requestBodyUriSpec).uri(ChatUriConstant.V1_CONVERSATIONS_URI + "/{conversationId}", conversationId);
+        verify(requestBodySpec).contentType(MediaType.APPLICATION_JSON);
+        verify(requestBodySpec).body(any(Map.class));
+    }
+
+    @Test
+    public void testTextToAudio() {
+        RestClient restClient = restClientMock.getRestClient();
+        RestClient.RequestBodySpec requestBodySpec = restClientMock.getRequestBodySpec();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestBodyUriSpec requestBodyUriSpec = restClientMock.getRequestBodyUriSpec();
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String userId = "test-user-id";
+        String messageId = "msg-123456";
+        String text = "This is text to be converted to audio";
+
+        // Create request
+        TextToAudioRequest request = new TextToAudioRequest();
+        request.setApiKey(apiKey);
+        request.setUserId(userId);
+        request.setMessageId(messageId);
+        request.setText(text);
+
+        // Create expected response
+        byte[] audioData = "mock audio data".getBytes();
+        ResponseEntity<byte[]> expectedResponse = ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(audioData);
+
+        // Mock response
+        when(responseSpec.body(any(ParameterizedTypeReference.class)))
+                .thenReturn(expectedResponse);
+
+        // Execute the method
+        ResponseEntity<byte[]> actualResponse = client.textToAudio(request);
+
+        // Verify results
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getStatusCode(), actualResponse.getStatusCode());
+        assertArrayEquals(expectedResponse.getBody(), actualResponse.getBody());
+
+        // Verify WebClient interactions
+        verify(restClient).post();
+        verify(requestBodyUriSpec).uri(ChatUriConstant.V1_TEXT_TO_AUDIO_URI);
+        verify(requestBodySpec).body(any(Map.class));
+        verify(responseSpec).body(any(ParameterizedTypeReference.class));
+    }
+
+    @Test
+    public void testMessageFeedback() {
+        RestClient restClient = restClientMock.getRestClient();
+        RestClient.RequestBodySpec requestBodySpec = restClientMock.getRequestBodySpec();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestBodyUriSpec requestBodyUriSpec = restClientMock.getRequestBodyUriSpec();
+
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String userId = "test-user-id";
+        String messageId = "msg-123456";
+        MessageFeedbackRequest.Rating rating = MessageFeedbackRequest.Rating.LIKE;
+        String content = "This was helpful";
+
+        // Create request
+        MessageFeedbackRequest request = new MessageFeedbackRequest();
+        request.setApiKey(apiKey);
+        request.setUserId(userId);
+        request.setMessageId(messageId);
+        request.setRating(rating);
+        request.setContent(content);
+
+        // Create expected response
+        MessageFeedbackResponse expectedResponse = new MessageFeedbackResponse();
+        expectedResponse.setResult("success");
+
+        // Mock response
+        when(responseSpec.body(any(ParameterizedTypeReference.class)))
+                .thenReturn(expectedResponse);
+
+        // Execute the method
+        MessageFeedbackResponse actualResponse = client.messageFeedback(request);
+
+        // Verify results
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getResult(), actualResponse.getResult());
+
+        // Verify WebClient interactions
+        verify(restClient).post();
+        verify(requestBodyUriSpec).uri(ChatUriConstant.V1_MESSAGES_URI + "/{messageId}/feedbacks", messageId);
+        verify(requestBodySpec).body(any(Map.class));
+        verify(responseSpec).body(any(ParameterizedTypeReference.class));
+    }
+
+    @Test
+    public void testAudioToText() {
+        RestClient restClient = restClientMock.getRestClient();
+        RestClient.RequestBodySpec requestBodySpec = restClientMock.getRequestBodySpec();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestBodyUriSpec requestBodyUriSpec = restClientMock.getRequestBodyUriSpec();
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String fileName = "audio.mp3";
+        String audioContent = "mock audio data";
+
+        // Create mock file
+        MultipartFile mockFile = mock(MultipartFile.class);
+        when(mockFile.getOriginalFilename()).thenReturn(fileName);
+        when(mockFile.getContentType()).thenReturn("audio/mpeg");
+        try {
+            when(mockFile.getBytes()).thenReturn(audioContent.getBytes());
+            when(mockFile.getInputStream()).thenReturn(new java.io.ByteArrayInputStream(audioContent.getBytes()));
+        } catch (java.io.IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Create request
+        AudioToTextRequest request = new AudioToTextRequest();
+        request.setApiKey(apiKey);
+        request.setFile(mockFile);
+
+        // Create expected response
+        DifyTextVO expectedResponse = new DifyTextVO();
+        expectedResponse.setText("Transcribed text from audio");
+
+        // Mock response
+        when(responseSpec.body(DifyTextVO.class)).thenReturn(expectedResponse);
+
+        // Execute the method
+        DifyTextVO actualResponse = client.audioToText(request);
+
+        // Verify results
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getText(), actualResponse.getText());
+
+        // Verify WebClient interactions
+        verify(restClient).post();
+        verify(requestBodyUriSpec).uri(ChatUriConstant.V1_AUDIO_TO_TEXT_URI);
+        verify(requestBodySpec).contentType(MediaType.MULTIPART_FORM_DATA);
+        verify(responseSpec).body(DifyTextVO.class);
     }
 }

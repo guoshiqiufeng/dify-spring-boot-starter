@@ -25,10 +25,10 @@ import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
 import io.github.guoshiqiufeng.dify.core.pojo.request.ChatMessageVO;
 import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
 import io.github.guoshiqiufeng.dify.dataset.constant.DatasetUriConstant;
-import io.github.guoshiqiufeng.dify.workflow.dto.request.WorkflowRunRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -39,9 +39,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
@@ -303,8 +305,11 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         assertEquals(expectedResponse.getData().get(0).getId(), actualResponse.getData().get(0).getId());
         assertEquals(expectedResponse.getData().get(0).getName(), actualResponse.getData().get(0).getName());
 
-        // Verify WebClient interactions
+        // Verify WebClient interactions - updated to match actual implementation
         verify(webClientMock).get();
+        verify(requestHeadersUriSpecMock).uri(any(Function.class));
+        verify(requestHeadersSpecMock).header(eq(HttpHeaders.AUTHORIZATION), eq("Bearer " + apiKey));
+        verify(requestHeadersSpecMock).retrieve();
         verify(responseSpecMock).bodyToMono(any(ParameterizedTypeReference.class));
     }
 
