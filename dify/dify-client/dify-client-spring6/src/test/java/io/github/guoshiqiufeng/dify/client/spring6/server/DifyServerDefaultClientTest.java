@@ -19,6 +19,7 @@ import io.github.guoshiqiufeng.dify.client.spring6.BaseClientTest;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
+import io.github.guoshiqiufeng.dify.server.constant.ServerUriConstant;
 import io.github.guoshiqiufeng.dify.server.dto.request.DifyLoginRequestVO;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,11 +50,26 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
 
     private DifyServerDefaultClient client;
 
+    private RestClient restClient;
+    private RestClient.RequestBodySpec requestBodySpec;
+    private RestClient.RequestBodyUriSpec requestBodyUriSpec;
+
+    private RestClient.ResponseSpec responseSpec;
+    private RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec;
+    private RestClient.RequestHeadersSpec<?> requestHeadersSpec;
+
     @BeforeEach
     public void setup() {
         super.setup();
         client = new DifyServerDefaultClient(new DifyProperties.Server(), new DifyServerTokenDefault(),
                 BASE_URL, new DifyProperties.ClientConfig(), restClientMock.getRestClientBuilder(), webClientMock.getWebClientBuilder());
+        restClient = restClientMock.getRestClient();
+        requestBodySpec = restClientMock.getRequestBodySpec();
+        requestBodyUriSpec = restClientMock.getRequestBodyUriSpec();
+
+        responseSpec = restClientMock.getResponseSpec();
+        requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        requestHeadersSpec = restClientMock.getRequestHeadersSpec();
     }
 
     @Test
@@ -203,5 +219,97 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         // Verify interactions with mocks
         verify(requestHeadersUriSpec).uri("/console/api/apps/{appId}/api-keys", appId);
         verify(requestHeadersSpec).headers(any());
+    }
+
+    @Test
+    public void testInitAppApiKey() {
+        // Prepare test data
+        String appId = "app-123456";
+
+        // Create expected response
+        ApiKeyResponseVO apiKey = new ApiKeyResponseVO();
+        apiKey.setId("api-key-123456");
+        apiKey.setToken("sk-123456789");
+        apiKey.setType("api");
+
+        // Set up the response mock to return our expected response
+        when(responseSpec.body(ApiKeyResponseVO.class)).thenReturn(apiKey);
+
+        // Execute the method
+        List<ApiKeyResponseVO> actualResponse = client.initAppApiKey(appId);
+
+        // Verify the result
+        assertNotNull(actualResponse);
+        assertEquals(1, actualResponse.size());
+        assertEquals(apiKey.getId(), actualResponse.get(0).getId());
+        assertEquals(apiKey.getToken(), actualResponse.get(0).getToken());
+        assertEquals(apiKey.getType(), actualResponse.get(0).getType());
+
+        // Verify WebClient interactions
+        verify(restClient).post();
+        verify(requestBodyUriSpec).uri(eq(ServerUriConstant.APPS + "/{appId}/api-keys"), eq(appId));
+        verify(requestBodySpec).headers(any());
+        verify(responseSpec).body(ApiKeyResponseVO.class);
+    }
+
+    @Test
+    public void testGetDatasetApiKey() {
+        // Create expected response
+        DatasetApiKeyResultVO resultResponseVO = new DatasetApiKeyResultVO();
+        List<DatasetApiKeyResponseVO> apiKeys = new ArrayList<>();
+
+        DatasetApiKeyResponseVO apiKey = new DatasetApiKeyResponseVO();
+        apiKey.setId("api-key-123456");
+        apiKey.setToken("sk-123456789");
+        apiKey.setCreatedAt(1745546400000L);
+        apiKeys.add(apiKey);
+
+        resultResponseVO.setData(apiKeys);
+
+        // Set up the response mock to return our expected response
+        when(responseSpec.body(DatasetApiKeyResultVO.class)).thenReturn(resultResponseVO);
+
+        // Execute the method
+        List<DatasetApiKeyResponseVO> actualResponse = client.getDatasetApiKey();
+
+        // Verify the result
+        assertNotNull(actualResponse);
+        assertEquals(1, actualResponse.size());
+        assertEquals(apiKey.getId(), actualResponse.get(0).getId());
+        assertEquals(apiKey.getToken(), actualResponse.get(0).getToken());
+        assertEquals(apiKey.getCreatedAt(), actualResponse.get(0).getCreatedAt());
+
+        // Verify WebClient interactions
+        verify(restClient).get();
+        verify(requestHeadersUriSpec).uri(ServerUriConstant.DATASETS + "/api-keys");
+        verify(responseSpec).body(DatasetApiKeyResultVO.class);
+    }
+
+    @Test
+    public void testInitDatasetApiKey() {
+        // Create expected response
+        DatasetApiKeyResponseVO apiKey = new DatasetApiKeyResponseVO();
+        apiKey.setId("api-key-123456");
+        apiKey.setToken("sk-123456789");
+        apiKey.setCreatedAt(1745546400000L);
+
+        // Set up the response mock to return our expected response
+        when(responseSpec.body(DatasetApiKeyResponseVO.class)).thenReturn(apiKey);
+
+        // Execute the method
+        List<DatasetApiKeyResponseVO> actualResponse = client.initDatasetApiKey();
+
+        // Verify the result
+        assertNotNull(actualResponse);
+        assertEquals(1, actualResponse.size());
+        assertEquals(apiKey.getId(), actualResponse.get(0).getId());
+        assertEquals(apiKey.getToken(), actualResponse.get(0).getToken());
+        assertEquals(apiKey.getCreatedAt(), actualResponse.get(0).getCreatedAt());
+
+        // Verify WebClient interactions
+        verify(restClient).post();
+        verify(requestBodyUriSpec).uri(ServerUriConstant.DATASETS + "/api-keys");
+        verify(requestBodySpec).headers(any());
+        verify(responseSpec).body(DatasetApiKeyResponseVO.class);
     }
 }
