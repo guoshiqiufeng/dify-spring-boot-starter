@@ -15,10 +15,13 @@
  */
 package io.github.guoshiqiufeng.dify.client.spring6.chat;
 
+import io.github.guoshiqiufeng.dify.chat.constant.ChatUriConstant;
 import io.github.guoshiqiufeng.dify.chat.dto.request.ChatMessageSendRequest;
 import io.github.guoshiqiufeng.dify.chat.dto.request.FileUploadRequest;
 import io.github.guoshiqiufeng.dify.chat.dto.request.RenameConversationRequest;
 import io.github.guoshiqiufeng.dify.chat.dto.response.*;
+import io.github.guoshiqiufeng.dify.client.spring6.BaseClientTest;
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.enums.ResponseModeEnum;
 import io.github.guoshiqiufeng.dify.core.pojo.request.ChatMessageVO;
 import io.github.guoshiqiufeng.dify.dataset.constant.DatasetUriConstant;
@@ -26,13 +29,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,7 +42,8 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
@@ -49,92 +51,35 @@ import static org.mockito.Mockito.*;
  * @version 1.0
  * @since 2025/4/21 14:45
  */
+@SuppressWarnings("unchecked")
 @DisplayName("DifyChatDefaultClient Tests")
-public class DifyChatDefaultClientTest {
+public class DifyChatDefaultClientTest extends BaseClientTest {
 
     private static final String BASE_URL = "https://api.dify.ai";
     private static final String TEST_API_KEY = "test-api-key";
 
-    // Common mock objects
-    private RestClient.Builder mockRestClientBuilder;
-    private RestClient mockRestClient;
-    private WebClient.Builder mockWebClientBuilder;
-    private WebClient mockWebClient;
-    private RestClient.RequestBodyUriSpec requestBodyUriSpec;
-    private RestClient.RequestBodySpec requestBodySpec;
-    private RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec;
-    private RestClient.RequestHeadersSpec<?> requestHeadersSpec;
-    private RestClient.ResponseSpec responseSpec;
-
-    // Client under test
     private DifyChatDefaultClient client;
 
     @BeforeEach
     public void setup() {
-        // Initialize all mock objects
-        mockRestClientBuilder = Mockito.mock(RestClient.Builder.class);
-        mockRestClient = Mockito.mock(RestClient.class);
-        mockWebClientBuilder = Mockito.mock(WebClient.Builder.class);
-        mockWebClient = Mockito.mock(WebClient.class);
-        requestBodyUriSpec = Mockito.mock(RestClient.RequestBodyUriSpec.class);
-        requestBodySpec = Mockito.mock(RestClient.RequestBodySpec.class);
-        requestHeadersUriSpec = Mockito.mock(RestClient.RequestHeadersUriSpec.class);
-        requestHeadersSpec = Mockito.mock(RestClient.RequestHeadersSpec.class);
-        responseSpec = Mockito.mock(RestClient.ResponseSpec.class);
-
-        // Setup common mock behavior
-        when(mockRestClientBuilder.baseUrl(anyString())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.defaultHeaders(any())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.build()).thenReturn(mockRestClient);
-
-        when(mockWebClientBuilder.baseUrl(anyString())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.defaultHeaders(any())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.build()).thenReturn(mockWebClient);
-
-        when(responseSpec.onStatus(any())).thenReturn(responseSpec);
-
-        // Initialize the client with mocked dependencies
-        client = new DifyChatDefaultClient(BASE_URL, null, mockRestClientBuilder, mockWebClientBuilder);
-    }
-
-    // Helper method to setup mocks for POST requests
-    private void setupPostRequestMocks(String uri) {
-        doReturn(requestBodyUriSpec).when(mockRestClient).post();
-        when(requestBodyUriSpec.uri(uri)).thenReturn(requestBodySpec);
-        when(requestBodySpec.header(eq(HttpHeaders.AUTHORIZATION), anyString())).thenReturn(requestBodySpec);
-        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
-    }
-
-    // Helper method to setup mocks for GET requests
-    private void setupGetRequestMocks(String uri) {
-        doReturn(requestHeadersUriSpec).when(mockRestClient).get();
-        doReturn(requestHeadersSpec).when(requestHeadersUriSpec).uri(anyString());
-        doReturn(requestHeadersSpec).when(requestHeadersSpec).header(eq(HttpHeaders.AUTHORIZATION), anyString());
-        doReturn(requestHeadersSpec).when(requestHeadersSpec).headers(any());
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-    }
-
-    // Helper method to setup mocks for parameterized URI POST requests
-    private void setupPostRequestMocksWithParam(String uri, String paramValue) {
-        doReturn(requestBodyUriSpec).when(mockRestClient).post();
-        when(requestBodyUriSpec.uri(eq(uri), eq(paramValue))).thenReturn(requestBodySpec);
-        when(requestBodySpec.header(eq(HttpHeaders.AUTHORIZATION), anyString())).thenReturn(requestBodySpec);
-        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+        super.setup();
+        client = new DifyChatDefaultClient(BASE_URL, new DifyProperties.ClientConfig(), restClientMock.getRestClientBuilder(), webClientMock.getWebClientBuilder());
     }
 
     @Test
     @DisplayName("Test chat method with valid request")
     public void testChat() {
-        // Setup specific mock behavior
-        setupPostRequestMocks("/v1/chat-messages");
-        when(requestBodySpec.body(any(ChatMessageVO.class))).thenReturn(requestBodySpec);
+        RestClient.RequestBodySpec requestBodySpec = restClientMock.getRequestBodySpec();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestBodyUriSpec requestBodyUriSpec = restClientMock.getRequestBodyUriSpec();
 
         // Mock the response
         ChatMessageSendResponse mockResponse = new ChatMessageSendResponse();
         mockResponse.setId("chat-123");
         mockResponse.setCreatedAt(1713841200L); // 2025-04-21T10:00:00Z 的时间戳
         mockResponse.setAnswer("Hello, this is a test response.");
-        when(responseSpec.body(ChatMessageSendResponse.class)).thenReturn(mockResponse);
+
+        when(responseSpec.body(eq(ChatMessageSendResponse.class))).thenReturn(mockResponse);
 
         // Create a chat request
         ChatMessageSendRequest request = new ChatMessageSendRequest();
@@ -153,7 +98,7 @@ public class DifyChatDefaultClientTest {
         assertEquals("Hello, this is a test response.", response.getAnswer());
 
         // Verify interactions with mocks
-        verify(requestBodyUriSpec).uri("/v1/chat-messages");
+        verify(requestBodyUriSpec).uri(ChatUriConstant.V1_CHAT_MESSAGES_URI);
         verify(requestBodySpec).header(HttpHeaders.AUTHORIZATION, "Bearer " + TEST_API_KEY);
 
         // Capture and verify the request body
@@ -170,8 +115,10 @@ public class DifyChatDefaultClientTest {
     @Test
     @DisplayName("Test parameters method")
     public void testParameters() {
-        // Setup specific mock behavior
-        setupGetRequestMocks("/v1/parameters");
+        RestClient restClient = restClientMock.getRestClient();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
 
         // Mock the response
         AppParametersResponseVO mockResponse = new AppParametersResponseVO();
@@ -196,17 +143,18 @@ public class DifyChatDefaultClientTest {
         assertEquals("How can I use Dify?", response.getSuggestedQuestions().get(1));
 
         // Verify interactions with mocks
-        verify(mockRestClient).get();
+        verify(restClient).get();
         verify(requestHeadersUriSpec).uri("/v1/parameters");
-        verify(requestHeadersSpec).header(HttpHeaders.AUTHORIZATION, "Bearer " + TEST_API_KEY);
+        verify(requestHeadersSpec).header(eq(HttpHeaders.AUTHORIZATION), eq("Bearer " + TEST_API_KEY));
     }
 
     @Test
     @DisplayName("Test renameConversation method")
     public void testRenameConversation() {
-        // Setup specific mock behavior
-        setupPostRequestMocksWithParam("/v1/conversations/{conversationId}/name", "conv-123");
-        when(requestBodySpec.body(any(Map.class))).thenReturn(requestBodySpec);
+        RestClient restClient = restClientMock.getRestClient();
+        RestClient.RequestBodySpec requestBodySpec = restClientMock.getRequestBodySpec();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestBodyUriSpec requestBodyUriSpec = restClientMock.getRequestBodyUriSpec();
 
         // Mock the response
         MessageConversationsResponse mockResponse = new MessageConversationsResponse();
@@ -233,6 +181,7 @@ public class DifyChatDefaultClientTest {
         assertEquals("New Conversation Name", response.getName());
 
         // Verify interactions with mocks
+        verify(restClient).post();
         verify(requestBodyUriSpec).uri("/v1/conversations/{conversationId}/name", "conv-123");
         verify(requestBodySpec).header(HttpHeaders.AUTHORIZATION, "Bearer " + TEST_API_KEY);
 
@@ -249,19 +198,10 @@ public class DifyChatDefaultClientTest {
     @Test
     @DisplayName("Test file upload method")
     public void testFileUpload() {
-        // Setup specific mock behavior for file upload
-        doReturn(requestBodyUriSpec).when(mockRestClient).post();
-        when(requestBodyUriSpec.uri(eq(DatasetUriConstant.V1_FILES_UPLOAD))).thenReturn(requestBodySpec);
-        when(requestBodySpec.header(eq(HttpHeaders.AUTHORIZATION), anyString())).thenReturn(requestBodySpec);
-        when(requestBodySpec.contentType(eq(MediaType.MULTIPART_FORM_DATA))).thenReturn(requestBodySpec);
-        when(requestBodySpec.headers(any())).thenReturn(requestBodySpec);
-        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
-
-        // Add more specific mocks for various body method overloads
-        when(requestBodySpec.body(any())).thenReturn(requestBodySpec);
-        when(requestBodySpec.body(any(Object.class))).thenReturn(requestBodySpec);
-        doReturn(requestBodySpec).when(requestBodySpec).body(any(Map.class));
-        doReturn(requestBodySpec).when(requestBodySpec).body(any(MultipartFile.class));
+        RestClient restClient = restClientMock.getRestClient();
+        RestClient.RequestBodySpec requestBodySpec = restClientMock.getRequestBodySpec();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestBodyUriSpec requestBodyUriSpec = restClientMock.getRequestBodyUriSpec();
 
         // Test data setup
         String userId = "test-user-id";
@@ -307,7 +247,7 @@ public class DifyChatDefaultClientTest {
         assertEquals("text/plain", actualResponse.getMimeType());
 
         // Verify basic interactions
-        verify(mockRestClient).post();
+        verify(restClient).post();
         verify(requestBodyUriSpec).uri(DatasetUriConstant.V1_FILES_UPLOAD);
         verify(requestBodySpec).contentType(MediaType.MULTIPART_FORM_DATA);
         // Body verification is tricky with multiple overloads, so we'll skip it
@@ -317,8 +257,10 @@ public class DifyChatDefaultClientTest {
     @Test
     @DisplayName("Test info")
     public void testInfo() {
-        // Setup specific mock behavior
-        setupGetRequestMocks("/v1/info");
+        RestClient restClient = restClientMock.getRestClient();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
 
         // Mock the response
         AppInfoResponse mockResponse = new AppInfoResponse();
@@ -332,19 +274,21 @@ public class DifyChatDefaultClientTest {
         AppInfoResponse response = client.info(TEST_API_KEY);
 
         // Verify the result
+        assertNotNull(response);
         assertEquals(mockResponse.getName(), response.getName());
         assertEquals(mockResponse.getDescription(), response.getDescription());
 
         // Verify interactions with mocks
-        verify(mockRestClient).get();
+        verify(restClient).get();
         verify(requestHeadersUriSpec).uri(DatasetUriConstant.V1_INFO);
     }
 
     @Test
     @DisplayName("Test meta")
     public void testMeta() {
-        // Setup specific mock behavior
-        setupGetRequestMocks("/v1/meta");
+        RestClient restClient = restClientMock.getRestClient();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
 
         // Mock the response
         AppMetaResponse mockResponse = new AppMetaResponse();
@@ -364,7 +308,7 @@ public class DifyChatDefaultClientTest {
         assertEquals(mockResponse.getToolIcons(), response.getToolIcons());
 
         // Verify interactions with mocks
-        verify(mockRestClient).get();
+        verify(restClient).get();
         verify(requestHeadersUriSpec).uri(DatasetUriConstant.V1_META);
     }
 }

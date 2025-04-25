@@ -15,18 +15,17 @@
  */
 package io.github.guoshiqiufeng.dify.client.spring6.server;
 
+import io.github.guoshiqiufeng.dify.client.spring6.BaseClientTest;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
-import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
 import io.github.guoshiqiufeng.dify.server.dto.request.DifyLoginRequestVO;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +34,6 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
@@ -43,36 +41,27 @@ import static org.mockito.Mockito.*;
  * @version 0.8.0
  * @since 2025/4/21 14:55
  */
+@SuppressWarnings("unchecked")
 @DisplayName("DifyServerDefaultClient Tests")
-public class DifyServerDefaultClientTest {
+public class DifyServerDefaultClientTest extends BaseClientTest {
+
+    private static final String BASE_URL = "https://api.dify.ai";
+
+    private DifyServerDefaultClient client;
+
+    @BeforeEach
+    public void setup() {
+        super.setup();
+        client = new DifyServerDefaultClient(new DifyProperties.Server(), new DifyServerTokenDefault(),
+                BASE_URL, new DifyProperties.ClientConfig(), restClientMock.getRestClientBuilder(), webClientMock.getWebClientBuilder());
+    }
 
     @Test
     @DisplayName("Test login method with valid credentials")
     public void testLogin() {
-        // Create mock objects
-        RestClient.RequestBodyUriSpec requestBodyUriSpec = Mockito.mock(RestClient.RequestBodyUriSpec.class);
-        RestClient.RequestBodySpec requestBodySpec = Mockito.mock(RestClient.RequestBodySpec.class);
-        RestClient.ResponseSpec responseSpec = Mockito.mock(RestClient.ResponseSpec.class);
-        RestClient.Builder mockRestClientBuilder = Mockito.mock(RestClient.Builder.class);
-        RestClient mockRestClient = Mockito.mock(RestClient.class);
-        WebClient.Builder mockWebClientBuilder = Mockito.mock(WebClient.Builder.class);
-        WebClient mockWebClient = Mockito.mock(WebClient.class);
-        BaseDifyServerToken mockServerToken = Mockito.mock(BaseDifyServerToken.class);
-
-        // Setup mock behavior
-        when(mockRestClientBuilder.baseUrl(anyString())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.defaultHeaders(any())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.build()).thenReturn(mockRestClient);
-
-        when(mockWebClientBuilder.baseUrl(anyString())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.defaultHeaders(any())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.build()).thenReturn(mockWebClient);
-
-        doReturn(requestBodyUriSpec).when(mockRestClient).post();
-        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
-        doReturn(requestBodySpec).when(requestBodySpec).body(any(DifyLoginRequestVO.class));
-        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.onStatus(any())).thenReturn(responseSpec);
+        RestClient.RequestBodySpec requestBodySpec = restClientMock.getRequestBodySpec();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestBodyUriSpec requestBodyUriSpec = restClientMock.getRequestBodyUriSpec();
 
         // Mock the login response
         LoginResultResponseVO mockLoginResult = new LoginResultResponseVO();
@@ -87,11 +76,8 @@ public class DifyServerDefaultClientTest {
         DifyProperties.Server serverProperties = new DifyProperties.Server();
         serverProperties.setEmail("test@example.com");
         serverProperties.setPassword("password123");
-
-        // Create the client with mocked dependencies
-        String baseUrl = "https://cloud.dify.ai";
-        DifyServerDefaultClient client = new DifyServerDefaultClient(serverProperties, mockServerToken, baseUrl, null, mockRestClientBuilder, mockWebClientBuilder);
-
+        client = new DifyServerDefaultClient(serverProperties, new DifyServerTokenDefault(),
+                BASE_URL, new DifyProperties.ClientConfig(), restClientMock.getRestClientBuilder(), webClientMock.getWebClientBuilder());
         // Call the method to test
         LoginResponseVO response = client.login();
 
@@ -115,30 +101,9 @@ public class DifyServerDefaultClientTest {
     @Test
     @DisplayName("Test refreshToken method")
     public void testRefreshToken() {
-        // Create mock objects
-        RestClient.RequestBodyUriSpec requestBodyUriSpec = Mockito.mock(RestClient.RequestBodyUriSpec.class);
-        RestClient.RequestBodySpec requestBodySpec = Mockito.mock(RestClient.RequestBodySpec.class);
-        RestClient.ResponseSpec responseSpec = Mockito.mock(RestClient.ResponseSpec.class);
-        RestClient.Builder mockRestClientBuilder = Mockito.mock(RestClient.Builder.class);
-        RestClient mockRestClient = Mockito.mock(RestClient.class);
-        WebClient.Builder mockWebClientBuilder = Mockito.mock(WebClient.Builder.class);
-        WebClient mockWebClient = Mockito.mock(WebClient.class);
-        BaseDifyServerToken mockServerToken = Mockito.mock(BaseDifyServerToken.class);
-
-        // Setup mock behavior
-        when(mockRestClientBuilder.baseUrl(anyString())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.defaultHeaders(any())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.build()).thenReturn(mockRestClient);
-
-        when(mockWebClientBuilder.baseUrl(anyString())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.defaultHeaders(any())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.build()).thenReturn(mockWebClient);
-
-        doReturn(requestBodyUriSpec).when(mockRestClient).post();
-        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
-        doReturn(requestBodySpec).when(requestBodySpec).body(any(Map.class));
-        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.onStatus(any())).thenReturn(responseSpec);
+        RestClient.RequestBodySpec requestBodySpec = restClientMock.getRequestBodySpec();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestBodyUriSpec requestBodyUriSpec = restClientMock.getRequestBodyUriSpec();
 
         // Mock the refresh token response
         LoginResultResponseVO mockRefreshResult = new LoginResultResponseVO();
@@ -149,13 +114,6 @@ public class DifyServerDefaultClientTest {
 
         mockRefreshResult.setData(mockRefreshData);
         when(responseSpec.body(LoginResultResponseVO.class)).thenReturn(mockRefreshResult);
-
-        // Create server properties
-        DifyProperties.Server serverProperties = new DifyProperties.Server();
-
-        // Create the client with mocked dependencies
-        String baseUrl = "https://cloud.dify.ai";
-        DifyServerDefaultClient client = new DifyServerDefaultClient(serverProperties, mockServerToken, baseUrl, null, mockRestClientBuilder, mockWebClientBuilder);
 
         // Call the method to test
         String refreshToken = "old-refresh-token";
@@ -180,30 +138,9 @@ public class DifyServerDefaultClientTest {
     @Test
     @DisplayName("Test app method")
     public void testApp() {
-        // Create mock objects
-        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = Mockito.mock(RestClient.RequestHeadersUriSpec.class);
-        RestClient.RequestHeadersSpec<?> requestHeadersSpec = Mockito.mock(RestClient.RequestHeadersSpec.class);
-        RestClient.ResponseSpec responseSpec = Mockito.mock(RestClient.ResponseSpec.class);
-        RestClient.Builder mockRestClientBuilder = Mockito.mock(RestClient.Builder.class);
-        RestClient mockRestClient = Mockito.mock(RestClient.class);
-        WebClient.Builder mockWebClientBuilder = Mockito.mock(WebClient.Builder.class);
-        WebClient mockWebClient = Mockito.mock(WebClient.class);
-        BaseDifyServerToken mockServerToken = new DifyServerTokenDefault();
-
-        // Setup mock behavior
-        when(mockRestClientBuilder.baseUrl(anyString())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.defaultHeaders(any())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.build()).thenReturn(mockRestClient);
-
-        when(mockWebClientBuilder.baseUrl(anyString())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.defaultHeaders(any())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.build()).thenReturn(mockWebClient);
-
-        doReturn(requestHeadersUriSpec).when(mockRestClient).get();
-        doReturn(requestHeadersSpec).when(requestHeadersUriSpec).uri(anyString(), anyString());
-        doReturn(requestHeadersSpec).when(requestHeadersSpec).headers(any());
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.onStatus(any())).thenReturn(responseSpec);
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
 
         // Mock the app response
         AppsResponseVO mockAppResponse = new AppsResponseVO();
@@ -211,13 +148,6 @@ public class DifyServerDefaultClientTest {
         mockAppResponse.setName("Test App");
         mockAppResponse.setMode("completion");
         when(responseSpec.body(AppsResponseVO.class)).thenReturn(mockAppResponse);
-
-        // Create server properties
-        DifyProperties.Server serverProperties = new DifyProperties.Server();
-
-        // Create the client with mocked dependencies
-        String baseUrl = "https://cloud.dify.ai";
-        DifyServerDefaultClient client = new DifyServerDefaultClient(serverProperties, mockServerToken, baseUrl, null, mockRestClientBuilder, mockWebClientBuilder);
 
         // Call the method to test
         String appId = "app-123";
@@ -237,32 +167,10 @@ public class DifyServerDefaultClientTest {
     @Test
     @DisplayName("Test getAppApiKey method")
     public void testGetAppApiKey() {
-        // Create mock objects
-        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = Mockito.mock(RestClient.RequestHeadersUriSpec.class);
-        RestClient.RequestHeadersSpec<?> requestHeadersSpec = Mockito.mock(RestClient.RequestHeadersSpec.class);
-        RestClient.ResponseSpec responseSpec = Mockito.mock(RestClient.ResponseSpec.class);
-        RestClient.Builder mockRestClientBuilder = Mockito.mock(RestClient.Builder.class);
-        RestClient mockRestClient = Mockito.mock(RestClient.class);
-        WebClient.Builder mockWebClientBuilder = Mockito.mock(WebClient.Builder.class);
-        WebClient mockWebClient = Mockito.mock(WebClient.class);
-        BaseDifyServerToken mockServerToken = new DifyServerTokenDefault();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
 
-        // Setup mock behavior
-        when(mockRestClientBuilder.baseUrl(anyString())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.defaultHeaders(any())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.build()).thenReturn(mockRestClient);
-
-        when(mockWebClientBuilder.baseUrl(anyString())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.defaultHeaders(any())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.build()).thenReturn(mockWebClient);
-
-        doReturn(requestHeadersUriSpec).when(mockRestClient).get();
-        doReturn(requestHeadersSpec).when(requestHeadersUriSpec).uri(anyString(), anyString());
-        doReturn(requestHeadersSpec).when(requestHeadersSpec).headers(any());
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.onStatus(any())).thenReturn(responseSpec);
-
-        // Mock the API key response
         ApiKeyResultResponseVO mockResult = new ApiKeyResultResponseVO();
         List<ApiKeyResponseVO> apiKeys = new ArrayList<>();
         ApiKeyResponseVO apiKey1 = new ApiKeyResponseVO();
@@ -277,13 +185,6 @@ public class DifyServerDefaultClientTest {
         apiKeys.add(apiKey2);
         mockResult.setData(apiKeys);
         doReturn(mockResult).when(responseSpec).body(ApiKeyResultResponseVO.class);
-
-        // Create server properties
-        DifyProperties.Server serverProperties = new DifyProperties.Server();
-
-        // Create the client with mocked dependencies
-        String baseUrl = "https://cloud.dify.ai";
-        DifyServerDefaultClient client = new DifyServerDefaultClient(serverProperties, mockServerToken, baseUrl, null, mockRestClientBuilder, mockWebClientBuilder);
 
         // Call the method to test
         String appId = "app-123";

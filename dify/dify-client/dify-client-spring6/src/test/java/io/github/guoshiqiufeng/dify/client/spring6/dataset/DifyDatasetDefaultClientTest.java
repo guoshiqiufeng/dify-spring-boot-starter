@@ -15,7 +15,10 @@
  */
 package io.github.guoshiqiufeng.dify.client.spring6.dataset;
 
+import io.github.guoshiqiufeng.dify.client.spring6.BaseClientTest;
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
+import io.github.guoshiqiufeng.dify.dataset.constant.DatasetUriConstant;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.DatasetCreateRequest;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.DatasetPageDocumentRequest;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.DatasetPageRequest;
@@ -24,13 +27,12 @@ import io.github.guoshiqiufeng.dify.dataset.dto.response.DatasetResponse;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentCreateResponse;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentInfo;
 import io.github.guoshiqiufeng.dify.dataset.enums.IndexingTechniqueEnum;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,45 +40,34 @@ import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
  * @author yanghq
- * @version 0.8.0
+ * @version 0.10.0
  * @since 2025/4/21 14:50
  */
+@SuppressWarnings("unchecked")
 @DisplayName("DifyDatasetDefaultClient Tests")
-public class DifyDatasetDefaultClientTest {
+public class DifyDatasetDefaultClientTest extends BaseClientTest {
+
+    private static final String BASE_URL = "https://api.dify.ai";
+
+    private DifyDatasetDefaultClient client;
+
+    @BeforeEach
+    public void setup() {
+        super.setup();
+        client = new DifyDatasetDefaultClient(BASE_URL, new DifyProperties.ClientConfig(), restClientMock.getRestClientBuilder(), webClientMock.getWebClientBuilder());
+    }
 
     @Test
     @DisplayName("Test create dataset method")
     public void testCreate() {
-        // Create mock objects
-        RestClient.RequestBodyUriSpec requestBodyUriSpec = Mockito.mock(RestClient.RequestBodyUriSpec.class);
-        RestClient.RequestBodySpec requestBodySpec = Mockito.mock(RestClient.RequestBodySpec.class);
-        RestClient.ResponseSpec responseSpec = Mockito.mock(RestClient.ResponseSpec.class);
-        RestClient.Builder mockRestClientBuilder = Mockito.mock(RestClient.Builder.class);
-        RestClient mockRestClient = Mockito.mock(RestClient.class);
-        WebClient.Builder mockWebClientBuilder = Mockito.mock(WebClient.Builder.class);
-        WebClient mockWebClient = Mockito.mock(WebClient.class);
-
-        // Setup mock behavior
-        when(mockRestClientBuilder.baseUrl(anyString())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.defaultHeaders(any())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.build()).thenReturn(mockRestClient);
-
-        when(mockWebClientBuilder.baseUrl(anyString())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.defaultHeaders(any())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.build()).thenReturn(mockWebClient);
-
-        // Setup mock behavior for RequestBodyUriSpec
-        doReturn(requestBodyUriSpec).when(mockRestClient).post();
-        when(requestBodyUriSpec.uri(eq("/v1/datasets"))).thenReturn(requestBodySpec);
-        when(requestBodySpec.headers(any(Consumer.class))).thenReturn(requestBodySpec);
-        doReturn(requestBodySpec).when(requestBodySpec).body(any(DatasetCreateRequest.class));
-        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.onStatus(any())).thenReturn(responseSpec);
+        RestClient.RequestBodySpec requestBodySpec = restClientMock.getRequestBodySpec();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestBodyUriSpec requestBodyUriSpec = restClientMock.getRequestBodyUriSpec();
 
         // Mock the response
         DatasetResponse mockResponse = new DatasetResponse();
@@ -84,10 +75,6 @@ public class DifyDatasetDefaultClientTest {
         mockResponse.setName("Test Dataset");
         mockResponse.setDescription("This is a test dataset");
         when(responseSpec.body(DatasetResponse.class)).thenReturn(mockResponse);
-
-        // Create the client with mocked dependencies
-        String baseUrl = "https://api.dify.ai";
-        DifyDatasetDefaultClient client = new DifyDatasetDefaultClient(baseUrl, null, mockRestClientBuilder, mockWebClientBuilder);
 
         // Create a dataset request
         DatasetCreateRequest request = new DatasetCreateRequest();
@@ -106,7 +93,7 @@ public class DifyDatasetDefaultClientTest {
         assertEquals("This is a test dataset", response.getDescription());
 
         // Verify interactions with mocks
-        verify(requestBodyUriSpec).uri("/v1/datasets");
+        verify(requestBodyUriSpec).uri(DatasetUriConstant.V1_DATASETS_URL);
         verify(requestBodySpec).headers(any(Consumer.class));
 
         // Capture and verify the request body
@@ -122,30 +109,9 @@ public class DifyDatasetDefaultClientTest {
     @Test
     @DisplayName("Test page datasets method")
     public void testPage() {
-        // Create mock objects
-        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = Mockito.mock(RestClient.RequestHeadersUriSpec.class);
-        RestClient.RequestHeadersSpec<?> requestHeadersSpec = Mockito.mock(RestClient.RequestHeadersSpec.class);
-        RestClient.ResponseSpec responseSpec = Mockito.mock(RestClient.ResponseSpec.class);
-        RestClient.Builder mockRestClientBuilder = Mockito.mock(RestClient.Builder.class);
-        RestClient mockRestClient = Mockito.mock(RestClient.class);
-        WebClient.Builder mockWebClientBuilder = Mockito.mock(WebClient.Builder.class);
-        WebClient mockWebClient = Mockito.mock(WebClient.class);
-
-        // Setup mock behavior
-        when(mockRestClientBuilder.baseUrl(anyString())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.defaultHeaders(any())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.build()).thenReturn(mockRestClient);
-
-        when(mockWebClientBuilder.baseUrl(anyString())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.defaultHeaders(any())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.build()).thenReturn(mockWebClient);
-
-        // Setup mock behavior for RequestHeadersUriSpec
-        doReturn(requestHeadersUriSpec).when(mockRestClient).get();
-        doReturn(requestHeadersSpec).when(requestHeadersUriSpec).uri(eq("/v1/datasets?page={page}&limit={limit}"), eq(1), eq(10));
-        when(requestHeadersSpec.headers(any(Consumer.class))).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.onStatus(any())).thenReturn(responseSpec);
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
 
         // Mock the response
         DifyPageResult<DatasetResponse> mockResponse = new DifyPageResult<>();
@@ -167,10 +133,6 @@ public class DifyDatasetDefaultClientTest {
         mockResponse.setTotal(2);
 
         doReturn(mockResponse).when(responseSpec).body(any(ParameterizedTypeReference.class));
-
-        // Create the client with mocked dependencies
-        String baseUrl = "https://api.dify.ai";
-        DifyDatasetDefaultClient client = new DifyDatasetDefaultClient(baseUrl, null, mockRestClientBuilder, mockWebClientBuilder);
 
         // Create a page request
         DatasetPageRequest request = new DatasetPageRequest();
@@ -201,35 +163,9 @@ public class DifyDatasetDefaultClientTest {
     @Test
     @DisplayName("Test delete dataset method")
     public void testDelete() {
-        // Create mock objects
-        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = Mockito.mock(RestClient.RequestHeadersUriSpec.class);
-        RestClient.RequestHeadersSpec<?> requestHeadersSpec = Mockito.mock(RestClient.RequestHeadersSpec.class);
-        RestClient.ResponseSpec responseSpec = Mockito.mock(RestClient.ResponseSpec.class);
-        RestClient.Builder mockRestClientBuilder = Mockito.mock(RestClient.Builder.class);
-        RestClient mockRestClient = Mockito.mock(RestClient.class);
-        WebClient.Builder mockWebClientBuilder = Mockito.mock(WebClient.Builder.class);
-        WebClient mockWebClient = Mockito.mock(WebClient.class);
-
-        // Setup mock behavior
-        when(mockRestClientBuilder.baseUrl(anyString())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.defaultHeaders(any())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.build()).thenReturn(mockRestClient);
-
-        when(mockWebClientBuilder.baseUrl(anyString())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.defaultHeaders(any())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.build()).thenReturn(mockWebClient);
-
-        // Setup mock behavior for RequestHeadersUriSpec
-        doReturn(requestHeadersUriSpec).when(mockRestClient).delete();
-        doReturn(requestHeadersSpec).when(requestHeadersUriSpec).uri(eq("/v1/datasets/{datasetId}"), eq("dataset-123"));
-        when(requestHeadersSpec.headers(any(Consumer.class))).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.onStatus(any())).thenReturn(responseSpec);
-        when(responseSpec.body(Void.class)).thenReturn(null);
-
-        // Create the client with mocked dependencies
-        String baseUrl = "https://api.dify.ai";
-        DifyDatasetDefaultClient client = new DifyDatasetDefaultClient(baseUrl, null, mockRestClientBuilder, mockWebClientBuilder);
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
 
         // Call the method to test
         String datasetId = "dataset-123";
@@ -245,31 +181,9 @@ public class DifyDatasetDefaultClientTest {
     @Test
     @DisplayName("Test create document by text method")
     public void testCreateDocumentByText() {
-        // Create mock objects
-        RestClient.RequestBodyUriSpec requestBodyUriSpec = Mockito.mock(RestClient.RequestBodyUriSpec.class);
-        RestClient.RequestBodySpec requestBodySpec = Mockito.mock(RestClient.RequestBodySpec.class);
-        RestClient.ResponseSpec responseSpec = Mockito.mock(RestClient.ResponseSpec.class);
-        RestClient.Builder mockRestClientBuilder = Mockito.mock(RestClient.Builder.class);
-        RestClient mockRestClient = Mockito.mock(RestClient.class);
-        WebClient.Builder mockWebClientBuilder = Mockito.mock(WebClient.Builder.class);
-        WebClient mockWebClient = Mockito.mock(WebClient.class);
-
-        // Setup mock behavior
-        when(mockRestClientBuilder.baseUrl(anyString())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.defaultHeaders(any())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.build()).thenReturn(mockRestClient);
-
-        when(mockWebClientBuilder.baseUrl(anyString())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.defaultHeaders(any())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.build()).thenReturn(mockWebClient);
-
-        // Setup mock behavior for RequestBodyUriSpec
-        doReturn(requestBodyUriSpec).when(mockRestClient).post();
-        doReturn(requestBodySpec).when(requestBodyUriSpec).uri(eq("/v1/datasets/{datasetId}/document/create-by-text"), eq("dataset-123"));
-        when(requestBodySpec.headers(any(Consumer.class))).thenReturn(requestBodySpec);
-        doReturn(requestBodySpec).when(requestBodySpec).body(any(DocumentCreateByTextRequest.class));
-        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.onStatus(any())).thenReturn(responseSpec);
+        RestClient.RequestBodySpec requestBodySpec = restClientMock.getRequestBodySpec();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestBodyUriSpec requestBodyUriSpec = restClientMock.getRequestBodyUriSpec();
 
         // Mock the response
         DocumentCreateResponse mockResponse = new DocumentCreateResponse();
@@ -280,10 +194,6 @@ public class DifyDatasetDefaultClientTest {
         mockResponse.setBatch("batch-1");
 
         when(responseSpec.body(DocumentCreateResponse.class)).thenReturn(mockResponse);
-
-        // Create the client with mocked dependencies
-        String baseUrl = "https://api.dify.ai";
-        DifyDatasetDefaultClient client = new DifyDatasetDefaultClient(baseUrl, null, mockRestClientBuilder, mockWebClientBuilder);
 
         // Create a document request
         DocumentCreateByTextRequest request = new DocumentCreateByTextRequest();
@@ -318,32 +228,9 @@ public class DifyDatasetDefaultClientTest {
     @Test
     @DisplayName("Test page documents method")
     public void testPageDocument() {
-        // Create mock objects
-        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = Mockito.mock(RestClient.RequestHeadersUriSpec.class);
-        RestClient.RequestHeadersSpec<?> requestHeadersSpec = Mockito.mock(RestClient.RequestHeadersSpec.class);
-        RestClient.ResponseSpec responseSpec = Mockito.mock(RestClient.ResponseSpec.class);
-        RestClient.Builder mockRestClientBuilder = Mockito.mock(RestClient.Builder.class);
-        RestClient mockRestClient = Mockito.mock(RestClient.class);
-        WebClient.Builder mockWebClientBuilder = Mockito.mock(WebClient.Builder.class);
-        WebClient mockWebClient = Mockito.mock(WebClient.class);
-
-        // Setup mock behavior
-        when(mockRestClientBuilder.baseUrl(anyString())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.defaultHeaders(any())).thenReturn(mockRestClientBuilder);
-        when(mockRestClientBuilder.build()).thenReturn(mockRestClient);
-
-        when(mockWebClientBuilder.baseUrl(anyString())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.defaultHeaders(any())).thenReturn(mockWebClientBuilder);
-        when(mockWebClientBuilder.build()).thenReturn(mockWebClient);
-
-        // Setup mock behavior for RequestHeadersUriSpec
-        doReturn(requestHeadersUriSpec).when(mockRestClient).get();
-        doReturn(requestHeadersSpec).when(requestHeadersUriSpec).uri(
-                eq("/v1/datasets/{datasetId}/documents?page={page}&limit={limit}&keyword={keyword}"),
-                eq("dataset-123"), eq(1), eq(10), eq("test"));
-        when(requestHeadersSpec.headers(any(Consumer.class))).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.onStatus(any())).thenReturn(responseSpec);
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
 
         // Mock the response
         DifyPageResult<DocumentInfo> mockResponse = new DifyPageResult<>();
@@ -365,10 +252,6 @@ public class DifyDatasetDefaultClientTest {
         mockResponse.setTotal(2);
 
         doReturn(mockResponse).when(responseSpec).body(any(ParameterizedTypeReference.class));
-
-        // Create the client with mocked dependencies
-        String baseUrl = "https://api.dify.ai";
-        DifyDatasetDefaultClient client = new DifyDatasetDefaultClient(baseUrl, null, mockRestClientBuilder, mockWebClientBuilder);
 
         // Create a page document request
         DatasetPageDocumentRequest request = new DatasetPageDocumentRequest();

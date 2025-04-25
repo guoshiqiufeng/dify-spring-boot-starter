@@ -366,7 +366,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         assertEquals(expectedResponse.getRecords().get(0).getSegment().getContent(), actualResponse.getRecords().get(0).getSegment().getContent());
         assertEquals(expectedResponse.getRecords().get(0).getScore(), actualResponse.getRecords().get(0).getScore());
         assertEquals(expectedResponse.getRecords().get(0).getSegment().getDocument().getId(),
-                     actualResponse.getRecords().get(0).getSegment().getDocument().getId());
+                actualResponse.getRecords().get(0).getSegment().getDocument().getId());
 
         // Verify WebClient interactions
         verify(webClientMock).post();
