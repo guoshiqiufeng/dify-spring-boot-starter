@@ -74,9 +74,6 @@ public class BaseDifyDefaultClientTest {
             return responseErrorHandler;
         }
 
-        public WebClient getWebClient() {
-            return webClient;
-        }
     }
 
     @Test
@@ -93,6 +90,15 @@ public class BaseDifyDefaultClientTest {
     public void testConstructorWithBaseUrl() {
         String baseUrl = "https://custom-dify-api.example.com";
         TestBaseDifyDefaultClient client = new TestBaseDifyDefaultClient(baseUrl);
+
+        assertNotNull(client.getResponseErrorHandler(), "ResponseErrorHandler should not be null");
+        assertNotNull(client.getWebClient(), "WebClient should not be null");
+    }
+
+    @Test
+    @DisplayName("Test constructor with null clientConfig")
+    public void testConstructorWithNullClientConfig() {
+        TestBaseDifyDefaultClient client = new TestBaseDifyDefaultClient("", null);
 
         assertNotNull(client.getResponseErrorHandler(), "ResponseErrorHandler should not be null");
         assertNotNull(client.getWebClient(), "WebClient should not be null");

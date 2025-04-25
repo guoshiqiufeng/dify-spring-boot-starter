@@ -98,6 +98,45 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
     }
 
     @Test
+    public void testRunWorkflowAndFile() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String userId = "test-user-id";
+
+        WorkflowRunRequest request = new WorkflowRunRequest();
+        request.setApiKey(apiKey);
+        request.setUserId(userId);
+        WorkflowRunRequest.WorkflowFile workflowFile = new WorkflowRunRequest.WorkflowFile();
+        workflowFile.setUrl("https://file.com");
+        workflowFile.setType("image");
+        request.setFiles(List.of(workflowFile));
+        Map<String, Object> inputs = new HashMap<>();
+        inputs.put("question", "What is the weather today?");
+        request.setInputs(inputs);
+
+        // Create expected response
+        WorkflowRunResponse expectedResponse = new WorkflowRunResponse();
+        expectedResponse.setWorkflowRunId("workflow-run-123456");
+
+        // Mock the response
+        when(responseSpecMock.bodyToMono(WorkflowRunResponse.class)).thenReturn(Mono.just(expectedResponse));
+
+        // Execute the method
+        WorkflowRunResponse actualResponse = difyWorkflowDefaultClient.runWorkflow(request);
+
+        // Verify the result
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getWorkflowRunId(), actualResponse.getWorkflowRunId());
+
+        // Verify WebClient interactions
+        verify(webClientMock).post();
+        verify(requestBodyUriSpecMock).uri(WorkflowConstant.WORKFLOW_RUN_URL);
+        verify(requestBodySpecMock).header(eq(HttpHeaders.AUTHORIZATION), eq("Bearer " + apiKey));
+        verify(requestBodySpecMock).bodyValue(any(ChatMessageVO.class));
+        verify(responseSpecMock).bodyToMono(WorkflowRunResponse.class);
+    }
+
+    @Test
     public void testRunWorkflowStream() {
         // Prepare test data
         String apiKey = "test-api-key";

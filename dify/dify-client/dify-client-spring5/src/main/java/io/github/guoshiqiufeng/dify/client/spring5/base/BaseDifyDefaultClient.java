@@ -18,6 +18,7 @@ package io.github.guoshiqiufeng.dify.client.spring5.base;
 import io.github.guoshiqiufeng.dify.client.spring5.utils.DifyExchangeStrategies;
 import io.github.guoshiqiufeng.dify.core.client.BaseDifyClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -42,6 +43,14 @@ public abstract class BaseDifyDefaultClient extends BaseDifyClient {
 
     protected final ResponseErrorHandler responseErrorHandler;
 
+    /**
+     * -- GETTER --
+     * Gets the WebClient instance used by this client.
+     * This method is primarily intended for testing purposes.
+     *
+     * @return the WebClient instance
+     */
+    @Getter
     protected final WebClient webClient;
 
     public BaseDifyDefaultClient() {
@@ -105,13 +114,4 @@ public abstract class BaseDifyDefaultClient extends BaseDifyClient {
 
     }
 
-    /**
-     * Gets the WebClient instance used by this client.
-     * This method is primarily intended for testing purposes.
-     *
-     * @return the WebClient instance
-     */
-    public WebClient getWebClient() {
-        return this.webClient;
-    }
 }
