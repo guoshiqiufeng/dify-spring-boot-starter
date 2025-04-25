@@ -17,10 +17,11 @@ package io.github.guoshiqiufeng.dify.client.spring5;
 
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.function.Consumer;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * @author yanghq
@@ -67,7 +68,7 @@ public abstract class BaseClientTest {
         // Handle header method properly
         when(requestBodySpecMock.header(anyString(), any(String[].class))).thenReturn(requestBodySpecMock);
         when(requestBodySpecMock.header(anyString(), anyString())).thenReturn(requestBodySpecMock);
-
+        doReturn(requestBodySpecMock).when(requestBodySpecMock).headers(any(Consumer.class));
         when(requestBodySpecMock.contentType(any())).thenReturn(requestBodySpecMock);
         when(requestBodySpecMock.bodyValue(any())).thenReturn(requestHeadersSpecMock);
         when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
@@ -80,7 +81,7 @@ public abstract class BaseClientTest {
 
         when(requestHeadersSpecMock.header(anyString(), any(String[].class))).thenReturn(requestHeadersSpecMock);
         when(requestHeadersSpecMock.header(anyString(), anyString())).thenReturn(requestHeadersSpecMock);
-
+        doReturn(requestHeadersSpecMock).when(requestHeadersSpecMock).headers(any(Consumer.class));
         when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
 
         // Setup WebClient mock behavior chain for DELETE
