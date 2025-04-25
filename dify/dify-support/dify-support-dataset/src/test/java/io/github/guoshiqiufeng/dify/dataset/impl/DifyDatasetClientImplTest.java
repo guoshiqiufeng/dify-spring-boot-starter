@@ -134,13 +134,13 @@ public class DifyDatasetClientImplTest {
         String datasetId = "dataset_123";
         String apiKey = "test_api_key";
 
-        doNothing().when(difyDatasetClient).delete(anyString(), anyString());
+        doNothing().when(difyDatasetClient).delete(anyString(), any());
 
         // Act
         difyDataset.delete(datasetId);
 
         // Assert
-        verify(difyDatasetClient, times(1)).delete(datasetId, apiKey);
+        verify(difyDatasetClient, times(1)).delete(datasetId, null);
     }
 
     @Test
@@ -362,7 +362,7 @@ public class DifyDatasetClientImplTest {
         DocumentDeleteResponse expectedResponse = new DocumentDeleteResponse();
         expectedResponse.setResult("success");
 
-        when(difyDatasetClient.deleteDocument(anyString(), anyString(), anyString()))
+        when(difyDatasetClient.deleteDocument(anyString(), anyString(), any()))
                 .thenReturn(expectedResponse);
 
         // Act
@@ -371,7 +371,7 @@ public class DifyDatasetClientImplTest {
         // Assert
         assertNotNull(actualResponse);
         assertEquals(expectedResponse.getResult(), actualResponse.getResult());
-        verify(difyDatasetClient, times(1)).deleteDocument(datasetId, documentId, apiKey);
+        verify(difyDatasetClient, times(1)).deleteDocument(datasetId, documentId, null);
     }
 
     @Test
@@ -478,7 +478,7 @@ public class DifyDatasetClientImplTest {
         SegmentDeleteResponse expectedResponse = new SegmentDeleteResponse();
         expectedResponse.setResult("success");
 
-        when(difyDatasetClient.deleteSegment(anyString(), anyString(), anyString(), anyString()))
+        when(difyDatasetClient.deleteSegment(anyString(), anyString(), anyString(), any()))
                 .thenReturn(expectedResponse);
 
         // Act
@@ -487,7 +487,7 @@ public class DifyDatasetClientImplTest {
         // Assert
         assertNotNull(actualResponse);
         assertEquals(expectedResponse.getResult(), actualResponse.getResult());
-        verify(difyDatasetClient, times(1)).deleteSegment(datasetId, documentId, segmentId, apiKey);
+        verify(difyDatasetClient, times(1)).deleteSegment(datasetId, documentId, segmentId, null);
     }
 
     @Test
@@ -707,7 +707,7 @@ public class DifyDatasetClientImplTest {
         expectedResponse.setCreatedBy("user123");
         expectedResponse.setCreatedAt(System.currentTimeMillis());
 
-        when(difyDatasetClient.uploadFileInfo(anyString(), anyString(), anyString()))
+        when(difyDatasetClient.uploadFileInfo(anyString(), anyString(), any()))
                 .thenReturn(expectedResponse);
 
         // Act
@@ -724,7 +724,7 @@ public class DifyDatasetClientImplTest {
         assertEquals(expectedResponse.getMimeType(), actualResponse.getMimeType());
         assertEquals(expectedResponse.getCreatedBy(), actualResponse.getCreatedBy());
         assertEquals(expectedResponse.getCreatedAt(), actualResponse.getCreatedAt());
-        verify(difyDatasetClient, times(1)).uploadFileInfo(datasetId, documentId, apiKey);
+        verify(difyDatasetClient, times(1)).uploadFileInfo(datasetId, documentId, null);
     }
 
     @Test
@@ -900,13 +900,13 @@ public class DifyDatasetClientImplTest {
         String metadataId = "meta_123";
         String apiKey = "test_api_key";
 
-        doNothing().when(difyDatasetClient).deleteMetaData(anyString(), anyString(), anyString());
+        doNothing().when(difyDatasetClient).deleteMetaData(anyString(), anyString(), any());
 
         // Act
         difyDataset.deleteMetaData(datasetId, metadataId);
 
         // Assert
-        verify(difyDatasetClient, times(1)).deleteMetaData(datasetId, metadataId, apiKey);
+        verify(difyDatasetClient, times(1)).deleteMetaData(datasetId, metadataId, null);
     }
 
     @Test
@@ -1020,7 +1020,7 @@ public class DifyDatasetClientImplTest {
         docMetadataList.add(docMetadata);
         expectedResponse.setDocMetadata(docMetadataList);
 
-        when(difyDatasetClient.listMetaData(anyString(), anyString()))
+        when(difyDatasetClient.listMetaData(anyString(), any()))
                 .thenReturn(expectedResponse);
 
         // Act
@@ -1035,7 +1035,7 @@ public class DifyDatasetClientImplTest {
         assertEquals(expectedResponse.getDocMetadata().get(0).getName(), actualResponse.getDocMetadata().get(0).getName());
         assertEquals(expectedResponse.getDocMetadata().get(0).getType(), actualResponse.getDocMetadata().get(0).getType());
         assertEquals(expectedResponse.getDocMetadata().get(0).getUserCount(), actualResponse.getDocMetadata().get(0).getUserCount());
-        verify(difyDatasetClient, times(1)).listMetaData(datasetId, apiKey);
+        verify(difyDatasetClient, times(1)).listMetaData(datasetId, null);
     }
 
     @Test
@@ -1096,7 +1096,7 @@ public class DifyDatasetClientImplTest {
         TextEmbeddingListResponse expectedResponse = new TextEmbeddingListResponse();
         expectedResponse.setData(embeddingList);
 
-        when(difyDatasetClient.listTextEmbedding(anyString()))
+        when(difyDatasetClient.listTextEmbedding(any()))
                 .thenReturn(expectedResponse);
 
         // Act
@@ -1109,6 +1109,6 @@ public class DifyDatasetClientImplTest {
         assertEquals("openai", actualResponse.getData().get(0).getProvider());
         assertEquals("anthropic", actualResponse.getData().get(1).getProvider());
         assertEquals("active", actualResponse.getData().get(0).getStatus());
-        verify(difyDatasetClient, times(1)).listTextEmbedding(apiKey);
+        verify(difyDatasetClient, times(1)).listTextEmbedding(null);
     }
 }
