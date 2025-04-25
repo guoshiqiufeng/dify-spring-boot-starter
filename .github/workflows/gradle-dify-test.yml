@@ -253,9 +253,14 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-      
+
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          
+      - name: Upload test results to Codecov shell
+        if: ${{ !cancelled() }}
+        run: |
+          /home/runner/work/_actions/codecov/test-results-action/v1/dist/codecov do-upload -C ${{ github.sha }} --report-type test_results -t ${{ secrets.CODECOV_TOKEN }}
