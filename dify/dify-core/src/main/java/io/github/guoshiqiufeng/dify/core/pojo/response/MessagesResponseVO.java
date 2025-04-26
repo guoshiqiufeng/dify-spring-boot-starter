@@ -147,6 +147,7 @@ public class MessagesResponseVO implements Serializable {
         /**
          * conversation_id (string) 会话ID
          */
+        @JsonAlias("conversation_id")
         private String conversationId;
     }
 
