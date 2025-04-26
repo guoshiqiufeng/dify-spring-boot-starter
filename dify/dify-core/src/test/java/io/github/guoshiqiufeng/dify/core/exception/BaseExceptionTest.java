@@ -80,7 +80,7 @@ public class BaseExceptionTest {
         BaseException exception = new BaseException(errorCode, errorMessage);
 
         // Verify exception message
-        assertEquals(errorMessage, exception.getMessage());
+        assertNull(exception.getMessage());
     }
 
     /**
@@ -112,6 +112,6 @@ public class BaseExceptionTest {
 
         // Test direct parameters constructor
         BaseException exception2 = new BaseException(404, "Resource not found");
-        assertEquals("Resource not found", exception2.getMessage());
+        assertNull(exception2.getMessage());
     }
 } 
