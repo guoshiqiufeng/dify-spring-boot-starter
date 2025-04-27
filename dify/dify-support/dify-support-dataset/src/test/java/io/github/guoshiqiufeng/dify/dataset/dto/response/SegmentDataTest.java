@@ -38,7 +38,7 @@ public class SegmentDataTest {
     public void testBasicProperties() {
         // Create test object
         SegmentData segmentData = new SegmentData();
-        
+
         // Set basic properties
         String id = "segment-123";
         Integer position = 1;
@@ -52,7 +52,7 @@ public class SegmentDataTest {
         Long disabledAt = null;
         String disabledBy = null;
         Boolean archived = false;
-        
+
         // Set all properties
         segmentData.setId(id);
         segmentData.setPosition(position);
@@ -66,7 +66,7 @@ public class SegmentDataTest {
         segmentData.setDisabledAt(disabledAt);
         segmentData.setDisabledBy(disabledBy);
         segmentData.setArchived(archived);
-        
+
         // Verify all properties
         assertEquals(id, segmentData.getId());
         assertEquals(position, segmentData.getPosition());
@@ -81,23 +81,23 @@ public class SegmentDataTest {
         assertEquals(disabledBy, segmentData.getDisabledBy());
         assertEquals(archived, segmentData.getArchived());
     }
-    
+
     @Test
     @DisplayName("Test chained setter methods of SegmentData")
     public void testChainSetter() {
         // Use chained setter methods (if available)
         SegmentData segmentData = new SegmentData();
-        
+
         // @Data annotation does not provide chained setters, so we need to reassign the variable after each set
         segmentData.setId("segment-123");
         segmentData.setContent("Test content");
         segmentData.setAnswer("Test answer");
-        
+
         assertEquals("segment-123", segmentData.getId());
         assertEquals("Test content", segmentData.getContent());
         assertEquals("Test answer", segmentData.getAnswer());
     }
-    
+
     @Test
     @DisplayName("Test JSON serialization and deserialization of SegmentData")
     public void testJsonSerializationDeserialization() throws JsonProcessingException {
@@ -112,10 +112,10 @@ public class SegmentDataTest {
         segmentData.setIndexingStatus("completed");
         segmentData.setEnabled("true");
         segmentData.setArchived(false);
-        
+
         // Serialize to JSON
         String json = objectMapper.writeValueAsString(segmentData);
-        
+
         // Check that JSON contains expected fields
         assertTrue(json.contains("\"id\":\"segment-123\""));
         assertTrue(json.contains("\"position\":1"));
@@ -126,10 +126,10 @@ public class SegmentDataTest {
         assertTrue(json.contains("\"indexingStatus\":\"completed\""));
         assertTrue(json.contains("\"enabled\":\"true\""));
         assertTrue(json.contains("\"archived\":false"));
-        
+
         // Deserialize from JSON
         SegmentData deserializedData = objectMapper.readValue(json, SegmentData.class);
-        
+
         // Verify deserialized object
         assertEquals(segmentData.getId(), deserializedData.getId());
         assertEquals(segmentData.getPosition(), deserializedData.getPosition());
@@ -141,7 +141,7 @@ public class SegmentDataTest {
         assertEquals(segmentData.getEnabled(), deserializedData.getEnabled());
         assertEquals(segmentData.getArchived(), deserializedData.getArchived());
     }
-    
+
     @Test
     @DisplayName("Test JSON deserialization of SegmentData using snake case naming")
     public void testSnakeCaseJsonDeserialization() throws JsonProcessingException {
@@ -160,10 +160,10 @@ public class SegmentDataTest {
                 "  \"disabled_by\": null,\n" +
                 "  \"archived\": false\n" +
                 "}";
-        
+
         // Deserialize from snake case JSON
         SegmentData deserializedData = objectMapper.readValue(snakeCaseJson, SegmentData.class);
-        
+
         // Verify fields with @JsonAlias annotations are correctly mapped
         assertEquals("segment-123", deserializedData.getId());
         assertEquals(Integer.valueOf(1), deserializedData.getPosition());
@@ -178,7 +178,7 @@ public class SegmentDataTest {
         assertNull(deserializedData.getDisabledBy());
         assertEquals(Boolean.FALSE, deserializedData.getArchived());
     }
-    
+
     @Test
     @DisplayName("Test equality and hash code of SegmentData")
     public void testEqualsAndHashCode() {
@@ -187,40 +187,40 @@ public class SegmentDataTest {
         data1.setId("segment-123");
         data1.setContent("Same content");
         data1.setAnswer("Same answer");
-        
+
         SegmentData data2 = new SegmentData();
         data2.setId("segment-123");
         data2.setContent("Same content");
         data2.setAnswer("Same answer");
-        
+
         // Test equality
         assertEquals(data1, data2);
         assertEquals(data2, data1);
-        
+
         // Test hash code
         assertEquals(data1.hashCode(), data2.hashCode());
-        
+
         // Create object with different content
         SegmentData data3 = new SegmentData();
         data3.setId("segment-456");  // Different ID
         data3.setContent("Same content");
         data3.setAnswer("Same answer");
-        
+
         // Test inequality
         assertNotEquals(data1, data3);
         assertNotEquals(data3, data1);
-        
+
         // Test comparison with null and other types
         assertNotEquals(data1, null);
         assertNotEquals(data1, "String");
     }
-    
+
     @Test
     @DisplayName("Test default values of SegmentData")
     public void testDefaultValues() {
         // Create new object to verify default values
         SegmentData segmentData = new SegmentData();
-        
+
         // All fields should have null as default value
         assertNull(segmentData.getId());
         assertNull(segmentData.getPosition());
@@ -235,7 +235,7 @@ public class SegmentDataTest {
         assertNull(segmentData.getDisabledBy());
         assertNull(segmentData.getArchived());
     }
-    
+
     @Test
     @DisplayName("Test toString method of SegmentData")
     public void testToString() {
@@ -244,13 +244,13 @@ public class SegmentDataTest {
         segmentData.setId("segment-123");
         segmentData.setContent("Test content");
         segmentData.setAnswer("Test answer");
-        
+
         // Get toString result
         String toStringResult = segmentData.toString();
-        
+
         // Verify toString contains all important fields
         assertTrue(toStringResult.contains("id=segment-123"));
         assertTrue(toStringResult.contains("content=Test content"));
         assertTrue(toStringResult.contains("answer=Test answer"));
     }
-} 
+}

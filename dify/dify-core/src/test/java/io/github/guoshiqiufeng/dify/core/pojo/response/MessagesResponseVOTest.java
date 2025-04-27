@@ -17,12 +17,15 @@ package io.github.guoshiqiufeng.dify.core.pojo.response;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Test class for MessagesResponseVO
@@ -243,4 +246,4 @@ public class MessagesResponseVOTest {
         assertEquals(1, agentThought.getMessageFiles().size());
         assertEquals("file_123456", agentThought.getMessageFiles().get(0));
     }
-} 
+}

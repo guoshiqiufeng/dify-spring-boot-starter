@@ -30,10 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -403,5 +400,160 @@ class DifyChatClientImplTest {
         assertNotNull(actualResponse);
         assertEquals(expectedResponse.getToolIcons(), actualResponse.getToolIcons());
         verify(difyChatClient, times(1)).meta(apiKey);
+    }
+
+    @Test
+    void testPageAppAnnotation() {
+        // Arrange
+        AppAnnotationPageRequest request = new AppAnnotationPageRequest();
+        request.setApiKey("test-api-key");
+        request.setUserId("user-123");
+        request.setPage(1);
+        request.setLimit(10);
+
+        List<AppAnnotationResponse> annotations = new ArrayList<>();
+        AppAnnotationResponse annotation1 = new AppAnnotationResponse();
+        annotation1.setId("anno-1");
+        annotation1.setQuestion("What is AI?");
+        annotation1.setAnswer("Artificial Intelligence is...");
+        annotation1.setHitCount(5);
+        annotation1.setCreatedAt(1619712000000L);
+
+        AppAnnotationResponse annotation2 = new AppAnnotationResponse();
+        annotation2.setId("anno-2");
+        annotation2.setQuestion("How does machine learning work?");
+        annotation2.setAnswer("Machine learning works by...");
+        annotation2.setHitCount(3);
+        annotation2.setCreatedAt(1619712001000L);
+
+        annotations.add(annotation1);
+        annotations.add(annotation2);
+
+        DifyPageResult<AppAnnotationResponse> expectedResult = new DifyPageResult<>();
+        expectedResult.setData(annotations);
+        expectedResult.setHasMore(false);
+        expectedResult.setLimit(10);
+        expectedResult.setPage(1);
+
+        when(difyChatClient.pageAppAnnotation(any(AppAnnotationPageRequest.class))).thenReturn(expectedResult);
+
+        // Act
+        DifyPageResult<AppAnnotationResponse> actualResult = difyChat.pageAppAnnotation(request);
+
+        // Assert
+        assertNotNull(actualResult);
+        assertEquals(expectedResult.getLimit(), actualResult.getLimit());
+        assertEquals(expectedResult.getPage(), actualResult.getPage());
+        assertEquals(expectedResult.getHasMore(), actualResult.getHasMore());
+        assertEquals(expectedResult.getData().size(), actualResult.getData().size());
+        assertEquals(expectedResult.getData().get(0).getId(), actualResult.getData().get(0).getId());
+        assertEquals(expectedResult.getData().get(0).getQuestion(), actualResult.getData().get(0).getQuestion());
+        assertEquals(expectedResult.getData().get(0).getAnswer(), actualResult.getData().get(0).getAnswer());
+        assertEquals(expectedResult.getData().get(0).getHitCount(), actualResult.getData().get(0).getHitCount());
+        assertEquals(expectedResult.getData().get(0).getCreatedAt(), actualResult.getData().get(0).getCreatedAt());
+        verify(difyChatClient, times(1)).pageAppAnnotation(any(AppAnnotationPageRequest.class));
+    }
+
+    @Test
+    void testCreateAppAnnotation() {
+        // Arrange
+        AppAnnotationCreateRequest request = new AppAnnotationCreateRequest();
+        request.setApiKey("test-api-key");
+        request.setUserId("user-123");
+        request.setQuestion("What is natural language processing?");
+        request.setAnswer("Natural language processing (NLP) is a field of AI that focuses on...");
+
+        AppAnnotationResponse expectedResponse = new AppAnnotationResponse();
+        expectedResponse.setId("anno-new");
+        expectedResponse.setQuestion(request.getQuestion());
+        expectedResponse.setAnswer(request.getAnswer());
+        expectedResponse.setHitCount(0);
+        expectedResponse.setCreatedAt(System.currentTimeMillis());
+
+        when(difyChatClient.createAppAnnotation(any(AppAnnotationCreateRequest.class))).thenReturn(expectedResponse);
+
+        // Act
+        AppAnnotationResponse actualResponse = difyChat.createAppAnnotation(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getQuestion(), actualResponse.getQuestion());
+        assertEquals(expectedResponse.getAnswer(), actualResponse.getAnswer());
+        assertEquals(expectedResponse.getHitCount(), actualResponse.getHitCount());
+        assertEquals(expectedResponse.getCreatedAt(), actualResponse.getCreatedAt());
+        verify(difyChatClient, times(1)).createAppAnnotation(any(AppAnnotationCreateRequest.class));
+    }
+
+    @Test
+    void testUpdateAppAnnotation() {
+        // Arrange
+        AppAnnotationUpdateRequest request = new AppAnnotationUpdateRequest();
+        request.setApiKey("test-api-key");
+        request.setUserId("user-123");
+        request.setAnnotationId("anno-1");
+        request.setQuestion("What is AI? (Updated)");
+        request.setAnswer("Artificial Intelligence is a field that... (Updated)");
+
+        AppAnnotationResponse expectedResponse = new AppAnnotationResponse();
+        expectedResponse.setId(request.getAnnotationId());
+        expectedResponse.setQuestion(request.getQuestion());
+        expectedResponse.setAnswer(request.getAnswer());
+        expectedResponse.setHitCount(6);
+        expectedResponse.setCreatedAt(1619712000000L);
+
+        when(difyChatClient.updateAppAnnotation(any(AppAnnotationUpdateRequest.class))).thenReturn(expectedResponse);
+
+        // Act
+        AppAnnotationResponse actualResponse = difyChat.updateAppAnnotation(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getQuestion(), actualResponse.getQuestion());
+        assertEquals(expectedResponse.getAnswer(), actualResponse.getAnswer());
+        assertEquals(expectedResponse.getHitCount(), actualResponse.getHitCount());
+        assertEquals(expectedResponse.getCreatedAt(), actualResponse.getCreatedAt());
+        verify(difyChatClient, times(1)).updateAppAnnotation(any(AppAnnotationUpdateRequest.class));
+    }
+
+    @Test
+    void testDeleteAppAnnotation() {
+        // Arrange
+        String annotationId = "anno-2";
+        String apiKey = "test-api-key";
+
+        AppAnnotationDeleteResponse expectedResponse = new AppAnnotationDeleteResponse();
+        expectedResponse.setResult("success");
+
+        when(difyChatClient.deleteAppAnnotation(anyString(), anyString())).thenReturn(expectedResponse);
+
+        // Act
+        AppAnnotationDeleteResponse actualResponse = difyChat.deleteAppAnnotation(annotationId, apiKey);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getResult(), actualResponse.getResult());
+        verify(difyChatClient, times(1)).deleteAppAnnotation(annotationId, apiKey);
+    }
+
+    @Test
+    void testDeleteAppAnnotation_Failure() {
+        // Arrange
+        String annotationId = "non-existent-id";
+        String apiKey = "test-api-key";
+
+        AppAnnotationDeleteResponse expectedResponse = new AppAnnotationDeleteResponse();
+        expectedResponse.setResult("error");
+
+        when(difyChatClient.deleteAppAnnotation(anyString(), anyString())).thenReturn(expectedResponse);
+
+        // Act
+        AppAnnotationDeleteResponse actualResponse = difyChat.deleteAppAnnotation(annotationId, apiKey);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getResult(), actualResponse.getResult());
+        verify(difyChatClient, times(1)).deleteAppAnnotation(annotationId, apiKey);
     }
 }

@@ -602,4 +602,177 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         verify(requestBodySpecMock).bodyValue(any());
         verify(responseSpecMock).bodyToMono(DifyTextVO.class);
     }
+
+    @Test
+    public void testPageAppAnnotation() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        int page = 1;
+        int limit = 20;
+
+        // Create request
+        AppAnnotationPageRequest request = new AppAnnotationPageRequest();
+        request.setApiKey(apiKey);
+        request.setPage(page);
+        request.setLimit(limit);
+
+        // Create expected response
+        DifyPageResult<AppAnnotationResponse> expectedResponse = new DifyPageResult<>();
+        List<AppAnnotationResponse> items = new ArrayList<>();
+        AppAnnotationResponse item = new AppAnnotationResponse();
+        item.setId("anno-1");
+        item.setQuestion("What is Dify?");
+        item.setAnswer("Dify is an LLM application development platform.");
+        item.setHitCount(10);
+        item.setCreatedAt(1715086123456L);
+        items.add(item);
+        expectedResponse.setData(items);
+        expectedResponse.setHasMore(false);
+
+        // Mock response
+        when(responseSpecMock.bodyToMono(any(ParameterizedTypeReference.class)))
+                .thenReturn(Mono.just(expectedResponse));
+
+        // Execute the method
+        DifyPageResult<AppAnnotationResponse> actualResponse = difyChatDefaultClient.pageAppAnnotation(request);
+
+        // Verify results
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getData().size(), actualResponse.getData().size());
+        assertEquals(expectedResponse.getData().get(0).getId(), actualResponse.getData().get(0).getId());
+        assertEquals(expectedResponse.getData().get(0).getQuestion(), actualResponse.getData().get(0).getQuestion());
+        assertEquals(expectedResponse.getData().get(0).getAnswer(), actualResponse.getData().get(0).getAnswer());
+        assertEquals(expectedResponse.getData().get(0).getHitCount(), actualResponse.getData().get(0).getHitCount());
+        assertEquals(expectedResponse.getData().get(0).getCreatedAt(), actualResponse.getData().get(0).getCreatedAt());
+
+        // Verify WebClient interactions
+        verify(webClientMock).get();
+        verify(requestHeadersUriSpecMock).uri(
+                DatasetUriConstant.V1_APPS_ANNOTATIONS + "?page={page}&limit={limit}",
+                page,
+                limit
+        );
+        verify(responseSpecMock).bodyToMono(any(ParameterizedTypeReference.class));
+    }
+
+    @Test
+    public void testCreateAppAnnotation() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String question = "What is LLM?";
+        String answer = "LLM stands for Large Language Model.";
+
+        // Create request
+        AppAnnotationCreateRequest request = new AppAnnotationCreateRequest();
+        request.setApiKey(apiKey);
+        request.setQuestion(question);
+        request.setAnswer(answer);
+
+        // Create expected response
+        AppAnnotationResponse expectedResponse = new AppAnnotationResponse();
+        expectedResponse.setId("anno-new");
+        expectedResponse.setQuestion(question);
+        expectedResponse.setAnswer(answer);
+        expectedResponse.setHitCount(0);
+        expectedResponse.setCreatedAt(System.currentTimeMillis());
+
+        // Mock response
+        when(responseSpecMock.bodyToMono(AppAnnotationResponse.class))
+                .thenReturn(Mono.just(expectedResponse));
+
+        // Execute the method
+        AppAnnotationResponse actualResponse = difyChatDefaultClient.createAppAnnotation(request);
+
+        // Verify results
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getQuestion(), actualResponse.getQuestion());
+        assertEquals(expectedResponse.getAnswer(), actualResponse.getAnswer());
+        assertEquals(expectedResponse.getHitCount(), actualResponse.getHitCount());
+        assertEquals(expectedResponse.getCreatedAt(), actualResponse.getCreatedAt());
+
+        // Verify WebClient interactions
+        verify(webClientMock).post();
+        verify(requestBodyUriSpecMock).uri(DatasetUriConstant.V1_APPS_ANNOTATIONS);
+        verify(requestBodySpecMock).bodyValue(request);
+        verify(responseSpecMock).bodyToMono(AppAnnotationResponse.class);
+    }
+
+    @Test
+    public void testUpdateAppAnnotation() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String annotationId = "anno-1";
+        String question = "What is an API key?";
+        String answer = "An API key is a unique identifier used to authenticate requests to an API.";
+
+        // Create request
+        AppAnnotationUpdateRequest request = new AppAnnotationUpdateRequest();
+        request.setApiKey(apiKey);
+        request.setAnnotationId(annotationId);
+        request.setQuestion(question);
+        request.setAnswer(answer);
+
+        // Create expected response
+        AppAnnotationResponse expectedResponse = new AppAnnotationResponse();
+        expectedResponse.setId(annotationId);
+        expectedResponse.setQuestion(question);
+        expectedResponse.setAnswer(answer);
+        expectedResponse.setHitCount(5);
+        expectedResponse.setCreatedAt(1715086123456L);
+
+        // Mock response
+        when(responseSpecMock.bodyToMono(AppAnnotationResponse.class))
+                .thenReturn(Mono.just(expectedResponse));
+
+        // Execute the method
+        AppAnnotationResponse actualResponse = difyChatDefaultClient.updateAppAnnotation(request);
+
+        // Verify results
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getQuestion(), actualResponse.getQuestion());
+        assertEquals(expectedResponse.getAnswer(), actualResponse.getAnswer());
+        assertEquals(expectedResponse.getHitCount(), actualResponse.getHitCount());
+        assertEquals(expectedResponse.getCreatedAt(), actualResponse.getCreatedAt());
+
+        // Verify WebClient interactions
+        verify(webClientMock).put();
+        verify(requestBodyUriSpecMock).uri(
+                DatasetUriConstant.V1_APPS_ANNOTATIONS + "/{annotation_id}",
+                annotationId
+        );
+        verify(requestBodySpecMock).bodyValue(request);
+        verify(responseSpecMock).bodyToMono(AppAnnotationResponse.class);
+    }
+
+    @Test
+    public void testDeleteAppAnnotation() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String annotationId = "anno-1";
+
+        // Create expected response
+        AppAnnotationDeleteResponse expectedResponse = new AppAnnotationDeleteResponse();
+        expectedResponse.setResult("success");
+
+        // Mock response
+        when(responseSpecMock.bodyToMono(AppAnnotationDeleteResponse.class))
+                .thenReturn(Mono.just(expectedResponse));
+
+        // Execute the method
+        AppAnnotationDeleteResponse actualResponse = difyChatDefaultClient.deleteAppAnnotation(annotationId, apiKey);
+
+        // Verify results
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getResult(), actualResponse.getResult());
+
+        // Verify WebClient interactions
+        verify(webClientMock).delete();
+        verify(requestHeadersUriSpecMock).uri(
+                DatasetUriConstant.V1_APPS_ANNOTATIONS + "/{annotation_id}",
+                annotationId
+        );
+        verify(responseSpecMock).bodyToMono(AppAnnotationDeleteResponse.class);
+    }
 }

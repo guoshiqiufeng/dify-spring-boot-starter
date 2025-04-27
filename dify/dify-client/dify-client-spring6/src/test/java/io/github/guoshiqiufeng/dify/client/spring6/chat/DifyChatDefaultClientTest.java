@@ -652,4 +652,199 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         verify(requestBodySpec).contentType(MediaType.MULTIPART_FORM_DATA);
         verify(responseSpec).body(DifyTextVO.class);
     }
+
+    @Test
+    @DisplayName("Test page app annotations")
+    public void testPageAppAnnotation() {
+        RestClient restClient = restClientMock.getRestClient();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+
+        // Prepare test data
+        String apiKey = "test-api-key";
+        int page = 1;
+        int limit = 20;
+
+        // Create request
+        AppAnnotationPageRequest request = new AppAnnotationPageRequest();
+        request.setApiKey(apiKey);
+        request.setPage(page);
+        request.setLimit(limit);
+
+        // Create expected response
+        DifyPageResult<AppAnnotationResponse> expectedResponse = new DifyPageResult<>();
+        List<AppAnnotationResponse> items = new ArrayList<>();
+        AppAnnotationResponse item = new AppAnnotationResponse();
+        item.setId("anno-1");
+        item.setQuestion("What is Dify?");
+        item.setAnswer("Dify is an LLM application development platform.");
+        item.setHitCount(10);
+        item.setCreatedAt(1715086123456L);
+        items.add(item);
+        expectedResponse.setData(items);
+        expectedResponse.setHasMore(false);
+
+        // Mock response
+        when(responseSpec.body(any(ParameterizedTypeReference.class)))
+                .thenReturn(expectedResponse);
+
+        // Execute the method
+        DifyPageResult<AppAnnotationResponse> actualResponse = client.pageAppAnnotation(request);
+
+        // Verify results
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getData().size(), actualResponse.getData().size());
+        assertEquals(expectedResponse.getData().get(0).getId(), actualResponse.getData().get(0).getId());
+        assertEquals(expectedResponse.getData().get(0).getQuestion(), actualResponse.getData().get(0).getQuestion());
+        assertEquals(expectedResponse.getData().get(0).getAnswer(), actualResponse.getData().get(0).getAnswer());
+        assertEquals(expectedResponse.getData().get(0).getHitCount(), actualResponse.getData().get(0).getHitCount());
+        assertEquals(expectedResponse.getData().get(0).getCreatedAt(), actualResponse.getData().get(0).getCreatedAt());
+
+        // Verify WebClient interactions
+        verify(restClient).get();
+        verify(requestHeadersUriSpec).uri(
+                DatasetUriConstant.V1_APPS_ANNOTATIONS + "?page={page}&limit={limit}",
+                page,
+                limit
+        );
+        verify(responseSpec).body(any(ParameterizedTypeReference.class));
+    }
+
+    @Test
+    @DisplayName("Test create app annotation")
+    public void testCreateAppAnnotation() {
+        RestClient restClient = restClientMock.getRestClient();
+        RestClient.RequestBodySpec requestBodySpec = restClientMock.getRequestBodySpec();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestBodyUriSpec requestBodyUriSpec = restClientMock.getRequestBodyUriSpec();
+
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String question = "What is LLM?";
+        String answer = "LLM stands for Large Language Model.";
+
+        // Create request
+        AppAnnotationCreateRequest request = new AppAnnotationCreateRequest();
+        request.setApiKey(apiKey);
+        request.setQuestion(question);
+        request.setAnswer(answer);
+
+        // Create expected response
+        AppAnnotationResponse expectedResponse = new AppAnnotationResponse();
+        expectedResponse.setId("anno-new");
+        expectedResponse.setQuestion(question);
+        expectedResponse.setAnswer(answer);
+        expectedResponse.setHitCount(0);
+        expectedResponse.setCreatedAt(System.currentTimeMillis());
+
+        // Mock response
+        when(responseSpec.body(AppAnnotationResponse.class))
+                .thenReturn(expectedResponse);
+
+        // Execute the method
+        AppAnnotationResponse actualResponse = client.createAppAnnotation(request);
+
+        // Verify results
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getQuestion(), actualResponse.getQuestion());
+        assertEquals(expectedResponse.getAnswer(), actualResponse.getAnswer());
+        assertEquals(expectedResponse.getHitCount(), actualResponse.getHitCount());
+        assertEquals(expectedResponse.getCreatedAt(), actualResponse.getCreatedAt());
+
+        // Verify WebClient interactions
+        verify(restClient).post();
+        verify(requestBodyUriSpec).uri(DatasetUriConstant.V1_APPS_ANNOTATIONS);
+        verify(requestBodySpec).body(request);
+        verify(responseSpec).body(AppAnnotationResponse.class);
+    }
+
+    @Test
+    @DisplayName("Test update app annotation")
+    public void testUpdateAppAnnotation() {
+        RestClient restClient = restClientMock.getRestClient();
+        RestClient.RequestBodySpec requestBodySpec = restClientMock.getRequestBodySpec();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestBodyUriSpec requestBodyUriSpec = restClientMock.getRequestBodyUriSpec();
+
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String annotationId = "anno-1";
+        String question = "What is an API key?";
+        String answer = "An API key is a unique identifier used to authenticate requests to an API.";
+
+        // Create request
+        AppAnnotationUpdateRequest request = new AppAnnotationUpdateRequest();
+        request.setApiKey(apiKey);
+        request.setAnnotationId(annotationId);
+        request.setQuestion(question);
+        request.setAnswer(answer);
+
+        // Create expected response
+        AppAnnotationResponse expectedResponse = new AppAnnotationResponse();
+        expectedResponse.setId(annotationId);
+        expectedResponse.setQuestion(question);
+        expectedResponse.setAnswer(answer);
+        expectedResponse.setHitCount(5);
+        expectedResponse.setCreatedAt(1715086123456L);
+
+        // Mock response
+        when(responseSpec.body(AppAnnotationResponse.class))
+                .thenReturn(expectedResponse);
+
+        // Execute the method
+        AppAnnotationResponse actualResponse = client.updateAppAnnotation(request);
+
+        // Verify results
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getQuestion(), actualResponse.getQuestion());
+        assertEquals(expectedResponse.getAnswer(), actualResponse.getAnswer());
+        assertEquals(expectedResponse.getHitCount(), actualResponse.getHitCount());
+        assertEquals(expectedResponse.getCreatedAt(), actualResponse.getCreatedAt());
+
+        // Verify WebClient interactions
+        verify(restClient).put();
+        verify(requestBodyUriSpec).uri(
+                DatasetUriConstant.V1_APPS_ANNOTATIONS + "/{annotation_id}",
+                annotationId
+        );
+        verify(requestBodySpec).body(request);
+        verify(responseSpec).body(AppAnnotationResponse.class);
+    }
+
+    @Test
+    @DisplayName("Test delete app annotation")
+    public void testDeleteAppAnnotation() {
+        RestClient restClient = restClientMock.getRestClient();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String annotationId = "anno-1";
+
+        // Create expected response
+        AppAnnotationDeleteResponse expectedResponse = new AppAnnotationDeleteResponse();
+        expectedResponse.setResult("success");
+
+        // Mock response
+        when(responseSpec.body(AppAnnotationDeleteResponse.class))
+                .thenReturn(expectedResponse);
+
+        // Execute the method
+        AppAnnotationDeleteResponse actualResponse = client.deleteAppAnnotation(annotationId, apiKey);
+
+        // Verify results
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getResult(), actualResponse.getResult());
+
+        // Verify WebClient interactions
+        verify(restClient).delete();
+        verify(requestHeadersUriSpec).uri(
+                DatasetUriConstant.V1_APPS_ANNOTATIONS + "/{annotation_id}",
+                annotationId
+        );
+        verify(responseSpec).body(AppAnnotationDeleteResponse.class);
+    }
 }

@@ -15,10 +15,10 @@
  */
 package io.github.guoshiqiufeng.dify.core.client;
 
-import io.github.guoshiqiufeng.dify.core.client.BaseDifyClient;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Test class for BaseDifyClient
