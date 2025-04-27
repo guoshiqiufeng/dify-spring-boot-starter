@@ -47,6 +47,8 @@ description:
 | 【CHAT】创建标注             | ✅  |  
 | 【CHAT】更新标注             | ✅  |  
 | 【CHAT】删除标注             | ✅  |  
+| 【CHAT】标注回复初始设置         | ✅  |  
+| 【CHAT】查询标注回复初始设置任务状态   | ✅  |  
 | 【WORKFLOW】 执行工作流       | ✅  |   
 | 【WORKFLOW】 执行工作流并获取工作流 | ✅  |   
 | 【WORKFLOW】 停止工作流响应     | ✅  |  
