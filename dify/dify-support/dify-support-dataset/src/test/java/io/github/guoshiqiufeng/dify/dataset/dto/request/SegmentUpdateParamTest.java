@@ -77,7 +77,7 @@ public class SegmentUpdateParamTest {
         SegmentUpdateParam param = new SegmentUpdateParam();
 
         // Test inheritance
-        assertTrue(param instanceof SegmentParam);
+        assertInstanceOf(SegmentParam.class, param);
 
         // Test casting to parent class
         SegmentParam parentParam = param;
@@ -264,4 +264,4 @@ public class SegmentUpdateParamTest {
         assertEquals(param1.hashCode(), param2.hashCode());
         assertNotEquals(param1.hashCode(), param3.hashCode());
     }
-} 
+}

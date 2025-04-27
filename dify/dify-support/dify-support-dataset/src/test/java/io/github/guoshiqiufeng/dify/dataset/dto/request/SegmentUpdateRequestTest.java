@@ -83,7 +83,7 @@ public class SegmentUpdateRequestTest {
         SegmentUpdateRequest request = new SegmentUpdateRequest();
 
         // Test inheritance
-        assertTrue(request instanceof BaseDatasetRequest);
+        assertInstanceOf(BaseDatasetRequest.class, request);
 
         // Test casting to parent class
         BaseDatasetRequest baseRequest = request;
@@ -297,7 +297,7 @@ public class SegmentUpdateRequestTest {
      */
     @Test
     public void testModificationAfterCreation() {
-        // Create request 
+        // Create request
         SegmentUpdateRequest request = new SegmentUpdateRequest();
         request.setApiKey("test-api-key");
         request.setDatasetId("dataset-123");
@@ -323,4 +323,4 @@ public class SegmentUpdateRequestTest {
         assertEquals("Updated content", request.getSegment().getContent());
         assertEquals("Updated answer", request.getSegment().getAnswer());
     }
-} 
+}

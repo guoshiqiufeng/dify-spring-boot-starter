@@ -9,4 +9,5 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-databind"
 
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.springframework:spring-test'
 }
