@@ -45,7 +45,7 @@ public class WorkflowRunStreamResponseDeserializer
         // 解析 event 字段
         JsonNode eventNode = root.get("event");
         if (eventNode == null || !eventNode.isTextual()) {
-            throw new IOException("Missing or invalid 'event' field");
+            return null;
         }
         StreamEventEnum event = StreamEventEnum.valueOf(eventNode.asText());
 

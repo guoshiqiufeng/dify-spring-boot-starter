@@ -38,9 +38,6 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          path: "dify-spring-boot-starter"
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -54,22 +51,17 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "8.10.2"
-          build-root-directory: ./dify-spring-boot-starter
           gradle-home-cache-cleanup: true
 
       # Runs a single command using the runners shell
       - name: Clone Dify repository
-        run: git clone https://github.com/langgenius/dify.git
-
-      - name: Setup environment
-        run: |
-          cd dify/docker
-          cp .env.example .env
+        run: git clone https://github.com/langgenius/dify.git tools/dify
 
       # Runs a set of commands using the runners shell
       - name: Start Docker containers
         run: |
-          cd dify/docker
+          cd tools/dify/docker
+          cp .env.example .env
           docker compose up -d
           docker compose ps
 
@@ -77,11 +69,24 @@ jobs:
         run: |
           # Instead of running Ollama directly on the host, run it in a Docker container and connect to Dify network
           docker run -d --name ollama -p 11434:11434 ollama/ollama
-          # Wait for Ollama to initialize
-          echo "Waiting for Ollama container to start..."
-          sleep 10
+          
           # Test if Ollama is running
-          curl -s http://localhost:11434/api/tags
+          max_retries=10
+          retry_delay=2
+          for ((i=1; i<=max_retries; i++)); do
+            echo "Attempt $i: Checking Ollama health..."
+            if curl -sSf -X GET http://localhost:11434/api/tags --connect-timeout 5; then
+              echo "Ollama is ready!"
+              break
+            else
+              echo "Ollama not ready yet, waiting ${retry_delay}s..."
+              sleep $retry_delay
+            fi
+            if [ $i -eq $max_retries ]; then
+              echo "Error: Failed to connect to Ollama after $max_retries attempts"
+              exit 1
+            fi
+          done
           
           # Find Dify network and connect Ollama to it
           DIFY_NETWORK=$(docker network ls | grep docker_default | awk '{print $1}')
@@ -124,14 +129,14 @@ jobs:
           docker run --rm curlimages/curl curl -s http://${HOST_IP}:11434/api/tags || echo "Failed to connect to Ollama from container"
       - name: Initialize Dify application
         run: |
-          cd dify/docker
+          cd tools/dify/docker
           curl -sSf -X GET 'http://localhost/console/api/init' \
             -H 'Accept: */*' \
             -H 'Content-Type: application/json' \
             --retry 10 --retry-delay 5
       - name: Create admin user
         run: |
-          cd dify/docker
+          cd tools/dify/docker
           curl -sSf -X POST 'http://localhost/console/api/setup' \
             -H 'Accept: */*' \
             -H 'Content-Type: application/json' \
@@ -140,7 +145,7 @@ jobs:
       - name: Get admin token
         id: get_token
         run: |
-          cd dify/docker
+          cd tools/dify/docker
           sudo apt-get update && sudo apt-get install -y jq
           echo "Attempting to login..."
           RESPONSE=$(curl -v -X POST 'http://localhost/console/api/login' \
@@ -168,7 +173,7 @@ jobs:
 
       - name: Add dify Ollama Plugin
         run: |
-          cd dify/docker
+          cd tools/dify/docker
           
           curl -sSf -X POST 'http://localhost/console/api/workspaces/current/plugin/install/marketplace' \
             -H 'Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}' \
@@ -178,7 +183,7 @@ jobs:
 
       - name: Wait for plugin to be installed
         run: |
-          cd dify/docker
+          cd tools/dify/docker
           echo "Checking if plugin is installed correctly..."
           MAX_ATTEMPTS=10
           ATTEMPT=0
@@ -209,7 +214,7 @@ jobs:
           fi
       - name: Add dify Ollama model
         run: |
-          cd dify/docker
+          cd tools/dify/docker
           
           # Get Docker container name and network info for Ollama
           OLLAMA_CONTAINER_NAME="ollama"
@@ -226,7 +231,7 @@ jobs:
 
       - name: Add test chat
         run: |
-          cd dify/docker
+          cd tools/dify/docker
           
           OLLAMA_CONTAINER_NAME="ollama"
           
@@ -237,7 +242,7 @@ jobs:
 
       - name: Set default model
         run: |
-          cd dify/docker
+          cd tools/dify/docker
           
           curl 'http://localhost/console/api/workspaces/current/default-model' \
             -H 'Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}' \
@@ -246,14 +251,13 @@ jobs:
 
       - name: Run Gradle tests
         run: |
-          cd dify-spring-boot-starter
           gradle jacocoTestReport
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          codecov_yml_path: dify-spring-boot-starter/.github/.codecov.yml
+          codecov_yml_path: .github/.codecov.yml
 
           #- name: Upload test results to Codecov
           #  if: ${{ !cancelled() }}
@@ -264,7 +268,7 @@ jobs:
       - name: Upload test results to Codecov shell
         if: ${{ !cancelled() }}
         run: |
-          cd dify-spring-boot-starter
+          cd tools
           curl -Os https://cli.codecov.io/latest/linux/codecov
           sudo chmod +x codecov
           ./codecov do-upload -C ${{ github.sha }} --report-type test_results -t ${{ secrets.CODECOV_TOKEN }}
