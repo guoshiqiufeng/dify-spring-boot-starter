@@ -15,6 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.chat.dto.response.message;
 
+import lombok.Data;
+
 import java.io.Serializable;
 
 /**
@@ -22,6 +24,7 @@ import java.io.Serializable;
  * @version 1.0
  * @since 2025/4/15 17:44
  */
+@Data
 public class CompletionData implements Serializable {
     private static final long serialVersionUID = -9035787788964834544L;
 }

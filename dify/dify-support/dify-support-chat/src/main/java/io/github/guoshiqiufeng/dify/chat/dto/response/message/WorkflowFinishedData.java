@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.chat.dto.response.message;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -32,6 +33,7 @@ public class WorkflowFinishedData extends CompletionData {
 
     private String id;
 
+    @JsonProperty("workflowId")
     @JsonAlias("workflow_id")
     private String workflowId;
 
@@ -40,16 +42,19 @@ public class WorkflowFinishedData extends CompletionData {
     private String status;
     private String error;
 
+    @JsonProperty("elapsedTime")
     @JsonAlias("elapsed_time")
     private Integer elapsedTime;
 
+    @JsonProperty("totalTokens")
     @JsonAlias("total_tokens")
     private Integer totalTokens;
 
+    @JsonProperty("totalSteps")
     @JsonAlias("total_steps")
     private Integer totalSteps;
 
-
+    @JsonProperty("createdAt")
     @JsonAlias("created_at")
     private Long createdAt;
 }

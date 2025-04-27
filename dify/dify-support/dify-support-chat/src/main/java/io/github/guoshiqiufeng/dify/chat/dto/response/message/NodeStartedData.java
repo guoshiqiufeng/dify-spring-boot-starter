@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.chat.dto.response.message;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -32,21 +33,25 @@ public class NodeStartedData extends CompletionData {
 
     private String id;
 
+    @JsonProperty("nodeId")
     @JsonAlias("node_id")
     private String nodeId;
 
-    @JsonAlias("nodeType")
+    @JsonProperty("nodeType")
+    @JsonAlias("node_type")
     private String nodeType;
 
     private String title;
 
     private Integer index;
 
+    @JsonProperty("predecessorNodeId")
     @JsonAlias("predecessor_node_id")
     private String predecessorNodeId;
 
     private Map<String, Object> inputs;
 
+    @JsonProperty("createdAt")
     @JsonAlias("created_at")
     private Long createdAt;
 

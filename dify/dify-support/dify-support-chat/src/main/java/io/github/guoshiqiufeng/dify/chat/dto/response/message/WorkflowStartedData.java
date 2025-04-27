@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.chat.dto.response.message;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -30,12 +31,15 @@ public class WorkflowStartedData extends CompletionData {
 
     private String id;
 
+    @JsonProperty("workflowId")
     @JsonAlias("workflow_id")
     private String workflowId;
 
+    @JsonProperty("sequenceNumber")
     @JsonAlias("sequence_number")
     private Integer sequenceNumber;
 
+    @JsonProperty("createdAt")
     @JsonAlias("created_at")
     private Long createdAt;
 
