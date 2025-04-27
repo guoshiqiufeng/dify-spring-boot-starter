@@ -68,7 +68,7 @@ public class MessageFeedbackRequest extends BaseChatRequest implements Serializa
 
         public static Rating keyOf(String key) {
             for (Rating rating : values()) {
-                if (rating.getKey().equals(key)) {
+                if (rating.getKey() != null && rating.getKey().equals(key)) {
                     return rating;
                 }
             }

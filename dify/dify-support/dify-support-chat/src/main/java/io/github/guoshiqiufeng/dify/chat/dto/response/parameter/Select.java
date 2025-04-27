@@ -17,6 +17,7 @@ package io.github.guoshiqiufeng.dify.chat.dto.response.parameter;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.List;
@@ -27,6 +28,7 @@ import java.util.List;
  * @since 2025/3/24 14:33
  */
 @Data
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class Select extends TextInput implements Serializable {
 
