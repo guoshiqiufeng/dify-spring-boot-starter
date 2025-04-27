@@ -35,7 +35,6 @@ jobs:
           fi
           echo "Marketplace URL is accessible."
 
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout Repository
         uses: actions/checkout@v4
 
