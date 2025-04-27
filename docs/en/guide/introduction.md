@@ -42,8 +42,12 @@ Implementation of the Redis messaging framework.
 | 【CHAT】text-to-speech                                  | ✅      |    
 | 【CHAT】speech-to-text                                  | ✅      |  
 | 【CHAT】File Upload                                     | ✅      |    
-| 【CHAT】Get Application Basic Information               | 🚧     |    
-| 【CHAT】Get Application Meta Information                | 🚧     |    
+| 【CHAT】Get Application Basic Information               | ✅      |    
+| 【CHAT】Get Application Meta Information                | ✅      |    
+| 【CHAT】Get Annotation List                             | ✅      |  
+| 【CHAT】Create Annotation                               | ✅      |  
+| 【CHAT】Update Annotation                               | ✅      |  
+| 【CHAT】Delete Annotation                               | ✅      |  
 | 【WORKFLOW】 Run Workflow                               | ✅      |   
 | 【WORKFLOW】 Run Workflow Stream                        | ✅      |   
 | 【WORKFLOW】 Stop Workflow Stream                       | ✅      |  
