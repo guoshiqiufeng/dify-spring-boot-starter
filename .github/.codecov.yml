@@ -16,6 +16,3 @@ flag_management:
       paths:
         - "dify/dify-client/dify-client-spring6/**"
         - "dify/spring-boot-starter/**"
-
-fixes:
-  - "dify-spring-boot-starter/::"  # Remove the project name prefix from paths
