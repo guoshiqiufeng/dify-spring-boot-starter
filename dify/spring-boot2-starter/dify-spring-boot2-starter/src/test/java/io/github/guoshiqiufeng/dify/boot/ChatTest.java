@@ -295,7 +295,7 @@ public class ChatTest extends BaseChatContainerTest {
         String token = datasetApiKeys.getFirst().getToken();
         DifyDataset difyDataset = DifyDatasetBuilder.create(DifyDatasetBuilder.DifyDatasetClientBuilder.builder()
                 .baseUrl(difyProperties.getUrl())
-                .webClientBuilder(WebClient.builder().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey))
+                .webClientBuilder(WebClient.builder().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .build()
         );
         TextEmbeddingListResponse textEmbeddingListResponse = difyDataset.listTextEmbedding();
@@ -307,8 +307,8 @@ public class ChatTest extends BaseChatContainerTest {
         request.setApiKey(apiKey);
         request.setUserId(userId);
         request.setAction(AnnotationReplyActionEnum.enable);
-        request.setEmbeddingModelProvider(textEmbedding.getProvider());
-        request.setEmbeddingModel(textEmbedding.getModels().getFirst().getModel());
+        request.setEmbeddingProviderName(textEmbedding.getProvider());
+        request.setEmbeddingModelName(textEmbedding.getModels().getFirst().getModel());
         request.setScoreThreshold(0.8f);
 
         AppAnnotationReplyResponse response = difyChat.annotationReply(request);

@@ -36,13 +36,13 @@ public class AppAnnotationReplyRequest extends BaseChatRequest implements Serial
 
     private AnnotationReplyActionEnum action;
 
-    @JsonAlias("embeddingModelProvider")
-    @JsonProperty("embedding_model_provider")
-    private String embeddingModelProvider;
+    @JsonAlias("embeddingProviderName")
+    @JsonProperty("embedding_provider_name")
+    private String embeddingProviderName;
 
-    @JsonAlias("embeddingModel")
-    @JsonProperty("embedding_model")
-    private String embeddingModel;
+    @JsonAlias("embeddingModelName")
+    @JsonProperty("embedding_model_name")
+    private String embeddingModelName;
 
     @JsonAlias("scoreThreshold")
     @JsonProperty("score_threshold")

@@ -622,14 +622,14 @@ AppAnnotationReplyResponse annotationReply(AppAnnotationReplyRequest request);
 
 AppAnnotationReplyRequest
 
-| Parameter name         | Type                      | Required | Description              |
-|------------------------|---------------------------|----------|--------------------------|
-| apiKey                 | String                    | Yes      | API key                  |
-| userId                 | String                    | Yes      | User ID                  |
-| action                 | AnnotationReplyActionEnum | Yes      | Reply action type        |
-| embeddingModelProvider | String                    | No       | Embedding model provider |
-| embeddingModel         | String                    | No       | Embedding model name     |
-| scoreThreshold         | Float                     | No       | Score threshold          |
+| Parameter name        | Type                      | Required | Description              |
+|-----------------------|---------------------------|----------|--------------------------|
+| apiKey                | String                    | Yes      | API key                  |
+| userId                | String                    | Yes      | User ID                  |
+| action                | AnnotationReplyActionEnum | Yes      | Reply action type        |
+| embeddingProviderName | String                    | No       | Embedding model provider |
+| embeddingModelName    | String                    | No       | Embedding model name     |
+| scoreThreshold        | Float                     | No       | Score threshold          |
 
 #### Response Parameters
 

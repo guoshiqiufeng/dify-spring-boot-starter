@@ -620,14 +620,14 @@ AppAnnotationReplyResponse annotationReply(AppAnnotationReplyRequest request);
 
 AppAnnotationReplyRequest
 
-| 参数名                    | 类型                        | 是否必须 | 描述      |
-|------------------------|---------------------------|------|---------|
-| apiKey                 | String                    | 是    | apiKey  |
-| userId                 | String                    | 是    | 用户 id   |
-| action                 | AnnotationReplyActionEnum | 是    | 回复动作类型  |
-| embeddingModelProvider | String                    | 否    | 嵌入模型提供商 |
-| embeddingModel         | String                    | 否    | 嵌入模型名称  |
-| scoreThreshold         | Float                     | 否    | 评分阈值    |
+| 参数名                   | 类型                        | 是否必须 | 描述      |
+|-----------------------|---------------------------|------|---------|
+| apiKey                | String                    | 是    | apiKey  |
+| userId                | String                    | 是    | 用户 id   |
+| action                | AnnotationReplyActionEnum | 是    | 回复动作类型  |
+| embeddingProviderName | String                    | 否    | 嵌入模型提供商 |
+| embeddingModelName    | String                    | 否    | 嵌入模型名称  |
+| scoreThreshold        | Float                     | 否    | 评分阈值    |
 
 #### 响应参数
 

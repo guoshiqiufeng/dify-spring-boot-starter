@@ -307,8 +307,8 @@ public class ChatTest extends BaseChatContainerTest {
         request.setApiKey(apiKey);
         request.setUserId(userId);
         request.setAction(AnnotationReplyActionEnum.enable);
-        request.setEmbeddingModelProvider(textEmbedding.getProvider());
-        request.setEmbeddingModel(textEmbedding.getModels().getFirst().getModel());
+        request.setEmbeddingProviderName(textEmbedding.getProvider());
+        request.setEmbeddingModelName(textEmbedding.getModels().getFirst().getModel());
         request.setScoreThreshold(0.8f);
 
         AppAnnotationReplyResponse response = difyChat.annotationReply(request);
@@ -328,7 +328,7 @@ public class ChatTest extends BaseChatContainerTest {
         AppAnnotationReplyQueryRequest request = new AppAnnotationReplyQueryRequest();
         request.setApiKey(apiKey);
         request.setUserId(userId);
-        request.setAction(AnnotationReplyActionEnum.disable);
+        request.setAction(AnnotationReplyActionEnum.enable);
         request.setJobId(replyJobId);
 
         AppAnnotationReplyResponse response = difyChat.queryAnnotationReply(request);

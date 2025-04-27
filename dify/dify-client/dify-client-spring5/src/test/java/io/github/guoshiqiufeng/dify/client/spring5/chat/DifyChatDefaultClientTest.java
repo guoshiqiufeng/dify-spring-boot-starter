@@ -790,8 +790,8 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         AppAnnotationReplyRequest request = new AppAnnotationReplyRequest();
         request.setApiKey(apiKey);
         request.setAction(AnnotationReplyActionEnum.enable);
-        request.setEmbeddingModelProvider(embeddingModelProvider);
-        request.setEmbeddingModel(embeddingModel);
+        request.setEmbeddingProviderName(embeddingModelProvider);
+        request.setEmbeddingModelName(embeddingModel);
         request.setScoreThreshold(scoreThreshold);
 
         // Create expected response

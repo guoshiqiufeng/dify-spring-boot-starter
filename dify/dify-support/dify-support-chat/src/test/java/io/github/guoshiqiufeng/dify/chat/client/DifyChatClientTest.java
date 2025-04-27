@@ -564,8 +564,8 @@ class DifyChatClientTest {
         request.setApiKey("test-api-key");
         request.setUserId("user-123");
         request.setAction(AnnotationReplyActionEnum.enable);
-        request.setEmbeddingModelProvider("openai");
-        request.setEmbeddingModel("text-embedding-ada-002");
+        request.setEmbeddingProviderName("openai");
+        request.setEmbeddingModelName("text-embedding-ada-002");
         request.setScoreThreshold(0.8f);
 
         AppAnnotationReplyResponse expectedResponse = new AppAnnotationReplyResponse();
