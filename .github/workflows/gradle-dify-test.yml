@@ -251,7 +251,6 @@ jobs:
 
       - name: Run Gradle tests
         run: |
-          cd dify-spring-boot-starter
           gradle jacocoTestReport
 
       - name: Upload coverage to Codecov
