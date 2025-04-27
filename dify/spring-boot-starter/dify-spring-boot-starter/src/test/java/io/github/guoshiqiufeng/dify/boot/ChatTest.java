@@ -20,12 +20,21 @@ import io.github.guoshiqiufeng.dify.chat.DifyChat;
 import io.github.guoshiqiufeng.dify.chat.dto.request.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.parameter.Enabled;
+import io.github.guoshiqiufeng.dify.chat.enums.AnnotationReplyActionEnum;
+import io.github.guoshiqiufeng.dify.client.spring6.builder.DifyDatasetBuilder;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
+import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
+import io.github.guoshiqiufeng.dify.dataset.dto.response.TextEmbeddingListResponse;
+import io.github.guoshiqiufeng.dify.dataset.dto.response.textembedding.TextEmbedding;
+import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponseVO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
@@ -54,6 +63,7 @@ public class ChatTest extends BaseChatContainerTest {
     private static String messageId;
     private static String taskId;
     private static String annotationId;
+    private static String replyJobId;
 
     private static Boolean suggestedEnable;
 
@@ -271,5 +281,58 @@ public class ChatTest extends BaseChatContainerTest {
     public void testDeleteAppAnnotation() {
         AppAnnotationDeleteResponse response = difyChat.deleteAppAnnotation(annotationId, apiKey);
         assertNotNull(response);
+    }
+
+    @Test
+    @Order(27)
+    @DisplayName("Test annotation reply")
+    public void testAnnotationReply() {
+        List<DatasetApiKeyResponseVO> datasetApiKeys = difyServer.getDatasetApiKey();
+        if (CollectionUtils.isEmpty(datasetApiKeys)) {
+            datasetApiKeys = difyServer.initDatasetApiKey();
+        }
+        String token = datasetApiKeys.getFirst().getToken();
+        DifyDataset difyDataset = DifyDatasetBuilder.create(DifyDatasetBuilder.DifyDatasetClientBuilder.builder()
+                .baseUrl(difyProperties.getUrl())
+                .restClientBuilder(RestClient.builder().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .build()
+        );
+        TextEmbeddingListResponse textEmbeddingListResponse = difyDataset.listTextEmbedding();
+        assertNotNull(textEmbeddingListResponse);
+        TextEmbedding textEmbedding = textEmbeddingListResponse.getData().getFirst();
+
+
+        // Test the annotation reply
+        AppAnnotationReplyRequest request = new AppAnnotationReplyRequest();
+        request.setApiKey(apiKey);
+        request.setUserId(userId);
+        request.setAction(AnnotationReplyActionEnum.enable);
+        request.setEmbeddingProviderName(textEmbedding.getProvider());
+        request.setEmbeddingModelName(textEmbedding.getModels().getFirst().getModel());
+        request.setScoreThreshold(0.8f);
+
+        AppAnnotationReplyResponse response = difyChat.annotationReply(request);
+        assertNotNull(response);
+        assertNotNull(response.getJobId());
+        replyJobId = response.getJobId();
+    }
+
+    @Test
+    @Order(28)
+    @DisplayName("Test query annotation reply")
+    public void testQueryAnnotationReply() {
+        if (replyJobId == null) {
+            return;
+        }
+
+        AppAnnotationReplyQueryRequest request = new AppAnnotationReplyQueryRequest();
+        request.setApiKey(apiKey);
+        request.setUserId(userId);
+        request.setAction(AnnotationReplyActionEnum.enable);
+        request.setJobId(replyJobId);
+
+        AppAnnotationReplyResponse response = difyChat.queryAnnotationReply(request);
+        assertNotNull(response);
+        assertNotNull(response.getJobStatus());
     }
 }

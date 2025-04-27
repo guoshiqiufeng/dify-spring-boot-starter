@@ -31,12 +31,12 @@ public enum StreamEventEnum {
     /**
      * workflow started
      */
-    workflow_started(NodeStartedData.class),
+    workflow_started(WorkflowStartedData.class),
 
     /**
      * node started
      */
-    node_started(WorkflowStartedData.class),
+    node_started(NodeStartedData.class),
 
 
     /**

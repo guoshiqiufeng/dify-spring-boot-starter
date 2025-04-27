@@ -395,6 +395,30 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
                 .bodyToMono(AppAnnotationDeleteResponse.class).block();
     }
 
+    @Override
+    public AppAnnotationReplyResponse annotationReply(AppAnnotationReplyRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        return webClient.post()
+                .uri(DatasetUriConstant.V1_APPS_ANNOTATIONS_REPLY + "/{action}", request.getAction())
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request.getApiKey()).accept(h))
+                .bodyValue(request)
+                .retrieve()
+                .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(AppAnnotationReplyResponse.class).block();
+    }
+
+    @Override
+    public AppAnnotationReplyResponse queryAnnotationReply(AppAnnotationReplyQueryRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        return webClient.get()
+                .uri(DatasetUriConstant.V1_APPS_ANNOTATIONS_REPLY + "/{action}/status/{job_id}",
+                        request.getAction(), request.getJobId())
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request.getApiKey()).accept(h))
+                .retrieve()
+                .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(AppAnnotationReplyResponse.class).block();
+    }
+
     private ChatMessageVO builderChatMessage(ResponseModeEnum responseMode, ChatMessageSendRequest sendRequest) {
         ChatMessageVO chatMessage = new ChatMessageVO();
         chatMessage.setResponseMode(responseMode);

@@ -398,6 +398,30 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
                 .body(AppAnnotationDeleteResponse.class);
     }
 
+    @Override
+    public AppAnnotationReplyResponse annotationReply(AppAnnotationReplyRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        return restClient.post()
+                .uri(DatasetUriConstant.V1_APPS_ANNOTATIONS_REPLY + "/{action}", request.getAction())
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request.getApiKey()).accept(h))
+                .body(request)
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(AppAnnotationReplyResponse.class);
+    }
+
+    @Override
+    public AppAnnotationReplyResponse queryAnnotationReply(AppAnnotationReplyQueryRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        return restClient.get()
+                .uri(DatasetUriConstant.V1_APPS_ANNOTATIONS_REPLY + "/{action}/status/{job_id}",
+                        request.getAction(), request.getJobId())
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request.getApiKey()).accept(h))
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(AppAnnotationReplyResponse.class);
+    }
+
     private ChatMessageVO builderChatMessage(ResponseModeEnum responseMode, ChatMessageSendRequest sendRequest) {
         ChatMessageVO chatMessage = new ChatMessageVO();
         chatMessage.setResponseMode(responseMode);

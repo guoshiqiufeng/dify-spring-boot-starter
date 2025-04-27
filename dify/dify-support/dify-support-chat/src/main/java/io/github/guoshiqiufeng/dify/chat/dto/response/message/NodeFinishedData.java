@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.chat.dto.response.message;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -31,6 +32,7 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 public class NodeFinishedData extends NodeStartedData {
 
+    @JsonProperty("processData")
     @JsonAlias("process_data")
     private Map<String, Object> processData;
 
@@ -39,17 +41,22 @@ public class NodeFinishedData extends NodeStartedData {
     private String status;
     private String error;
 
+    @JsonProperty("elapsedTime")
     @JsonAlias("elapsed_time")
     private Integer elapsedTime;
 
+    @JsonProperty("executionMetadata")
     @JsonAlias("execution_metadata")
     private ExecutionMetadata executionMetadata;
 
     @Data
     public static class ExecutionMetadata {
+
+        @JsonProperty("totalTokens")
         @JsonAlias("total_tokens")
         private Integer totalTokens;
 
+        @JsonProperty("totalPrice")
         @JsonAlias("total_price")
         private BigDecimal totalPrice;
 

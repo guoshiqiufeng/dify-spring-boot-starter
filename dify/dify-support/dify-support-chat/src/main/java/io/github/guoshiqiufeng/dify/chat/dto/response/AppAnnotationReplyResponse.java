@@ -13,22 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.chat.dto.response.parameter;
+package io.github.guoshiqiufeng.dify.chat.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 import java.io.Serializable;
 
 /**
  * @author yanghq
- * @version 1.0
- * @since 2025/3/24 14:32
+ * @version 0.10.0
+ * @since 2025/4/27 11:01
  */
 @Data
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public class Paragraph extends TextInput implements Serializable {
-
+public class AppAnnotationReplyResponse implements Serializable {
+    private static final long serialVersionUID = 6264478725338981923L;
+    @JsonAlias("job_id")
+    private String jobId;
+    @JsonAlias("job_status")
+    private String jobStatus;
+    @JsonAlias("error_msg")
+    private String errorMsg;
 }

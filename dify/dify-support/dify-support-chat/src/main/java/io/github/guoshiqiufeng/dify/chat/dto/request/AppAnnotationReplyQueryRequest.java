@@ -13,22 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.chat.dto.response.parameter;
+package io.github.guoshiqiufeng.dify.chat.dto.request;
 
+import io.github.guoshiqiufeng.dify.chat.enums.AnnotationReplyActionEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 import java.io.Serializable;
 
 /**
  * @author yanghq
  * @version 1.0
- * @since 2025/3/24 14:32
+ * @since 2025/4/27 11:02
  */
 @Data
-@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class Paragraph extends TextInput implements Serializable {
+public class AppAnnotationReplyQueryRequest extends BaseChatRequest implements Serializable {
 
+    private static final long serialVersionUID = 3705079948625308524L;
+
+    private AnnotationReplyActionEnum action;
+
+    private String jobId;
 }

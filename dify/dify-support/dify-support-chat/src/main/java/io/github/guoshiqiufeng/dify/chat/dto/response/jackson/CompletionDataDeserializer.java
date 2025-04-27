@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.guoshiqiufeng.dify.chat.dto.response.message.CompletionData;
 import io.github.guoshiqiufeng.dify.chat.enums.StreamEventEnum;
 
@@ -48,14 +49,13 @@ public class CompletionDataDeserializer
 
         try {
             StreamEventEnum event = StreamEventEnum.valueOf(eventNode.asText());
-
-
             Class<? extends CompletionData> dataClass = event.getClazz();
+            // Create a copy of the node without the "event" field to avoid UnrecognizedPropertyException
+            ObjectNode rootCopy = root.deepCopy();
+            rootCopy.remove("event");
 
-
-            return mapper.treeToValue(root, dataClass);
+            return mapper.treeToValue(rootCopy, dataClass);
         } catch (IllegalArgumentException e) {
-
             throw new IOException("Unknown event type: " + eventNode.asText(), e);
         }
     }

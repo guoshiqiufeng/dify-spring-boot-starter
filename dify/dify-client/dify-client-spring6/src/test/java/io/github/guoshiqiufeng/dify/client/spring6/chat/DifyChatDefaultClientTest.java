@@ -18,6 +18,7 @@ package io.github.guoshiqiufeng.dify.client.spring6.chat;
 import io.github.guoshiqiufeng.dify.chat.constant.ChatUriConstant;
 import io.github.guoshiqiufeng.dify.chat.dto.request.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.*;
+import io.github.guoshiqiufeng.dify.chat.enums.AnnotationReplyActionEnum;
 import io.github.guoshiqiufeng.dify.client.spring6.BaseClientTest;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.enums.ResponseModeEnum;
@@ -846,5 +847,102 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 annotationId
         );
         verify(responseSpec).body(AppAnnotationDeleteResponse.class);
+    }
+
+    @Test
+    @DisplayName("Test annotation reply")
+    public void testAnnotationReply() {
+        RestClient restClient = restClientMock.getRestClient();
+        RestClient.RequestBodySpec requestBodySpec = restClientMock.getRequestBodySpec();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestBodyUriSpec requestBodyUriSpec = restClientMock.getRequestBodyUriSpec();
+
+        // Prepare test data
+        String apiKey = "test-api-key";
+        AnnotationReplyActionEnum action = AnnotationReplyActionEnum.enable;
+        String embeddingModelProvider = "openai";
+        String embeddingModel = "text-embedding-3-small";
+        Float scoreThreshold = 0.75f;
+
+        // Create request
+        AppAnnotationReplyRequest request = new AppAnnotationReplyRequest();
+        request.setApiKey(apiKey);
+        request.setAction(action);
+        request.setEmbeddingProviderName(embeddingModelProvider);
+        request.setEmbeddingModelName(embeddingModel);
+        request.setScoreThreshold(scoreThreshold);
+
+        // Create expected response
+        AppAnnotationReplyResponse expectedResponse = new AppAnnotationReplyResponse();
+        // Assuming jobId field exists in the response based on the query method
+        expectedResponse.setJobId("b15c8f68-1cf4-4877-bf21-ed7cf2011802");
+        expectedResponse.setJobStatus("waiting");
+
+        // Mock response
+        when(responseSpec.body(AppAnnotationReplyResponse.class))
+                .thenReturn(expectedResponse);
+
+        // Execute the method
+        AppAnnotationReplyResponse actualResponse = client.annotationReply(request);
+
+        // Verify results
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getJobId(), actualResponse.getJobId());
+        assertEquals(expectedResponse.getJobStatus(), actualResponse.getJobStatus());
+
+        // Verify WebClient interactions
+        verify(restClient).post();
+        verify(requestBodyUriSpec).uri(
+                DatasetUriConstant.V1_APPS_ANNOTATIONS_REPLY + "/{action}",
+                action
+        );
+        verify(requestBodySpec).body(request);
+        verify(responseSpec).body(AppAnnotationReplyResponse.class);
+    }
+
+    @Test
+    @DisplayName("Test query annotation reply status")
+    public void testQueryAnnotationReply() {
+        RestClient restClient = restClientMock.getRestClient();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+
+        // Prepare test data
+        String apiKey = "test-api-key";
+        AnnotationReplyActionEnum action = AnnotationReplyActionEnum.enable;
+        String jobId = "job-123456";
+
+        // Create request
+        AppAnnotationReplyQueryRequest request = new AppAnnotationReplyQueryRequest();
+        request.setApiKey(apiKey);
+        request.setAction(action);
+        request.setJobId(jobId);
+
+        // Create expected response
+        AppAnnotationReplyResponse expectedResponse = new AppAnnotationReplyResponse();
+        expectedResponse.setJobId("b15c8f68-1cf4-4877-bf21-ed7cf2011802");
+        expectedResponse.setJobStatus("waiting");
+        expectedResponse.setErrorMsg("");
+
+        // Mock response
+        when(responseSpec.body(AppAnnotationReplyResponse.class))
+                .thenReturn(expectedResponse);
+
+        // Execute the method
+        AppAnnotationReplyResponse actualResponse = client.queryAnnotationReply(request);
+
+        // Verify results
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getJobId(), actualResponse.getJobId());
+        assertEquals(expectedResponse.getJobStatus(), actualResponse.getJobStatus());
+
+        // Verify WebClient interactions
+        verify(restClient).get();
+        verify(requestHeadersUriSpec).uri(
+                DatasetUriConstant.V1_APPS_ANNOTATIONS_REPLY + "/{action}/status/{job_id}",
+                action,
+                jobId
+        );
+        verify(responseSpec).body(AppAnnotationReplyResponse.class);
     }
 }

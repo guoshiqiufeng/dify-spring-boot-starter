@@ -607,3 +607,63 @@ AppAnnotationDeleteResponse
 | 参数名    | 类型     | 描述                |
 |--------|--------|-------------------|
 | result | String | 操作结果，成功返回 success |
+
+### 4.5 标注回复
+
+#### 方法
+
+```java
+AppAnnotationReplyResponse annotationReply(AppAnnotationReplyRequest request);
+```
+
+#### 请求参数
+
+AppAnnotationReplyRequest
+
+| 参数名                   | 类型                        | 是否必须 | 描述      |
+|-----------------------|---------------------------|------|---------|
+| apiKey                | String                    | 是    | apiKey  |
+| userId                | String                    | 是    | 用户 id   |
+| action                | AnnotationReplyActionEnum | 是    | 回复动作类型  |
+| embeddingProviderName | String                    | 否    | 嵌入模型提供商 |
+| embeddingModelName    | String                    | 否    | 嵌入模型名称  |
+| scoreThreshold        | Float                     | 否    | 评分阈值    |
+
+#### 响应参数
+
+AppAnnotationReplyResponse
+
+| 参数名       | 类型     | 描述    |
+|-----------|--------|-------|
+| jobId     | String | 任务 id |
+| jobStatus | String | 任务状态  |
+| errorMsg  | String | 错误信息  |
+
+### 4.6 查询标注回复状态
+
+#### 方法
+
+```java
+AppAnnotationReplyResponse queryAnnotationReply(AppAnnotationReplyQueryRequest request);
+```
+
+#### 请求参数
+
+AppAnnotationReplyQueryRequest
+
+| 参数名    | 类型                        | 是否必须 | 描述        |
+|--------|---------------------------|------|-----------|
+| apiKey | String                    | 是    | apiKey    |
+| userId | String                    | 是    | 用户 id     |
+| action | AnnotationReplyActionEnum | 是    | 回复动作类型    |
+| jobId  | String                    | 是    | 需要查询的任务id |
+
+#### 响应参数
+
+AppAnnotationReplyResponse
+
+| 参数名       | 类型     | 描述    |
+|-----------|--------|-------|
+| jobId     | String | 任务 id |
+| jobStatus | String | 任务状态  |
+| errorMsg  | String | 错误信息  |

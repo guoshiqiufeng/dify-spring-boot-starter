@@ -20,6 +20,7 @@ import io.github.guoshiqiufeng.dify.chat.client.DifyChatClient;
 import io.github.guoshiqiufeng.dify.chat.dto.request.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.parameter.Enabled;
+import io.github.guoshiqiufeng.dify.chat.enums.AnnotationReplyActionEnum;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
 import org.junit.jupiter.api.BeforeEach;
@@ -555,5 +556,58 @@ class DifyChatClientImplTest {
         assertNotNull(actualResponse);
         assertEquals(expectedResponse.getResult(), actualResponse.getResult());
         verify(difyChatClient, times(1)).deleteAppAnnotation(annotationId, apiKey);
+    }
+
+    @Test
+    void testAnnotationReply() {
+        // Arrange
+        AppAnnotationReplyRequest request = new AppAnnotationReplyRequest();
+        request.setApiKey("test-api-key");
+        request.setUserId("user-123");
+        request.setAction(AnnotationReplyActionEnum.enable);
+        request.setEmbeddingProviderName("openai");
+        request.setEmbeddingModelName("text-embedding-ada-002");
+        request.setScoreThreshold(0.8f);
+
+        AppAnnotationReplyResponse expectedResponse = new AppAnnotationReplyResponse();
+        expectedResponse.setJobId("b15c8f68-1cf4-4877-bf21-ed7cf2011802");
+        expectedResponse.setJobStatus("waiting");
+
+        when(difyChatClient.annotationReply(any(AppAnnotationReplyRequest.class))).thenReturn(expectedResponse);
+
+        // Act
+        AppAnnotationReplyResponse actualResponse = difyChat.annotationReply(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getJobId(), actualResponse.getJobId());
+        assertEquals(expectedResponse.getJobStatus(), actualResponse.getJobStatus());
+        verify(difyChatClient, times(1)).annotationReply(any(AppAnnotationReplyRequest.class));
+    }
+
+    @Test
+    void testQueryAnnotationReply() {
+        // Arrange
+        AppAnnotationReplyQueryRequest request = new AppAnnotationReplyQueryRequest();
+        request.setApiKey("test-api-key");
+        request.setUserId("user-123");
+        request.setAction(AnnotationReplyActionEnum.enable);
+        request.setJobId("job-123");
+
+        AppAnnotationReplyResponse expectedResponse = new AppAnnotationReplyResponse();
+        expectedResponse.setJobId("b15c8f68-1cf4-4877-bf21-ed7cf2011802");
+        expectedResponse.setJobStatus("waiting");
+        expectedResponse.setErrorMsg("");
+
+        when(difyChatClient.queryAnnotationReply(any(AppAnnotationReplyQueryRequest.class))).thenReturn(expectedResponse);
+
+        // Act
+        AppAnnotationReplyResponse actualResponse = difyChat.queryAnnotationReply(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getJobId(), actualResponse.getJobId());
+        assertEquals(expectedResponse.getJobStatus(), actualResponse.getJobStatus());
+        verify(difyChatClient, times(1)).queryAnnotationReply(any(AppAnnotationReplyQueryRequest.class));
     }
 }

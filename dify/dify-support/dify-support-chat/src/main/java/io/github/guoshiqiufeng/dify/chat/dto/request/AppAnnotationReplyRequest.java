@@ -13,48 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.chat.dto.response.message;
+package io.github.guoshiqiufeng.dify.chat.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.github.guoshiqiufeng.dify.chat.enums.AnnotationReplyActionEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Map;
+import java.io.Serializable;
 
 /**
  * @author yanghq
- * @version 1.0
- * @since 2025/4/15 17:52
+ * @version 0.10.0
+ * @since 2025/4/27 11:02
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class WorkflowFinishedData extends CompletionData {
+public class AppAnnotationReplyRequest extends BaseChatRequest implements Serializable {
 
-    private String id;
+    private static final long serialVersionUID = 5501616085947094901L;
 
-    @JsonProperty("workflowId")
-    @JsonAlias("workflow_id")
-    private String workflowId;
+    private AnnotationReplyActionEnum action;
 
-    private Map<String, Object> outputs;
+    @JsonAlias("embeddingProviderName")
+    @JsonProperty("embedding_provider_name")
+    private String embeddingProviderName;
 
-    private String status;
-    private String error;
+    @JsonAlias("embeddingModelName")
+    @JsonProperty("embedding_model_name")
+    private String embeddingModelName;
 
-    @JsonProperty("elapsedTime")
-    @JsonAlias("elapsed_time")
-    private Integer elapsedTime;
-
-    @JsonProperty("totalTokens")
-    @JsonAlias("total_tokens")
-    private Integer totalTokens;
-
-    @JsonProperty("totalSteps")
-    @JsonAlias("total_steps")
-    private Integer totalSteps;
-
-    @JsonProperty("createdAt")
-    @JsonAlias("created_at")
-    private Long createdAt;
+    @JsonAlias("scoreThreshold")
+    @JsonProperty("score_threshold")
+    private Float scoreThreshold;
 }
