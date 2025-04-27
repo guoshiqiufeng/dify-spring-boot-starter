@@ -73,4 +73,6 @@ public interface DatasetUriConstant {
     String V1_INFO = V1_URL + "/info";
 
     String V1_META = V1_URL + "/meta";
+
+    String V1_APPS_ANNOTATIONS = V1_URL + "/apps/annotations";
 }

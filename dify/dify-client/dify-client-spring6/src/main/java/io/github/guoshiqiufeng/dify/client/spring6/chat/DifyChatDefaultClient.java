@@ -350,6 +350,54 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
                 .body(AppMetaResponse.class);
     }
 
+    @Override
+    public DifyPageResult<AppAnnotationResponse> pageAppAnnotation(AppAnnotationPageRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        return restClient.get()
+                .uri(DatasetUriConstant.V1_APPS_ANNOTATIONS + "?page={page}&limit={limit}", request.getPage(), request.getLimit())
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request.getApiKey()).accept(h))
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(new ParameterizedTypeReference<DifyPageResult<AppAnnotationResponse>>() {
+                });
+    }
+
+    @Override
+    public AppAnnotationResponse createAppAnnotation(AppAnnotationCreateRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        return restClient.post()
+                .uri(DatasetUriConstant.V1_APPS_ANNOTATIONS)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request.getApiKey()).accept(h))
+                .body(request)
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(AppAnnotationResponse.class);
+    }
+
+    @Override
+    public AppAnnotationResponse updateAppAnnotation(AppAnnotationUpdateRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        return restClient.post()
+                .uri(DatasetUriConstant.V1_APPS_ANNOTATIONS + "/{annotation_id}", request.getAnnotationId())
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request.getApiKey()).accept(h))
+                .body(request)
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(AppAnnotationResponse.class);
+    }
+
+    @Override
+    public AppAnnotationDeleteResponse deleteAppAnnotation(String annotationId, String apiKey) {
+        Assert.notNull(annotationId, "annotationId must not be null");
+        Assert.notNull(apiKey, "apiKey must not be null");
+        return restClient.delete()
+                .uri(DatasetUriConstant.V1_APPS_ANNOTATIONS + "/{annotation_id}", annotationId)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(AppAnnotationDeleteResponse.class);
+    }
+
     private ChatMessageVO builderChatMessage(ResponseModeEnum responseMode, ChatMessageSendRequest sendRequest) {
         ChatMessageVO chatMessage = new ChatMessageVO();
         chatMessage.setResponseMode(responseMode);

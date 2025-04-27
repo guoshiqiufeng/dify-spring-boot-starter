@@ -63,6 +63,7 @@ public abstract class BaseClientTest {
 
         // Setup WebClient mock behavior chain for POST
         when(webClientMock.post()).thenReturn(requestBodyUriSpecMock);
+        when(webClientMock.put()).thenReturn(requestBodyUriSpecMock);
         when(requestBodyUriSpecMock.uri(anyString())).thenReturn(requestBodySpecMock);
         when(requestBodyUriSpecMock.uri(anyString(), any(Object[].class))).thenReturn(requestBodySpecMock);
         when(requestBodyUriSpecMock.uri(anyString(), any(Object.class))).thenReturn(requestBodySpecMock);
@@ -76,6 +77,7 @@ public abstract class BaseClientTest {
 
         // Setup WebClient mock behavior chain for GET
         when(webClientMock.get()).thenReturn(requestHeadersUriSpecMock);
+        when(webClientMock.delete()).thenReturn(requestHeadersUriSpecMock);
         when(requestHeadersUriSpecMock.uri(anyString())).thenReturn(requestHeadersSpecMock);
         when(requestHeadersUriSpecMock.uri(anyString(), any(Object[].class))).thenReturn(requestHeadersSpecMock);
         when(requestHeadersUriSpecMock.uri(anyString(), any(Object.class))).thenReturn(requestHeadersSpecMock);

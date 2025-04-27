@@ -347,6 +347,54 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
                 .bodyToMono(AppMetaResponse.class).block();
     }
 
+    @Override
+    public DifyPageResult<AppAnnotationResponse> pageAppAnnotation(AppAnnotationPageRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        return webClient.get()
+                .uri(DatasetUriConstant.V1_APPS_ANNOTATIONS + "?page={page}&limit={limit}", request.getPage(), request.getLimit())
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request.getApiKey()).accept(h))
+                .retrieve()
+                .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(new ParameterizedTypeReference<DifyPageResult<AppAnnotationResponse>>() {
+                }).block();
+    }
+
+    @Override
+    public AppAnnotationResponse createAppAnnotation(AppAnnotationCreateRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        return webClient.post()
+                .uri(DatasetUriConstant.V1_APPS_ANNOTATIONS)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request.getApiKey()).accept(h))
+                .bodyValue(request)
+                .retrieve()
+                .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(AppAnnotationResponse.class).block();
+    }
+
+    @Override
+    public AppAnnotationResponse updateAppAnnotation(AppAnnotationUpdateRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        return webClient.post()
+                .uri(DatasetUriConstant.V1_APPS_ANNOTATIONS + "/{annotation_id}", request.getAnnotationId())
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request.getApiKey()).accept(h))
+                .bodyValue(request)
+                .retrieve()
+                .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(AppAnnotationResponse.class).block();
+    }
+
+    @Override
+    public AppAnnotationDeleteResponse deleteAppAnnotation(String annotationId, String apiKey) {
+        Assert.notNull(annotationId, "annotationId must not be null");
+        Assert.notNull(apiKey, "apiKey must not be null");
+        return webClient.delete()
+                .uri(DatasetUriConstant.V1_APPS_ANNOTATIONS + "/{annotation_id}", annotationId)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
+                .retrieve()
+                .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(AppAnnotationDeleteResponse.class).block();
+    }
+
     private ChatMessageVO builderChatMessage(ResponseModeEnum responseMode, ChatMessageSendRequest sendRequest) {
         ChatMessageVO chatMessage = new ChatMessageVO();
         chatMessage.setResponseMode(responseMode);

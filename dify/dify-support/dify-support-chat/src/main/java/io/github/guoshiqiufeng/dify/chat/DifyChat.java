@@ -160,4 +160,45 @@ public interface DifyChat {
      */
     AppMetaResponse meta(String apiKey);
 
+    /**
+     * Paginate application annotations
+     *
+     * @param request Annotation pagination request containing page parameters and filters
+     * @return DifyPageResult<AppAnnotationResponse> Paginated result with annotation list
+     * @since 0.10.0
+     * @since Dify version 1.2.0 or higher
+     */
+    DifyPageResult<AppAnnotationResponse> pageAppAnnotation(AppAnnotationPageRequest request);
+
+    /**
+     * Create application annotation
+     *
+     * @param request Annotation creation request containing annotation content and metadata
+     * @return AppAnnotationResponse The created annotation information
+     * @since 0.10.0
+     * @since Dify version 1.2.0 or higher
+     */
+    AppAnnotationResponse createAppAnnotation(AppAnnotationCreateRequest request);
+
+    /**
+     * Update application annotation
+     *
+     * @param request Annotation update request containing modified annotation content and metadata
+     * @return AppAnnotationResponse The updated annotation information
+     * @since 0.10.0
+     * @since Dify version 1.2.0 or higher
+     */
+    AppAnnotationResponse updateAppAnnotation(AppAnnotationUpdateRequest request);
+
+    /**
+     * Delete application annotation
+     *
+     * @param annotationId Annotation ID to identify the annotation to delete
+     * @param apiKey       API key for authentication
+     * @return AppAnnotationDeleteResponse Response information for the deletion operation
+     * @since 0.10.0
+     * @since Dify version 1.2.0 or higher
+     */
+    AppAnnotationDeleteResponse deleteAppAnnotation(String annotationId, String apiKey);
+
 }

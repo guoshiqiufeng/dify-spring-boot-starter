@@ -486,3 +486,124 @@ AppMetaResponse
 | 参数名       | 类型                    | 描述     |
 |-----------|-----------------------|--------|
 | toolIcons | `Map<String, Object>` | 工具图标映射 |
+
+## 4. 应用标注
+
+> 需要 Dify 1.2.0 或更高版本
+
+### 4.1 获取应用标注列表
+
+#### 方法
+
+```java
+DifyPageResult<AppAnnotationResponse> pageAppAnnotation(AppAnnotationPageRequest request);
+```
+
+#### 请求参数
+
+AppAnnotationPageRequest
+
+| 参数名    | 类型      | 是否必须 | 描述                  |
+|--------|---------|------|---------------------|
+| apiKey | String  | 是    | apiKey              |
+| userId | String  | 是    | 用户 id               |
+| page   | Integer | 否    | 页码，默认1              |
+| limit  | Integer | 否    | 每页记录数，默认20，范围 1-100 |
+
+#### 响应参数
+
+AppAnnotationResponse
+
+| 参数名       | 类型      | 描述    |
+|-----------|---------|-------|
+| id        | String  | 标注 id |
+| question  | String  | 问题内容  |
+| answer    | String  | 回答内容  |
+| hitCount  | Integer | 命中次数  |
+| createdAt | Long    | 创建时间戳 |
+
+### 4.2 创建应用标注
+
+#### 方法
+
+```java
+AppAnnotationResponse createAppAnnotation(AppAnnotationCreateRequest request);
+```
+
+#### 请求参数
+
+AppAnnotationCreateRequest
+
+| 参数名      | 类型     | 是否必须 | 描述     |
+|----------|--------|------|--------|
+| apiKey   | String | 是    | apiKey |
+| userId   | String | 是    | 用户 id  |
+| question | String | 是    | 问题内容   |
+| answer   | String | 是    | 回答内容   |
+
+#### 响应参数
+
+AppAnnotationResponse
+
+| 参数名       | 类型      | 描述    |
+|-----------|---------|-------|
+| id        | String  | 标注 id |
+| question  | String  | 问题内容  |
+| answer    | String  | 回答内容  |
+| hitCount  | Integer | 命中次数  |
+| createdAt | Long    | 创建时间戳 |
+
+### 4.3 更新应用标注
+
+#### 方法
+
+```java
+AppAnnotationResponse updateAppAnnotation(AppAnnotationUpdateRequest request);
+```
+
+#### 请求参数
+
+AppAnnotationUpdateRequest
+
+| 参数名          | 类型     | 是否必须 | 描述     |
+|--------------|--------|------|--------|
+| apiKey       | String | 是    | apiKey |
+| userId       | String | 是    | 用户 id  |
+| annotationId | String | 是    | 标注 id  |
+| question     | String | 是    | 问题内容   |
+| answer       | String | 是    | 回答内容   |
+
+#### 响应参数
+
+AppAnnotationResponse
+
+| 参数名       | 类型      | 描述    |
+|-----------|---------|-------|
+| id        | String  | 标注 id |
+| question  | String  | 问题内容  |
+| answer    | String  | 回答内容  |
+| hitCount  | Integer | 命中次数  |
+| createdAt | Long    | 创建时间戳 |
+
+### 4.4 删除应用标注
+
+#### 方法
+
+```java
+AppAnnotationDeleteResponse deleteAppAnnotation(String annotationId, String apiKey);
+```
+
+#### 请求参数
+
+| 参数名          | 类型     | 是否必须 | 描述     |
+|--------------|--------|------|--------|
+| annotationId | String | 是    | 标注 id  |
+| apiKey       | String | 是    | apiKey |
+
+#### 响应参数
+
+AppAnnotationDeleteResponse
+
+| 参数名    | 类型     | 描述                |
+|--------|--------|-------------------|
+| result | String | 操作结果，成功返回 success |

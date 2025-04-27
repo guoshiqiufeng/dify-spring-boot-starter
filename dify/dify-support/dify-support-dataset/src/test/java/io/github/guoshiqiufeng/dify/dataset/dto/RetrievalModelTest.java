@@ -17,7 +17,6 @@ package io.github.guoshiqiufeng.dify.dataset.dto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.guoshiqiufeng.dify.dataset.dto.RetrievalModel;
 import io.github.guoshiqiufeng.dify.dataset.enums.RerankingModeEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.SearchMethodEnum;
 import org.junit.jupiter.api.Test;
@@ -234,4 +233,4 @@ public class RetrievalModelTest {
         assertNotNull(model.getWeights().getKeywordSetting());
         assertEquals(0.2f, model.getWeights().getKeywordSetting().getKeywordWeight(), 0.001);
     }
-} 
+}

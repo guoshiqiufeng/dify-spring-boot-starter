@@ -53,6 +53,7 @@ public class ChatTest extends BaseChatContainerTest {
     private static String conversationId;
     private static String messageId;
     private static String taskId;
+    private static String annotationId;
 
     private static Boolean suggestedEnable;
 
@@ -216,5 +217,60 @@ public class ChatTest extends BaseChatContainerTest {
     @DisplayName("Test meta")
     public void testMeta() {
         AppMetaResponse meta = difyChat.meta(apiKey);
+    }
+
+
+    @Test
+    @Order(23)
+    @DisplayName("Test create app annotation")
+    public void testCreateAppAnnotation() {
+        AppAnnotationCreateRequest request = new AppAnnotationCreateRequest();
+        request.setApiKey(apiKey);
+        request.setUserId(userId);
+        request.setQuestion("Test annotation question");
+        request.setAnswer("Test annotation answer");
+
+        AppAnnotationResponse response = difyChat.createAppAnnotation(request);
+        assertNotNull(response);
+        assertNotNull(response.getId());
+        annotationId = response.getId();
+    }
+
+    @Test
+    @Order(24)
+    @DisplayName("Test page app annotation")
+    public void testPageAppAnnotation() {
+        AppAnnotationPageRequest request = new AppAnnotationPageRequest();
+        request.setApiKey(apiKey);
+        request.setUserId(userId);
+        request.setPage(1);
+        request.setLimit(10);
+
+        DifyPageResult<AppAnnotationResponse> result = difyChat.pageAppAnnotation(request);
+        assertNotNull(result);
+        assertFalse(result.getData().isEmpty(), "Should have at least one annotation");
+    }
+
+    @Test
+    @Order(25)
+    @DisplayName("Test update app annotation")
+    public void testUpdateAppAnnotation() {
+        AppAnnotationUpdateRequest request = new AppAnnotationUpdateRequest();
+        request.setApiKey(apiKey);
+        request.setUserId(userId);
+        request.setAnnotationId(annotationId);
+        request.setQuestion("Updated annotation question");
+        request.setAnswer("Updated annotation answer");
+
+        AppAnnotationResponse response = difyChat.updateAppAnnotation(request);
+        assertNotNull(response);
+    }
+
+    @Test
+    @Order(26)
+    @DisplayName("Test delete app annotation")
+    public void testDeleteAppAnnotation() {
+        AppAnnotationDeleteResponse response = difyChat.deleteAppAnnotation(annotationId, apiKey);
+        assertNotNull(response);
     }
 }

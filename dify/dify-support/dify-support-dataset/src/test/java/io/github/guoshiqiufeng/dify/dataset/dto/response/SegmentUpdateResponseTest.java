@@ -160,7 +160,7 @@ public class SegmentUpdateResponseTest {
 
         // Verify JSON
         assertTrue(json.contains("\"data\":"));
-        
+
         // Empty objects should have default values (null) for all fields
         assertTrue(json.contains("\"data\":{}") || json.contains("\"data\":{"));
 
@@ -192,4 +192,4 @@ public class SegmentUpdateResponseTest {
         assertTrue(toStringResult.contains("id=segment-123"));
         assertTrue(toStringResult.contains("content=Test content"));
     }
-} 
+}

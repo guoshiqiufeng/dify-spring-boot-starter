@@ -115,4 +115,24 @@ public class DifyChatClientImpl implements DifyChat {
     public AppMetaResponse meta(String apiKey) {
         return difyChatClient.meta(apiKey);
     }
+
+    @Override
+    public DifyPageResult<AppAnnotationResponse> pageAppAnnotation(AppAnnotationPageRequest request) {
+        return difyChatClient.pageAppAnnotation(request);
+    }
+
+    @Override
+    public AppAnnotationResponse createAppAnnotation(AppAnnotationCreateRequest request) {
+        return difyChatClient.createAppAnnotation(request);
+    }
+
+    @Override
+    public AppAnnotationResponse updateAppAnnotation(AppAnnotationUpdateRequest request) {
+        return difyChatClient.updateAppAnnotation(request);
+    }
+
+    @Override
+    public AppAnnotationDeleteResponse deleteAppAnnotation(String annotationId, String apiKey) {
+        return difyChatClient.deleteAppAnnotation(annotationId, apiKey);
+    }
 }

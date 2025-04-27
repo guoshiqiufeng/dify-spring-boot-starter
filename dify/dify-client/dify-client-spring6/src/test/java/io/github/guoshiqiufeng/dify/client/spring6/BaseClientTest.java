@@ -84,6 +84,7 @@ public abstract class BaseClientTest {
 
             // Setup RestClient behavior chain for POST
             when(restClient.post()).thenReturn(requestBodyUriSpec);
+            when(restClient.put()).thenReturn(requestBodyUriSpec);
             when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
             when(requestBodyUriSpec.uri(anyString(), any(Object[].class))).thenReturn(requestBodySpec);
             when(requestBodyUriSpec.uri(anyString(), any(Object.class))).thenReturn(requestBodySpec);
@@ -108,6 +109,7 @@ public abstract class BaseClientTest {
 
             // Setup RestClient behavior chain for GET
             when(restClient.get()).thenReturn(requestHeadersUriSpec);
+            when(restClient.delete()).thenReturn(requestHeadersUriSpec);
             when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
             when(requestHeadersUriSpec.uri(anyString(), any(Object[].class))).thenReturn(requestHeadersSpec);
             when(requestHeadersUriSpec.uri(anyString(), any(Object.class))).thenReturn(requestHeadersSpec);

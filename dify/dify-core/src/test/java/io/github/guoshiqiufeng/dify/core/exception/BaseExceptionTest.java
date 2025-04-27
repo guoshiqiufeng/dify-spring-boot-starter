@@ -15,8 +15,6 @@
  */
 package io.github.guoshiqiufeng.dify.core.exception;
 
-import io.github.guoshiqiufeng.dify.core.exception.BaseException;
-import io.github.guoshiqiufeng.dify.core.exception.BaseExceptionEnum;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -114,4 +112,4 @@ public class BaseExceptionTest {
         BaseException exception2 = new BaseException(404, "Resource not found");
         assertNull(exception2.getMessage());
     }
-} 
+}

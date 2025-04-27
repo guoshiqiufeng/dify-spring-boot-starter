@@ -489,3 +489,124 @@ AppMetaResponse
 |----------------|-----------------------|--------------------|
 | toolIcons      | `Map<String, Object>` | Tool icons mapping |
 
+## 4. Application Annotation
+
+> required Dify version 1.2.0 or higher
+
+### 4.1 Get Application Annotations List
+
+#### Method
+
+```java
+DifyPageResult<AppAnnotationResponse> pageAppAnnotation(AppAnnotationPageRequest request);
+```
+
+#### Request Parameters
+
+AppAnnotationPageRequest
+
+| Parameter name | Type    | Required | Description                               |
+|----------------|---------|----------|-------------------------------------------|
+| apiKey         | String  | Yes      | apiKey                                    |
+| userId         | String  | Yes      | User id                                   |
+| page           | Integer | No       | Page number, default 1                    |
+| limit          | Integer | No       | Records per page, default 20, range 1-100 |
+
+#### Response Parameters
+
+AppAnnotationResponse
+
+| Parameter name | Type    | Description        |
+|----------------|---------|--------------------|
+| id             | String  | Annotation id      |
+| question       | String  | Question content   |
+| answer         | String  | Answer content     |
+| hitCount       | Integer | Hit count          |
+| createdAt      | Long    | Creation timestamp |
+
+### 4.2 Create Application Annotation
+
+#### Method
+
+```java
+AppAnnotationResponse createAppAnnotation(AppAnnotationCreateRequest request);
+```
+
+#### Request Parameters
+
+AppAnnotationCreateRequest
+
+| Parameter name | Type   | Required | Description      |
+|----------------|--------|----------|------------------|
+| apiKey         | String | Yes      | apiKey           |
+| userId         | String | Yes      | User id          |
+| question       | String | Yes      | Question content |
+| answer         | String | Yes      | Answer content   |
+
+#### Response Parameters
+
+AppAnnotationResponse
+
+| Parameter name | Type    | Description        |
+|----------------|---------|--------------------|
+| id             | String  | Annotation id      |
+| question       | String  | Question content   |
+| answer         | String  | Answer content     |
+| hitCount       | Integer | Hit count          |
+| createdAt      | Long    | Creation timestamp |
+
+### 4.3 Update Application Annotation
+
+#### Method
+
+```java
+AppAnnotationResponse updateAppAnnotation(AppAnnotationUpdateRequest request);
+```
+
+#### Request Parameters
+
+AppAnnotationUpdateRequest
+
+| Parameter name | Type   | Required | Description      |
+|----------------|--------|----------|------------------|
+| apiKey         | String | Yes      | apiKey           |
+| userId         | String | Yes      | User id          |
+| annotationId   | String | Yes      | Annotation id    |
+| question       | String | Yes      | Question content |
+| answer         | String | Yes      | Answer content   |
+
+#### Response Parameters
+
+AppAnnotationResponse
+
+| Parameter name | Type    | Description        |
+|----------------|---------|--------------------|
+| id             | String  | Annotation id      |
+| question       | String  | Question content   |
+| answer         | String  | Answer content     |
+| hitCount       | Integer | Hit count          |
+| createdAt      | Long    | Creation timestamp |
+
+### 4.4 Delete Application Annotation
+
+#### Method
+
+```java
+AppAnnotationDeleteResponse deleteAppAnnotation(String annotationId, String apiKey);
+```
+
+#### Request Parameters
+
+| Parameter name | Type   | Required | Description   |
+|----------------|--------|----------|---------------|
+| annotationId   | String | Yes      | Annotation id |
+| apiKey         | String | Yes      | apiKey        |
+
+#### Response Parameters
+
+AppAnnotationDeleteResponse
+
+| Parameter name | Type   | Description                               |
+|----------------|--------|-------------------------------------------|
+| result         | String | Result, returns "success" when successful |
+

@@ -41,8 +41,12 @@ description:
 | 【CHAT】文本转语音            | ✅  |    
 | 【CHAT】语音转文本            | ✅  |    
 | 【CHAT】文件上传             | ✅  |    
-| 【CHAT】获取应用基本信息         | 🚧 |    
-| 【CHAT】获取应用Meta信息       | 🚧 |    
+| 【CHAT】获取应用基本信息         | ✅  |    
+| 【CHAT】获取应用Meta信息       | ✅  |  
+| 【CHAT】获取标注列表           | ✅  |  
+| 【CHAT】创建标注             | ✅  |  
+| 【CHAT】更新标注             | ✅  |  
+| 【CHAT】删除标注             | ✅  |  
 | 【WORKFLOW】 执行工作流       | ✅  |   
 | 【WORKFLOW】 执行工作流并获取工作流 | ✅  |   
 | 【WORKFLOW】 停止工作流响应     | ✅  |  
