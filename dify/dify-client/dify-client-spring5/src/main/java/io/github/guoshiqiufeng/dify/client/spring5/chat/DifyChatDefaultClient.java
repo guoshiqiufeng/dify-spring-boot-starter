@@ -374,7 +374,7 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
     @Override
     public AppAnnotationResponse updateAppAnnotation(AppAnnotationUpdateRequest request) {
         Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
-        return webClient.put()
+        return webClient.post()
                 .uri(DatasetUriConstant.V1_APPS_ANNOTATIONS + "/{annotation_id}", request.getAnnotationId())
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request.getApiKey()).accept(h))
                 .bodyValue(request)

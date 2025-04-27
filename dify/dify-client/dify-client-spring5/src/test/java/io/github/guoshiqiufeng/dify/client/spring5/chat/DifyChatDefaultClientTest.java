@@ -53,6 +53,7 @@ import static org.mockito.Mockito.*;
  * @version 0.10.0
  * @since 2025/4/24 14:29
  */
+@SuppressWarnings("unchecked")
 public class DifyChatDefaultClientTest extends BaseClientTest {
 
     private DifyChatDefaultClient difyChatDefaultClient;
@@ -737,7 +738,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         assertEquals(expectedResponse.getCreatedAt(), actualResponse.getCreatedAt());
 
         // Verify WebClient interactions
-        verify(webClientMock).put();
+        verify(webClientMock).post();
         verify(requestBodyUriSpecMock).uri(
                 DatasetUriConstant.V1_APPS_ANNOTATIONS + "/{annotation_id}",
                 annotationId

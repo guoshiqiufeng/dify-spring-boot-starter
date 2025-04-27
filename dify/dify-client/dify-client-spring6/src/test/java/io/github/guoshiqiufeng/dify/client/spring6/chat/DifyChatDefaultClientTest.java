@@ -804,7 +804,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         assertEquals(expectedResponse.getCreatedAt(), actualResponse.getCreatedAt());
 
         // Verify WebClient interactions
-        verify(restClient).put();
+        verify(restClient).post();
         verify(requestBodyUriSpec).uri(
                 DatasetUriConstant.V1_APPS_ANNOTATIONS + "/{annotation_id}",
                 annotationId
