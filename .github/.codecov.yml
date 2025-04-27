@@ -3,7 +3,20 @@ coverage:
     project:
       default:
         threshold: 20%
+component_management:
+  individual_components:
+    - component_id: "springboot2"
+      paths:
+        - "dify/dify-client/dify-client-spring5/"
+        - "dify/spring-boot2-starter/"
+    - component_id: "springboot3"
+      paths:
+        - "dify/dify-client/dify-client-spring6/"
+        - "dify/spring-boot-starter/"
 
+comment:
+  layout: "header, diff, flags, components"  # show component info in the PR comment
+  
 flag_management:
   default_rules: # the rules that will be followed for any flag added, generally
     carryforward: true
