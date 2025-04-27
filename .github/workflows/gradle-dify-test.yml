@@ -71,7 +71,22 @@ jobs:
           docker run -d --name ollama -p 11434:11434 ollama/ollama
           
           # Test if Ollama is running
-          curl -sSf -X GET http://localhost:11434/api/tags --retry 10 --retry-delay 2 --retry-connrefused
+          max_retries=10
+          retry_delay=2
+          for ((i=1; i<=max_retries; i++)); do
+            echo "Attempt $i: Checking Ollama health..."
+            if curl -sSf -X GET http://localhost:11434/api/tags --connect-timeout 5; then
+              echo "Ollama is ready!"
+              break
+            else
+              echo "Ollama not ready yet, waiting ${retry_delay}s..."
+              sleep $retry_delay
+            fi
+            if [ $i -eq $max_retries ]; then
+              echo "Error: Failed to connect to Ollama after $max_retries attempts"
+              exit 1
+            fi
+          done
           
           # Find Dify network and connect Ollama to it
           DIFY_NETWORK=$(docker network ls | grep docker_default | awk '{print $1}')
