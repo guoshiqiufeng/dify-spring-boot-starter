@@ -10,12 +10,12 @@ flag_management:
   individual_flags: # exceptions to the default rules above, stated flag by flag
     - name: springboot2
       paths:
-        - "dify-spring-boot-starter/dify/dify-client/dify-client-spring5/**"
-        - "dify-spring-boot-starter/dify/spring-boot2-starter/**"
+        - "dify/dify-client/dify-client-spring5/**"
+        - "dify/spring-boot2-starter/**"
     - name: springboot3
       paths:
-        - "dify-spring-boot-starter/dify/dify-client/dify-client-spring6/**"
-        - "dify-spring-boot-starter/dify/spring-boot-starter/**"
+        - "dify/dify-client/dify-client-spring6/**"
+        - "dify/spring-boot-starter/**"
 
 fixes:
   - "dify-spring-boot-starter/::"  # Remove the project name prefix from paths
