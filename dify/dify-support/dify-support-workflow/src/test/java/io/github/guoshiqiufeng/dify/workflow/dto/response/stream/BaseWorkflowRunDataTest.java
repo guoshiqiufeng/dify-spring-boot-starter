@@ -95,4 +95,158 @@ public class BaseWorkflowRunDataTest {
         assertTrue(toString.contains("id=test-id"));
         assertTrue(toString.contains("createdAt=1619517600000"));
     }
+    
+    @Test
+    public void testEqualsWithDifferentId() {
+        // Arrange
+        ConcreteBaseWorkflowRunData data1 = new ConcreteBaseWorkflowRunData();
+        data1.setId("id-1");
+        data1.setCreatedAt(1619517600000L);
+
+        ConcreteBaseWorkflowRunData data2 = new ConcreteBaseWorkflowRunData();
+        data2.setId("id-2");
+        data2.setCreatedAt(1619517600000L);
+
+        // Assert
+        assertNotEquals(data1, data2);
+        assertNotEquals(data1.hashCode(), data2.hashCode());
+    }
+
+    @Test
+    public void testEqualsWithDifferentCreatedAt() {
+        // Arrange
+        ConcreteBaseWorkflowRunData data1 = new ConcreteBaseWorkflowRunData();
+        data1.setId("id-1");
+        data1.setCreatedAt(1619517600000L);
+
+        ConcreteBaseWorkflowRunData data2 = new ConcreteBaseWorkflowRunData();
+        data2.setId("id-1");
+        data2.setCreatedAt(1619604000000L);
+
+        // Assert
+        assertNotEquals(data1, data2);
+        assertNotEquals(data1.hashCode(), data2.hashCode());
+    }
+
+    @Test
+    public void testEqualsWithNull() {
+        // Arrange
+        ConcreteBaseWorkflowRunData data = new ConcreteBaseWorkflowRunData();
+        data.setId("id-1");
+        data.setCreatedAt(1619517600000L);
+
+        // Assert
+        assertNotEquals(data, null);
+    }
+
+    @Test
+    public void testEqualsWithDifferentClass() {
+        // Arrange
+        ConcreteBaseWorkflowRunData data = new ConcreteBaseWorkflowRunData();
+        data.setId("id-1");
+        data.setCreatedAt(1619517600000L);
+
+        Object otherObject = new Object();
+
+        // Assert
+        assertNotEquals(data, otherObject);
+    }
+
+    @Test
+    public void testEqualsReflexivity() {
+        // Arrange
+        ConcreteBaseWorkflowRunData data = new ConcreteBaseWorkflowRunData();
+        data.setId("id-1");
+        data.setCreatedAt(1619517600000L);
+
+        // Assert
+        assertEquals(data, data);
+        assertEquals(data.hashCode(), data.hashCode());
+    }
+
+    @Test
+    public void testEqualsSymmetry() {
+        // Arrange
+        ConcreteBaseWorkflowRunData data1 = new ConcreteBaseWorkflowRunData();
+        data1.setId("id-1");
+        data1.setCreatedAt(1619517600000L);
+
+        ConcreteBaseWorkflowRunData data2 = new ConcreteBaseWorkflowRunData();
+        data2.setId("id-1");
+        data2.setCreatedAt(1619517600000L);
+
+        // Assert
+        assertEquals(data1, data2);
+        assertEquals(data2, data1);
+        assertEquals(data1.hashCode(), data2.hashCode());
+    }
+
+    @Test
+    public void testEqualsTransitivity() {
+        // Arrange
+        ConcreteBaseWorkflowRunData data1 = new ConcreteBaseWorkflowRunData();
+        data1.setId("id-1");
+        data1.setCreatedAt(1619517600000L);
+
+        ConcreteBaseWorkflowRunData data2 = new ConcreteBaseWorkflowRunData();
+        data2.setId("id-1");
+        data2.setCreatedAt(1619517600000L);
+
+        ConcreteBaseWorkflowRunData data3 = new ConcreteBaseWorkflowRunData();
+        data3.setId("id-1");
+        data3.setCreatedAt(1619517600000L);
+
+        // Assert
+        assertEquals(data1, data2);
+        assertEquals(data2, data3);
+        assertEquals(data1, data3);
+        assertEquals(data1.hashCode(), data2.hashCode());
+        assertEquals(data2.hashCode(), data3.hashCode());
+        assertEquals(data1.hashCode(), data3.hashCode());
+    }
+
+    @Test
+    public void testEqualsWithNullFields() {
+        // Arrange
+        ConcreteBaseWorkflowRunData data1 = new ConcreteBaseWorkflowRunData();
+        data1.setId(null);
+        data1.setCreatedAt(null);
+
+        ConcreteBaseWorkflowRunData data2 = new ConcreteBaseWorkflowRunData();
+        data2.setId(null);
+        data2.setCreatedAt(null);
+
+        // Assert
+        assertEquals(data1, data2);
+        assertEquals(data1.hashCode(), data2.hashCode());
+    }
+
+    @Test
+    public void testEqualsWithSomeNullFields() {
+        // Arrange
+        ConcreteBaseWorkflowRunData data1 = new ConcreteBaseWorkflowRunData();
+        data1.setId("id-1");
+        data1.setCreatedAt(null);
+
+        ConcreteBaseWorkflowRunData data2 = new ConcreteBaseWorkflowRunData();
+        data2.setId("id-1");
+        data2.setCreatedAt(null);
+
+        ConcreteBaseWorkflowRunData data3 = new ConcreteBaseWorkflowRunData();
+        data3.setId(null);
+        data3.setCreatedAt(1619517600000L);
+
+        ConcreteBaseWorkflowRunData data4 = new ConcreteBaseWorkflowRunData();
+        data4.setId(null);
+        data4.setCreatedAt(1619517600000L);
+
+        // Assert
+        assertEquals(data1, data2);
+        assertEquals(data1.hashCode(), data2.hashCode());
+        
+        assertEquals(data3, data4);
+        assertEquals(data3.hashCode(), data4.hashCode());
+        
+        assertNotEquals(data1, data3);
+    }
 } 
