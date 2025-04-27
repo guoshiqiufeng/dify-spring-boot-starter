@@ -294,7 +294,7 @@ public class ChatTest extends BaseChatContainerTest {
         String token = datasetApiKeys.getFirst().getToken();
         DifyDataset difyDataset = DifyDatasetBuilder.create(DifyDatasetBuilder.DifyDatasetClientBuilder.builder()
                 .baseUrl(difyProperties.getUrl())
-                .restClientBuilder(RestClient.builder().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey))
+                .restClientBuilder(RestClient.builder().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .build()
         );
         TextEmbeddingListResponse textEmbeddingListResponse = difyDataset.listTextEmbedding();
