@@ -40,7 +40,7 @@ public class StreamEventEnumTest {
         assertEquals("workflow_started", StreamEventEnum.workflow_started.name());
 
         // Test the associated class
-        assertEquals(NodeStartedData.class, StreamEventEnum.workflow_started.getClazz());
+        assertEquals(WorkflowStartedData.class, StreamEventEnum.workflow_started.getClazz());
     }
 
     @Test
@@ -50,7 +50,7 @@ public class StreamEventEnumTest {
         assertEquals("node_started", StreamEventEnum.node_started.name());
 
         // Test the associated class
-        assertEquals(WorkflowStartedData.class, StreamEventEnum.node_started.getClazz());
+        assertEquals(NodeStartedData.class, StreamEventEnum.node_started.getClazz());
     }
 
     @Test
