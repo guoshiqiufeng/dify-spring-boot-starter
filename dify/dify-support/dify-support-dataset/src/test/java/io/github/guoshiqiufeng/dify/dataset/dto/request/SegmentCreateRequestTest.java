@@ -93,7 +93,7 @@ public class SegmentCreateRequestTest {
         SegmentCreateRequest request = new SegmentCreateRequest();
 
         // Test inheritance
-        assertTrue(request instanceof BaseDatasetRequest);
+        assertInstanceOf(BaseDatasetRequest.class, request);
 
         // Test casting to parent class
         BaseDatasetRequest baseRequest = request;
@@ -321,4 +321,4 @@ public class SegmentCreateRequestTest {
         assertEquals(request1.hashCode(), request2.hashCode());
         assertNotEquals(request1.hashCode(), request3.hashCode());
     }
-} 
+}

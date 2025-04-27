@@ -16,12 +16,14 @@
 package io.github.guoshiqiufeng.dify.workflow.dto.response.stream;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import lombok.Data;
 
 /**
  * @author yanghq
  * @version 1.0
  * @since 2025/3/13 10:36
  */
+@Data
 public abstract class BaseWorkflowRunData {
     /**
      * Unique ID of workflow execution
