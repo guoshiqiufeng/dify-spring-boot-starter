@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.boot.base;
 
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponseVO;
 import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponseVO;
@@ -33,7 +34,10 @@ import java.util.List;
 public abstract class BaseChatContainerTest implements RedisContainerTest {
 
     @Resource
-    DifyServer difyServer;
+    protected DifyServer difyServer;
+
+    @Resource
+    protected DifyProperties difyProperties;
 
     protected static String apiKey;
 

@@ -201,4 +201,24 @@ public interface DifyChat {
      */
     AppAnnotationDeleteResponse deleteAppAnnotation(String annotationId, String apiKey);
 
+    /**
+     * Reply to an annotation
+     *
+     * @param request Annotation reply request containing the reply content and metadata
+     * @return AppAnnotationReplyResponse Response containing the created reply information
+     * @since 0.10.0
+     * @since Dify version 1.2.0 or higher
+     */
+    AppAnnotationReplyResponse annotationReply(AppAnnotationReplyRequest request);
+
+    /**
+     * Query annotation reply information
+     *
+     * @param request Query parameters for retrieving annotation reply data
+     * @return AppAnnotationReplyResponse Response containing the requested reply information
+     * @since 0.10.0
+     * @since Dify version 1.2.0 or higher
+     */
+    AppAnnotationReplyResponse queryAnnotationReply(AppAnnotationReplyQueryRequest request);
+
 }

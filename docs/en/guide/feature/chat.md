@@ -610,3 +610,63 @@ AppAnnotationDeleteResponse
 |----------------|--------|-------------------------------------------|
 | result         | String | Result, returns "success" when successful |
 
+### 4.5 Annotation Reply
+
+#### Method
+
+```java
+AppAnnotationReplyResponse annotationReply(AppAnnotationReplyRequest request);
+```
+
+#### Request Parameters
+
+AppAnnotationReplyRequest
+
+| Parameter name         | Type                      | Required | Description              |
+|------------------------|---------------------------|----------|--------------------------|
+| apiKey                 | String                    | Yes      | API key                  |
+| userId                 | String                    | Yes      | User ID                  |
+| action                 | AnnotationReplyActionEnum | Yes      | Reply action type        |
+| embeddingModelProvider | String                    | No       | Embedding model provider |
+| embeddingModel         | String                    | No       | Embedding model name     |
+| scoreThreshold         | Float                     | No       | Score threshold          |
+
+#### Response Parameters
+
+AppAnnotationReplyResponse
+
+| Parameter name | Type   | Description   |
+|----------------|--------|---------------|
+| jobId          | String | Job ID        |
+| jobStatus      | String | Job status    |
+| errorMsg       | String | Error message |
+
+### 4.6 Query Annotation Reply Status
+
+#### Method
+
+```java
+AppAnnotationReplyResponse queryAnnotationReply(AppAnnotationReplyQueryRequest request);
+```
+
+#### Request Parameters
+
+AppAnnotationReplyQueryRequest
+
+| Parameter name | Type                      | Required | Description       |
+|----------------|---------------------------|----------|-------------------|
+| apiKey         | String                    | Yes      | API key           |
+| userId         | String                    | Yes      | User ID           |
+| action         | AnnotationReplyActionEnum | Yes      | Reply action type |
+| jobId          | String                    | Yes      | Job ID to query   |
+
+#### Response Parameters
+
+AppAnnotationReplyResponse
+
+| Parameter name | Type   | Description   |
+|----------------|--------|---------------|
+| jobId          | String | Job ID        |
+| jobStatus      | String | Job status    |
+| errorMsg       | String | Error message |
+

@@ -18,6 +18,7 @@ package io.github.guoshiqiufeng.dify.client.spring5.chat;
 import io.github.guoshiqiufeng.dify.chat.constant.ChatUriConstant;
 import io.github.guoshiqiufeng.dify.chat.dto.request.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.*;
+import io.github.guoshiqiufeng.dify.chat.enums.AnnotationReplyActionEnum;
 import io.github.guoshiqiufeng.dify.client.spring5.BaseClientTest;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
@@ -775,5 +776,88 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 annotationId
         );
         verify(responseSpecMock).bodyToMono(AppAnnotationDeleteResponse.class);
+    }
+
+    @Test
+    public void testAnnotationReply() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String embeddingModelProvider = "openai";
+        String embeddingModel = "text-embedding-3-small";
+        Float scoreThreshold = 0.8f;
+
+        // Create request
+        AppAnnotationReplyRequest request = new AppAnnotationReplyRequest();
+        request.setApiKey(apiKey);
+        request.setAction(AnnotationReplyActionEnum.enable);
+        request.setEmbeddingModelProvider(embeddingModelProvider);
+        request.setEmbeddingModel(embeddingModel);
+        request.setScoreThreshold(scoreThreshold);
+
+        // Create expected response
+        AppAnnotationReplyResponse expectedResponse = new AppAnnotationReplyResponse();
+        expectedResponse.setJobId("b15c8f68-1cf4-4877-bf21-ed7cf2011802");
+        expectedResponse.setJobStatus("waiting");
+
+        // Mock response
+        when(responseSpecMock.bodyToMono(AppAnnotationReplyResponse.class))
+                .thenReturn(Mono.just(expectedResponse));
+
+        // Execute the method
+        AppAnnotationReplyResponse actualResponse = difyChatDefaultClient.annotationReply(request);
+
+        // Verify results
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getJobId(), actualResponse.getJobId());
+        assertEquals(expectedResponse.getJobStatus(), actualResponse.getJobStatus());
+
+        // Verify WebClient interactions
+        verify(webClientMock).post();
+        verify(requestBodyUriSpecMock).uri(
+                DatasetUriConstant.V1_APPS_ANNOTATIONS_REPLY + "/{action}",
+                AnnotationReplyActionEnum.enable
+        );
+        verify(requestBodySpecMock).bodyValue(request);
+        verify(responseSpecMock).bodyToMono(AppAnnotationReplyResponse.class);
+    }
+
+    @Test
+    public void testQueryAnnotationReply() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String jobId = "job-123456";
+
+        // Create request
+        AppAnnotationReplyQueryRequest request = new AppAnnotationReplyQueryRequest();
+        request.setApiKey(apiKey);
+        request.setAction(AnnotationReplyActionEnum.enable);
+        request.setJobId(jobId);
+
+        // Create expected response
+        AppAnnotationReplyResponse expectedResponse = new AppAnnotationReplyResponse();
+        expectedResponse.setJobId("b15c8f68-1cf4-4877-bf21-ed7cf2011802");
+        expectedResponse.setJobStatus("waiting");
+        expectedResponse.setErrorMsg("");
+
+        // Mock response
+        when(responseSpecMock.bodyToMono(AppAnnotationReplyResponse.class))
+                .thenReturn(Mono.just(expectedResponse));
+
+        // Execute the method
+        AppAnnotationReplyResponse actualResponse = difyChatDefaultClient.queryAnnotationReply(request);
+
+        // Verify results
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getJobId(), actualResponse.getJobId());
+        assertEquals(expectedResponse.getJobStatus(), actualResponse.getJobStatus());
+
+        // Verify WebClient interactions
+        verify(webClientMock).get();
+        verify(requestHeadersUriSpecMock).uri(
+                DatasetUriConstant.V1_APPS_ANNOTATIONS_REPLY + "/{action}/status/{job_id}",
+                AnnotationReplyActionEnum.enable,
+                jobId
+        );
+        verify(responseSpecMock).bodyToMono(AppAnnotationReplyResponse.class);
     }
 }
