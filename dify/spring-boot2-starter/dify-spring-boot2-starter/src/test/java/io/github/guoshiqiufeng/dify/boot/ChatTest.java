@@ -328,7 +328,7 @@ public class ChatTest extends BaseChatContainerTest {
         AppAnnotationReplyQueryRequest request = new AppAnnotationReplyQueryRequest();
         request.setApiKey(apiKey);
         request.setUserId(userId);
-        request.setAction(AnnotationReplyActionEnum.disable);
+        request.setAction(AnnotationReplyActionEnum.enable);
         request.setJobId(replyJobId);
 
         AppAnnotationReplyResponse response = difyChat.queryAnnotationReply(request);
