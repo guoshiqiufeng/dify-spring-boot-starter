@@ -38,6 +38,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Set up version environment variable
+        run: |
+          APP_VERSION=$(grep -oP 'APP_VERSION=\K[^\s]+' gradle.properties)
+          echo "Using version: $APP_VERSION"
+          echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -257,6 +263,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           codecov_yml_path: .github/.codecov.yml
+          flags: v${{ env.APP_VERSION }}
 
           #- name: Upload test results to Codecov
           #  if: ${{ !cancelled() }}
@@ -270,4 +277,4 @@ jobs:
           cd tools
           curl -Os https://cli.codecov.io/latest/linux/codecov
           sudo chmod +x codecov
-          ./codecov do-upload -C ${{ github.sha }} --report-type test_results -t ${{ secrets.CODECOV_TOKEN }}
+          ./codecov do-upload -C ${{ github.sha }} --report-type test_results -t ${{ secrets.CODECOV_TOKEN }} -F v${{ env.APP_VERSION }}
