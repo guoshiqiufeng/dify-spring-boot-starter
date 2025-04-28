@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.core.pojo.request;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.guoshiqiufeng.dify.core.enums.ResponseModeEnum;
 import lombok.Data;
@@ -48,12 +49,14 @@ public class ChatMessageVO implements Serializable {
      * 模式
      */
     @JsonProperty("response_mode")
+    @JsonAlias("responseMode")
     private ResponseModeEnum responseMode;
 
     /**
      * 会话 id
      */
     @JsonProperty("conversation_id")
+    @JsonAlias("conversationId")
     private String conversationId;
 
     /**

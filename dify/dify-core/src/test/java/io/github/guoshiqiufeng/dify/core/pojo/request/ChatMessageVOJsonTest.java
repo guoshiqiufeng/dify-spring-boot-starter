@@ -105,8 +105,8 @@ public class ChatMessageVOJsonTest {
         assertEquals("John Doe", chatMessage.getInputs().get("name"));
         assertEquals(25, chatMessage.getInputs().get("age"));
         assertEquals("How are you today?", chatMessage.getQuery());
-        assertNull(chatMessage.getResponseMode()); // Should be null because JSON used "responseMode" instead of "response_mode"
-        assertNull(chatMessage.getConversationId()); // Should be null because JSON used "conversationId" instead of "conversation_id"
+        assertEquals(ResponseModeEnum.blocking, chatMessage.getResponseMode());
+        assertEquals("conv-123456", chatMessage.getConversationId());
         assertEquals("user-789", chatMessage.getUser());
     }
 
