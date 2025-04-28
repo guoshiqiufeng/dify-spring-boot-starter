@@ -17,15 +17,3 @@ component_management:
 comment:
   layout: "header, diff, flags, components"  # show component info in the PR comment
 
-flag_management:
-  default_rules: # the rules that will be followed for any flag added, generally
-    carryforward: true
-  individual_flags: # exceptions to the default rules above, stated flag by flag
-    - name: springboot2
-      paths:
-        - "dify/dify-client/dify-client-spring5/**"
-        - "dify/spring-boot2-starter/**"
-    - name: springboot3
-      paths:
-        - "dify/dify-client/dify-client-spring6/**"
-        - "dify/spring-boot-starter/**"

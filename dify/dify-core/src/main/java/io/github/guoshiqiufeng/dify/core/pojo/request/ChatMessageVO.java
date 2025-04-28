@@ -64,7 +64,8 @@ public class ChatMessageVO implements Serializable {
     private List<ChatMessageFile> files;
 
     @Data
-    public static class ChatMessageFile {
+    public static class ChatMessageFile implements Serializable {
+        private static final long serialVersionUID = 3796193415966750860L;
         /**
          * 类型
          */
