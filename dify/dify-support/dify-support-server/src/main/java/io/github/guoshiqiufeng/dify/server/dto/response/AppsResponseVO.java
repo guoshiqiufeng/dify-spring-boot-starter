@@ -88,7 +88,8 @@ public class AppsResponseVO implements Serializable {
     private List<String> deletedTools;
 
     @Data
-    public static class ModelConfig {
+    public static class ModelConfig implements Serializable {
+        private static final long serialVersionUID = 5952505802589220765L;
         private Model model;
         @JsonAlias("pre_prompt")
         private String prePrompt;
@@ -103,7 +104,8 @@ public class AppsResponseVO implements Serializable {
     }
 
     @Data
-    public static class Model {
+    public static class Model implements Serializable {
+        private static final long serialVersionUID = 3375062828857004922L;
         private String provider;
         private String name;
         private String mode;
@@ -112,7 +114,8 @@ public class AppsResponseVO implements Serializable {
     }
 
     @Data
-    public static class CompletionParams {
+    public static class CompletionParams implements Serializable {
+        private static final long serialVersionUID = -8990638022329588332L;
         private List<String> stop;
 
         private String format;

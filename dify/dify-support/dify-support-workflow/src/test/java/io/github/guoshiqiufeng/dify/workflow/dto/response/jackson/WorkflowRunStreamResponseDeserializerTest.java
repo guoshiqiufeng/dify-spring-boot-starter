@@ -72,10 +72,10 @@ public class WorkflowRunStreamResponseDeserializerTest {
         Assertions.assertEquals(StreamEventEnum.node_started, response.getEvent());
         Assertions.assertEquals("wfr-123456", response.getWorkflowRunId());
         Assertions.assertEquals("task-123456", response.getTaskId());
-        
+
         Assertions.assertNotNull(response.getData());
         Assertions.assertInstanceOf(NodeStartedData.class, response.getData());
-        
+
         NodeStartedData nodeStartedData = (NodeStartedData) response.getData();
 
         Assertions.assertEquals("node-123", nodeStartedData.getNodeId());
@@ -115,10 +115,10 @@ public class WorkflowRunStreamResponseDeserializerTest {
         Assertions.assertEquals(StreamEventEnum.workflow_started, response.getEvent());
         Assertions.assertEquals("wfr-123456", response.getWorkflowRunId());
         Assertions.assertEquals("task-123456", response.getTaskId());
-        
+
         Assertions.assertNotNull(response.getData());
         Assertions.assertInstanceOf(WorkflowStartedData.class, response.getData());
-        
+
         WorkflowStartedData workflowStartedData = (WorkflowStartedData) response.getData();
         Assertions.assertEquals("workflow-123", workflowStartedData.getId());
         Assertions.assertEquals("wf-123", workflowStartedData.getWorkflowId());
@@ -150,10 +150,10 @@ public class WorkflowRunStreamResponseDeserializerTest {
         Assertions.assertEquals(StreamEventEnum.text_chunk, response.getEvent());
         Assertions.assertEquals("wfr-123456", response.getWorkflowRunId());
         Assertions.assertEquals("task-123456", response.getTaskId());
-        
+
         Assertions.assertNotNull(response.getData());
         Assertions.assertInstanceOf(Map.class, response.getData());
-        
+
         Map<String, Object> textChunkData = (Map<String, Object>) response.getData();
         Assertions.assertEquals("This is a test text", textChunkData.get("text"));
         Assertions.assertEquals("node-456", textChunkData.get("node_id"));
@@ -205,4 +205,4 @@ public class WorkflowRunStreamResponseDeserializerTest {
             addDeserializer(WorkflowRunStreamResponse.class, new WorkflowRunStreamResponseDeserializer());
         }
     }
-} 
+}
