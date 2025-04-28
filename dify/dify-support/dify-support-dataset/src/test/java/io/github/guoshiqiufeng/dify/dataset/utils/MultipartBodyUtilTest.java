@@ -17,7 +17,6 @@ package io.github.guoshiqiufeng.dify.dataset.utils;
 
 import io.github.guoshiqiufeng.dify.dataset.dto.request.file.FileOperation;
 import io.github.guoshiqiufeng.dify.dataset.exception.DiftDatasetException;
-import io.github.guoshiqiufeng.dify.dataset.exception.DiftDatasetExceptionEnum;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
@@ -82,21 +81,21 @@ public class MultipartBodyUtilTest {
 
         // Assert
         assertNotNull(builder);
-        
+
         // Build and verify the multipart body
         MultiValueMap<String, HttpEntity<?>> multipartBody = builder.build();
-        
+
         // Verify file part exists
         assertTrue(multipartBody.containsKey("file"));
         assertFalse(multipartBody.get("file").isEmpty());
-        
-        // Verify data part exists 
+
+        // Verify data part exists
         assertTrue(multipartBody.containsKey("data"));
         assertFalse(multipartBody.get("data").isEmpty());
-        
+
         // Verify request's file field is null after building
         assertNull(request.getFile());
-        
+
         // Verify the correct method calls were made
         verify(mockFile).getBytes();
         verify(mockFile).getOriginalFilename();
@@ -120,7 +119,7 @@ public class MultipartBodyUtilTest {
 
         // Assert
         assertNotNull(builder);
-        
+
         // Verify the correct content type fallback behavior
         MultiValueMap<String, HttpEntity<?>> multipartBody = builder.build();
         assertTrue(multipartBody.containsKey("file"));
@@ -138,7 +137,7 @@ public class MultipartBodyUtilTest {
                 DiftDatasetException.class,
                 () -> MultipartBodyUtil.getMultipartBodyBuilder(mockFile, request)
         );
-        
+
         // Since we don't have direct access to the BaseException methods like getCode(),
         // we can't fully verify the exception properties.
         assertNotNull(exception);
@@ -161,9 +160,9 @@ public class MultipartBodyUtilTest {
                 DiftDatasetException.class,
                 () -> MultipartBodyUtil.getMultipartBodyBuilder(mockFile, request)
         );
-        
+
         assertNotNull(exception);
-        
+
         // Verify the correct method calls were made
         verify(mockFile).getBytes();
     }
@@ -173,7 +172,7 @@ public class MultipartBodyUtilTest {
         // Arrange
         TestFileOperationRequest request = new TestFileOperationRequest();
         request.setTestField("test value");
-        
+
         // Create a MultipartFile mock just to test the JSON conversion
         MultipartFile mockFile = mock(MultipartFile.class);
         when(mockFile.getBytes()).thenReturn("test content".getBytes(StandardCharsets.UTF_8));
@@ -182,18 +181,18 @@ public class MultipartBodyUtilTest {
 
         // Act
         MultipartBodyBuilder builder = MultipartBodyUtil.getMultipartBodyBuilder(mockFile, request);
-        
+
         // Assert
         assertNotNull(builder);
-        
+
         // Verify the content of the multipart body
         MultiValueMap<String, HttpEntity<?>> multipartBody = builder.build();
         assertTrue(multipartBody.containsKey("data"));
-        
+
         // Get the JSON data part
         HttpEntity<?> dataEntity = multipartBody.get("data").get(0);
         assertNotNull(dataEntity);
-        
+
         // Verify it contains our test field and doesn't contain file
         String jsonBody = dataEntity.getBody().toString();
         assertTrue(jsonBody.contains("testField"));
@@ -204,11 +203,11 @@ public class MultipartBodyUtilTest {
     @Test
     public void testPrivateConstructor() throws Exception {
         // Test the private constructor for code coverage
-        java.lang.reflect.Constructor<MultipartBodyUtil> constructor = 
+        java.lang.reflect.Constructor<MultipartBodyUtil> constructor =
                 MultipartBodyUtil.class.getDeclaredConstructor();
         constructor.setAccessible(true);
         constructor.newInstance();
-        
+
         // No assertion needed, we're just verifying it executes without errors
     }
-} 
+}

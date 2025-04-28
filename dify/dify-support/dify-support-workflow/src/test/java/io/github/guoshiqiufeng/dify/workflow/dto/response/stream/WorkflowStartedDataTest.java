@@ -21,50 +21,58 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test for {@link BaseWorkflowRunData}
+ * Test for {@link WorkflowStartedData}
  *
  * @author yanghq
  * @version 1.0
  * @since 2025/4/27
  */
-public class BaseWorkflowRunDataTest {
+public class WorkflowStartedDataTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    // Concrete implementation for testing the abstract class
-    private static class TestBaseWorkflowRunData extends BaseWorkflowRunData {
-    }
 
     @Test
     public void testSettersAndGetters() {
         // Arrange
         String id = "run-123";
         Long createdAt = 1705395332L;
+        String workflowId = "workflow-456";
+        Integer sequenceNumber = 1;
 
         // Act
-        TestBaseWorkflowRunData data = new TestBaseWorkflowRunData();
+        WorkflowStartedData data = new WorkflowStartedData();
         data.setId(id);
         data.setCreatedAt(createdAt);
+        data.setWorkflowId(workflowId);
+        data.setSequenceNumber(sequenceNumber);
 
         // Assert
         assertEquals(id, data.getId());
         assertEquals(createdAt, data.getCreatedAt());
+        assertEquals(workflowId, data.getWorkflowId());
+        assertEquals(sequenceNumber, data.getSequenceNumber());
     }
 
     @Test
     public void testEqualsAndHashCode() {
         // Arrange
-        TestBaseWorkflowRunData data1 = new TestBaseWorkflowRunData();
+        WorkflowStartedData data1 = new WorkflowStartedData();
         data1.setId("run-123");
         data1.setCreatedAt(1705395332L);
+        data1.setWorkflowId("workflow-456");
+        data1.setSequenceNumber(1);
 
-        TestBaseWorkflowRunData data2 = new TestBaseWorkflowRunData();
+        WorkflowStartedData data2 = new WorkflowStartedData();
         data2.setId("run-123");
         data2.setCreatedAt(1705395332L);
+        data2.setWorkflowId("workflow-456");
+        data2.setSequenceNumber(1);
 
-        TestBaseWorkflowRunData data3 = new TestBaseWorkflowRunData();
-        data3.setId("run-456");
+        WorkflowStartedData data3 = new WorkflowStartedData();
+        data3.setId("run-789");
         data3.setCreatedAt(1705395332L);
+        data3.setWorkflowId("workflow-999");
+        data3.setSequenceNumber(2);
 
         // Assert
         assertEquals(data1, data2);
@@ -74,11 +82,22 @@ public class BaseWorkflowRunDataTest {
     }
 
     @Test
+    public void testInheritance() {
+        // Arrange
+        WorkflowStartedData data = new WorkflowStartedData();
+
+        // Assert
+        assertInstanceOf(BaseWorkflowRunData.class, data);
+    }
+
+    @Test
     public void testJsonSerializationDeserialization() throws Exception {
         // Arrange
-        TestBaseWorkflowRunData data = new TestBaseWorkflowRunData();
+        WorkflowStartedData data = new WorkflowStartedData();
         data.setId("run-123");
         data.setCreatedAt(1705395332L);
+        data.setWorkflowId("workflow-456");
+        data.setSequenceNumber(1);
 
         // Act - Serialize
         String json = objectMapper.writeValueAsString(data);
@@ -86,34 +105,42 @@ public class BaseWorkflowRunDataTest {
         // Assert - Serialization
         assertTrue(json.contains("\"id\":\"run-123\""));
         assertTrue(json.contains("\"createdAt\":1705395332"));
+        assertTrue(json.contains("\"workflowId\":\"workflow-456\""));
+        assertTrue(json.contains("\"sequenceNumber\":1"));
 
         // Act - Deserialize
-        TestBaseWorkflowRunData deserializedData = objectMapper.readValue(json, TestBaseWorkflowRunData.class);
+        WorkflowStartedData deserializedData = objectMapper.readValue(json, WorkflowStartedData.class);
 
         // Assert - Deserialization
         assertEquals(data.getId(), deserializedData.getId());
         assertEquals(data.getCreatedAt(), deserializedData.getCreatedAt());
+        assertEquals(data.getWorkflowId(), deserializedData.getWorkflowId());
+        assertEquals(data.getSequenceNumber(), deserializedData.getSequenceNumber());
     }
 
     @Test
     public void testJsonDeserializationWithJsonAlias() throws Exception {
         // Arrange - Use JsonAlias field names
-        String json = "{\"id\":\"run-123\",\"created_at\":1705395332}";
+        String json = "{\"id\":\"run-123\",\"created_at\":1705395332,\"workflow_id\":\"workflow-456\",\"sequence_number\":1}";
 
         // Act
-        TestBaseWorkflowRunData data = objectMapper.readValue(json, TestBaseWorkflowRunData.class);
+        WorkflowStartedData data = objectMapper.readValue(json, WorkflowStartedData.class);
 
         // Assert
         assertEquals("run-123", data.getId());
         assertEquals(Long.valueOf(1705395332), data.getCreatedAt());
+        assertEquals("workflow-456", data.getWorkflowId());
+        assertEquals(Integer.valueOf(1), data.getSequenceNumber());
     }
 
     @Test
     public void testToString() {
         // Arrange
-        TestBaseWorkflowRunData data = new TestBaseWorkflowRunData();
+        WorkflowStartedData data = new WorkflowStartedData();
         data.setId("run-123");
         data.setCreatedAt(1705395332L);
+        data.setWorkflowId("workflow-456");
+        data.setSequenceNumber(1);
 
         // Act
         String toString = data.toString();
@@ -121,5 +148,7 @@ public class BaseWorkflowRunDataTest {
         // Assert
         assertTrue(toString.contains("id=run-123"));
         assertTrue(toString.contains("createdAt=1705395332"));
+        assertTrue(toString.contains("workflowId=workflow-456"));
+        assertTrue(toString.contains("sequenceNumber=1"));
     }
-} 
+}

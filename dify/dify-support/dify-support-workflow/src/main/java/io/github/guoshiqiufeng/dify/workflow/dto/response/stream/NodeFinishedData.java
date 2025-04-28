@@ -18,6 +18,7 @@ package io.github.guoshiqiufeng.dify.workflow.dto.response.stream;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -29,6 +30,7 @@ import java.util.Map;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class NodeFinishedData extends NodeStartedData {
 
     /**
