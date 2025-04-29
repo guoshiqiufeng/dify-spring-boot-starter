@@ -2,7 +2,8 @@
 
 <p align="center">
   <a href="https://guoshiqiufeng.github.io/dify-spring-boot-starter/en">Documentation</a> ·
-  <a href="https://github.com/guoshiqiufeng/dify-spring-boot-starter-examples">Examples</a>
+  <a href="https://github.com/guoshiqiufeng/dify-spring-boot-starter-examples">Examples</a> ·
+  <a href="https://deepwiki.com/guoshiqiufeng/dify-spring-boot-starter">DeepWiki</a>
 </p>
 
 <div align="center">
