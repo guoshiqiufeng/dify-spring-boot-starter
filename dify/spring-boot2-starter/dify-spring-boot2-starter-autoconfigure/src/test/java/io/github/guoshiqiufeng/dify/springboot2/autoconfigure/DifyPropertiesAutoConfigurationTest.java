@@ -48,10 +48,10 @@ public class DifyPropertiesAutoConfigurationTest {
                 .withPropertyValues("dify.url=https://custom-dify-api.example.com")
                 .run((context) -> {
                     DifyProperties properties = context.getBean(DifyProperties.class);
-                    // assertThat(properties.getUrl()).isEqualTo("https://custom-dify-api.example.com");
+                    assertThat(properties.getUrl()).isEqualTo("https://custom-dify-api.example.com");
 
                     DifyConnectionDetails connectionDetails = context.getBean(DifyConnectionDetails.class);
-                    // assertThat(connectionDetails.getUrl()).isEqualTo("https://custom-dify-api.example.com");
+                    assertThat(connectionDetails.getUrl()).isEqualTo("https://custom-dify-api.example.com");
                 });
     }
 
@@ -67,7 +67,7 @@ public class DifyPropertiesAutoConfigurationTest {
                 .run((context) -> {
                     assertThat(context).hasSingleBean(DifyConnectionDetails.class);
                     DifyConnectionDetails connectionDetails = context.getBean(DifyConnectionDetails.class);
-                    // assertThat(connectionDetails.getUrl()).isEqualTo("https://custom-connection-details.example.com");
+                    assertThat(connectionDetails.getUrl()).isEqualTo("https://custom-connection-details.example.com");
                 });
     }
 }

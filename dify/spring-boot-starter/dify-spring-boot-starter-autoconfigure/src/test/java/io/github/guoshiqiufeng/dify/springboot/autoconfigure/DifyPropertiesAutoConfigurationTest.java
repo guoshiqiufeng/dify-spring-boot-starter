@@ -46,8 +46,8 @@ public class DifyPropertiesAutoConfigurationTest {
                     DifyProperties difyProperties = context.getBean(DifyProperties.class);
                     DifyConnectionDetails connectionProperties = context.getBean(DifyConnectionDetails.class);
 
-                    //assertThat(difyProperties.getUrl()).isEqualTo("https://api.dify.ai");
-                    //assertThat(connectionProperties.getUrl()).isEqualTo("https://api.dify.ai");
+                    assertThat(difyProperties.getUrl()).isEqualTo("https://api.dify.ai");
+                    assertThat(connectionProperties.getUrl()).isEqualTo("https://api.dify.ai");
                 });
 
     }
@@ -68,7 +68,7 @@ public class DifyPropertiesAutoConfigurationTest {
                 .withUserConfiguration(CustomConnectionDetailsConfiguration.class)
                 .run((context) -> {
                     assertThat(context).hasSingleBean(DifyConnectionDetails.class);
-                    // assertThat(context.getBean(DifyConnectionDetails.class)).isNotInstanceOf(DifyConnectionDetails.class);
+                    assertThat(context.getBean(CustomConnectionDetailsConfiguration.class)).isNotInstanceOf(DifyConnectionDetails.class);
                 });
     }
 
