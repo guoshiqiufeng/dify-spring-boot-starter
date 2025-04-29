@@ -60,3 +60,11 @@ dify:
 - Default value：`true`
 - Not required
 - Description：Whether to skip null fields, by default null fields are filtered out when submitting data
+
+##### logging
+
+- Type：`Boolean`
+- Default value：`true`
+- Not required
+- Description：If or not print request logs, enable this parameter and configure `io.github.guoshiqiufeng.dedify.client`
+  to print request and response logs if the log level is debug.

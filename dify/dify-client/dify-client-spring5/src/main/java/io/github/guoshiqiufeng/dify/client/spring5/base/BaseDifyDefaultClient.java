@@ -15,6 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.client.spring5.base;
 
+import io.github.guoshiqiufeng.dify.client.spring5.logging.DifyLoggingControl;
+import io.github.guoshiqiufeng.dify.client.spring5.logging.DifyLoggingFilter;
 import io.github.guoshiqiufeng.dify.client.spring5.utils.DifyExchangeStrategies;
 import io.github.guoshiqiufeng.dify.core.client.BaseDifyClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
@@ -39,7 +41,7 @@ import java.util.function.Consumer;
  * @since 2025/4/7 16:10
  */
 @Slf4j
-public abstract class BaseDifyDefaultClient extends BaseDifyClient {
+public abstract class BaseDifyDefaultClient implements BaseDifyClient {
 
     protected final ResponseErrorHandler responseErrorHandler;
 
@@ -84,6 +86,14 @@ public abstract class BaseDifyDefaultClient extends BaseDifyClient {
         };
         if (clientConfig != null && clientConfig.getSkipNull()) {
             DifyExchangeStrategies.exchangeStrategies().accept(webClientBuilder);
+        }
+        if (clientConfig != null && clientConfig.getLogging()) {
+            DifyLoggingControl loggingControl = DifyLoggingControl.getInstance();
+
+            DifyLoggingFilter filter = loggingControl.getAndMarkFilter();
+            if (filter != null) {
+                webClientBuilder.filter(filter);
+            }
         }
         this.webClient = webClientBuilder.baseUrl(baseUrl).defaultHeaders(defaultHeaders).build();
     }
