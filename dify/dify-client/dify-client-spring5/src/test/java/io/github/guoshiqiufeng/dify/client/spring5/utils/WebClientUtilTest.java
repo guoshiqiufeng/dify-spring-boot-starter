@@ -26,6 +26,8 @@ import reactor.test.StepVerifier;
 import static org.mockito.Mockito.when;
 
 /**
+ * Tests for {@link WebClientUtil}.
+ *
  * @author yanghq
  * @version 0.9.0
  * @since 2025/4/21 11:55

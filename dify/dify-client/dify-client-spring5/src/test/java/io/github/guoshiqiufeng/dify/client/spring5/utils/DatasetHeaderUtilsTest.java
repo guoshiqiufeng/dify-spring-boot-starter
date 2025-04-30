@@ -25,6 +25,8 @@ import java.util.function.Consumer;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
+ * Tests for {@link DatasetHeaderUtils}.
+ *
  * @author yanghq
  * @version 0.9.0
  * @since 2025/4/21 11:40

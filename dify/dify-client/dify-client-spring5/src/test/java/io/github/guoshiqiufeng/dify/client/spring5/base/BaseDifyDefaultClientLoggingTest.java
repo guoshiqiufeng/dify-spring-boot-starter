@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 /**
- * BaseDifyDefaultClient日志功能测试
+ * Tests for {@link BaseDifyDefaultClient}.
  *
  * @author yanghq
  * @version 0.11.0
