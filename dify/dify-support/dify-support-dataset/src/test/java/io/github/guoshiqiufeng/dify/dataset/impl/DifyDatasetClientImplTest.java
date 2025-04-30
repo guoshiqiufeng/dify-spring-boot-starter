@@ -336,19 +336,10 @@ public class DifyDatasetClientImplTest {
         String datasetId = "dataset_123";
         String documentId = "doc_456";
         String apiKey = "test_api_key";
-
-        DocumentDeleteResponse expectedResponse = new DocumentDeleteResponse();
-        expectedResponse.setResult("success");
-
-        when(difyDatasetClient.deleteDocument(anyString(), anyString(), anyString()))
-                .thenReturn(expectedResponse);
-
         // Act
-        DocumentDeleteResponse actualResponse = difyDataset.deleteDocument(datasetId, documentId, apiKey);
+        difyDataset.deleteDocument(datasetId, documentId, apiKey);
 
         // Assert
-        assertNotNull(actualResponse);
-        assertEquals(expectedResponse.getResult(), actualResponse.getResult());
         verify(difyDatasetClient, times(1)).deleteDocument(datasetId, documentId, apiKey);
     }
 
@@ -357,20 +348,10 @@ public class DifyDatasetClientImplTest {
         // Arrange
         String datasetId = "dataset_123";
         String documentId = "doc_456";
-        String apiKey = "test_api_key";
-
-        DocumentDeleteResponse expectedResponse = new DocumentDeleteResponse();
-        expectedResponse.setResult("success");
-
-        when(difyDatasetClient.deleteDocument(anyString(), anyString(), any()))
-                .thenReturn(expectedResponse);
-
         // Act
-        DocumentDeleteResponse actualResponse = difyDataset.deleteDocument(datasetId, documentId);
+        difyDataset.deleteDocument(datasetId, documentId);
 
         // Assert
-        assertNotNull(actualResponse);
-        assertEquals(expectedResponse.getResult(), actualResponse.getResult());
         verify(difyDatasetClient, times(1)).deleteDocument(datasetId, documentId, null);
     }
 
@@ -452,18 +433,10 @@ public class DifyDatasetClientImplTest {
         String segmentId = "seg_789";
         String apiKey = "test_api_key";
 
-        SegmentDeleteResponse expectedResponse = new SegmentDeleteResponse();
-        expectedResponse.setResult("success");
-
-        when(difyDatasetClient.deleteSegment(anyString(), anyString(), anyString(), anyString()))
-                .thenReturn(expectedResponse);
-
         // Act
-        SegmentDeleteResponse actualResponse = difyDataset.deleteSegment(datasetId, documentId, segmentId, apiKey);
+        difyDataset.deleteSegment(datasetId, documentId, segmentId, apiKey);
 
         // Assert
-        assertNotNull(actualResponse);
-        assertEquals(expectedResponse.getResult(), actualResponse.getResult());
         verify(difyDatasetClient, times(1)).deleteSegment(datasetId, documentId, segmentId, apiKey);
     }
 
@@ -473,20 +446,11 @@ public class DifyDatasetClientImplTest {
         String datasetId = "dataset_123";
         String documentId = "doc_456";
         String segmentId = "seg_789";
-        String apiKey = "test_api_key";
-
-        SegmentDeleteResponse expectedResponse = new SegmentDeleteResponse();
-        expectedResponse.setResult("success");
-
-        when(difyDatasetClient.deleteSegment(anyString(), anyString(), anyString(), any()))
-                .thenReturn(expectedResponse);
 
         // Act
-        SegmentDeleteResponse actualResponse = difyDataset.deleteSegment(datasetId, documentId, segmentId);
+        difyDataset.deleteSegment(datasetId, documentId, segmentId);
 
         // Assert
-        assertNotNull(actualResponse);
-        assertEquals(expectedResponse.getResult(), actualResponse.getResult());
         verify(difyDatasetClient, times(1)).deleteSegment(datasetId, documentId, segmentId, null);
     }
 
@@ -604,18 +568,10 @@ public class DifyDatasetClientImplTest {
         request.setChildChunkId("chunk_123");
         request.setApiKey("test_api_key");
 
-        SegmentChildChunkDeleteResponse expectedResponse = new SegmentChildChunkDeleteResponse();
-        expectedResponse.setResult("success");
-
-        when(difyDatasetClient.deleteSegmentChildChunk(any(SegmentChildChunkDeleteRequest.class)))
-                .thenReturn(expectedResponse);
-
         // Act
-        SegmentChildChunkDeleteResponse actualResponse = difyDataset.deleteSegmentChildChunk(request);
+        difyDataset.deleteSegmentChildChunk(request);
 
         // Assert
-        assertNotNull(actualResponse);
-        assertEquals(expectedResponse.getResult(), actualResponse.getResult());
         verify(difyDatasetClient, times(1)).deleteSegmentChildChunk(any(SegmentChildChunkDeleteRequest.class));
     }
 

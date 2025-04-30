@@ -18,6 +18,7 @@ package io.github.guoshiqiufeng.dify.springboot2.autoconfigure;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -27,6 +28,7 @@ import org.springframework.context.annotation.Configuration;
  * @since 2025/3/18 17:29
  */
 @Configuration
+@EnableConfigurationProperties
 public class DifyPropertiesAutoConfiguration {
 
     @Bean

@@ -82,8 +82,8 @@ public class DifyDatasetClientImpl implements DifyDataset {
     }
 
     @Override
-    public DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apiKey) {
-        return difyDatasetClient.deleteDocument(datasetId, documentId, apiKey);
+    public void deleteDocument(String datasetId, String documentId, String apiKey) {
+        difyDatasetClient.deleteDocument(datasetId, documentId, apiKey);
     }
 
     @Override
@@ -97,8 +97,8 @@ public class DifyDatasetClientImpl implements DifyDataset {
     }
 
     @Override
-    public SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apiKey) {
-        return difyDatasetClient.deleteSegment(datasetId, documentId, segmentId, apiKey);
+    public void deleteSegment(String datasetId, String documentId, String segmentId, String apiKey) {
+        difyDatasetClient.deleteSegment(datasetId, documentId, segmentId, apiKey);
     }
 
     @Override
@@ -117,8 +117,8 @@ public class DifyDatasetClientImpl implements DifyDataset {
     }
 
     @Override
-    public SegmentChildChunkDeleteResponse deleteSegmentChildChunk(SegmentChildChunkDeleteRequest request) {
-        return difyDatasetClient.deleteSegmentChildChunk(request);
+    public void deleteSegmentChildChunk(SegmentChildChunkDeleteRequest request) {
+        difyDatasetClient.deleteSegmentChildChunk(request);
     }
 
     @Override

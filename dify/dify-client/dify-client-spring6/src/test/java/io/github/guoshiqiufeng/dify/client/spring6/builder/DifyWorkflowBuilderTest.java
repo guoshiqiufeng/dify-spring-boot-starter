@@ -28,6 +28,8 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
+ * Tests for {@link DifyWorkflowBuilder}.
+ *
  * @author yanghq
  * @version 0.9.0
  * @since 2025/4/18 10:42

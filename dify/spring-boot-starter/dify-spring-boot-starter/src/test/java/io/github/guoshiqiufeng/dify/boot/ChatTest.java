@@ -279,8 +279,7 @@ public class ChatTest extends BaseChatContainerTest {
     @Order(26)
     @DisplayName("Test delete app annotation")
     public void testDeleteAppAnnotation() {
-        AppAnnotationDeleteResponse response = difyChat.deleteAppAnnotation(annotationId, apiKey);
-        assertNotNull(response);
+        difyChat.deleteAppAnnotation(annotationId, apiKey);
     }
 
     @Test

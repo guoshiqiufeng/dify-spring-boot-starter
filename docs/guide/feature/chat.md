@@ -555,6 +555,8 @@ AppAnnotationResponse
 
 ### 4.3 更新应用标注
 
+> 需要 Dify 1.3.1 或更高版本
+
 #### 方法
 
 ```java
@@ -590,7 +592,7 @@ AppAnnotationResponse
 #### 方法
 
 ```java
-AppAnnotationDeleteResponse deleteAppAnnotation(String annotationId, String apiKey);
+ void deleteAppAnnotation(String annotationId, String apiKey);
 ```
 
 #### 请求参数
@@ -602,11 +604,7 @@ AppAnnotationDeleteResponse deleteAppAnnotation(String annotationId, String apiK
 
 #### 响应参数
 
-AppAnnotationDeleteResponse
-
-| 参数名    | 类型     | 描述                |
-|--------|--------|-------------------|
-| result | String | 操作结果，成功返回 success |
+无
 
 ### 4.5 标注回复
 

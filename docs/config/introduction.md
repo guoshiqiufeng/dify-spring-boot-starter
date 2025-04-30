@@ -61,4 +61,10 @@ dify:
 - 非必填
 - 描述：是否跳过null字段，默认提交数据时，会过滤掉null字段
 
+##### logging
+
+- 类型：`Boolean`
+- 默认值：`true`
+- 非必填
+- 描述：是否打印请求日志，开启此参数并配置`io.github.guoshiqiufeng.dify.client`日志级别为 debug则打印请求、响应日志
 

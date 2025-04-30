@@ -33,37 +33,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
+ * Tests for {@link DifyMessageConverters}.
+ *
  * @author yanghq
  * @version 0.8.0
  * @since 2025/4/21 14:35
  */
 public class DifyMessageConvertersTest {
-
-//    @Test
-//    @DisplayName("Test messageConvertersConsumer returns a valid RestClient.Builder consumer")
-//    public void testMessageConvertersConsumer() {
-//        // Get the RestClient.Builder consumer
-//        Consumer<RestClient.Builder> consumer = DifyMessageConverters.messageConvertersConsumer();
-//
-//        // Verify that the consumer is not null
-//        assertNotNull(consumer);
-//
-//        // Create a mock RestClient.Builder
-//        RestClient.Builder mockBuilder = mock(RestClient.Builder.class);
-//
-//        // Mock the behavior to capture the messageConverters consumer
-//        // Using a suppressed warning since we know the types are compatible
-//        @SuppressWarnings("unchecked")
-//        Consumer<List<HttpMessageConverter<?>>> anyConsumer = ArgumentMatchers.any(Consumer.class);
-//        when(mockBuilder.messageConverters(anyConsumer)).thenReturn(mockBuilder);
-//
-//        // Apply the consumer to the mock builder
-//        consumer.accept(mockBuilder);
-//
-//        // Verify that the messageConverters method was called once
-//        verify(mockBuilder, times(1)).messageConverters(c-> {
-//        });
-//    }
 
     @Test
     @DisplayName("Test messageConvertersConsumer configures Jackson converter correctly")

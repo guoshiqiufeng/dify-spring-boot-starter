@@ -15,6 +15,9 @@
  */
 package io.github.guoshiqiufeng.dify.client.spring6.base;
 
+import io.github.guoshiqiufeng.dify.client.spring6.logging.DifyLoggingControl;
+import io.github.guoshiqiufeng.dify.client.spring6.logging.DifyLoggingFilter;
+import io.github.guoshiqiufeng.dify.client.spring6.logging.DifyRestLoggingInterceptor;
 import io.github.guoshiqiufeng.dify.client.spring6.utils.DifyExchangeStrategies;
 import io.github.guoshiqiufeng.dify.client.spring6.utils.DifyMessageConverters;
 import io.github.guoshiqiufeng.dify.core.client.BaseDifyClient;
@@ -40,7 +43,7 @@ import java.util.function.Consumer;
  * @since 2025/4/7 16:10
  */
 @Slf4j
-public abstract class BaseDifyDefaultClient extends BaseDifyClient {
+public abstract class BaseDifyDefaultClient implements BaseDifyClient {
 
     protected final ResponseErrorHandler responseErrorHandler;
 
@@ -80,7 +83,19 @@ public abstract class BaseDifyDefaultClient extends BaseDifyClient {
             DifyMessageConverters.messageConvertersConsumer().accept(restClientBuilder);
             DifyExchangeStrategies.exchangeStrategies().accept(webClientBuilder);
         }
+        if (clientConfig != null && clientConfig.getLogging()) {
+            DifyLoggingControl loggingControl = DifyLoggingControl.getInstance();
 
+            DifyRestLoggingInterceptor interceptor = loggingControl.getAndMarkInterceptor();
+            if (interceptor != null) {
+                restClientBuilder.requestInterceptor(interceptor);
+            }
+
+            DifyLoggingFilter filter = loggingControl.getAndMarkFilter();
+            if (filter != null) {
+                webClientBuilder.filter(filter);
+            }
+        }
         this.restClient = restClientBuilder.baseUrl(baseUrl).defaultHeaders(defaultHeaders).build();
 
         this.webClient = webClientBuilder.baseUrl(baseUrl).defaultHeaders(defaultHeaders).build();
@@ -88,12 +103,10 @@ public abstract class BaseDifyDefaultClient extends BaseDifyClient {
 
     private static class DifyResponseErrorHandler implements ResponseErrorHandler {
 
-
         @Override
         public boolean hasError(ClientHttpResponse response) throws IOException {
             return response.getStatusCode().isError();
         }
-
 
         @Override
         public void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException {
@@ -101,10 +114,9 @@ public abstract class BaseDifyDefaultClient extends BaseDifyClient {
                 int statusCode = response.getStatusCode().value();
                 String statusText = response.getStatusText();
                 String message = StreamUtils.copyToString(response.getBody(), java.nio.charset.StandardCharsets.UTF_8);
-                log.warn(String.format("URI: %s, Method: %s, Status: [%s] %s - %s", url, method, statusCode, statusText, message));
+                log.error("【Dify】请求错误，URI：{}，Method：{}，状态码：{}，状态文本：{}，错误信息：{}", url, method, statusCode, statusText, message);
                 throw new RuntimeException(String.format("[%s] %s - %s", statusCode, statusText, message));
             }
         }
-
     }
 }

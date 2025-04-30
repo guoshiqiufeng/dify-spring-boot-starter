@@ -84,5 +84,7 @@ public class DifyProperties implements Serializable {
         private static final long serialVersionUID = -8070163136236819894L;
 
         private Boolean skipNull = true;
+
+        private Boolean logging = true;
     }
 }

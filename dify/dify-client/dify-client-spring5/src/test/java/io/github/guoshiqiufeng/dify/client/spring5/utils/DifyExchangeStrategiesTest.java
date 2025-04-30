@@ -25,6 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
+ * Tests for {@link DifyExchangeStrategies}.
+ *
  * @author yanghq
  * @version 0.9.0
  * @since 2025/4/21 11:45

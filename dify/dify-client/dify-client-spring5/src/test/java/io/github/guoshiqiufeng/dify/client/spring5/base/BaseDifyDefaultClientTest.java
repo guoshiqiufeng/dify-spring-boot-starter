@@ -36,6 +36,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
+ * Tests for {@link BaseDifyDefaultClient}.
+ *
  * @author yanghq
  * @version 0.9.0
  * @since 2025/4/21 12:00

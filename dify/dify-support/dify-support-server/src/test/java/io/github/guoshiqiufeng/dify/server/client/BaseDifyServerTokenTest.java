@@ -33,6 +33,7 @@ import static org.mockito.Mockito.*;
  * @version 0.10.0
  * @since 2025/4/23 14:25
  */
+@SuppressWarnings("unchecked")
 @ExtendWith(MockitoExtension.class)
 class BaseDifyServerTokenTest {
 

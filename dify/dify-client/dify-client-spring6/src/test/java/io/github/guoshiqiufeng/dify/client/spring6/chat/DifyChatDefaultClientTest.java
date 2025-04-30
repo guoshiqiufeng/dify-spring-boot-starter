@@ -50,6 +50,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
+ * Tests for {@link DifyChatDefaultClient}.
+ *
  * @author yanghq
  * @version 1.0
  * @since 2025/4/21 14:45
@@ -805,7 +807,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         assertEquals(expectedResponse.getCreatedAt(), actualResponse.getCreatedAt());
 
         // Verify WebClient interactions
-        verify(restClient).post();
+        verify(restClient).put();
         verify(requestBodyUriSpec).uri(
                 DatasetUriConstant.V1_APPS_ANNOTATIONS + "/{annotation_id}",
                 annotationId
@@ -825,20 +827,8 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         String apiKey = "test-api-key";
         String annotationId = "anno-1";
 
-        // Create expected response
-        AppAnnotationDeleteResponse expectedResponse = new AppAnnotationDeleteResponse();
-        expectedResponse.setResult("success");
-
-        // Mock response
-        when(responseSpec.body(AppAnnotationDeleteResponse.class))
-                .thenReturn(expectedResponse);
-
         // Execute the method
-        AppAnnotationDeleteResponse actualResponse = client.deleteAppAnnotation(annotationId, apiKey);
-
-        // Verify results
-        assertNotNull(actualResponse);
-        assertEquals(expectedResponse.getResult(), actualResponse.getResult());
+        client.deleteAppAnnotation(annotationId, apiKey);
 
         // Verify WebClient interactions
         verify(restClient).delete();
@@ -846,7 +836,6 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 DatasetUriConstant.V1_APPS_ANNOTATIONS + "/{annotation_id}",
                 annotationId
         );
-        verify(responseSpec).body(AppAnnotationDeleteResponse.class);
     }
 
     @Test

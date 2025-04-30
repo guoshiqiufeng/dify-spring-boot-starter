@@ -20,11 +20,11 @@ package io.github.guoshiqiufeng.dify.core.client;
  * @version 1.0
  * @since 2025/4/16 09:42
  */
-public abstract class BaseDifyClient {
+public interface BaseDifyClient {
 
-    public static final String REQUEST_BODY_NULL_ERROR = "The request body can not be null.";
+    String REQUEST_BODY_NULL_ERROR = "The request body can not be null.";
 
-    public static final String DEFAULT_BASE_URL = "http://localhost";
+    String DEFAULT_BASE_URL = "http://localhost";
 
 
 }
