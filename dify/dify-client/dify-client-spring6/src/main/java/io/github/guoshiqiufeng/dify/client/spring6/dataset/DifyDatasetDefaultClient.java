@@ -181,15 +181,14 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
 
 
     @Override
-    public DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apiKey) {
+    public void deleteDocument(String datasetId, String documentId, String apiKey) {
         Assert.notNull(datasetId, "datasetId can not be null");
         Assert.notNull(documentId, "documentId can not be null");
-        return restClient.delete()
+        restClient.delete()
                 .uri(DatasetUriConstant.V1_DOCUMENT_URL, datasetId, documentId)
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
                 .retrieve()
-                .onStatus(responseErrorHandler)
-                .body(DocumentDeleteResponse.class);
+                .onStatus(responseErrorHandler);
     }
 
 
@@ -222,17 +221,16 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
 
 
     @Override
-    public SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apiKey) {
+    public void deleteSegment(String datasetId, String documentId, String segmentId, String apiKey) {
         Assert.notNull(datasetId, "datasetId can not be null");
         Assert.notNull(documentId, "documentId can not be null");
         Assert.notNull(segmentId, "segmentId can not be null");
 
-        return restClient.delete()
+        restClient.delete()
                 .uri(DatasetUriConstant.V1_DOCUMENTS_SEGMENT_URL, datasetId, documentId, segmentId)
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
                 .retrieve()
-                .onStatus(responseErrorHandler)
-                .body(SegmentDeleteResponse.class);
+                .onStatus(responseErrorHandler);
     }
 
 
@@ -276,16 +274,15 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
     }
 
     @Override
-    public SegmentChildChunkDeleteResponse deleteSegmentChildChunk(SegmentChildChunkDeleteRequest request) {
+    public void deleteSegmentChildChunk(SegmentChildChunkDeleteRequest request) {
         Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
         Assert.notNull(request.getChildChunkId(), "childChunkId can not be null");
-        return restClient.delete()
+        restClient.delete()
                 .uri(DatasetUriConstant.V1_DOCUMENTS_SEGMENTS_CHILD_CHUNK_URL,
                         request.getDatasetId(), request.getDocumentId(), request.getSegmentId(), request.getChildChunkId())
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request).accept(h))
                 .retrieve()
-                .onStatus(responseErrorHandler)
-                .body(SegmentChildChunkDeleteResponse.class);
+                .onStatus(responseErrorHandler);
     }
 
     @Override

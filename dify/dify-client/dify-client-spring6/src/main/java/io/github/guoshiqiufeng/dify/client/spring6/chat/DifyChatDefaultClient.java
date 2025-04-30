@@ -377,7 +377,7 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
     @Override
     public AppAnnotationResponse updateAppAnnotation(AppAnnotationUpdateRequest request) {
         Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
-        return restClient.post()
+        return restClient.put()
                 .uri(DatasetUriConstant.V1_APPS_ANNOTATIONS + "/{annotation_id}", request.getAnnotationId())
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request.getApiKey()).accept(h))
                 .body(request)
@@ -387,15 +387,14 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
     }
 
     @Override
-    public AppAnnotationDeleteResponse deleteAppAnnotation(String annotationId, String apiKey) {
+    public void deleteAppAnnotation(String annotationId, String apiKey) {
         Assert.notNull(annotationId, "annotationId must not be null");
         Assert.notNull(apiKey, "apiKey must not be null");
-        return restClient.delete()
+        restClient.delete()
                 .uri(DatasetUriConstant.V1_APPS_ANNOTATIONS + "/{annotation_id}", annotationId)
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
                 .retrieve()
-                .onStatus(responseErrorHandler)
-                .body(AppAnnotationDeleteResponse.class);
+                .onStatus(responseErrorHandler);
     }
 
     @Override
