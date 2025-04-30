@@ -477,23 +477,11 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         String datasetId = "dataset-123456";
         String documentId = "document-123456";
 
-        // Create expected response
-        DocumentDeleteResponse expectedResponse = new DocumentDeleteResponse();
-        expectedResponse.setResult("success");
-
-        // Set up the response mock to return our expected response
-        when(responseSpecMock.bodyToMono(DocumentDeleteResponse.class)).thenReturn(Mono.just(expectedResponse));
-
-        // Execute the method
-        DocumentDeleteResponse actualResponse = difyDatasetDefaultClient.deleteDocument(datasetId, documentId, apiKey);
-
-        // Verify the result
-        assertEquals(expectedResponse.getResult(), actualResponse.getResult());
+        difyDatasetDefaultClient.deleteDocument(datasetId, documentId, apiKey);
 
         // Verify WebClient interactions
         verify(webClientMock).delete();
         verify(requestHeadersUriSpecMock).uri(eq(DatasetUriConstant.V1_DOCUMENT_URL), eq(datasetId), eq(documentId));
-        verify(responseSpecMock).bodyToMono(DocumentDeleteResponse.class);
     }
 
     @Test
@@ -751,24 +739,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         String documentId = "document-123456";
         String segmentId = "segment-123456";
 
-        // Create expected response
-        SegmentDeleteResponse expectedResponse = new SegmentDeleteResponse();
-        expectedResponse.setResult("success");
-
-        // Set up the response mock to return our expected response
-        when(responseSpecMock.bodyToMono(SegmentDeleteResponse.class)).thenReturn(Mono.just(expectedResponse));
-
-        // Execute the method
-        SegmentDeleteResponse actualResponse = difyDatasetDefaultClient.deleteSegment(datasetId, documentId, segmentId, apiKey);
-
-        // Verify the result
-        assertEquals(expectedResponse.getResult(), actualResponse.getResult());
+        difyDatasetDefaultClient.deleteSegment(datasetId, documentId, segmentId, apiKey);
 
         // Verify WebClient interactions
         verify(webClientMock).delete();
         verify(requestHeadersUriSpecMock).uri(eq(DatasetUriConstant.V1_DOCUMENTS_SEGMENT_URL),
                 eq(datasetId), eq(documentId), eq(segmentId));
-        verify(responseSpecMock).bodyToMono(SegmentDeleteResponse.class);
     }
 
     @Test
@@ -1182,24 +1158,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         request.setSegmentId(segmentId);
         request.setChildChunkId(childChunkId);
 
-        // Create expected response
-        SegmentChildChunkDeleteResponse expectedResponse = new SegmentChildChunkDeleteResponse();
-        expectedResponse.setResult("success");
-
-        // Set up the response mock
-        when(responseSpecMock.bodyToMono(SegmentChildChunkDeleteResponse.class)).thenReturn(Mono.just(expectedResponse));
-
-        // Execute the method
-        SegmentChildChunkDeleteResponse actualResponse = difyDatasetDefaultClient.deleteSegmentChildChunk(request);
-
-        // Verify the result
-        assertEquals(expectedResponse.getResult(), actualResponse.getResult());
+        difyDatasetDefaultClient.deleteSegmentChildChunk(request);
 
         // Verify WebClient interactions
         verify(webClientMock).delete();
         verify(requestHeadersUriSpecMock).uri(eq(DatasetUriConstant.V1_DOCUMENTS_SEGMENTS_CHILD_CHUNK_URL),
                 eq(datasetId), eq(documentId), eq(segmentId), eq(childChunkId));
-        verify(responseSpecMock).bodyToMono(SegmentChildChunkDeleteResponse.class);
     }
 
     @Test

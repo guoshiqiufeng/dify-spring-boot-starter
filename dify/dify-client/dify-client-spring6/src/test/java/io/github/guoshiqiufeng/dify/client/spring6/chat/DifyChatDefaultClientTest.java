@@ -807,7 +807,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         assertEquals(expectedResponse.getCreatedAt(), actualResponse.getCreatedAt());
 
         // Verify WebClient interactions
-        verify(restClient).post();
+        verify(restClient).put();
         verify(requestBodyUriSpec).uri(
                 DatasetUriConstant.V1_APPS_ANNOTATIONS + "/{annotation_id}",
                 annotationId
@@ -836,11 +836,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 .thenReturn(expectedResponse);
 
         // Execute the method
-        AppAnnotationDeleteResponse actualResponse = client.deleteAppAnnotation(annotationId, apiKey);
-
-        // Verify results
-        assertNotNull(actualResponse);
-        assertEquals(expectedResponse.getResult(), actualResponse.getResult());
+        client.deleteAppAnnotation(annotationId, apiKey);
 
         // Verify WebClient interactions
         verify(restClient).delete();

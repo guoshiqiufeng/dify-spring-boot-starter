@@ -112,10 +112,9 @@ public interface DifyDataset {
      *
      * @param datasetId  知识库的唯一标识符。
      * @param documentId 文档的唯一标识符。
-     * @return 返回文档删除响应对象。
      */
-    default DocumentDeleteResponse deleteDocument(String datasetId, String documentId) {
-        return deleteDocument(datasetId, documentId, null);
+    default void deleteDocument(String datasetId, String documentId) {
+        deleteDocument(datasetId, documentId, null);
     }
 
     /**
@@ -124,9 +123,8 @@ public interface DifyDataset {
      * @param datasetId  知识库的唯一标识符。
      * @param documentId 文档的唯一标识符。
      * @param apiKey     apiKey
-     * @return 返回文档删除响应对象。
      */
-    DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apiKey);
+    void deleteDocument(String datasetId, String documentId, String apiKey);
 
     /**
      * 创建分段。
@@ -150,10 +148,9 @@ public interface DifyDataset {
      * @param datasetId  知识库的唯一标识符。
      * @param documentId 文档的唯一标识符。
      * @param segmentId  分段的唯一标识符。
-     * @return 返回分段删除响应对象。
      */
-    default SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId) {
-        return deleteSegment(datasetId, documentId, segmentId, null);
+    default void deleteSegment(String datasetId, String documentId, String segmentId) {
+        deleteSegment(datasetId, documentId, segmentId, null);
     }
 
     /**
@@ -163,9 +160,8 @@ public interface DifyDataset {
      * @param documentId 文档的唯一标识符。
      * @param segmentId  分段的唯一标识符。
      * @param apiKey     apiKey
-     * @return 返回分段删除响应对象。
      */
-    SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apiKey);
+    void deleteSegment(String datasetId, String documentId, String segmentId, String apiKey);
 
     /**
      * 更新分段。
@@ -195,9 +191,8 @@ public interface DifyDataset {
      * 删除指定子分段
      *
      * @param request 子分段删除请求对象
-     * @return 返回子分段删除响应对象
      */
-    SegmentChildChunkDeleteResponse deleteSegmentChildChunk(SegmentChildChunkDeleteRequest request);
+    void deleteSegmentChildChunk(SegmentChildChunkDeleteRequest request);
 
     /**
      * 更新子分段

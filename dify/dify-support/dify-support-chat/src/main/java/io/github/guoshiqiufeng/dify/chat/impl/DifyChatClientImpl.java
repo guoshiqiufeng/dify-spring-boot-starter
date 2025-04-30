@@ -132,8 +132,8 @@ public class DifyChatClientImpl implements DifyChat {
     }
 
     @Override
-    public AppAnnotationDeleteResponse deleteAppAnnotation(String annotationId, String apiKey) {
-        return difyChatClient.deleteAppAnnotation(annotationId, apiKey);
+    public void deleteAppAnnotation(String annotationId, String apiKey) {
+        difyChatClient.deleteAppAnnotation(annotationId, apiKey);
     }
 
     @Override

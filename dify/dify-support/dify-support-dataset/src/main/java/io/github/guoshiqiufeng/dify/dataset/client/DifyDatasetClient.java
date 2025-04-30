@@ -108,9 +108,8 @@ public interface DifyDatasetClient {
      * @param datasetId  The ID of the dataset containing the document
      * @param documentId The ID of the document to delete
      * @param apiKey     The API key for authentication and authorization to the Dify API
-     * @return The document deletion response
      */
-    DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apiKey);
+    void deleteDocument(String datasetId, String documentId, String apiKey);
 
     /**
      * Creates a segment within a document
@@ -135,9 +134,8 @@ public interface DifyDatasetClient {
      * @param documentId The ID of the document containing the segment
      * @param segmentId  The ID of the segment to delete
      * @param apiKey     The API key for authentication and authorization to the Dify API
-     * @return The segment deletion response
      */
-    SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apiKey);
+    void deleteSegment(String datasetId, String documentId, String segmentId, String apiKey);
 
     /**
      * Updates an existing segment
@@ -167,9 +165,8 @@ public interface DifyDatasetClient {
      * Deletes a child chunk from a segment
      *
      * @param request The segment child chunk deletion request
-     * @return The segment child chunk deletion response
      */
-    SegmentChildChunkDeleteResponse deleteSegmentChildChunk(SegmentChildChunkDeleteRequest request);
+    void deleteSegmentChildChunk(SegmentChildChunkDeleteRequest request);
 
     /**
      * Updates an existing child chunk within a segment
