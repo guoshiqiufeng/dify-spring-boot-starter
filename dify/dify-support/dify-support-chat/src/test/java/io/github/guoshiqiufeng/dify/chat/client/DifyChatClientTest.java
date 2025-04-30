@@ -522,17 +522,9 @@ class DifyChatClientTest {
         String annotationId = "anno-2";
         String apiKey = "test-api-key";
 
-        AppAnnotationDeleteResponse expectedResponse = new AppAnnotationDeleteResponse();
-        expectedResponse.setResult("success");
-
-        when(difyChatClient.deleteAppAnnotation(anyString(), anyString())).thenReturn(expectedResponse);
-
-        // Act
-        AppAnnotationDeleteResponse actualResponse = difyChatClient.deleteAppAnnotation(annotationId, apiKey);
+        difyChatClient.deleteAppAnnotation(annotationId, apiKey);
 
         // Assert
-        assertNotNull(actualResponse);
-        assertEquals(expectedResponse.getResult(), actualResponse.getResult());
         verify(difyChatClient, times(1)).deleteAppAnnotation(annotationId, apiKey);
     }
 
