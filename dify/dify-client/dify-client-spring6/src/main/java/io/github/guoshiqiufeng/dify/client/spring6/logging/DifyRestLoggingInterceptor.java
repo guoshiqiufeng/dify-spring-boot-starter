@@ -79,7 +79,7 @@ public class DifyRestLoggingInterceptor implements ClientHttpRequestInterceptor 
             REQUEST_TIME_CACHE.remove(requestId);
 
             String bodyContent = body.length > 0 ? new String(body, StandardCharsets.UTF_8) : "";
-            log.debug("logResponse，requestId：{}，status：{}，headers：{}，执行时间：{}ms，body：{}",
+            log.debug("logResponse，requestId：{}，status：{}，headers：{}，executionTime：{}ms，body：{}",
                     requestId, response.getStatusCode(), response.getHeaders(), executionTime, bodyContent);
         }
 

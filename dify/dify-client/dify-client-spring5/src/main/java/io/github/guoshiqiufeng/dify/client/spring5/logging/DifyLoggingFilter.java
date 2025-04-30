@@ -71,7 +71,7 @@ public class DifyLoggingFilter implements ExchangeFilterFunction {
             long executionTime = System.currentTimeMillis() - REQUEST_TIME_CACHE.getOrDefault(requestId, 0L);
             REQUEST_TIME_CACHE.remove(requestId);
 
-            log.debug("logResponse，requestId：{}，status：{}，headers：{}，执行时间：{}ms",
+            log.debug("logResponse，requestId：{}，status：{}，headers：{}，executionTime：{}ms",
                     requestId, response.statusCode(), response.headers().asHttpHeaders(), executionTime);
         }
     }
