@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.client.spring6.logging;
+package io.github.guoshiqiufeng.dify.client.spring5.logging;
 
 import org.junit.jupiter.api.*;
 
@@ -47,31 +47,6 @@ public class DifyLoggingControlTest {
     }
 
     @Test
-    @Order(2)
-    @DisplayName("testGetAndMarkInterceptorFirstTime")
-    void testGetAndMarkInterceptorFirstTime() {
-        DifyLoggingControl instance = DifyLoggingControl.getInstance();
-
-        DifyRestLoggingInterceptor interceptor = instance.getAndMarkInterceptor();
-        assertNotNull(interceptor, "首次获取拦截器不应为空");
-    }
-
-    @Test
-    @Order(3)
-    @DisplayName("testGetAndMarkInterceptorSecondTime")
-    void testGetAndMarkInterceptorSecondTime() {
-        DifyLoggingControl instance = DifyLoggingControl.getInstance();
-
-        // 首次获取
-        DifyRestLoggingInterceptor firstInterceptor = instance.getAndMarkInterceptor();
-        assertNotNull(firstInterceptor, "首次获取拦截器不应为空");
-
-        // 再次获取
-        DifyRestLoggingInterceptor secondInterceptor = instance.getAndMarkInterceptor();
-        assertNull(secondInterceptor, "再次获取拦截器应为空");
-    }
-
-    @Test
     @Order(4)
     @DisplayName("testGetAndMarkFilterFirstTime")
     void testGetAndMarkFilterFirstTime() {
@@ -94,29 +69,5 @@ public class DifyLoggingControlTest {
         // 再次获取
         DifyLoggingFilter secondFilter = instance.getAndMarkFilter();
         assertNull(secondFilter, "再次获取过滤器应为空");
-    }
-
-    @Test
-    @Order(6)
-    @DisplayName("testReset")
-    void testReset() {
-        DifyLoggingControl instance = DifyLoggingControl.getInstance();
-
-        // 首次获取
-        DifyRestLoggingInterceptor firstInterceptor = instance.getAndMarkInterceptor();
-        DifyLoggingFilter firstFilter = instance.getAndMarkFilter();
-
-        assertNotNull(firstInterceptor, "首次获取拦截器不应为空");
-        assertNotNull(firstFilter, "首次获取过滤器不应为空");
-
-        // 重置
-        instance.reset();
-
-        // 再次获取
-        DifyRestLoggingInterceptor secondInterceptor = instance.getAndMarkInterceptor();
-        DifyLoggingFilter secondFilter = instance.getAndMarkFilter();
-
-        assertNotNull(secondInterceptor, "重置后获取拦截器不应为空");
-        assertNotNull(secondFilter, "重置后获取过滤器不应为空");
     }
 }

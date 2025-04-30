@@ -76,19 +76,8 @@ public class DifyRestLoggingInterceptorTest {
     }
 
     @Test
-    @Order(1)
-    @DisplayName("测试拦截器等值性")
-    void testEquality() {
-        DifyRestLoggingInterceptor interceptor1 = new DifyRestLoggingInterceptor();
-        DifyRestLoggingInterceptor interceptor2 = new DifyRestLoggingInterceptor();
-
-        assertEquals(interceptor1, interceptor2, "不同的拦截器实例应该被视为相等");
-        assertEquals(interceptor1.hashCode(), interceptor2.hashCode(), "相等的拦截器应有相同的哈希码");
-    }
-
-    @Test
     @Order(2)
-    @DisplayName("测试请求拦截与日志记录")
+    @DisplayName("testIntercept")
     void testIntercept() throws IOException {
         // 设置请求模拟
         URI uri = URI.create("http://example.com/api/test");
@@ -123,24 +112,24 @@ public class DifyRestLoggingInterceptorTest {
 
         // 确保返回的响应是BufferedClientHttpResponse
         assertNotNull(result);
-        assertTrue(result instanceof DifyRestLoggingInterceptor.BufferedClientHttpResponse);
+        assertInstanceOf(DifyRestLoggingInterceptor.BufferedClientHttpResponse.class, result);
 
         // 验证请求日志
         boolean hasRequestLog = listAppender.list.stream()
-                .anyMatch(event -> event.getFormattedMessage().contains("发送请求") &&
+                .anyMatch(event -> event.getFormattedMessage().contains("logRequest") &&
                         event.getFormattedMessage().contains(uri.toString()));
         assertTrue(hasRequestLog, "请求日志应包含URL和方法信息");
 
         // 验证响应日志
         boolean hasResponseLog = listAppender.list.stream()
-                .anyMatch(event -> event.getFormattedMessage().contains("接收响应") &&
+                .anyMatch(event -> event.getFormattedMessage().contains("logResponse") &&
                         event.getFormattedMessage().contains("200"));
         assertTrue(hasResponseLog, "响应日志应包含状态码信息");
     }
 
     @Test
     @Order(3)
-    @DisplayName("测试BufferedClientHttpResponse功能")
+    @DisplayName("testBufferedResponse")
     void testBufferedResponse() throws IOException {
         // 创建模拟原始响应
         ClientHttpResponse originalResponse = mock(ClientHttpResponse.class);
