@@ -186,7 +186,7 @@ public interface DifyChat {
      * @param request Annotation update request containing modified annotation content and metadata
      * @return AppAnnotationResponse The updated annotation information
      * @since 0.10.0
-     * @since Dify version 1.2.0 or higher
+     * @since Dify version 1.3.1 or higher
      */
     AppAnnotationResponse updateAppAnnotation(AppAnnotationUpdateRequest request);
 
@@ -199,7 +199,7 @@ public interface DifyChat {
      * @since 0.10.0
      * @since Dify version 1.2.0 or higher
      */
-    AppAnnotationDeleteResponse deleteAppAnnotation(String annotationId, String apiKey);
+    void deleteAppAnnotation(String annotationId, String apiKey);
 
     /**
      * Reply to an annotation

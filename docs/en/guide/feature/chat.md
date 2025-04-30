@@ -557,6 +557,8 @@ AppAnnotationResponse
 
 ### 4.3 Update Application Annotation
 
+> required Dify version 1.3.1 or higher
+
 #### Method
 
 ```java
@@ -592,7 +594,7 @@ AppAnnotationResponse
 #### Method
 
 ```java
-AppAnnotationDeleteResponse deleteAppAnnotation(String annotationId, String apiKey);
+void deleteAppAnnotation(String annotationId, String apiKey);
 ```
 
 #### Request Parameters
@@ -604,11 +606,7 @@ AppAnnotationDeleteResponse deleteAppAnnotation(String annotationId, String apiK
 
 #### Response Parameters
 
-AppAnnotationDeleteResponse
-
-| Parameter name | Type   | Description                               |
-|----------------|--------|-------------------------------------------|
-| result         | String | Result, returns "success" when successful |
+not have
 
 ### 4.5 Annotation Reply
 

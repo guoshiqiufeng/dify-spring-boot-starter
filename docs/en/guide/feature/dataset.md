@@ -116,6 +116,7 @@ DatasetResponse See 1.1
 
 ```java
 void delete(String datasetId);
+
 void delete(String datasetId, String apiKey);
 ```
 
@@ -517,8 +518,9 @@ DocumentIndexingStatusResponse
 #### Method
 
 ```java
-DocumentDeleteResponse deleteDocument(String datasetId, String documentId);
-DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apiKey);
+void deleteDocument(String datasetId, String documentId);
+
+void deleteDocument(String datasetId, String documentId, String apiKey);
 ```
 
 #### Request Parameters
@@ -530,11 +532,7 @@ DocumentDeleteResponse deleteDocument(String datasetId, String documentId, Strin
 
 #### Response Parameters
 
-DocumentDeleteResponse
-
-| Parameter | Type   | Description            |
-|-----------|--------|------------------------|
-| result    | String | Fixed return "success" |
+not have
 
 ### 2.8 Get Upload File Information
 
@@ -542,6 +540,7 @@ DocumentDeleteResponse
 
 ```java
 UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId);
+
 UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, String apiKey);
 ```
 
@@ -672,8 +671,9 @@ SegmentResponse
 #### Method
 
 ```java
-SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId);
-SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apiKey);
+void deleteSegment(String datasetId, String documentId, String segmentId);
+
+void deleteSegment(String datasetId, String documentId, String segmentId, String apiKey);
 ```
 
 #### Request Parameters
@@ -686,11 +686,7 @@ SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String 
 
 #### Response Parameters
 
-SegmentDeleteResponse
-
-| Parameter | Type   | Description            |
-|-----------|--------|------------------------|
-| result    | String | Fixed return "success" |
+not have
 
 ### 3.4 Update Segment
 
@@ -862,7 +858,7 @@ SegmentChildChunkUpdateResponse
 #### Method
 
 ```java
-SegmentChildChunkDeleteResponse deleteSegmentChildChunk(SegmentChildChunkDeleteRequest request);
+void deleteSegmentChildChunk(SegmentChildChunkDeleteRequest request);
 ```
 
 #### Request Parameters
@@ -878,11 +874,7 @@ SegmentChildChunkDeleteRequest
 
 #### Response Parameters
 
-SegmentChildChunkDeleteResponse
-
-| Parameter | Type   | Description            |
-|-----------|--------|------------------------|
-| result    | String | Fixed return "success" |
+not have
 
 ## 5. Data Retrieval
 
@@ -1028,6 +1020,7 @@ MetaDataResponse See 6.1
 
 ```java
 MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId);
+
 MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId, String apiKey);
 ```
 
@@ -1113,6 +1106,7 @@ not have
 
 ```java
 MetaDataListResponse listMetaData(String datasetId);
+
 MetaDataListResponse listMetaData(String datasetId, String apiKey);
 ```
 
@@ -1148,6 +1142,7 @@ MetaDataListResponse
 
 ```java
 TextEmbeddingListResponse listTextEmbedding();
+
 TextEmbeddingListResponse listTextEmbedding(String apikey);
 ```
 

@@ -515,9 +515,9 @@ DocumentIndexingStatusResponse
 #### 方法
 
 ```java
-DocumentDeleteResponse deleteDocument(String datasetId, String documentId);
+void deleteDocument(String datasetId, String documentId);
 
-DocumentDeleteResponse deleteDocument(String datasetId, String documentId, String apiKey);
+void deleteDocument(String datasetId, String documentId, String apiKey);
 ```
 
 #### 请求参数
@@ -529,11 +529,7 @@ DocumentDeleteResponse deleteDocument(String datasetId, String documentId, Strin
 
 #### 响应参数
 
-DocumentDeleteResponse
-
-| 参数名    | 类型     | 描述           |
-|--------|--------|--------------|
-| result | String | 固定返回 success |
+无
 
 ### 2.8 获取上传文件信息
 
@@ -672,9 +668,9 @@ SegmentResponse
 #### 方法
 
 ```java
-SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId);
+void deleteSegment(String datasetId, String documentId, String segmentId);
 
-SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String segmentId, String apiKey);
+void deleteSegment(String datasetId, String documentId, String segmentId, String apiKey);
 ```
 
 #### 请求参数
@@ -687,11 +683,7 @@ SegmentDeleteResponse deleteSegment(String datasetId, String documentId, String 
 
 #### 响应参数
 
-SegmentDeleteResponse
-
-| 参数名    | 类型     | 描述           |
-|--------|--------|--------------|
-| result | String | 固定返回 success |
+无
 
 ### 3.4 更新分段
 
@@ -862,7 +854,7 @@ SegmentChildChunkUpdateResponse
 #### 方法
 
 ```java
-SegmentChildChunkDeleteResponse deleteSegmentChildChunk(SegmentChildChunkDeleteRequest request);
+ void deleteSegmentChildChunk(SegmentChildChunkDeleteRequest request);
 ```
 
 #### 请求参数
@@ -878,11 +870,7 @@ SegmentChildChunkDeleteRequest
 
 #### 响应参数
 
-SegmentChildChunkDeleteResponse
-
-| 参数名    | 类型     | 描述           |
-|--------|--------|--------------|
-| result | String | 固定返回 success |
+无
 
 ## 5. 数据检索
 

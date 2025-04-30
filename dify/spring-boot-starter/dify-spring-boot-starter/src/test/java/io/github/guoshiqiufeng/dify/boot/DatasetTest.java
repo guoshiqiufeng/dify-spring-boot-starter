@@ -323,9 +323,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
         }
 
         // Test deleting segment
-        SegmentDeleteResponse deleteResponse = difyDataset.deleteSegment(datasetId, documentTextId, segmentId);
-        assertNotNull(deleteResponse);
-        log.info("Deleted segment: {}", JSONUtil.toJsonStr(deleteResponse));
+        difyDataset.deleteSegment(datasetId, documentTextId, segmentId);
     }
 
     @Test
@@ -408,8 +406,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
         childChunkDeleteRequest.setDocumentId(documentId);
         childChunkDeleteRequest.setSegmentId(segmentId);
         childChunkDeleteRequest.setChildChunkId(childChunkId);
-        SegmentChildChunkDeleteResponse segmentChildChunkDelete = difyDataset.deleteSegmentChildChunk(childChunkDeleteRequest);
-        assertNotNull(segmentChildChunkDelete);
+        difyDataset.deleteSegmentChildChunk(childChunkDeleteRequest);
     }
 
     @Test
@@ -528,9 +525,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
         assertNotNull(datasetId, "Dataset ID should be available from previous test");
         assertNotNull(documentFileId, "Document File ID should be available from previous test");
 
-        DocumentDeleteResponse response = difyDataset.deleteDocument(datasetId, documentFileId);
-        assertNotNull(response);
-        log.info("Deleted document: {}", JSONUtil.toJsonStr(response));
+        difyDataset.deleteDocument(datasetId, documentFileId);
     }
 
     @Test
