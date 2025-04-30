@@ -754,14 +754,6 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         String apiKey = "test-api-key";
         String annotationId = "anno-1";
 
-        // Create expected response
-        AppAnnotationDeleteResponse expectedResponse = new AppAnnotationDeleteResponse();
-        expectedResponse.setResult("success");
-
-        // Mock response
-        when(responseSpecMock.bodyToMono(AppAnnotationDeleteResponse.class))
-                .thenReturn(Mono.just(expectedResponse));
-
         // Execute the method
         difyChatDefaultClient.deleteAppAnnotation(annotationId, apiKey);
 
@@ -771,7 +763,6 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 DatasetUriConstant.V1_APPS_ANNOTATIONS + "/{annotation_id}",
                 annotationId
         );
-        verify(responseSpecMock).bodyToMono(AppAnnotationDeleteResponse.class);
     }
 
     @Test
