@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
- * DifyRestLoggingInterceptor单元测试
+ * Tests for {@link DifyRestLoggingInterceptor}.
  *
  * @author yanghq
  * @version 0.11.0

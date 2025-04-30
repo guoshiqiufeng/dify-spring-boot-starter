@@ -25,6 +25,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
+ * Tests for {@link BaseDifyBuilder}.
+ *
  * @author yanghq
  * @version 0.9.0
  * @since 2025/4/18 10:19

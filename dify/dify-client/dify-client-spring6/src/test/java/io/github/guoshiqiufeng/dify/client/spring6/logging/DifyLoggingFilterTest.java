@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
- * DifyLoggingFilter单元测试
+ * Tests for {@link DifyLoggingFilter}.
  *
  * @author yanghq
  * @version 0.11.0

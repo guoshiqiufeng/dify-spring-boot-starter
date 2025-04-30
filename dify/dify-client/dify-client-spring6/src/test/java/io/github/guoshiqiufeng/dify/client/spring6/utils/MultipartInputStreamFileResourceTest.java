@@ -24,6 +24,8 @@ import java.io.InputStream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
+ * Tests for {@link MultipartInputStreamFileResource}.
+ *
  * @author yanghq
  * @version 0.8.0
  * @since 2025/4/21 14:40

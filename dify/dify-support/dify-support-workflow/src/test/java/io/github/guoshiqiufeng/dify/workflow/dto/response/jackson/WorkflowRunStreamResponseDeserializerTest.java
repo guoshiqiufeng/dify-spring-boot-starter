@@ -35,7 +35,8 @@ import java.util.Map;
  * @version 0.10.0
  * @since 2025/4/28
  */
-public class WorkflowRunStreamResponseDeserializerTest {
+@SuppressWarnings("unchecked")
+public final class WorkflowRunStreamResponseDeserializerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 

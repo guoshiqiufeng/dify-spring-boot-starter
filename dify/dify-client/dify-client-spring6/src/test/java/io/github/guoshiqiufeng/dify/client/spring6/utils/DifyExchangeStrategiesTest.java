@@ -26,6 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 /**
+ * Tests for {@link DifyExchangeStrategies}.
+ *
  * @author yanghq
  * @version 0.9.0
  * @since 2025/4/21 14:30

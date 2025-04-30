@@ -20,7 +20,7 @@ import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * DifyLoggingControl单元测试
+ * Tests for {@link DifyLoggingControl}.
  *
  * @author yanghq
  * @version 0.11.0
