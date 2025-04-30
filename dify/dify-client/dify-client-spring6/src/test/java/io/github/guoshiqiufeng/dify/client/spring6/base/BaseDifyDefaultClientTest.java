@@ -35,6 +35,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
+ * Tests for {@link BaseDifyDefaultClient}.
+ *
  * @author yanghq
  * @version 0.8.0
  * @since 2025/4/21 14:40

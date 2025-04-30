@@ -46,6 +46,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
+ * Tests for {@link DifyDatasetDefaultClient}.
+ *
  * @author yanghq
  * @version 0.10.0
  * @since 2025/4/21 14:50

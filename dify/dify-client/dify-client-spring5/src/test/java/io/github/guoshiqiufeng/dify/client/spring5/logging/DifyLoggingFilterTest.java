@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.client.spring6.logging;
+package io.github.guoshiqiufeng.dify.client.spring5.logging;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;

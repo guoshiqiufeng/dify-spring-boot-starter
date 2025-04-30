@@ -25,6 +25,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
+ * Tests for {@link BaseClient}.
+ *
  * @author yanghq
  * @version 0.10.0
  * @since 2025/4/24 17:07

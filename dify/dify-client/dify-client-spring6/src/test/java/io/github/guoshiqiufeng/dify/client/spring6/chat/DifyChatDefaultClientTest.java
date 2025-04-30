@@ -50,6 +50,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
+ * Tests for {@link DifyChatDefaultClient}.
+ *
  * @author yanghq
  * @version 1.0
  * @since 2025/4/21 14:45

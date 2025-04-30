@@ -26,6 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
+ * Tests for {@link DatasetHeaderUtils}.
+ *
  * @author yanghq
  * @version 0.9.0
  * @since 2025/4/21 14:25
