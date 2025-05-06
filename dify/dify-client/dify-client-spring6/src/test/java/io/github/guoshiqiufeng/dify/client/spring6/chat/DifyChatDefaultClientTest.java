@@ -38,6 +38,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -115,6 +119,87 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         assertEquals("user-123", capturedBody.getUser());
         assertEquals("conv-123", capturedBody.getConversationId());
         assertEquals(ResponseModeEnum.blocking, capturedBody.getResponseMode());
+    }
+
+    @Test
+    @DisplayName("Test streamingChat method with valid request")
+    public void testStreamingChat() {
+        WebClient.RequestBodySpec requestBodySpec = webClientMock.getRequestBodySpec();
+        WebClient.ResponseSpec responseSpec = webClientMock.getResponseSpec();
+        WebClient.RequestBodyUriSpec requestBodyUriSpec = webClientMock.getRequestBodyUriSpec();
+
+        // Mock the response
+        ChatMessageSendCompletionResponse response1 = new ChatMessageSendCompletionResponse();
+        response1.setEvent("message");
+        response1.setId("chat-123");
+        response1.setCreatedAt(1713841200L);
+        response1.setAnswer("Hello, ");
+
+        ChatMessageSendCompletionResponse response2 = new ChatMessageSendCompletionResponse();
+        response2.setEvent("message");
+        response2.setId("chat-123");
+        response2.setCreatedAt(1713841200L);
+        response2.setAnswer("this is a test response.");
+
+        Flux<ChatMessageSendCompletionResponse> mockFlux = Flux.just(response1, response2);
+
+        when(responseSpec.bodyToFlux(ChatMessageSendCompletionResponse.class)).thenReturn(mockFlux);
+
+        // Create a chat request
+        ChatMessageSendRequest request = new ChatMessageSendRequest();
+        request.setApiKey(TEST_API_KEY);
+        request.setUserId("user-123");
+        request.setContent("Hello, Dify!");
+        request.setConversationId("conv-123");
+        request.setFiles(List.of(new ChatMessageSendRequest.ChatMessageFile()));
+        // Call the method to test
+        Flux<ChatMessageSendCompletionResponse> responseFlux = client.streamingChat(request);
+
+        // Verify the response using StepVerifier
+        assertNotNull(responseFlux);
+        StepVerifier.create(responseFlux)
+                .expectNext(response1)
+                .expectNext(response2)
+                .verifyComplete();
+
+        // Verify interactions with mocks
+        verify(requestBodyUriSpec).uri(ChatUriConstant.V1_CHAT_MESSAGES_URI);
+        verify(requestBodySpec).header(HttpHeaders.AUTHORIZATION, "Bearer " + TEST_API_KEY);
+
+        // Verify the body method was called with the correct argument types
+        verify(requestBodySpec).body(any(Mono.class), eq(ChatMessageVO.class));
+    }
+
+    @Test
+    @DisplayName("Test stopMessagesStream method")
+    public void testStopMessagesStream() {
+        RestClient restClient = restClientMock.getRestClient();
+        RestClient.RequestBodySpec requestBodySpec = restClientMock.getRequestBodySpec();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestBodyUriSpec requestBodyUriSpec = restClientMock.getRequestBodyUriSpec();
+
+        // Mock the response for toBodilessEntity
+        when(responseSpec.toBodilessEntity()).thenReturn(ResponseEntity.ok().build());
+
+        // Define test parameters
+        String apiKey = TEST_API_KEY;
+        String taskId = "task-123";
+        String userId = "user-123";
+
+        // Call the method to test
+        client.stopMessagesStream(apiKey, taskId, userId);
+
+        // Verify interactions with mocks
+        verify(restClient).post();
+        verify(requestBodyUriSpec).uri(ChatUriConstant.V1_CHAT_MESSAGES_URI + "/{taskId}/stop", taskId);
+        verify(requestBodySpec).header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey);
+
+        // Capture and verify the request body
+        ArgumentCaptor<Map<String, Object>> bodyCaptor = ArgumentCaptor.forClass(Map.class);
+        verify(requestBodySpec).body(bodyCaptor.capture());
+
+        Map<String, Object> capturedBody = bodyCaptor.getValue();
+        assertEquals(userId, capturedBody.get("user"));
     }
 
     @Test
@@ -383,6 +468,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         request.setUserId(userId);
         request.setSortBy(sortBy);
         request.setLimit(limit);
+        request.setLastId("1");
 
         // Create expected response
         DifyPageResult<MessageConversationsResponse> expectedResponse = new DifyPageResult<>();
@@ -410,6 +496,11 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(restClient).get();
         verify(responseSpec).body(any(ParameterizedTypeReference.class));
+
+        MessageConversationsRequest defaultRequest = new MessageConversationsRequest();
+        defaultRequest.setApiKey(apiKey);
+        defaultRequest.setUserId(userId);
+        client.conversations(defaultRequest);
     }
 
     @Test
@@ -606,6 +697,13 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         verify(requestBodyUriSpec).uri(ChatUriConstant.V1_MESSAGES_URI + "/{messageId}/feedbacks", messageId);
         verify(requestBodySpec).body(any(Map.class));
         verify(responseSpec).body(any(ParameterizedTypeReference.class));
+
+        // Create request
+        MessageFeedbackRequest defaultRequest = new MessageFeedbackRequest();
+        request.setApiKey(apiKey);
+        request.setUserId(userId);
+        request.setMessageId(messageId);
+        client.messageFeedback(defaultRequest);
     }
 
     @Test

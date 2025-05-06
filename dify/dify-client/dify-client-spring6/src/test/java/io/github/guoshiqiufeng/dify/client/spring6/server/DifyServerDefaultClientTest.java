@@ -27,10 +27,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.util.UriBuilder;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -180,6 +184,68 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         // Verify interactions with mocks
         verify(requestHeadersUriSpec).uri("/console/api/apps/{appId}", appId);
         verify(requestHeadersSpec).headers(any());
+    }
+
+    @Test
+    public void testApps() {
+        // Prepare test data
+        String mode = "completion";
+        String name = "Test";
+
+        // We need to mock the UriBuilder for the queryParam functionality
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+
+        when(requestHeadersUriSpec.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("page"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("limit"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("mode"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("name"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build()).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpec;
+        });
+
+        // Create expected response for first page
+        AppsResponseResult resultResponseVO = new AppsResponseResult();
+        List<AppsResponse> appsPage1 = new ArrayList<>();
+
+        AppsResponse app1 = new AppsResponse();
+        app1.setId("app-123456");
+        app1.setName("Test App 1");
+        app1.setMode(mode);
+        appsPage1.add(app1);
+
+        AppsResponse app2 = new AppsResponse();
+        app2.setId("app-789012");
+        app2.setName("Test App 2");
+        app2.setMode(mode);
+        appsPage1.add(app2);
+
+        resultResponseVO.setData(appsPage1);
+        resultResponseVO.setHasMore(false); // Only one page to keep the test simple
+
+        // Set up the response mock to return our expected response
+        when(responseSpec.body(AppsResponseResult.class)).thenReturn(resultResponseVO);
+
+        // Execute the method
+        List<AppsResponse> actualResponse = client.apps(mode, name);
+
+        // Verify the result
+        assertNotNull(actualResponse);
+        assertEquals(2, actualResponse.size());
+        assertEquals(app1.getId(), actualResponse.get(0).getId());
+        assertEquals(app1.getName(), actualResponse.get(0).getName());
+        assertEquals(app2.getId(), actualResponse.get(1).getId());
+        assertEquals(app2.getName(), actualResponse.get(1).getName());
+
+        // Verify WebClient interactions
+        verify(restClient).get();
+        verify(responseSpec).body(AppsResponseResult.class);
     }
 
     @Test

@@ -16,7 +16,6 @@
 package io.github.guoshiqiufeng.dify.dataset.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

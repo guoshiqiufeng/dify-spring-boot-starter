@@ -188,6 +188,10 @@ public abstract class BaseClientTest {
 
             when(requestBodySpec.contentType(any())).thenReturn(requestBodySpec);
             when(requestBodySpec.bodyValue(any())).thenReturn(requestHeadersSpec);
+
+            // Add proper mocking for body() method that takes a Publisher and Class arguments
+            when(requestBodySpec.body(any(), any(Class.class))).thenReturn(requestHeadersSpec);
+
             when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
 
             // Setup WebClient behavior chain for GET
@@ -213,6 +217,10 @@ public abstract class BaseClientTest {
 
             // Ensure response handling works
             when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
+
+            // Add support for bodyToFlux method with correct typing - don't use any() as the return value
+            // This would cause issues as any() is not a valid Flux return value
+            // Let individual tests set this up as needed
         }
     }
 }
