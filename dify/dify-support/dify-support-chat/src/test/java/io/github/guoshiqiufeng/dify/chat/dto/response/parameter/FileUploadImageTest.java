@@ -77,7 +77,7 @@ public class FileUploadImageTest {
         FileUploadImage image3 = new FileUploadImage();
         image3.setEnabled(false);
         image3.setNumberLimits(10);
-        image3.setTransferMethods(Arrays.asList("local_file"));
+        image3.setTransferMethods(List.of("local_file"));
 
         // Assert
         assertEquals(image1, image2);

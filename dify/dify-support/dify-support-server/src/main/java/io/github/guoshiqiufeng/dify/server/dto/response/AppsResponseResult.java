@@ -15,26 +15,22 @@
  */
 package io.github.guoshiqiufeng.dify.server.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
+import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 
 /**
  * @author yanghq
  * @version 1.0
- * @since 2024/12/31 14:25
+ * @since 2024/12/31 15:46
  */
 @Data
-public class LoginResponseVO implements Serializable {
+@EqualsAndHashCode(callSuper = true)
+public class AppsResponseResult extends DifyPageResult<AppsResponse> implements Serializable {
 
 
-    private static final long serialVersionUID = -2546124702668700191L;
-
-    @JsonAlias("access_token")
-    private String accessToken;
-
-    @JsonAlias("refresh_token")
-    private String refreshToken;
+    private static final long serialVersionUID = -8135296664181854970L;
 
 }

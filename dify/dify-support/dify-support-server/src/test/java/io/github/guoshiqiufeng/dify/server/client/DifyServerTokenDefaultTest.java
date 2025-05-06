@@ -15,7 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.server.client;
 
-import io.github.guoshiqiufeng.dify.server.dto.response.LoginResponseVO;
+import io.github.guoshiqiufeng.dify.server.dto.response.LoginResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,7 +53,7 @@ class DifyServerTokenDefaultTest {
     @DisplayName("Test addAuthorizationHeader with no existing token")
     void testAddAuthorizationHeaderWithNoToken() {
         // Setup mock responses
-        LoginResponseVO loginResponse = new LoginResponseVO();
+        LoginResponse loginResponse = new LoginResponse();
         loginResponse.setAccessToken("test-access-token");
         loginResponse.setRefreshToken("test-refresh-token");
         when(difyServerClient.login()).thenReturn(loginResponse);
@@ -73,7 +73,7 @@ class DifyServerTokenDefaultTest {
     @DisplayName("Test addAuthorizationHeader with existing token")
     void testAddAuthorizationHeaderWithExistingToken() {
         // Setup - first call to set the token
-        LoginResponseVO loginResponse = new LoginResponseVO();
+        LoginResponse loginResponse = new LoginResponse();
         loginResponse.setAccessToken("test-access-token");
         loginResponse.setRefreshToken("test-refresh-token");
         when(difyServerClient.login()).thenReturn(loginResponse);
@@ -104,7 +104,7 @@ class DifyServerTokenDefaultTest {
     @DisplayName("Test refreshOrObtainNewToken with valid refresh token")
     void testRefreshOrObtainNewTokenWithValidRefreshToken() throws Exception {
         // Setup - first set initial tokens
-        LoginResponseVO initialLoginResponse = new LoginResponseVO();
+        LoginResponse initialLoginResponse = new LoginResponse();
         initialLoginResponse.setAccessToken("initial-access-token");
         initialLoginResponse.setRefreshToken("initial-refresh-token");
         when(difyServerClient.login()).thenReturn(initialLoginResponse);
@@ -121,7 +121,7 @@ class DifyServerTokenDefaultTest {
         reset(difyServerClient);
 
         // Setup refresh response
-        LoginResponseVO refreshResponse = new LoginResponseVO();
+        LoginResponse refreshResponse = new LoginResponse();
         refreshResponse.setAccessToken("refreshed-access-token");
         refreshResponse.setRefreshToken("refreshed-refresh-token");
         when(difyServerClient.refreshToken("initial-refresh-token")).thenReturn(refreshResponse);
@@ -149,7 +149,7 @@ class DifyServerTokenDefaultTest {
     @DisplayName("Test refreshOrObtainNewToken with failed refresh")
     void testRefreshOrObtainNewTokenWithFailedRefresh() throws Exception {
         // Setup - first set initial tokens
-        LoginResponseVO initialLoginResponse = new LoginResponseVO();
+        LoginResponse initialLoginResponse = new LoginResponse();
         initialLoginResponse.setAccessToken("initial-access-token");
         initialLoginResponse.setRefreshToken("initial-refresh-token");
         when(difyServerClient.login()).thenReturn(initialLoginResponse);
@@ -169,7 +169,7 @@ class DifyServerTokenDefaultTest {
         when(difyServerClient.refreshToken("initial-refresh-token")).thenReturn(null);
 
         // Setup new login response
-        LoginResponseVO newLoginResponse = new LoginResponseVO();
+        LoginResponse newLoginResponse = new LoginResponse();
         newLoginResponse.setAccessToken("new-access-token");
         newLoginResponse.setRefreshToken("new-refresh-token");
         when(difyServerClient.login()).thenReturn(newLoginResponse);

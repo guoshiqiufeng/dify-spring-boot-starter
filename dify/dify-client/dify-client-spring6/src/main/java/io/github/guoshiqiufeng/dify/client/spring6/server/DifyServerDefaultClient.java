@@ -23,7 +23,7 @@ import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
 import io.github.guoshiqiufeng.dify.server.client.RequestSupplier;
 import io.github.guoshiqiufeng.dify.server.constant.ServerUriConstant;
-import io.github.guoshiqiufeng.dify.server.dto.request.DifyLoginRequestVO;
+import io.github.guoshiqiufeng.dify.server.dto.request.DifyLoginRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -71,33 +71,33 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
     }
 
     @Override
-    public List<AppsResponseVO> apps(String mode, String name) {
-        List<AppsResponseVO> result = new ArrayList<>();
+    public List<AppsResponse> apps(String mode, String name) {
+        List<AppsResponse> result = new ArrayList<>();
         appPages(mode, name, 1, result);
         return result;
     }
 
     @Override
-    public AppsResponseVO app(String appId) {
+    public AppsResponse app(String appId) {
         return executeWithRetry(
                 () -> restClient.get()
                         .uri(ServerUriConstant.APPS + "/{appId}", appId)
                         .headers(this::addAuthorizationHeader)
                         .retrieve()
                         .onStatus(responseErrorHandler)
-                        .body(AppsResponseVO.class)
+                        .body(AppsResponse.class)
         );
     }
 
     @Override
-    public List<ApiKeyResponseVO> getAppApiKey(String appId) {
-        ApiKeyResultResponseVO tmp = executeWithRetry(
+    public List<ApiKeyResponse> getAppApiKey(String appId) {
+        ApiKeyResultResponse tmp = executeWithRetry(
                 () -> restClient.get()
                         .uri(ServerUriConstant.APPS + "/{appId}/api-keys", appId)
                         .headers(this::addAuthorizationHeader)
                         .retrieve()
                         .onStatus(responseErrorHandler)
-                        .body(ApiKeyResultResponseVO.class)
+                        .body(ApiKeyResultResponse.class)
         );
         if (tmp == null) {
             return new ArrayList<>();
@@ -106,46 +106,46 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
     }
 
     @Override
-    public List<ApiKeyResponseVO> initAppApiKey(String appId) {
-        ApiKeyResponseVO apiKeyResponseVO = executeWithRetry(
+    public List<ApiKeyResponse> initAppApiKey(String appId) {
+        ApiKeyResponse apiKeyResponseVO = executeWithRetry(
                 () -> restClient.post()
                         .uri(ServerUriConstant.APPS + "/{appId}/api-keys", appId)
                         .headers(this::addAuthorizationHeader)
                         .retrieve()
                         .onStatus(responseErrorHandler)
-                        .body(ApiKeyResponseVO.class)
+                        .body(ApiKeyResponse.class)
         );
         return apiKeyResponseVO != null ? new ArrayList<>(List.of(apiKeyResponseVO)) : null;
     }
 
     @Override
-    public List<DatasetApiKeyResponseVO> getDatasetApiKey() {
-        DatasetApiKeyResultVO result = executeWithRetry(
+    public List<DatasetApiKeyResponse> getDatasetApiKey() {
+        DatasetApiKeyResult result = executeWithRetry(
                 () -> restClient.get()
                         .uri(ServerUriConstant.DATASETS + "/api-keys")
                         .headers(this::addAuthorizationHeader)
                         .retrieve()
                         .onStatus(responseErrorHandler)
-                        .body(DatasetApiKeyResultVO.class)
+                        .body(DatasetApiKeyResult.class)
         );
         return result != null ? result.getData() : null;
     }
 
     @Override
-    public List<DatasetApiKeyResponseVO> initDatasetApiKey() {
-        DatasetApiKeyResponseVO result = executeWithRetry(
+    public List<DatasetApiKeyResponse> initDatasetApiKey() {
+        DatasetApiKeyResponse result = executeWithRetry(
                 () -> restClient.post()
                         .uri(ServerUriConstant.DATASETS + "/api-keys")
                         .headers(this::addAuthorizationHeader)
                         .retrieve()
                         .onStatus(responseErrorHandler)
-                        .body(DatasetApiKeyResponseVO.class)
+                        .body(DatasetApiKeyResponse.class)
         );
         return result != null ? new ArrayList<>(List.of(result)) : null;
     }
 
-    private void appPages(String mode, String name, int page, List<AppsResponseVO> result) {
-        AppsResponseResultVO response = executeWithRetry(
+    private void appPages(String mode, String name, int page, List<AppsResponse> result) {
+        AppsResponseResult response = executeWithRetry(
                 () -> restClient.get()
                         .uri(uriBuilder -> uriBuilder
                                 .path(ServerUriConstant.APPS)
@@ -157,13 +157,13 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                         .headers(this::addAuthorizationHeader)
                         .retrieve()
                         .onStatus(responseErrorHandler)
-                        .body(AppsResponseResultVO.class)
+                        .body(AppsResponseResult.class)
         );
 
         if (response == null) {
             return;
         }
-        List<AppsResponseVO> data = response.getData();
+        List<AppsResponse> data = response.getData();
         if (data != null) {
             result.addAll(data);
         }
@@ -182,27 +182,27 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
     }
 
     @Override
-    public LoginResponseVO login() {
+    public LoginResponse login() {
         Assert.notNull(difyServerProperties, "The difyServerProperties can not be null.");
-        DifyLoginRequestVO requestVO = DifyLoginRequestVO.build(difyServerProperties.getEmail(), difyServerProperties.getPassword());
-        LoginResultResponseVO result = restClient.post()
+        DifyLoginRequest requestVO = DifyLoginRequest.build(difyServerProperties.getEmail(), difyServerProperties.getPassword());
+        LoginResultResponse result = restClient.post()
                 .uri(ServerUriConstant.LOGIN)
                 .body(requestVO)
                 .retrieve()
                 .onStatus(responseErrorHandler)
-                .body(LoginResultResponseVO.class);
+                .body(LoginResultResponse.class);
         return processLoginResult(result);
     }
 
     @Override
-    public LoginResponseVO refreshToken(String refreshToken) {
+    public LoginResponse refreshToken(String refreshToken) {
         Map<String, String> requestVO = Map.of("refresh_token", refreshToken);
-        LoginResultResponseVO result = restClient.post()
+        LoginResultResponse result = restClient.post()
                 .uri(ServerUriConstant.REFRESH_TOKEN)
                 .body(requestVO)
                 .retrieve()
                 .onStatus(responseErrorHandler)
-                .body(LoginResultResponseVO.class);
+                .body(LoginResultResponse.class);
         return processLoginResult(result);
     }
 
@@ -212,10 +212,10 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
      * @param result the login result
      * @return the login response data or null
      */
-    private LoginResponseVO processLoginResult(LoginResultResponseVO result) {
+    private LoginResponse processLoginResult(LoginResultResponse result) {
         return Optional.ofNullable(result)
                 .filter(r -> DifyResult.SUCCESS.equals(r.getResult()))
-                .map(LoginResultResponseVO::getData)
+                .map(LoginResultResponse::getData)
                 .orElse(null);
     }
 }

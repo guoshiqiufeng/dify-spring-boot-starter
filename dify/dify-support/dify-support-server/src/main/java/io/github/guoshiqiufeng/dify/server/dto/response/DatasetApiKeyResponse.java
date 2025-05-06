@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.server.dto.request;
+package io.github.guoshiqiufeng.dify.server.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
@@ -23,26 +23,22 @@ import java.io.Serializable;
 /**
  * @author yanghq
  * @version 1.0
- * @since 2024/12/31 14:17
+ * @since 2025/4/1 13:41
  */
 @Data
-public class DifyLoginRequestVO implements Serializable {
-    private static final long serialVersionUID = 7556073605254679649L;
+public class DatasetApiKeyResponse implements Serializable {
+    private static final long serialVersionUID = 5622933209445579199L;
 
-    private String email;
+    private String id;
 
-    private String password;
+    private String type;
 
-    private String language;
-    @JsonAlias("remember-me")
-    private Boolean rememberMe;
+    private String token;
 
-    public static DifyLoginRequestVO build(String email, String password) {
-        DifyLoginRequestVO vo = new DifyLoginRequestVO();
-        vo.setEmail(email);
-        vo.setPassword(password);
-        vo.setLanguage("zh-Hans");
-        vo.setRememberMe(true);
-        return vo;
-    }
+    @JsonAlias("last_used_at")
+    private Long lastUsedAt;
+
+    @JsonAlias("created_at")
+    private Long createdAt;
+
 }

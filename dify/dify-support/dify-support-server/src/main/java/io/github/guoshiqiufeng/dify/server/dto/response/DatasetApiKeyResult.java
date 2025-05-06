@@ -26,9 +26,9 @@ import java.util.List;
  * @since 2025/4/1 13:41
  */
 @Data
-public class DatasetApiKeyResultVO implements Serializable {
+public class DatasetApiKeyResult implements Serializable {
     private static final long serialVersionUID = 5622933209445579199L;
 
-    private List<DatasetApiKeyResponseVO> data;
+    private List<DatasetApiKeyResponse> data;
 
 }

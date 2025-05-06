@@ -16,7 +16,7 @@
 package io.github.guoshiqiufeng.dify.server.client;
 
 import io.github.guoshiqiufeng.dify.server.cache.DifyRedisKey;
-import io.github.guoshiqiufeng.dify.server.dto.response.LoginResponseVO;
+import io.github.guoshiqiufeng.dify.server.dto.response.LoginResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -83,7 +83,7 @@ class DifyServerTokenRedisTest {
         // Setup
         when(valueOperations.get(DifyRedisKey.ACCESS_TOKEN)).thenReturn(null);
 
-        LoginResponseVO loginResponse = new LoginResponseVO();
+        LoginResponse loginResponse = new LoginResponse();
         loginResponse.setAccessToken("new-access-token");
         loginResponse.setRefreshToken("new-refresh-token");
         when(difyServerClient.login()).thenReturn(loginResponse);
@@ -106,7 +106,7 @@ class DifyServerTokenRedisTest {
         // Setup
         when(valueOperations.get(DifyRedisKey.REFRESH_TOKEN)).thenReturn("stored-refresh-token");
 
-        LoginResponseVO refreshResponse = new LoginResponseVO();
+        LoginResponse refreshResponse = new LoginResponse();
         refreshResponse.setAccessToken("refreshed-access-token");
         refreshResponse.setRefreshToken("refreshed-refresh-token");
         when(difyServerClient.refreshToken("stored-refresh-token")).thenReturn(refreshResponse);
@@ -131,7 +131,7 @@ class DifyServerTokenRedisTest {
         when(valueOperations.get(DifyRedisKey.REFRESH_TOKEN)).thenReturn("stored-refresh-token");
         when(difyServerClient.refreshToken("stored-refresh-token")).thenReturn(null);
 
-        LoginResponseVO loginResponse = new LoginResponseVO();
+        LoginResponse loginResponse = new LoginResponse();
         loginResponse.setAccessToken("new-access-token");
         loginResponse.setRefreshToken("new-refresh-token");
         when(difyServerClient.login()).thenReturn(loginResponse);
@@ -155,7 +155,7 @@ class DifyServerTokenRedisTest {
         // Setup
         when(valueOperations.get(DifyRedisKey.REFRESH_TOKEN)).thenReturn(null);
 
-        LoginResponseVO loginResponse = new LoginResponseVO();
+        LoginResponse loginResponse = new LoginResponse();
         loginResponse.setAccessToken("new-access-token");
         loginResponse.setRefreshToken("new-refresh-token");
         when(difyServerClient.login()).thenReturn(loginResponse);

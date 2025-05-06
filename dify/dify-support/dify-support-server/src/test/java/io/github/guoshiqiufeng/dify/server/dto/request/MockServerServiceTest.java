@@ -44,7 +44,7 @@ public class MockServerServiceTest {
      * A simple mock server service that uses DifyLoginRequestVO
      */
     private static class MockServerService {
-        public String login(DifyLoginRequestVO loginRequest) throws DifyServerException {
+        public String login(DifyLoginRequest loginRequest) throws DifyServerException {
             if (loginRequest == null) {
                 throw new DifyServerException(DifyServerExceptionEnum.DIFY_DATA_PARSING_FAILURE);
             }
@@ -69,7 +69,7 @@ public class MockServerServiceTest {
     @Test
     public void testLoginSuccess() throws DifyServerException {
         // Arrange
-        DifyLoginRequestVO request = DifyLoginRequestVO.build("test@example.com", "password123");
+        DifyLoginRequest request = DifyLoginRequest.build("test@example.com", "password123");
 
         // Act
         String result = mockServerService.login(request);
@@ -92,7 +92,7 @@ public class MockServerServiceTest {
     @Test
     public void testLoginWithEmptyEmail() {
         // Arrange
-        DifyLoginRequestVO request = DifyLoginRequestVO.build("", "password123");
+        DifyLoginRequest request = DifyLoginRequest.build("", "password123");
 
         // Act & Assert
         DifyServerException exception = ExceptionTestUtil.assertThrowsException(
@@ -106,7 +106,7 @@ public class MockServerServiceTest {
     @Test
     public void testLoginWithEmptyPassword() {
         // Arrange
-        DifyLoginRequestVO request = DifyLoginRequestVO.build("test@example.com", "");
+        DifyLoginRequest request = DifyLoginRequest.build("test@example.com", "");
 
         // Act & Assert
         DifyServerException exception = ExceptionTestUtil.assertThrowsException(
@@ -120,7 +120,7 @@ public class MockServerServiceTest {
     @Test
     public void testLoginWithApiError() {
         // Arrange
-        DifyLoginRequestVO request = DifyLoginRequestVO.build("error@example.com", "password123");
+        DifyLoginRequest request = DifyLoginRequest.build("error@example.com", "password123");
 
         // Act & Assert
         DifyServerException exception = ExceptionTestUtil.assertThrowsException(
@@ -134,7 +134,7 @@ public class MockServerServiceTest {
     @Test
     public void testLoginWithCatchingAndHandlingException() {
         // Arrange
-        DifyLoginRequestVO request = DifyLoginRequestVO.build("error@example.com", "password123");
+        DifyLoginRequest request = DifyLoginRequest.build("error@example.com", "password123");
 
         // Act & Assert
         try {

@@ -120,6 +120,6 @@ public class FileUploadRequestTest {
         String toString = request.toString();
 
         // Assert
-        assertTrue(toString.contains("file=" + file.toString()));
+        assertTrue(toString.contains("file=" + file));
     }
 }

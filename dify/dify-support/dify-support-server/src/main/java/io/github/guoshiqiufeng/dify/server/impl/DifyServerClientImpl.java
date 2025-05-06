@@ -17,9 +17,9 @@ package io.github.guoshiqiufeng.dify.server.impl;
 
 import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
-import io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponseVO;
-import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponseVO;
-import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponseVO;
+import io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponse;
+import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponse;
+import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponse;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -39,32 +39,32 @@ public class DifyServerClientImpl implements DifyServer {
     }
 
     @Override
-    public List<AppsResponseVO> apps(String mode, String name) {
+    public List<AppsResponse> apps(String mode, String name) {
         return difyServerClient.apps(mode, name);
     }
 
     @Override
-    public AppsResponseVO app(String appId) {
+    public AppsResponse app(String appId) {
         return difyServerClient.app(appId);
     }
 
     @Override
-    public List<ApiKeyResponseVO> getAppApiKey(String appId) {
+    public List<ApiKeyResponse> getAppApiKey(String appId) {
         return difyServerClient.getAppApiKey(appId);
     }
 
     @Override
-    public List<ApiKeyResponseVO> initAppApiKey(String appId) {
+    public List<ApiKeyResponse> initAppApiKey(String appId) {
         return difyServerClient.initAppApiKey(appId);
     }
 
     @Override
-    public List<DatasetApiKeyResponseVO> getDatasetApiKey() {
+    public List<DatasetApiKeyResponse> getDatasetApiKey() {
         return difyServerClient.getDatasetApiKey();
     }
 
     @Override
-    public List<DatasetApiKeyResponseVO> initDatasetApiKey() {
+    public List<DatasetApiKeyResponse> initDatasetApiKey() {
         return difyServerClient.initDatasetApiKey();
     }
 }

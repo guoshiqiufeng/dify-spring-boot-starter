@@ -28,7 +28,7 @@ import java.util.Map;
  * @since 2024/12/31 15:46
  */
 @Data
-public class AppsResponseVO implements Serializable {
+public class AppsResponse implements Serializable {
     private static final long serialVersionUID = -8281293887457701741L;
 
     private String id;

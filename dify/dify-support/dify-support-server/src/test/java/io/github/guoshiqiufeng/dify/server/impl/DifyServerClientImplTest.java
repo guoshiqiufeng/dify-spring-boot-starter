@@ -16,9 +16,9 @@
 package io.github.guoshiqiufeng.dify.server.impl;
 
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
-import io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponseVO;
-import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponseVO;
-import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponseVO;
+import io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponse;
+import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponse;
+import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -55,20 +55,20 @@ class DifyServerClientImplTest {
         String mode = "chat";
         String name = "test-app";
 
-        AppsResponseVO app1 = new AppsResponseVO();
+        AppsResponse app1 = new AppsResponse();
         app1.setId("app-123");
         app1.setName("Test App 1");
 
-        AppsResponseVO app2 = new AppsResponseVO();
+        AppsResponse app2 = new AppsResponse();
         app2.setId("app-456");
         app2.setName("Test App 2");
 
-        List<AppsResponseVO> expectedApps = Arrays.asList(app1, app2);
+        List<AppsResponse> expectedApps = Arrays.asList(app1, app2);
 
         when(difyServerClient.apps(mode, name)).thenReturn(expectedApps);
 
         // Act
-        List<AppsResponseVO> actualApps = difyServerClientImpl.apps(mode, name);
+        List<AppsResponse> actualApps = difyServerClientImpl.apps(mode, name);
 
         // Assert
         assertNotNull(actualApps);
@@ -83,14 +83,14 @@ class DifyServerClientImplTest {
         // Arrange
         String appId = "app-123";
 
-        AppsResponseVO expectedApp = new AppsResponseVO();
+        AppsResponse expectedApp = new AppsResponse();
         expectedApp.setId(appId);
         expectedApp.setName("Test App");
 
         when(difyServerClient.app(appId)).thenReturn(expectedApp);
 
         // Act
-        AppsResponseVO actualApp = difyServerClientImpl.app(appId);
+        AppsResponse actualApp = difyServerClientImpl.app(appId);
 
         // Assert
         assertNotNull(actualApp);
@@ -104,20 +104,20 @@ class DifyServerClientImplTest {
         // Arrange
         String appId = "app-123";
 
-        ApiKeyResponseVO apiKey1 = new ApiKeyResponseVO();
+        ApiKeyResponse apiKey1 = new ApiKeyResponse();
         apiKey1.setId("key-123");
         apiKey1.setToken("test-api-key-1");
 
-        ApiKeyResponseVO apiKey2 = new ApiKeyResponseVO();
+        ApiKeyResponse apiKey2 = new ApiKeyResponse();
         apiKey2.setId("key-456");
         apiKey2.setToken("test-api-key-2");
 
-        List<ApiKeyResponseVO> expectedApiKeys = Arrays.asList(apiKey1, apiKey2);
+        List<ApiKeyResponse> expectedApiKeys = Arrays.asList(apiKey1, apiKey2);
 
         when(difyServerClient.getAppApiKey(appId)).thenReturn(expectedApiKeys);
 
         // Act
-        List<ApiKeyResponseVO> actualApiKeys = difyServerClientImpl.getAppApiKey(appId);
+        List<ApiKeyResponse> actualApiKeys = difyServerClientImpl.getAppApiKey(appId);
 
         // Assert
         assertNotNull(actualApiKeys);
@@ -132,16 +132,16 @@ class DifyServerClientImplTest {
         // Arrange
         String appId = "app-123";
 
-        ApiKeyResponseVO apiKey = new ApiKeyResponseVO();
+        ApiKeyResponse apiKey = new ApiKeyResponse();
         apiKey.setId("key-123");
         apiKey.setToken("new-api-key");
 
-        List<ApiKeyResponseVO> expectedApiKeys = List.of(apiKey);
+        List<ApiKeyResponse> expectedApiKeys = List.of(apiKey);
 
         when(difyServerClient.initAppApiKey(appId)).thenReturn(expectedApiKeys);
 
         // Act
-        List<ApiKeyResponseVO> actualApiKeys = difyServerClientImpl.initAppApiKey(appId);
+        List<ApiKeyResponse> actualApiKeys = difyServerClientImpl.initAppApiKey(appId);
 
         // Assert
         assertNotNull(actualApiKeys);
@@ -154,20 +154,20 @@ class DifyServerClientImplTest {
     @Test
     void testGetDatasetApiKey() {
         // Arrange
-        DatasetApiKeyResponseVO datasetApiKey1 = new DatasetApiKeyResponseVO();
+        DatasetApiKeyResponse datasetApiKey1 = new DatasetApiKeyResponse();
         datasetApiKey1.setId("dkey-123");
         datasetApiKey1.setToken("dataset-api-key-1");
 
-        DatasetApiKeyResponseVO datasetApiKey2 = new DatasetApiKeyResponseVO();
+        DatasetApiKeyResponse datasetApiKey2 = new DatasetApiKeyResponse();
         datasetApiKey2.setId("dkey-456");
         datasetApiKey2.setToken("dataset-api-key-2");
 
-        List<DatasetApiKeyResponseVO> expectedDatasetApiKeys = Arrays.asList(datasetApiKey1, datasetApiKey2);
+        List<DatasetApiKeyResponse> expectedDatasetApiKeys = Arrays.asList(datasetApiKey1, datasetApiKey2);
 
         when(difyServerClient.getDatasetApiKey()).thenReturn(expectedDatasetApiKeys);
 
         // Act
-        List<DatasetApiKeyResponseVO> actualDatasetApiKeys = difyServerClientImpl.getDatasetApiKey();
+        List<DatasetApiKeyResponse> actualDatasetApiKeys = difyServerClientImpl.getDatasetApiKey();
 
         // Assert
         assertNotNull(actualDatasetApiKeys);
@@ -180,16 +180,16 @@ class DifyServerClientImplTest {
     @Test
     void testInitDatasetApiKey() {
         // Arrange
-        DatasetApiKeyResponseVO datasetApiKey = new DatasetApiKeyResponseVO();
+        DatasetApiKeyResponse datasetApiKey = new DatasetApiKeyResponse();
         datasetApiKey.setId("dkey-123");
         datasetApiKey.setToken("new-dataset-api-key");
 
-        List<DatasetApiKeyResponseVO> expectedDatasetApiKeys = List.of(datasetApiKey);
+        List<DatasetApiKeyResponse> expectedDatasetApiKeys = List.of(datasetApiKey);
 
         when(difyServerClient.initDatasetApiKey()).thenReturn(expectedDatasetApiKeys);
 
         // Act
-        List<DatasetApiKeyResponseVO> actualDatasetApiKeys = difyServerClientImpl.initDatasetApiKey();
+        List<DatasetApiKeyResponse> actualDatasetApiKeys = difyServerClientImpl.initDatasetApiKey();
 
         // Assert
         assertNotNull(actualDatasetApiKeys);

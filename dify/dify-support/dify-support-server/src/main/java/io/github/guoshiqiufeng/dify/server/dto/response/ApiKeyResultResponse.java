@@ -15,19 +15,16 @@
  */
 package io.github.guoshiqiufeng.dify.server.dto.response;
 
-
-import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
+import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.io.Serializable;
 
 /**
  * @author yanghq
  * @version 1.0
- * @since 2024/12/31 14:50
+ * @since 2025/1/7 17:11
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class LoginResultResponseVO extends DifyResult<LoginResponseVO> implements Serializable {
+public class ApiKeyResultResponse extends DifyPageResult<ApiKeyResponse> {
 }

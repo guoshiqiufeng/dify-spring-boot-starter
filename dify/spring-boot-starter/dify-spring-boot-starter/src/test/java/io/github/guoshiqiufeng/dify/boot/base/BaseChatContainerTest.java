@@ -17,8 +17,8 @@ package io.github.guoshiqiufeng.dify.boot.base;
 
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
-import io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponseVO;
-import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponseVO;
+import io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponse;
+import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponse;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,9 +46,9 @@ public abstract class BaseChatContainerTest implements RedisContainerTest {
         if (apiKey != null) {
             return;
         }
-        List<AppsResponseVO> apps = difyServer.apps("chat", "");
+        List<AppsResponse> apps = difyServer.apps("chat", "");
         assert !apps.isEmpty();
-        List<ApiKeyResponseVO> appApiKey = difyServer.getAppApiKey(apps.getFirst().getId());
+        List<ApiKeyResponse> appApiKey = difyServer.getAppApiKey(apps.getFirst().getId());
         if (appApiKey.isEmpty()) {
             appApiKey = difyServer.initAppApiKey(apps.getFirst().getId());
         }

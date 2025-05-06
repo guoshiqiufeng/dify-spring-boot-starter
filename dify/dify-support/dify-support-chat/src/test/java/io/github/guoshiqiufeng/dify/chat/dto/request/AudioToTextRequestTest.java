@@ -92,6 +92,6 @@ public class AudioToTextRequestTest {
         String toString = request.toString();
 
         // Assert
-        assertTrue(toString.contains("file=" + file.toString()));
+        assertTrue(toString.contains("file=" + file));
     }
 }

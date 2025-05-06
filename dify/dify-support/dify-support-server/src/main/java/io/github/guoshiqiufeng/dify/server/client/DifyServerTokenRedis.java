@@ -17,7 +17,7 @@ package io.github.guoshiqiufeng.dify.server.client;
 
 import cn.hutool.core.util.StrUtil;
 import io.github.guoshiqiufeng.dify.server.cache.DifyRedisKey;
-import io.github.guoshiqiufeng.dify.server.dto.response.LoginResponseVO;
+import io.github.guoshiqiufeng.dify.server.dto.response.LoginResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
@@ -50,7 +50,7 @@ public class DifyServerTokenRedis extends BaseDifyServerToken {
     }
 
     public String obtainToken(DifyServerClient difyServerClient) {
-        LoginResponseVO loginResponse = difyServerClient.login();
+        LoginResponse loginResponse = difyServerClient.login();
         if (loginResponse != null) {
             String accessToken = loginResponse.getAccessToken();
             redisTemplate.opsForValue().set(DifyRedisKey.ACCESS_TOKEN, accessToken);
@@ -68,7 +68,7 @@ public class DifyServerTokenRedis extends BaseDifyServerToken {
     public void refreshOrObtainNewToken(DifyServerClient difyServerClient) {
         String refreshToken = redisTemplate.opsForValue().get(DifyRedisKey.REFRESH_TOKEN);
         if (refreshToken != null) {
-            LoginResponseVO response = difyServerClient.refreshToken(refreshToken);
+            LoginResponse response = difyServerClient.refreshToken(refreshToken);
             if (response != null) {
                 String accessToken = response.getAccessToken();
                 redisTemplate.opsForValue().set(DifyRedisKey.ACCESS_TOKEN, accessToken);
@@ -78,7 +78,7 @@ public class DifyServerTokenRedis extends BaseDifyServerToken {
             }
         }
         // 如果刷新token失败或没有刷新token，则重新登录
-        LoginResponseVO loginResponse = difyServerClient.login();
+        LoginResponse loginResponse = difyServerClient.login();
         if (loginResponse != null) {
             String accessToken = loginResponse.getAccessToken();
             redisTemplate.opsForValue().set(DifyRedisKey.ACCESS_TOKEN, accessToken);
