@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -86,10 +87,10 @@ public class DocumentMetaDataUpdateRequestTest {
 
         DocumentMetaDataUpdateRequest.OperationData operationData = new DocumentMetaDataUpdateRequest.OperationData();
         operationData.setDocumentId("doc-456");
-        operationData.setMetadataList(Arrays.asList(
+        operationData.setMetadataList(Collections.singletonList(
                 MetaData.builder().id("meta-1").type("text").name("title").value("Sample Title").build()
         ));
-        request.setOperationData(Arrays.asList(operationData));
+        request.setOperationData(List.of(operationData));
 
         // 序列化为JSON
         String json = objectMapper.writeValueAsString(request);
@@ -208,7 +209,7 @@ public class DocumentMetaDataUpdateRequestTest {
         // 第一个操作数据
         DocumentMetaDataUpdateRequest.OperationData opData1 = new DocumentMetaDataUpdateRequest.OperationData();
         opData1.setDocumentId("doc-456");
-        opData1.setMetadataList(Arrays.asList(
+        opData1.setMetadataList(Collections.singletonList(
                 MetaData.builder().id("meta-1").type("text").name("title").value("Document 1").build()
         ));
         operationDataList.add(opData1);
@@ -253,20 +254,20 @@ public class DocumentMetaDataUpdateRequestTest {
         // 创建两个相同内容的操作数据对象
         DocumentMetaDataUpdateRequest.OperationData opData1 = new DocumentMetaDataUpdateRequest.OperationData();
         opData1.setDocumentId("doc-123");
-        opData1.setMetadataList(Arrays.asList(
+        opData1.setMetadataList(Collections.singletonList(
                 MetaData.builder().id("meta-1").type("text").name("title").value("Test Document").build()
         ));
 
         DocumentMetaDataUpdateRequest.OperationData opData2 = new DocumentMetaDataUpdateRequest.OperationData();
         opData2.setDocumentId("doc-123");
-        opData2.setMetadataList(Arrays.asList(
+        opData2.setMetadataList(Collections.singletonList(
                 MetaData.builder().id("meta-1").type("text").name("title").value("Test Document").build()
         ));
 
         // 创建不同内容的操作数据对象
         DocumentMetaDataUpdateRequest.OperationData opData3 = new DocumentMetaDataUpdateRequest.OperationData();
         opData3.setDocumentId("doc-456");  // 不同的ID
-        opData3.setMetadataList(Arrays.asList(
+        opData3.setMetadataList(Collections.singletonList(
                 MetaData.builder().id("meta-1").type("text").name("title").value("Test Document").build()
         ));
 
