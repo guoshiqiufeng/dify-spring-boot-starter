@@ -18,6 +18,7 @@ package io.github.guoshiqiufeng.dify.chat.dto.response;
 import io.github.guoshiqiufeng.dify.chat.dto.response.parameter.*;
 import org.junit.jupiter.api.Test;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -163,7 +164,7 @@ public class AppParametersResponseVOTest {
 
         AppParametersResponseVO responseVO3 = new AppParametersResponseVO();
         responseVO3.setOpeningStatement("Hello!");
-        responseVO3.setSuggestedQuestions(Arrays.asList("Different question"));
+        responseVO3.setSuggestedQuestions(List.of("Different question"));
 
         // Assert
         assertEquals(responseVO1, responseVO2);
@@ -177,7 +178,7 @@ public class AppParametersResponseVOTest {
         // Arrange
         AppParametersResponseVO responseVO = new AppParametersResponseVO();
         responseVO.setOpeningStatement("Welcome to the assistant!");
-        responseVO.setSuggestedQuestions(Arrays.asList("How can I help?"));
+        responseVO.setSuggestedQuestions(List.of("How can I help?"));
 
         // Create and set up a UserInputForm with proper structure
         UserInputForm form = new UserInputForm();
@@ -186,7 +187,7 @@ public class AppParametersResponseVOTest {
         textInput.setVariable("name");
         textInput.setRequired(true);
         form.setTextInput(textInput);
-        responseVO.setUserInputForm(Arrays.asList(form));
+        responseVO.setUserInputForm(List.of(form));
 
         // Create and set up a FileUploadConfig with proper structure
         FileUploadConfig config = new FileUploadConfig();
@@ -210,14 +211,14 @@ public class AppParametersResponseVOTest {
     public void testSerializable() {
         // Verify that the class implements Serializable
         AppParametersResponseVO responseVO = new AppParametersResponseVO();
-        assertTrue(responseVO instanceof java.io.Serializable);
+        assertInstanceOf(Serializable.class, responseVO);
 
         // Also verify serializable for nested components
         UserInputForm userInputForm = new UserInputForm();
-        assertTrue(userInputForm instanceof java.io.Serializable);
+        assertInstanceOf(Serializable.class, userInputForm);
 
         FileUploadConfig fileUploadConfig = new FileUploadConfig();
-        assertTrue(fileUploadConfig instanceof java.io.Serializable);
+        assertInstanceOf(Serializable.class, fileUploadConfig);
     }
 
     @Test

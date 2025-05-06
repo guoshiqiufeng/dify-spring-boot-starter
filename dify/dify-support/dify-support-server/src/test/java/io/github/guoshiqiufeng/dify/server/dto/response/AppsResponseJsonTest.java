@@ -26,21 +26,21 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test for JSON serialization/deserialization of {@link AppsResponseVO}
+ * Test for JSON serialization/deserialization of {@link AppsResponse}
  *
  * @author yanghq
  * @version 1.0
  * @since 2025/4/27
  */
 @SuppressWarnings("unchecked")
-public class AppsResponseVOJsonTest {
+public class AppsResponseJsonTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     public void testJsonSerialization() throws Exception {
         // Arrange
-        AppsResponseVO vo = new AppsResponseVO();
+        AppsResponse vo = new AppsResponse();
         vo.setId("app-123");
         vo.setName("Test App");
         vo.setMaxActiveRequests(5);
@@ -64,7 +64,7 @@ public class AppsResponseVOJsonTest {
         String json = "{\"id\":\"app-123\",\"name\":\"Test App\",\"description\":\"Test Description\",\"mode\":\"completion\"}";
 
         // Act
-        AppsResponseVO vo = objectMapper.readValue(json, AppsResponseVO.class);
+        AppsResponse vo = objectMapper.readValue(json, AppsResponse.class);
 
         // Assert
         assertEquals("app-123", vo.getId());
@@ -83,7 +83,7 @@ public class AppsResponseVOJsonTest {
                 "\"updated_by\":\"user-456\",\"updated_at\":1619798400,\"deleted_tools\":[\"tool1\"]}";
 
         // Act
-        AppsResponseVO vo = objectMapper.readValue(json, AppsResponseVO.class);
+        AppsResponse vo = objectMapper.readValue(json, AppsResponse.class);
 
         // Assert
         assertEquals("app-123", vo.getId());
@@ -113,7 +113,7 @@ public class AppsResponseVOJsonTest {
                 "\"updated_by\":\"user-456\",\"updated_at\":1619798400}}";
 
         // Act
-        AppsResponseVO vo = objectMapper.readValue(json, AppsResponseVO.class);
+        AppsResponse vo = objectMapper.readValue(json, AppsResponse.class);
         Map<String, Object> modelConfigMap = vo.getModelConfig();
 
         // Assert
@@ -156,7 +156,7 @@ public class AppsResponseVOJsonTest {
         modelMap.put("completion_params", completionParamsMap);
         modelConfigMap.put("model", modelMap);
 
-        AppsResponseVO originalVO = new AppsResponseVO();
+        AppsResponse originalVO = new AppsResponse();
         originalVO.setId("app-123");
         originalVO.setName("Test App");
         originalVO.setModelConfig(modelConfigMap);
@@ -166,7 +166,7 @@ public class AppsResponseVOJsonTest {
 
         // Act - Serialize then deserialize
         String json = objectMapper.writeValueAsString(originalVO);
-        AppsResponseVO deserializedVO = objectMapper.readValue(json, AppsResponseVO.class);
+        AppsResponse deserializedVO = objectMapper.readValue(json, AppsResponse.class);
 
         // Assert
         assertEquals(originalVO.getId(), deserializedVO.getId());
@@ -200,7 +200,7 @@ public class AppsResponseVOJsonTest {
         String json = "{\"id\":\"app-123\",\"name\":\"Test App\"}";
 
         // Act
-        AppsResponseVO vo = objectMapper.readValue(json, AppsResponseVO.class);
+        AppsResponse vo = objectMapper.readValue(json, AppsResponse.class);
 
         // Assert
         assertEquals("app-123", vo.getId());

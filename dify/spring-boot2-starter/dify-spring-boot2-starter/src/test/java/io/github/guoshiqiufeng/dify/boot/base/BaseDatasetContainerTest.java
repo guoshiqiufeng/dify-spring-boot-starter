@@ -21,7 +21,7 @@ import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
 import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;
 import io.github.guoshiqiufeng.dify.dataset.impl.DifyDatasetClientImpl;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
-import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponseVO;
+import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -100,7 +100,7 @@ public abstract class BaseDatasetContainerTest implements RedisContainerTest {
             throw new IllegalStateException("DifyServer is not initialized");
         }
 
-        List<DatasetApiKeyResponseVO> apiKeys = difyServer.getDatasetApiKey();
+        List<DatasetApiKeyResponse> apiKeys = difyServer.getDatasetApiKey();
         if (apiKeys == null) {
             log.debug("No existing API keys found, creating new key");
             apiKeys = difyServer.initDatasetApiKey();
@@ -112,9 +112,9 @@ public abstract class BaseDatasetContainerTest implements RedisContainerTest {
 
         return apiKeys.stream()
                 .findFirst()
-                .map(DatasetApiKeyResponseVO::getToken)
+                .map(DatasetApiKeyResponse::getToken)
                 .orElseGet(() -> {
-                    List<DatasetApiKeyResponseVO> newKeys = difyServer.initDatasetApiKey();
+                    List<DatasetApiKeyResponse> newKeys = difyServer.initDatasetApiKey();
                     if (CollectionUtils.isEmpty(newKeys)) {
                         throw new IllegalStateException("Failed to initialize API Key");
                     }

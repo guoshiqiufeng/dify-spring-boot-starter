@@ -113,7 +113,7 @@ public class FileUploadTest {
         FileUpload fileUpload3 = new FileUpload();
         fileUpload3.setImage(image3);
         fileUpload3.setEnabled(false);
-        fileUpload3.setAllowedFileTypes(Arrays.asList("audio"));
+        fileUpload3.setAllowedFileTypes(List.of("audio"));
         fileUpload3.setFileUploadConfig(config3);
 
         // Assert

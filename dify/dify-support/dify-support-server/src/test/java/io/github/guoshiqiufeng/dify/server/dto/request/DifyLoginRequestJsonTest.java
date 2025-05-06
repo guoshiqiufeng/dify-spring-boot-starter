@@ -21,20 +21,20 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test for JSON serialization/deserialization of {@link DifyLoginRequestVO}
+ * Test for JSON serialization/deserialization of {@link DifyLoginRequest}
  *
  * @author yanghq
  * @version 1.0
  * @since 2025/4/27
  */
-public class DifyLoginRequestVOJsonTest {
+public class DifyLoginRequestJsonTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     public void testJsonSerializationWithStandardFields() throws Exception {
         // Arrange
-        DifyLoginRequestVO vo = new DifyLoginRequestVO();
+        DifyLoginRequest vo = new DifyLoginRequest();
         vo.setEmail("test@example.com");
         vo.setPassword("password123");
         vo.setLanguage("zh-Hans");
@@ -56,7 +56,7 @@ public class DifyLoginRequestVOJsonTest {
         String json = "{\"email\":\"test@example.com\",\"password\":\"password123\",\"language\":\"zh-Hans\",\"rememberMe\":true}";
 
         // Act
-        DifyLoginRequestVO vo = objectMapper.readValue(json, DifyLoginRequestVO.class);
+        DifyLoginRequest vo = objectMapper.readValue(json, DifyLoginRequest.class);
 
         // Assert
         assertEquals("test@example.com", vo.getEmail());
@@ -71,7 +71,7 @@ public class DifyLoginRequestVOJsonTest {
         String json = "{\"email\":\"test@example.com\",\"password\":\"password123\",\"language\":\"zh-Hans\",\"remember-me\":true}";
 
         // Act
-        DifyLoginRequestVO vo = objectMapper.readValue(json, DifyLoginRequestVO.class);
+        DifyLoginRequest vo = objectMapper.readValue(json, DifyLoginRequest.class);
 
         // Assert
         assertEquals("test@example.com", vo.getEmail());
@@ -86,7 +86,7 @@ public class DifyLoginRequestVOJsonTest {
         String json = "{\"email\":\"test@example.com\",\"password\":\"password123\",\"language\":\"zh-Hans\",\"rememberMe\":false,\"remember-me\":true}";
 
         // Act
-        DifyLoginRequestVO vo = objectMapper.readValue(json, DifyLoginRequestVO.class);
+        DifyLoginRequest vo = objectMapper.readValue(json, DifyLoginRequest.class);
 
         // Assert
         assertEquals("test@example.com", vo.getEmail());
@@ -102,7 +102,7 @@ public class DifyLoginRequestVOJsonTest {
         String json = "{\"email\":\"test@example.com\"}";
 
         // Act
-        DifyLoginRequestVO vo = objectMapper.readValue(json, DifyLoginRequestVO.class);
+        DifyLoginRequest vo = objectMapper.readValue(json, DifyLoginRequest.class);
 
         // Assert
         assertEquals("test@example.com", vo.getEmail());
@@ -114,7 +114,7 @@ public class DifyLoginRequestVOJsonTest {
     @Test
     public void testBuildMethodJsonSerialization() throws Exception {
         // Arrange
-        DifyLoginRequestVO vo = DifyLoginRequestVO.build("test@example.com", "password123");
+        DifyLoginRequest vo = DifyLoginRequest.build("test@example.com", "password123");
 
         // Act
         String json = objectMapper.writeValueAsString(vo);
@@ -125,4 +125,4 @@ public class DifyLoginRequestVOJsonTest {
         assertTrue(json.contains("\"language\":\"zh-Hans\""));
         assertTrue(json.contains("\"rememberMe\":true"));
     }
-} 
+}

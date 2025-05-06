@@ -17,6 +17,7 @@ package io.github.guoshiqiufeng.dify.chat.dto.response;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -348,15 +349,15 @@ public class ChatMessageSendResponseTest {
     public void testSerializable() {
         // Verify that all classes implement Serializable
         ChatMessageSendResponse response = new ChatMessageSendResponse();
-        assertTrue(response instanceof java.io.Serializable);
+        assertInstanceOf(Serializable.class, response);
 
         ChatMessageSendResponse.Metadata metadata = new ChatMessageSendResponse.Metadata();
-        assertTrue(metadata instanceof java.io.Serializable);
+        assertInstanceOf(Serializable.class, metadata);
 
         ChatMessageSendResponse.RetrieverResources resources = new ChatMessageSendResponse.RetrieverResources();
-        assertTrue(resources instanceof java.io.Serializable);
+        assertInstanceOf(Serializable.class, resources);
 
         ChatMessageSendResponse.Usage usage = new ChatMessageSendResponse.Usage();
-        assertTrue(usage instanceof java.io.Serializable);
+        assertInstanceOf(Serializable.class, usage);
     }
 }

@@ -27,7 +27,7 @@ import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
 import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.TextEmbeddingListResponse;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.textembedding.TextEmbedding;
-import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponseVO;
+import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.http.HttpHeaders;
@@ -287,7 +287,7 @@ public class ChatTest extends BaseChatContainerTest {
     @Order(27)
     @DisplayName("Test annotation reply")
     public void testAnnotationReply() {
-        List<DatasetApiKeyResponseVO> datasetApiKeys = difyServer.getDatasetApiKey();
+        List<DatasetApiKeyResponse> datasetApiKeys = difyServer.getDatasetApiKey();
         if (CollectionUtils.isEmpty(datasetApiKeys)) {
             datasetApiKeys = difyServer.initDatasetApiKey();
         }

@@ -18,6 +18,7 @@ package io.github.guoshiqiufeng.dify.dataset.dto.request;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.io.Serializable;
 
@@ -28,6 +29,7 @@ import java.io.Serializable;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class MetaDataCreateRequest extends BaseDatasetRequest implements Serializable {
     private static final long serialVersionUID = 3246895121202690206L;
 

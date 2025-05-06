@@ -20,18 +20,18 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test for {@link DifyLoginRequestVO}
+ * Test for {@link DifyLoginRequest}
  *
  * @author yanghq
  * @version 1.0
  * @since 2025/4/27
  */
-public class DifyLoginRequestVOTest {
+public class DifyLoginRequestTest {
 
     @Test
     public void testDefaultConstructor() {
         // Act
-        DifyLoginRequestVO vo = new DifyLoginRequestVO();
+        DifyLoginRequest vo = new DifyLoginRequest();
 
         // Assert
         assertNull(vo.getEmail());
@@ -49,7 +49,7 @@ public class DifyLoginRequestVOTest {
         Boolean rememberMe = false;
 
         // Act
-        DifyLoginRequestVO vo = new DifyLoginRequestVO();
+        DifyLoginRequest vo = new DifyLoginRequest();
         vo.setEmail(email);
         vo.setPassword(password);
         vo.setLanguage(language);
@@ -69,7 +69,7 @@ public class DifyLoginRequestVOTest {
         String password = "password123";
 
         // Act
-        DifyLoginRequestVO vo = DifyLoginRequestVO.build(email, password);
+        DifyLoginRequest vo = DifyLoginRequest.build(email, password);
 
         // Assert
         assertEquals(email, vo.getEmail());
@@ -81,7 +81,7 @@ public class DifyLoginRequestVOTest {
     @Test
     public void testBuildMethodWithNullValues() {
         // Act
-        DifyLoginRequestVO vo = DifyLoginRequestVO.build(null, null);
+        DifyLoginRequest vo = DifyLoginRequest.build(null, null);
 
         // Assert
         assertNull(vo.getEmail());
@@ -93,19 +93,19 @@ public class DifyLoginRequestVOTest {
     @Test
     public void testEqualsAndHashCode() {
         // Arrange
-        DifyLoginRequestVO vo1 = new DifyLoginRequestVO();
+        DifyLoginRequest vo1 = new DifyLoginRequest();
         vo1.setEmail("test@example.com");
         vo1.setPassword("password123");
         vo1.setLanguage("zh-Hans");
         vo1.setRememberMe(true);
 
-        DifyLoginRequestVO vo2 = new DifyLoginRequestVO();
+        DifyLoginRequest vo2 = new DifyLoginRequest();
         vo2.setEmail("test@example.com");
         vo2.setPassword("password123");
         vo2.setLanguage("zh-Hans");
         vo2.setRememberMe(true);
 
-        DifyLoginRequestVO vo3 = new DifyLoginRequestVO();
+        DifyLoginRequest vo3 = new DifyLoginRequest();
         vo3.setEmail("different@example.com");
         vo3.setPassword("password123");
         vo3.setLanguage("zh-Hans");
@@ -121,7 +121,7 @@ public class DifyLoginRequestVOTest {
     @Test
     public void testSerializable() {
         // Just verify that the class implements Serializable
-        DifyLoginRequestVO vo = new DifyLoginRequestVO();
+        DifyLoginRequest vo = new DifyLoginRequest();
         assertTrue(vo instanceof java.io.Serializable);
     }
 }

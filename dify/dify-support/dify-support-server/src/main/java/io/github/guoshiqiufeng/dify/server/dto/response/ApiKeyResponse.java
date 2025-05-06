@@ -15,16 +15,28 @@
  */
 package io.github.guoshiqiufeng.dify.server.dto.response;
 
-import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
 
 /**
  * @author yanghq
  * @version 1.0
- * @since 2025/1/7 17:11
+ * @since 2025/1/7 17:03
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class ApiKeyResultResponseVO extends DifyPageResult<ApiKeyResponseVO> {
+public class ApiKeyResponse implements Serializable {
+
+    private String id;
+
+    private String type;
+
+    private String token;
+
+    @JsonAlias("last_used_at")
+    private Long lastUsedAt;
+
+    @JsonAlias("created_at")
+    private Long createdAt;
 }

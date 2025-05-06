@@ -24,7 +24,7 @@ import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
 import io.github.guoshiqiufeng.dify.server.client.RequestSupplier;
 import io.github.guoshiqiufeng.dify.server.constant.ServerUriConstant;
-import io.github.guoshiqiufeng.dify.server.dto.request.DifyLoginRequestVO;
+import io.github.guoshiqiufeng.dify.server.dto.request.DifyLoginRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -69,34 +69,34 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
     }
 
     @Override
-    public List<AppsResponseVO> apps(String mode, String name) {
-        List<AppsResponseVO> result = new ArrayList<>();
+    public List<AppsResponse> apps(String mode, String name) {
+        List<AppsResponse> result = new ArrayList<>();
         appPages(mode, name, 1, result);
         return result;
     }
 
     @Override
-    public AppsResponseVO app(String appId) {
+    public AppsResponse app(String appId) {
         return executeWithRetry(
                 () -> webClient.get()
                         .uri(ServerUriConstant.APPS + "/{appId}", appId)
                         .headers(this::addAuthorizationHeader)
                         .retrieve()
                         .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
-                        .bodyToMono(AppsResponseVO.class)
+                        .bodyToMono(AppsResponse.class)
                         .block()
         );
     }
 
     @Override
-    public List<ApiKeyResponseVO> getAppApiKey(String appId) {
-        ApiKeyResultResponseVO tmp = executeWithRetry(
+    public List<ApiKeyResponse> getAppApiKey(String appId) {
+        ApiKeyResultResponse tmp = executeWithRetry(
                 () -> webClient.get()
                         .uri(ServerUriConstant.APPS + "/{appId}/api-keys", appId)
                         .headers(this::addAuthorizationHeader)
                         .retrieve()
                         .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
-                        .bodyToMono(ApiKeyResultResponseVO.class)
+                        .bodyToMono(ApiKeyResultResponse.class)
                         .block()
         );
         if (tmp == null) {
@@ -106,53 +106,53 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
     }
 
     @Override
-    public List<ApiKeyResponseVO> initAppApiKey(String appId) {
-        ApiKeyResponseVO apiKeyResponseVO = executeWithRetry(
+    public List<ApiKeyResponse> initAppApiKey(String appId) {
+        ApiKeyResponse apiKeyResponseVO = executeWithRetry(
                 () -> webClient.post()
                         .uri(ServerUriConstant.APPS + "/{appId}/api-keys", appId)
                         .headers(this::addAuthorizationHeader)
                         .retrieve()
                         .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
-                        .bodyToMono(ApiKeyResponseVO.class)
+                        .bodyToMono(ApiKeyResponse.class)
                         .block()
         );
-        ArrayList<ApiKeyResponseVO> objects = new ArrayList<>();
+        ArrayList<ApiKeyResponse> objects = new ArrayList<>();
         objects.add(apiKeyResponseVO);
         return apiKeyResponseVO != null ? objects : null;
     }
 
     @Override
-    public List<DatasetApiKeyResponseVO> getDatasetApiKey() {
-        DatasetApiKeyResultVO result = executeWithRetry(
+    public List<DatasetApiKeyResponse> getDatasetApiKey() {
+        DatasetApiKeyResult result = executeWithRetry(
                 () -> webClient.get()
                         .uri(ServerUriConstant.DATASETS + "/api-keys")
                         .headers(this::addAuthorizationHeader)
                         .retrieve()
                         .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
-                        .bodyToMono(DatasetApiKeyResultVO.class)
+                        .bodyToMono(DatasetApiKeyResult.class)
                         .block()
         );
         return result != null ? result.getData() : null;
     }
 
     @Override
-    public List<DatasetApiKeyResponseVO> initDatasetApiKey() {
-        DatasetApiKeyResponseVO result = executeWithRetry(
+    public List<DatasetApiKeyResponse> initDatasetApiKey() {
+        DatasetApiKeyResponse result = executeWithRetry(
                 () -> webClient.post()
                         .uri(ServerUriConstant.DATASETS + "/api-keys")
                         .headers(this::addAuthorizationHeader)
                         .retrieve()
                         .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
-                        .bodyToMono(DatasetApiKeyResponseVO.class)
+                        .bodyToMono(DatasetApiKeyResponse.class)
                         .block()
         );
-        ArrayList<DatasetApiKeyResponseVO> data = new ArrayList<>();
+        ArrayList<DatasetApiKeyResponse> data = new ArrayList<>();
         data.add(result);
         return result != null ? data : null;
     }
 
-    private void appPages(String mode, String name, int page, List<AppsResponseVO> result) {
-        AppsResponseResultVO response = executeWithRetry(
+    private void appPages(String mode, String name, int page, List<AppsResponse> result) {
+        AppsResponseResult response = executeWithRetry(
                 () -> webClient.get()
                         .uri(uriBuilder -> uriBuilder
                                 .path(ServerUriConstant.APPS)
@@ -164,14 +164,14 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                         .headers(this::addAuthorizationHeader)
                         .retrieve()
                         .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
-                        .bodyToMono(AppsResponseResultVO.class)
+                        .bodyToMono(AppsResponseResult.class)
                         .block()
         );
 
         if (response == null) {
             return;
         }
-        List<AppsResponseVO> data = response.getData();
+        List<AppsResponse> data = response.getData();
         if (data != null) {
             result.addAll(data);
         }
@@ -190,29 +190,29 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
     }
 
     @Override
-    public LoginResponseVO login() {
+    public LoginResponse login() {
         Assert.notNull(difyServerProperties, "The difyServerProperties can not be null.");
-        DifyLoginRequestVO requestVO = DifyLoginRequestVO.build(difyServerProperties.getEmail(), difyServerProperties.getPassword());
-        LoginResultResponseVO result = webClient.post()
+        DifyLoginRequest requestVO = DifyLoginRequest.build(difyServerProperties.getEmail(), difyServerProperties.getPassword());
+        LoginResultResponse result = webClient.post()
                 .uri(ServerUriConstant.LOGIN)
                 .bodyValue(requestVO)
                 .retrieve()
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
-                .bodyToMono(LoginResultResponseVO.class)
+                .bodyToMono(LoginResultResponse.class)
                 .block();
         return processLoginResult(result);
     }
 
     @Override
-    public LoginResponseVO refreshToken(String refreshToken) {
+    public LoginResponse refreshToken(String refreshToken) {
         Map<String, String> requestVO = new HashMap<>(1);
         requestVO.put("refresh_token", refreshToken);
-        LoginResultResponseVO result = webClient.post()
+        LoginResultResponse result = webClient.post()
                 .uri(ServerUriConstant.REFRESH_TOKEN)
                 .bodyValue(requestVO)
                 .retrieve()
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
-                .bodyToMono(LoginResultResponseVO.class)
+                .bodyToMono(LoginResultResponse.class)
                 .block();
         return processLoginResult(result);
     }
@@ -223,10 +223,10 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
      * @param result the login result
      * @return the login response data or null
      */
-    private LoginResponseVO processLoginResult(LoginResultResponseVO result) {
+    private LoginResponse processLoginResult(LoginResultResponse result) {
         return Optional.ofNullable(result)
                 .filter(r -> DifyResult.SUCCESS.equals(r.getResult()))
-                .map(LoginResultResponseVO::getData)
+                .map(LoginResultResponse::getData)
                 .orElse(null);
     }
 }

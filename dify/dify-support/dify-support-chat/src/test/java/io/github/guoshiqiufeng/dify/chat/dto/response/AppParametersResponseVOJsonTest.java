@@ -215,7 +215,7 @@ public class AppParametersResponseVOJsonTest {
         textInput.setVariable("name");
         textInput.setRequired(true);
         form.setTextInput(textInput);
-        responseVO.setUserInputForm(Arrays.asList(form));
+        responseVO.setUserInputForm(List.of(form));
 
         // Add FileUploadConfig
         FileUploadConfig config = new FileUploadConfig();

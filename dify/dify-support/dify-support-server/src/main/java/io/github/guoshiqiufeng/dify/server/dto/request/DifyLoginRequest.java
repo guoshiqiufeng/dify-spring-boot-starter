@@ -13,24 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.server.dto.response;
+package io.github.guoshiqiufeng.dify.server.dto.request;
 
-import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 
 /**
  * @author yanghq
  * @version 1.0
- * @since 2024/12/31 15:46
+ * @since 2024/12/31 14:17
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class AppsResponseResultVO extends DifyPageResult<AppsResponseVO> implements Serializable {
+public class DifyLoginRequest implements Serializable {
+    private static final long serialVersionUID = 7556073605254679649L;
 
+    private String email;
 
-    private static final long serialVersionUID = -8135296664181854970L;
+    private String password;
 
+    private String language;
+    @JsonAlias("remember-me")
+    private Boolean rememberMe;
+
+    public static DifyLoginRequest build(String email, String password) {
+        DifyLoginRequest vo = new DifyLoginRequest();
+        vo.setEmail(email);
+        vo.setPassword(password);
+        vo.setLanguage("zh-Hans");
+        vo.setRememberMe(true);
+        return vo;
+    }
 }

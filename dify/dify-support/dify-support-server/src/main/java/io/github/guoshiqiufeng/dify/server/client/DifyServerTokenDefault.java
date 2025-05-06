@@ -15,7 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.server.client;
 
-import io.github.guoshiqiufeng.dify.server.dto.response.LoginResponseVO;
+import io.github.guoshiqiufeng.dify.server.dto.response.LoginResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 
@@ -47,7 +47,7 @@ public class DifyServerTokenDefault extends BaseDifyServerToken {
         tokenLock.lock();
         try {
             if (accessToken == null) {
-                LoginResponseVO loginResponse = difyServerClient.login();
+                LoginResponse loginResponse = difyServerClient.login();
                 if (loginResponse != null) {
                     this.accessToken = loginResponse.getAccessToken();
                     this.refreshToken = loginResponse.getRefreshToken();
@@ -66,7 +66,7 @@ public class DifyServerTokenDefault extends BaseDifyServerToken {
         tokenLock.lock();
         try {
             if (refreshToken != null) {
-                LoginResponseVO response = difyServerClient.refreshToken(refreshToken);
+                LoginResponse response = difyServerClient.refreshToken(refreshToken);
                 if (response != null) {
                     this.accessToken = response.getAccessToken();
                     this.refreshToken = response.getRefreshToken();
@@ -74,7 +74,7 @@ public class DifyServerTokenDefault extends BaseDifyServerToken {
                 }
             }
             // 如果刷新token失败或没有刷新token，则重新登录
-            LoginResponseVO loginResponse = difyServerClient.login();
+            LoginResponse loginResponse = difyServerClient.login();
             if (loginResponse != null) {
                 this.accessToken = loginResponse.getAccessToken();
                 this.refreshToken = loginResponse.getRefreshToken();

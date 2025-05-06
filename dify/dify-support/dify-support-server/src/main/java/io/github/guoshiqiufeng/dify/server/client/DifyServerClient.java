@@ -15,10 +15,10 @@
  */
 package io.github.guoshiqiufeng.dify.server.client;
 
-import io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponseVO;
-import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponseVO;
-import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponseVO;
-import io.github.guoshiqiufeng.dify.server.dto.response.LoginResponseVO;
+import io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponse;
+import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponse;
+import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponse;
+import io.github.guoshiqiufeng.dify.server.dto.response.LoginResponse;
 
 import java.util.List;
 
@@ -40,7 +40,7 @@ public interface DifyServerClient {
      * @param name The application name to search for
      * @return List of application responses matching the criteria
      */
-    List<AppsResponseVO> apps(String mode, String name);
+    List<AppsResponse> apps(String mode, String name);
 
     /**
      * Retrieves detailed information about a specific application
@@ -48,7 +48,7 @@ public interface DifyServerClient {
      * @param appId The ID of the application to retrieve
      * @return The application response containing detailed information
      */
-    AppsResponseVO app(String appId);
+    AppsResponse app(String appId);
 
     /**
      * Retrieves existing API keys for a specific application
@@ -56,7 +56,7 @@ public interface DifyServerClient {
      * @param appId The ID of the application to get API keys for
      * @return List of API key responses associated with the application
      */
-    List<ApiKeyResponseVO> getAppApiKey(String appId);
+    List<ApiKeyResponse> getAppApiKey(String appId);
 
     /**
      * Initializes or regenerates API keys for a specific application
@@ -64,28 +64,28 @@ public interface DifyServerClient {
      * @param appId The ID of the application to initialize API keys for
      * @return List of newly generated API key responses
      */
-    List<ApiKeyResponseVO> initAppApiKey(String appId);
+    List<ApiKeyResponse> initAppApiKey(String appId);
 
     /**
      * Retrieves existing API keys for datasets
      *
      * @return List of dataset API key responses
      */
-    List<DatasetApiKeyResponseVO> getDatasetApiKey();
+    List<DatasetApiKeyResponse> getDatasetApiKey();
 
     /**
      * Initializes or regenerates API keys for datasets
      *
      * @return List of newly generated dataset API key responses
      */
-    List<DatasetApiKeyResponseVO> initDatasetApiKey();
+    List<DatasetApiKeyResponse> initDatasetApiKey();
 
     /**
      * Authenticates with the Dify server and returns login credentials
      *
      * @return Login response containing access token and refresh token
      */
-    LoginResponseVO login();
+    LoginResponse login();
 
     /**
      * Refreshes an authentication token to maintain session validity
@@ -93,5 +93,5 @@ public interface DifyServerClient {
      * @param refreshToken The refresh token used to obtain a new access token
      * @return Login response containing new access token and refresh token
      */
-    LoginResponseVO refreshToken(String refreshToken);
+    LoginResponse refreshToken(String refreshToken);
 }

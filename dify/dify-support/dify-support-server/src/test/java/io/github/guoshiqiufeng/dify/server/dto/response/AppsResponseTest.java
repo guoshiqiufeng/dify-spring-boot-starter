@@ -23,18 +23,18 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test for {@link AppsResponseVO}
+ * Test for {@link AppsResponse}
  *
  * @author yanghq
  * @version 1.0
  * @since 2025/4/27
  */
-public class AppsResponseVOTest {
+public class AppsResponseTest {
 
     @Test
     public void testDefaultConstructor() {
         // Act
-        AppsResponseVO vo = new AppsResponseVO();
+        AppsResponse vo = new AppsResponse();
 
         // Assert
         assertNull(vo.getId());
@@ -91,7 +91,7 @@ public class AppsResponseVOTest {
         List<String> deletedTools = Collections.singletonList("tool1");
 
         // Act
-        AppsResponseVO vo = new AppsResponseVO();
+        AppsResponse vo = new AppsResponse();
         vo.setId(id);
         vo.setName(name);
         vo.setMaxActiveRequests(maxActiveRequests);
@@ -143,8 +143,8 @@ public class AppsResponseVOTest {
     @Test
     public void testNestedModelConfigClass() {
         // Arrange
-        AppsResponseVO.ModelConfig modelConfig = new AppsResponseVO.ModelConfig();
-        AppsResponseVO.Model model = new AppsResponseVO.Model();
+        AppsResponse.ModelConfig modelConfig = new AppsResponse.ModelConfig();
+        AppsResponse.Model model = new AppsResponse.Model();
         String prePrompt = "You are a helpful assistant";
         String createdBy = "user-123";
         Long createdAt = 1619712000L;
@@ -171,11 +171,11 @@ public class AppsResponseVOTest {
     @Test
     public void testNestedModelClass() {
         // Arrange
-        AppsResponseVO.Model model = new AppsResponseVO.Model();
+        AppsResponse.Model model = new AppsResponse.Model();
         String provider = "openai";
         String name = "gpt-4";
         String mode = "chat";
-        AppsResponseVO.CompletionParams completionParams = new AppsResponseVO.CompletionParams();
+        AppsResponse.CompletionParams completionParams = new AppsResponse.CompletionParams();
 
         // Act
         model.setProvider(provider);
@@ -193,7 +193,7 @@ public class AppsResponseVOTest {
     @Test
     public void testNestedCompletionParamsClass() {
         // Arrange
-        AppsResponseVO.CompletionParams completionParams = new AppsResponseVO.CompletionParams();
+        AppsResponse.CompletionParams completionParams = new AppsResponse.CompletionParams();
         List<String> stop = Arrays.asList("###", "END");
         String format = "json";
 
@@ -209,15 +209,15 @@ public class AppsResponseVOTest {
     @Test
     public void testEqualsAndHashCode() {
         // Arrange
-        AppsResponseVO vo1 = new AppsResponseVO();
+        AppsResponse vo1 = new AppsResponse();
         vo1.setId("app-123");
         vo1.setName("Test App");
 
-        AppsResponseVO vo2 = new AppsResponseVO();
+        AppsResponse vo2 = new AppsResponse();
         vo2.setId("app-123");
         vo2.setName("Test App");
 
-        AppsResponseVO vo3 = new AppsResponseVO();
+        AppsResponse vo3 = new AppsResponse();
         vo3.setId("app-456");
         vo3.setName("Different App");
 
@@ -231,28 +231,28 @@ public class AppsResponseVOTest {
     @Test
     public void testNestedClassesEqualsAndHashCode() {
         // Arrange - Model
-        AppsResponseVO.Model model1 = new AppsResponseVO.Model();
+        AppsResponse.Model model1 = new AppsResponse.Model();
         model1.setProvider("openai");
         model1.setName("gpt-4");
 
-        AppsResponseVO.Model model2 = new AppsResponseVO.Model();
+        AppsResponse.Model model2 = new AppsResponse.Model();
         model2.setProvider("openai");
         model2.setName("gpt-4");
 
-        AppsResponseVO.Model model3 = new AppsResponseVO.Model();
+        AppsResponse.Model model3 = new AppsResponse.Model();
         model3.setProvider("anthropic");
         model3.setName("claude-v2");
 
         // Arrange - CompletionParams
-        AppsResponseVO.CompletionParams params1 = new AppsResponseVO.CompletionParams();
+        AppsResponse.CompletionParams params1 = new AppsResponse.CompletionParams();
         params1.setFormat("json");
         params1.setStop(Arrays.asList("###", "END"));
 
-        AppsResponseVO.CompletionParams params2 = new AppsResponseVO.CompletionParams();
+        AppsResponse.CompletionParams params2 = new AppsResponse.CompletionParams();
         params2.setFormat("json");
         params2.setStop(Arrays.asList("###", "END"));
 
-        AppsResponseVO.CompletionParams params3 = new AppsResponseVO.CompletionParams();
+        AppsResponse.CompletionParams params3 = new AppsResponse.CompletionParams();
         params3.setFormat("text");
         params3.setStop(Collections.singletonList("STOP"));
 
@@ -272,16 +272,16 @@ public class AppsResponseVOTest {
     @Test
     public void testSerializable() {
         // Just verify that the class implements Serializable
-        AppsResponseVO vo = new AppsResponseVO();
+        AppsResponse vo = new AppsResponse();
         assertInstanceOf(Serializable.class, vo);
 
-        AppsResponseVO.ModelConfig modelConfig = new AppsResponseVO.ModelConfig();
+        AppsResponse.ModelConfig modelConfig = new AppsResponse.ModelConfig();
         assertInstanceOf(Serializable.class, modelConfig);
 
-        AppsResponseVO.Model model = new AppsResponseVO.Model();
+        AppsResponse.Model model = new AppsResponse.Model();
         assertInstanceOf(Serializable.class, model);
 
-        AppsResponseVO.CompletionParams completionParams = new AppsResponseVO.CompletionParams();
+        AppsResponse.CompletionParams completionParams = new AppsResponse.CompletionParams();
         assertInstanceOf(Serializable.class, completionParams);
     }
 }

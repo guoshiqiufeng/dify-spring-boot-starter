@@ -18,9 +18,9 @@ package io.github.guoshiqiufeng.dify.boot;
 import cn.hutool.json.JSONUtil;
 import io.github.guoshiqiufeng.dify.boot.base.BaseServerContainerTest;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
-import io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponseVO;
-import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponseVO;
-import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponseVO;
+import io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponse;
+import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponse;
+import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 
@@ -51,7 +51,7 @@ public class ServerTest extends BaseServerContainerTest {
     @DisplayName("Test retrieving application list")
     public void appsTest() {
         // Test retrieving all applications
-        List<AppsResponseVO> allApps = difyServer.apps("", "");
+        List<AppsResponse> allApps = difyServer.apps("", "");
         log.debug("All applications: {}", JSONUtil.toJsonStr(allApps));
         assertNotNull(allApps, "Application list should not be null");
 
@@ -64,7 +64,7 @@ public class ServerTest extends BaseServerContainerTest {
         // Test filtering applications by name
         if (!allApps.isEmpty() && allApps.getFirst().getName() != null) {
             String nameFilter = allApps.getFirst().getName().substring(0, 1); // Use first character as filter
-            List<AppsResponseVO> filteredApps = difyServer.apps("", nameFilter);
+            List<AppsResponse> filteredApps = difyServer.apps("", nameFilter);
             log.debug("Applications filtered by name '{}': {}", nameFilter, JSONUtil.toJsonStr(filteredApps));
             assertNotNull(filteredApps, "Filtered application list should not be null");
         }
@@ -76,7 +76,7 @@ public class ServerTest extends BaseServerContainerTest {
     public void appTest() {
         // Check if test application ID is available
         if (testAppId == null) {
-            List<AppsResponseVO> apps = difyServer.apps("", "");
+            List<AppsResponse> apps = difyServer.apps("", "");
             if (!apps.isEmpty()) {
                 testAppId = apps.getFirst().getId();
             } else {
@@ -86,7 +86,7 @@ public class ServerTest extends BaseServerContainerTest {
         }
 
         // Get application details
-        AppsResponseVO app = difyServer.app(testAppId);
+        AppsResponse app = difyServer.app(testAppId);
         log.debug("Application details: {}", JSONUtil.toJsonStr(app));
         assertNotNull(app, "Application details should not be null");
         assertEquals(testAppId, app.getId(), "Returned application ID should match requested ID");
@@ -98,7 +98,7 @@ public class ServerTest extends BaseServerContainerTest {
     public void appApiKeyTest() {
         // Check if test application ID is available
         if (testAppId == null) {
-            List<AppsResponseVO> apps = difyServer.apps("", "");
+            List<AppsResponse> apps = difyServer.apps("", "");
             if (!apps.isEmpty()) {
                 testAppId = apps.getFirst().getId();
             } else {
@@ -108,12 +108,12 @@ public class ServerTest extends BaseServerContainerTest {
         }
 
         // Get application API Keys
-        List<ApiKeyResponseVO> apiKeys = difyServer.getAppApiKey(testAppId);
+        List<ApiKeyResponse> apiKeys = difyServer.getAppApiKey(testAppId);
         log.debug("Application API Keys: {}", JSONUtil.toJsonStr(apiKeys));
         assertNotNull(apiKeys, "API Key list should not be null");
 
         // Initialize API Keys (may create new keys on the platform)
-        List<ApiKeyResponseVO> initializedKeys = difyServer.initAppApiKey(testAppId);
+        List<ApiKeyResponse> initializedKeys = difyServer.initAppApiKey(testAppId);
         log.debug("Initialized API Keys: {}", JSONUtil.toJsonStr(initializedKeys));
         // Initialization may return null, so no assertion here
     }
@@ -123,11 +123,11 @@ public class ServerTest extends BaseServerContainerTest {
     @DisplayName("Test dataset API Keys")
     public void datasetApiKeyTest() {
         // Get dataset API Keys
-        List<DatasetApiKeyResponseVO> datasetApiKey = difyServer.getDatasetApiKey();
+        List<DatasetApiKeyResponse> datasetApiKey = difyServer.getDatasetApiKey();
         log.debug("Dataset API Keys: {}", JSONUtil.toJsonStr(datasetApiKey));
 
         // Initialize dataset API Keys
-        List<DatasetApiKeyResponseVO> initializedKeys = difyServer.initDatasetApiKey();
+        List<DatasetApiKeyResponse> initializedKeys = difyServer.initDatasetApiKey();
         log.debug("Initialized dataset API Keys: {}", JSONUtil.toJsonStr(initializedKeys));
         assertNotNull(initializedKeys, "Initialized dataset API Key list should not be null");
     }
@@ -138,7 +138,7 @@ public class ServerTest extends BaseServerContainerTest {
     public void errorHandlingTest() {
         // Test with invalid application ID
         try {
-            AppsResponseVO invalidApp = difyServer.app("invalid-app-id");
+            AppsResponse invalidApp = difyServer.app("invalid-app-id");
             log.info("No exception thrown for invalid app ID, received response: {}",
                     invalidApp == null ? "null" : JSONUtil.toJsonStr(invalidApp));
         } catch (Exception e) {
@@ -149,7 +149,7 @@ public class ServerTest extends BaseServerContainerTest {
 
         // Test API Keys with invalid application ID
         try {
-            List<ApiKeyResponseVO> invalidApiKeys = difyServer.getAppApiKey("invalid-app-id");
+            List<ApiKeyResponse> invalidApiKeys = difyServer.getAppApiKey("invalid-app-id");
             log.info("No exception thrown for invalid API Key ID, received response size: {}",
                     invalidApiKeys == null ? "null" : invalidApiKeys.size());
         } catch (Exception e) {

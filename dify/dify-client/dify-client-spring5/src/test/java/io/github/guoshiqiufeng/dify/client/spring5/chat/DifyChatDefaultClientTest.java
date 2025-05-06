@@ -27,6 +27,7 @@ import io.github.guoshiqiufeng.dify.core.pojo.request.ChatMessageVO;
 import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
 import io.github.guoshiqiufeng.dify.dataset.constant.DatasetUriConstant;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
@@ -34,7 +35,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,6 +62,7 @@ import static org.mockito.Mockito.*;
 public class DifyChatDefaultClientTest extends BaseClientTest {
 
     private DifyChatDefaultClient difyChatDefaultClient;
+    private static final String TEST_API_KEY = "test-api-key";
 
     @BeforeEach
     public void setup() {
@@ -222,6 +227,79 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         verify(requestBodyUriSpecMock).uri(ChatUriConstant.V1_CHAT_MESSAGES_URI);
         verify(requestBodySpecMock).bodyValue(any(ChatMessageVO.class));
         verify(responseSpecMock).bodyToMono(ChatMessageSendResponse.class);
+    }
+
+    @Test
+    @DisplayName("Test streamingChat method with valid request")
+    public void testStreamingChat() {
+        WebClient.RequestBodySpec requestBodySpec = requestBodySpecMock;
+        WebClient.ResponseSpec responseSpec = responseSpecMock;
+        WebClient.RequestBodyUriSpec requestBodyUriSpec = requestBodyUriSpecMock;
+
+        // Mock the response
+        ChatMessageSendCompletionResponse response1 = new ChatMessageSendCompletionResponse();
+        response1.setEvent("message");
+        response1.setId("chat-123");
+        response1.setCreatedAt(1713841200L);
+        response1.setAnswer("Hello, ");
+
+        ChatMessageSendCompletionResponse response2 = new ChatMessageSendCompletionResponse();
+        response2.setEvent("message");
+        response2.setId("chat-123");
+        response2.setCreatedAt(1713841200L);
+        response2.setAnswer("this is a test response.");
+
+        Flux<ChatMessageSendCompletionResponse> mockFlux = Flux.just(response1, response2);
+
+        when(responseSpec.bodyToFlux(ChatMessageSendCompletionResponse.class)).thenReturn(mockFlux);
+
+        // Create a chat request
+        ChatMessageSendRequest request = new ChatMessageSendRequest();
+        request.setApiKey(TEST_API_KEY);
+        request.setUserId("user-123");
+        request.setContent("Hello, Dify!");
+        request.setConversationId("conv-123");
+
+        // Call the method to test
+        Flux<ChatMessageSendCompletionResponse> responseFlux = difyChatDefaultClient.streamingChat(request);
+
+        // Verify the response using StepVerifier
+        assertNotNull(responseFlux);
+        StepVerifier.create(responseFlux)
+                .expectNext(response1)
+                .expectNext(response2)
+                .verifyComplete();
+
+        // Verify interactions with mocks
+        verify(requestBodyUriSpec).uri(ChatUriConstant.V1_CHAT_MESSAGES_URI);
+        verify(requestBodySpec).header(HttpHeaders.AUTHORIZATION, "Bearer " + TEST_API_KEY);
+
+        // Verify the body method was called with the correct argument types
+        verify(requestBodySpec).body(any(Mono.class), eq(ChatMessageVO.class));
+    }
+
+
+    @Test
+    @DisplayName("Test stopMessagesStream method")
+    public void testStopMessagesStream() {
+        WebClient webClient = webClientMock;
+        WebClient.RequestBodySpec requestBodySpec = requestBodySpecMock;
+        WebClient.RequestBodyUriSpec requestBodyUriSpec = requestBodyUriSpecMock;
+
+        when(responseSpecMock.bodyToMono(Void.class)).thenReturn(Mono.empty());
+
+        // Define test parameters
+        String apiKey = TEST_API_KEY;
+        String taskId = "task-123";
+        String userId = "user-123";
+
+        // Call the method to test
+        difyChatDefaultClient.stopMessagesStream(apiKey, taskId, userId);
+
+        // Verify interactions with mocks
+        verify(webClient).post();
+        verify(requestBodyUriSpec).uri(ChatUriConstant.V1_CHAT_MESSAGES_URI + "/{taskId}/stop", taskId);
+        verify(requestBodySpec).header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey);
     }
 
     @Test

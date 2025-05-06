@@ -75,6 +75,8 @@ public abstract class BaseClientTest {
         doReturn(requestBodySpecMock).when(requestBodySpecMock).headers(any(Consumer.class));
         when(requestBodySpecMock.contentType(any())).thenReturn(requestBodySpecMock);
         when(requestBodySpecMock.bodyValue(any())).thenReturn(requestHeadersSpecMock);
+        // Add proper mocking for body() method that takes a Publisher and Class arguments
+        when(requestBodySpecMock.body(any(), any(Class.class))).thenReturn(requestHeadersSpecMock);
         when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
 
         // Setup WebClient mock behavior chain for GET

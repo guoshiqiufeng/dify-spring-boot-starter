@@ -23,22 +23,18 @@ import java.io.Serializable;
 /**
  * @author yanghq
  * @version 1.0
- * @since 2025/4/1 13:41
+ * @since 2024/12/31 14:25
  */
 @Data
-public class DatasetApiKeyResponseVO implements Serializable {
-    private static final long serialVersionUID = 5622933209445579199L;
+public class LoginResponse implements Serializable {
 
-    private String id;
 
-    private String type;
+    private static final long serialVersionUID = -2546124702668700191L;
 
-    private String token;
+    @JsonAlias("access_token")
+    private String accessToken;
 
-    @JsonAlias("last_used_at")
-    private Long lastUsedAt;
-
-    @JsonAlias("created_at")
-    private Long createdAt;
+    @JsonAlias("refresh_token")
+    private String refreshToken;
 
 }
