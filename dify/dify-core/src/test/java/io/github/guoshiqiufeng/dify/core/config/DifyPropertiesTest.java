@@ -144,4 +144,160 @@ class DifyPropertiesTest {
         assertTrue(config.toString().contains("skipNull=false"));
         assertTrue(config.toString().contains("logging=false"));
     }
+
+    @Test
+void testDefaultInitialization() {
+    DifyProperties properties = new DifyProperties();
+
+    // 验证 url 初始化为 null
+    assertNull(properties.getUrl());
+
+    // 验证 dataset 初始化为 new Dataset()，其中 apiKey 为 null
+    assertNotNull(properties.getDataset());
+    assertNull(properties.getDataset().getApiKey());
+
+    // 验证 server 初始化为 new Server()，其中 email 和 password 为 null
+    assertNotNull(properties.getServer());
+    assertNull(properties.getServer().getEmail());
+    assertNull(properties.getServer().getPassword());
+
+    // 验证 clientConfig 初始化为 new ClientConfig()，其中 skipNull 和 logging 为 true
+    assertNotNull(properties.getClientConfig());
+    assertTrue(properties.getClientConfig().getSkipNull());
+    assertTrue(properties.getClientConfig().getLogging());
+}
+
+    
+    @Test
+void testDatasetEqualsAndHashCode() {
+    Dataset d1 = new Dataset("key1");
+    Dataset d2 = new Dataset("key1");
+    Dataset d3 = new Dataset("key2");
+
+    assertEquals(d1, d2);
+    assertNotEquals(d1, d3);
+    assertEquals(d1.hashCode(), d2.hashCode());
+    assertNotEquals(d1.hashCode(), d3.hashCode());
+}
+
+    @Test
+void testServerEqualsAndHashCode() {
+    Server s1 = new Server("email1", "password1");
+    Server s2 = new Server("email1", "password1");
+    Server s3 = new Server("email2", "password2");
+
+    assertEquals(s1, s2);
+    assertNotEquals(s1, s3);
+    assertEquals(s1.hashCode(), s2.hashCode());
+    assertNotEquals(s1.hashCode(), s3.hashCode());
+}
+@Test
+void testClientConfigEqualsAndHashCode() {
+    ClientConfig c1 = new ClientConfig(true, false);
+    ClientConfig c2 = new ClientConfig(true, false);
+    ClientConfig c3 = new ClientConfig(false, true);
+
+    assertEquals(c1, c2);
+    assertNotEquals(c1, c3);
+    assertEquals(c1.hashCode(), c2.hashCode());
+    assertNotEquals(c1.hashCode(), c3.hashCode());
+}
+
+    @Test
+void testClientConfigDefaultValues() {
+    DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+    assertTrue(config.getSkipNull());
+    assertTrue(config.getLogging());
+}
+
+    @Test
+void testToStringIncludesAllFields() {
+    DifyProperties properties = new DifyProperties();
+    properties.setUrl("https://example.com ");
+
+    String str = properties.toString();
+    assertTrue(str.contains("url=https://example.com "));
+    assertTrue(str.contains("dataset="));
+    assertTrue(str.contains("server="));
+    assertTrue(str.contains("clientConfig="));
+
+    DifyProperties.Dataset dataset = new DifyProperties.Dataset("key");
+    String datasetStr = dataset.toString();
+    assertTrue(datasetStr.contains("apiKey=key"));
+
+    DifyProperties.Server server = new DifyProperties.Server("user@example.com", "pass");
+    String serverStr = server.toString();
+    assertTrue(serverStr.contains("email=user@example.com"));
+    assertTrue(serverStr.contains("password=pass"));
+
+    DifyProperties.ClientConfig config = new DifyProperties.ClientConfig(false, true);
+    String configStr = config.toString();
+    assertTrue(configStr.contains("skipNull=false"));
+    assertTrue(configStr.contains("logging=true"));
+}
+
+    @Test
+void testDatasetGetterSetter() {
+    DifyProperties.Dataset dataset = new DifyProperties.Dataset();
+    dataset.setApiKey("key");
+    assertEquals("key", dataset.getApiKey());
+}
+
+@Test
+void testServerGetterSetter() {
+    DifyProperties.Server server = new DifyProperties.Server();
+    server.setEmail("email@example.com");
+    server.setPassword("password");
+    assertEquals("email@example.com", server.getEmail());
+    assertEquals("password", server.getPassword());
+}
+
+@Test
+void testClientConfigGetterSetter() {
+    DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+    config.setSkipNull(false);
+    config.setLogging(false);
+    assertFalse(config.getSkipNull());
+    assertFalse(config.getLogging());
+}
+
+    @Test
+void testDatasetNoArgsConstructor() {
+    DifyProperties.Dataset dataset = new DifyProperties.Dataset();
+    assertNull(dataset.getApiKey());
+}
+
+@Test
+void testServerNoArgsConstructor() {
+    DifyProperties.Server server = new DifyProperties.Server();
+    assertNull(server.getEmail());
+    assertNull(server.getPassword());
+}
+
+@Test
+void testClientConfigNoArgsConstructor() {
+    DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+    assertTrue(config.getSkipNull());
+    assertTrue(config.getLogging());
+}
+
+    @Test
+void testDatasetAllArgsConstructor() {
+    DifyProperties.Dataset dataset = new DifyProperties.Dataset("key");
+    assertEquals("key", dataset.getApiKey());
+}
+
+@Test
+void testServerAllArgsConstructor() {
+    DifyProperties.Server server = new DifyProperties.Server("email@example.com", "password");
+    assertEquals("email@example.com", server.getEmail());
+    assertEquals("password", server.getPassword());
+}
+
+@Test
+void testClientConfigAllArgsConstructor() {
+    DifyProperties.ClientConfig config = new DifyProperties.ClientConfig(false, true);
+    assertFalse(config.getSkipNull());
+    assertTrue(config.getLogging());
+}
 }
