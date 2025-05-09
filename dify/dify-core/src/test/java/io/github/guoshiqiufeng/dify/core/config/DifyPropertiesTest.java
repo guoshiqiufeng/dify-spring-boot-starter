@@ -90,4 +90,36 @@ class DifyPropertiesTest {
         assertEquals(properties1.hashCode(), properties2.hashCode());
         assertNotEquals(properties1.hashCode(), properties3.hashCode());
     }
+
+    
+    @Test
+    void testClientConfig() {
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        assertTrue(config.getSkipNull());
+        assertTrue(config.getLogging());
+
+        // setter/getter
+        config.setSkipNull(false);
+        config.setLogging(false);
+        assertFalse(config.getSkipNull());
+        assertFalse(config.getLogging());
+
+        DifyProperties.ClientConfig config2 = new DifyProperties.ClientConfig(false, false);
+        assertFalse(config2.getSkipNull());
+        assertFalse(config2.getLogging());
+
+        // equals/hashCode
+        DifyProperties.ClientConfig config3 = new DifyProperties.ClientConfig(false, false);
+        assertEquals(config2, config3);
+        assertEquals(config2.hashCode(), config3.hashCode());
+        assertEquals(config, config2);
+    }
+
+    @Test
+    void testSetAndGetClientConfig() {
+        DifyProperties properties = new DifyProperties();
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig(false, true);
+        properties.setClientConfig(config);
+        assertEquals(config, properties.getClientConfig());
+    }
 }
