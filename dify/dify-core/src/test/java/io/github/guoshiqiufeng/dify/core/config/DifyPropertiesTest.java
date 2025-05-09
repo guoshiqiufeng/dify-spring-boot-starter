@@ -122,4 +122,26 @@ class DifyPropertiesTest {
         properties.setClientConfig(config);
         assertEquals(config, properties.getClientConfig());
     }
+
+    @Test
+    void testToString() {
+        DifyProperties properties = new DifyProperties();
+        properties.setUrl("https://test-dify.example.com");
+        assertNotNull(properties.toString());
+        assertTrue(properties.toString().contains("url=https://test-dify.example.com"));
+        
+        DifyProperties.Dataset dataset = new DifyProperties.Dataset("test-api-key");
+        assertNotNull(dataset.toString());
+        assertTrue(dataset.toString().contains("apiKey=test-api-key"));
+        
+        DifyProperties.Server server = new DifyProperties.Server("test@example.com", "test-password");
+        assertNotNull(server.toString());
+        assertTrue(server.toString().contains("email=test@example.com"));
+        assertTrue(server.toString().contains("password=test-password"));
+        
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig(false, false);
+        assertNotNull(config.toString());
+        assertTrue(config.toString().contains("skipNull=false"));
+        assertTrue(config.toString().contains("logging=false"));
+    }
 }
