@@ -33,6 +33,8 @@ import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.util.Assert;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.Optional;
+
 /**
  * @author yanghq
  * @version 0.8.0
@@ -207,9 +209,11 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
     public SegmentResponse pageSegment(SegmentPageRequest request) {
         Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
         return webClient.get()
-                .uri(DatasetUriConstant.V1_DOCUMENTS_SEGMENTS_URL + "?keyword={keyword}&status={status}",
-                        request.getDatasetId(), request.getDocumentId(),
-                        request.getKeyword(), request.getStatus())
+                .uri(uriBuilder -> uriBuilder
+                        .path(DatasetUriConstant.V1_DOCUMENTS_SEGMENTS_URL)
+                        .queryParamIfPresent("keyword", Optional.ofNullable(request.getKeyword()).filter(m -> !m.isEmpty()))
+                        .queryParamIfPresent("status", Optional.ofNullable(request.getStatus()).filter(m -> !m.isEmpty()))
+                        .build(request.getDatasetId(), request.getDocumentId()))
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request).accept(h))
                 .retrieve()
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
