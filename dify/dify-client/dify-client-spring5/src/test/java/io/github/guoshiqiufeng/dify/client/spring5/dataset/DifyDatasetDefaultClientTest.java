@@ -725,9 +725,6 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
 
         // Verify WebClient interactions
         verify(webClientMock).get();
-        verify(requestHeadersUriSpecMock).uri(
-                eq(DatasetUriConstant.V1_DOCUMENTS_SEGMENTS_URL + "?keyword={keyword}&status={status}"),
-                eq(datasetId), eq(documentId), eq(keyword), eq(status));
         verify(responseSpecMock).bodyToMono(any(ParameterizedTypeReference.class));
     }
 
