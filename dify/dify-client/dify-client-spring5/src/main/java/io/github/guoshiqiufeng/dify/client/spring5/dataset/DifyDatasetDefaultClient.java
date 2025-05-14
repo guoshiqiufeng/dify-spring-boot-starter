@@ -213,6 +213,8 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
                         .path(DatasetUriConstant.V1_DOCUMENTS_SEGMENTS_URL)
                         .queryParamIfPresent("keyword", Optional.ofNullable(request.getKeyword()).filter(m -> !m.isEmpty()))
                         .queryParamIfPresent("status", Optional.ofNullable(request.getStatus()).filter(m -> !m.isEmpty()))
+                        .queryParam("page", request.getPage())
+                        .queryParam("limit", request.getLimit())
                         .build(request.getDatasetId(), request.getDocumentId()))
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request).accept(h))
                 .retrieve()
