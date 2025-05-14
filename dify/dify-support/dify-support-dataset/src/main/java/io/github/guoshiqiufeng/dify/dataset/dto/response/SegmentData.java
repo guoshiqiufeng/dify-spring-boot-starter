@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author yanghq
@@ -43,6 +44,8 @@ public class SegmentData implements Serializable {
     private Integer wordCount;
 
     private Integer tokens;
+
+    private List<String> keywords;
 
     @JsonAlias("indexing_status")
     private String indexingStatus;
