@@ -44,4 +44,8 @@ public class SegmentPageRequest extends BaseDatasetRequest implements Serializab
     private String keyword;
 
     private String status;
+
+    private Integer page = 1;
+
+    private Integer limit = 20;
 }
