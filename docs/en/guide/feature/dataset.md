@@ -130,28 +130,28 @@ DatasetInfoRequest
 
 DatasetInfoResponse
 
-| Parameter              | Type                  | Description                |
-|------------------------|-----------------------|----------------------------|
-| id                      | String                | Knowledge base ID          |
-| name                    | String                | Knowledge base name        |
-| description             | String                | Knowledge base description |
-| permission              | PermissionEnum        | Permission                 |
-| dataSourceType          | String                | Data source type           |
-| indexingTechnique       | IndexingTechniqueEnum | Indexing technique         |
-| appCount                | Integer               | Application count          |
-| documentCount           | Integer               | Document count             |
-| wordCount               | Integer               | Word count                 |
-| createdBy               | String                | Created by                 |
-| createdAt               | Long                  | Creation timestamp         |
-| updatedBy               | String                | Updated by                 |
-| updatedAt               | Long                  | Update timestamp           |
-| embeddingModel          | String                | Embedding model            |
-| embeddingModelProvider  | String                | Embedding model provider   |
-| embeddingAvailable      | Boolean               | Whether embedding is available |
-| retrievalModelDict      | RetrievalModel        | Retrieval model dictionary |
-| tags                    | `List<String>`        | Tag list                   |
-| docForm                 | DocFormEnum           | Document form              |
-| externalKnowledgeInfo   | ExternalKnowledgeInfo | External knowledge info    |
+| Parameter              | Type                  | Description                    |
+|------------------------|-----------------------|--------------------------------|
+| id                     | String                | Knowledge base ID              |
+| name                   | String                | Knowledge base name            |
+| description            | String                | Knowledge base description     |
+| permission             | PermissionEnum        | Permission                     |
+| dataSourceType         | String                | Data source type               |
+| indexingTechnique      | IndexingTechniqueEnum | Indexing technique             |
+| appCount               | Integer               | Application count              |
+| documentCount          | Integer               | Document count                 |
+| wordCount              | Integer               | Word count                     |
+| createdBy              | String                | Created by                     |
+| createdAt              | Long                  | Creation timestamp             |
+| updatedBy              | String                | Updated by                     |
+| updatedAt              | Long                  | Update timestamp               |
+| embeddingModel         | String                | Embedding model                |
+| embeddingModelProvider | String                | Embedding model provider       |
+| embeddingAvailable     | Boolean               | Whether embedding is available |
+| retrievalModelDict     | RetrievalModel        | Retrieval model dictionary     |
+| tags                   | `List<String>`        | Tag list                       |
+| docForm                | DocFormEnum           | Document form                  |
+| externalKnowledgeInfo  | ExternalKnowledgeInfo | External knowledge info        |
 
 ### 1.4 Update Knowledge Base
 
@@ -165,15 +165,15 @@ DatasetInfoResponse update(DatasetUpdateRequest request);
 
 DatasetUpdateRequest
 
-| Parameter              | Type                  | Required | Description                |
-|------------------------|-----------------------|----------|----------------------------|
-| datasetId              | String                | Yes      | Knowledge base ID          |
-| indexingTechnique      | IndexingTechniqueEnum | No       | Indexing mode              |
-| permission             | PermissionEnum        | No       | Permission                 |
-| retrievalModel         | RetrievalModel        | No       | Retrieval model            |
-| embeddingModel         | String                | No       | Embedding model            |
-| embeddingModelProvider | String                | No       | Embedding model provider   |
-| partialMemberList      | `List<String>`        | No       | Partial member list        |
+| Parameter              | Type                  | Required | Description              |
+|------------------------|-----------------------|----------|--------------------------|
+| datasetId              | String                | Yes      | Knowledge base ID        |
+| indexingTechnique      | IndexingTechniqueEnum | No       | Indexing mode            |
+| permission             | PermissionEnum        | No       | Permission               |
+| retrievalModel         | RetrievalModel        | No       | Retrieval model          |
+| embeddingModel         | String                | No       | Embedding model          |
+| embeddingModelProvider | String                | No       | Embedding model provider |
+| partialMemberList      | `List<String>`        | No       | Partial member list      |
 
 #### Response Parameters
 

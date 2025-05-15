@@ -32,12 +32,13 @@ class SearchMethodEnumTest {
     @Test
     @DisplayName("Test enum count")
     void testEnumCount() {
-        assertEquals(3, SearchMethodEnum.values().length);
+        assertEquals(4, SearchMethodEnum.values().length);
     }
 
     @Test
     @DisplayName("Test specific enum values")
     void testSpecificEnumValues() {
+        assertNotNull(SearchMethodEnum.keyword_search);
         assertNotNull(SearchMethodEnum.hybrid_search);
         assertNotNull(SearchMethodEnum.semantic_search);
         assertNotNull(SearchMethodEnum.full_text_search);
@@ -46,6 +47,7 @@ class SearchMethodEnumTest {
     @Test
     @DisplayName("Test enum names")
     void testEnumNames() {
+        assertEquals("keyword_search", SearchMethodEnum.keyword_search.name());
         assertEquals("hybrid_search", SearchMethodEnum.hybrid_search.name());
         assertEquals("semantic_search", SearchMethodEnum.semantic_search.name());
         assertEquals("full_text_search", SearchMethodEnum.full_text_search.name());
@@ -54,14 +56,16 @@ class SearchMethodEnumTest {
     @Test
     @DisplayName("Test enum ordinals")
     void testEnumOrdinals() {
-        assertEquals(0, SearchMethodEnum.hybrid_search.ordinal());
-        assertEquals(1, SearchMethodEnum.semantic_search.ordinal());
-        assertEquals(2, SearchMethodEnum.full_text_search.ordinal());
+        assertEquals(0, SearchMethodEnum.keyword_search.ordinal());
+        assertEquals(1, SearchMethodEnum.hybrid_search.ordinal());
+        assertEquals(2, SearchMethodEnum.semantic_search.ordinal());
+        assertEquals(3, SearchMethodEnum.full_text_search.ordinal());
     }
 
     @Test
     @DisplayName("Test valueOf method with valid names")
     void testValueOfWithValidNames() {
+        assertEquals(SearchMethodEnum.keyword_search, SearchMethodEnum.valueOf("keyword_search"));
         assertEquals(SearchMethodEnum.hybrid_search, SearchMethodEnum.valueOf("hybrid_search"));
         assertEquals(SearchMethodEnum.semantic_search, SearchMethodEnum.valueOf("semantic_search"));
         assertEquals(SearchMethodEnum.full_text_search, SearchMethodEnum.valueOf("full_text_search"));

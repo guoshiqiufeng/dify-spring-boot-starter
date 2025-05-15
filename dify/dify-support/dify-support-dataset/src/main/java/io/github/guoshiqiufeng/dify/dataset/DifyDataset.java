@@ -44,6 +44,7 @@ public interface DifyDataset {
 
     /**
      * 知识库详情
+     *
      * @param request 知识库详情查询请求对象
      * @return 知识库详情
      */
@@ -51,6 +52,7 @@ public interface DifyDataset {
 
     /**
      * 修改知识库
+     *
      * @param request 请求对象
      * @return 知识库详情
      */

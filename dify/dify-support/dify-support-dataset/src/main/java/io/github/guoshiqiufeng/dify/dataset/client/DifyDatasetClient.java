@@ -48,6 +48,7 @@ public interface DifyDatasetClient {
 
     /**
      * info
+     *
      * @param request request parameters
      * @return dataset data
      */
@@ -55,6 +56,7 @@ public interface DifyDatasetClient {
 
     /**
      * update
+     *
      * @param request request parameters
      * @return dataset data
      */
