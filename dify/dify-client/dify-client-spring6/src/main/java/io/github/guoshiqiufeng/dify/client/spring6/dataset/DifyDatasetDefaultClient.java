@@ -91,6 +91,35 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
                 });
     }
 
+    @Override
+    public DatasetInfoResponse info(DatasetInfoRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        return restClient.get()
+                .uri(uri ->
+                        uri.path(DatasetUriConstant.V1_DATASET_URL)
+                                .build(request.getDatasetId())
+                )
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request).accept(h))
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(DatasetInfoResponse.class);
+    }
+
+    @Override
+    public DatasetInfoResponse update(DatasetUpdateRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        return restClient.patch()
+                .uri(uri ->
+                        uri.path(DatasetUriConstant.V1_DATASET_URL)
+                                .build(request.getDatasetId())
+                )
+                .body(request)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request).accept(h))
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(DatasetInfoResponse.class);
+    }
+
 
     @Override
     public void delete(String datasetId, String apiKey) {

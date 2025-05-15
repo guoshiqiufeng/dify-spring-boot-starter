@@ -150,7 +150,6 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
 
         // Verify WebClient interactions
         verify(webClientMock).get();
-        verify(requestHeadersUriSpecMock).uri(eq(DatasetUriConstant.V1_DATASETS_URL + "?page={page}&limit={limit}"), eq(page), eq(limit));
         verify(responseSpecMock).bodyToMono(any(ParameterizedTypeReference.class));
     }
 

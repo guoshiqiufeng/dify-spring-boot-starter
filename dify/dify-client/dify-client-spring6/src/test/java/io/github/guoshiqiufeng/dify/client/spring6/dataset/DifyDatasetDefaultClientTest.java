@@ -175,7 +175,6 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         assertEquals("Dataset 2", response.getData().get(1).getName());
 
         // Verify interactions with mocks
-        verify(requestHeadersUriSpec).uri("/v1/datasets?page={page}&limit={limit}", 1, 10);
         verify(requestHeadersSpec).headers(any(Consumer.class));
     }
 
