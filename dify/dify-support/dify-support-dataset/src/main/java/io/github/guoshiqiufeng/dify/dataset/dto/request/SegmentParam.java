@@ -15,6 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.dataset.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -36,4 +38,10 @@ public class SegmentParam implements Serializable {
     private String answer;
 
     private List<String> keywords;
+
+    private Boolean enabled;
+
+    @JsonProperty("regenerate_child_chunks")
+    @JsonAlias("regenerateChildChunks")
+    private Boolean regenerateChildChunks;
 }

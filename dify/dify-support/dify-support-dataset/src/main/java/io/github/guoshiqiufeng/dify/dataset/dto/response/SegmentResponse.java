@@ -34,4 +34,22 @@ public class SegmentResponse implements Serializable {
 
     @JsonAlias("doc_form")
     private String docForm;
+
+    @JsonAlias("has_more")
+    private Boolean hasMore;
+
+    /**
+     * 每页的最大数据条数
+     */
+    private Integer limit;
+
+    /**
+     * 当前页码
+     */
+    private Integer page;
+
+    /**
+     * 总数据条数
+     */
+    private Integer total;
 }
