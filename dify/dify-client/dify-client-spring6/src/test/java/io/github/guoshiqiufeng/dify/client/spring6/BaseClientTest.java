@@ -90,6 +90,7 @@ public abstract class BaseClientTest {
             when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
             when(requestBodyUriSpec.uri(anyString(), any(Object[].class))).thenReturn(requestBodySpec);
             when(requestBodyUriSpec.uri(anyString(), any(Object.class))).thenReturn(requestBodySpec);
+            when(requestBodyUriSpec.uri(any(Function.class))).thenReturn(requestBodySpec);
 
             // Handle header method properly
             when(requestBodySpec.header(anyString(), any(String[].class))).thenReturn(requestBodySpec);

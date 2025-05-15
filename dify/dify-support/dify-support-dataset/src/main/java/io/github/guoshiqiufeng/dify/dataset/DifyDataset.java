@@ -43,6 +43,22 @@ public interface DifyDataset {
     DifyPageResult<DatasetResponse> page(DatasetPageRequest request);
 
     /**
+     * 知识库详情
+     *
+     * @param request 知识库详情查询请求对象
+     * @return 知识库详情
+     */
+    DatasetInfoResponse info(DatasetInfoRequest request);
+
+    /**
+     * 修改知识库
+     *
+     * @param request 请求对象
+     * @return 知识库详情
+     */
+    DatasetInfoResponse update(DatasetUpdateRequest request);
+
+    /**
      * 删除指定 知识库。
      *
      * @param datasetId 知识库的唯一标识符。

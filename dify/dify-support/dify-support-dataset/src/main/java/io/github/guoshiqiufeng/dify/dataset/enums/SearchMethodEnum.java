@@ -23,6 +23,10 @@ package io.github.guoshiqiufeng.dify.dataset.enums;
 public enum SearchMethodEnum {
 
     /**
+     * 关键字检索
+     */
+    keyword_search,
+    /**
      * 混合检索
      */
     hybrid_search,

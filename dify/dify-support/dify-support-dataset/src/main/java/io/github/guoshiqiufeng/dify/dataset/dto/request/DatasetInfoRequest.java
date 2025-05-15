@@ -19,30 +19,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * @author yanghq
  * @version 1.0
- * @since 2025/3/13 13:12
+ * @since 2025/5/15 14:19
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class DatasetPageRequest extends BaseDatasetRequest implements Serializable {
+public class DatasetInfoRequest extends BaseDatasetRequest implements Serializable {
 
-    /**
-     * 页码
-     */
-    private Integer page = 1;
-
-    /**
-     * 返回条数，默认 20，范围 1-100
-     */
-    private Integer limit = 20;
-
-    private String keyword;
-
-    private List<String> tagIds;
-
-    private Boolean includeAll;
+    private String datasetId;
 }

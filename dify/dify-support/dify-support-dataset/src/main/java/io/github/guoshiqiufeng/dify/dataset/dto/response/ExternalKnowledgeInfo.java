@@ -16,40 +16,39 @@
 package io.github.guoshiqiufeng.dify.dataset.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * @author yanghq
  * @version 1.0
- * @since 2025/3/13 17:18
+ * @since 2025/5/15 14:24
  */
 @Data
-public class SegmentResponse implements Serializable {
-    private static final long serialVersionUID = -1174425396475689757L;
-
-    private List<SegmentData> data;
-
-    @JsonAlias("doc_form")
-    private String docForm;
-
-    @JsonAlias("has_more")
-    private Boolean hasMore;
+public class ExternalKnowledgeInfo implements Serializable {
+    private static final long serialVersionUID = -8388356622715394711L;
 
     /**
-     * 每页的最大数据条数
+     * 外部知识库 ID
      */
-    private Integer limit;
+    @JsonProperty("external_knowledge_id")
+    @JsonAlias("externalKnowledgeId")
+    private String externalKnowledgeId;
 
     /**
-     * 当前页码
+     * 外部知识库 API_ID
      */
-    private Integer page;
+    @JsonProperty("external_knowledge_api_id")
+    @JsonAlias("externalKnowledgeApiId")
+    private String externalKnowledgeApiId;
 
-    /**
-     * 总数据条数
-     */
-    private Integer total;
+    @JsonProperty("external_knowledge_api_name")
+    @JsonAlias("externalKnowledgeApiName")
+    private String externalKnowledgeApiName;
+
+    @JsonProperty("external_knowledge_api_endpoint")
+    @JsonAlias("externalKnowledgeApiEndpoint")
+    private String externalKnowledgeApiEndpoint;
 }

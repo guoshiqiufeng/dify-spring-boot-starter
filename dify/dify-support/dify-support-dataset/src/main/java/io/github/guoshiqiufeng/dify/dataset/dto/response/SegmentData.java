@@ -36,6 +36,9 @@ public class SegmentData implements Serializable {
 
     private Integer position;
 
+    @JsonAlias("document_id")
+    private String documentId;
+
     private String content;
 
     private String answer;
@@ -46,6 +49,15 @@ public class SegmentData implements Serializable {
     private Integer tokens;
 
     private List<String> keywords;
+
+    @JsonAlias("index_node_id")
+    private String indexNodeId;
+
+    @JsonAlias("index_node_hash")
+    private String indexNodeHash;
+
+    @JsonAlias("hit_count")
+    private Integer hitCount;
 
     @JsonAlias("indexing_status")
     private String indexingStatus;
@@ -60,6 +72,20 @@ public class SegmentData implements Serializable {
     @JsonAlias("disabled_by")
     private String disabledBy;
 
+    @JsonAlias("status")
+    private String status;
+
     private Boolean archived;
 
+    @JsonAlias("created_at")
+    private Long createdAt;
+
+    @JsonAlias("indexing_at")
+    private Long indexingAt;
+
+    @JsonAlias("completed_at")
+    private Long completedAt;
+
+    @JsonAlias("stopped_at")
+    private Long stoppedAt;
 }

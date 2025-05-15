@@ -35,14 +35,19 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.util.UriBuilder;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
@@ -132,6 +137,23 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
         RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
 
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+        when(requestHeadersUriSpec.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("page"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("limit"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("tag_ids"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("keyword"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("include_all"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build()).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpec;
+        });
+
         // Mock the response
         DifyPageResult<DatasetResponse> mockResponse = new DifyPageResult<>();
         List<DatasetResponse> data = new ArrayList<>();
@@ -158,6 +180,9 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         request.setApiKey("test-api-key");
         request.setPage(1);
         request.setLimit(10);
+        request.setTagIds(List.of("123456"));
+        request.setKeyword("search-keyword");
+        request.setIncludeAll(false);
 
         // Call the method to test
         DifyPageResult<DatasetResponse> response = client.page(request);
@@ -175,8 +200,137 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         assertEquals("Dataset 2", response.getData().get(1).getName());
 
         // Verify interactions with mocks
-        verify(requestHeadersUriSpec).uri("/v1/datasets?page={page}&limit={limit}", 1, 10);
         verify(requestHeadersSpec).headers(any(Consumer.class));
+    }
+
+    @Test
+    @DisplayName("Test info dataset method")
+    public void testInfo() {
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
+
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+        when(requestHeadersUriSpec.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build(anyString())).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpec;
+        });
+
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String datasetId = "dataset-123456";
+
+        // Create expected response
+        DatasetInfoResponse expectedResponse = new DatasetInfoResponse();
+        expectedResponse.setId(datasetId);
+        expectedResponse.setName("Test Dataset");
+        expectedResponse.setDescription("This is a test dataset");
+        expectedResponse.setCreatedAt(1650000000L);
+        expectedResponse.setUpdatedAt(1650000100L);
+        expectedResponse.setIndexingTechnique(IndexingTechniqueEnum.HIGH_QUALITY);
+        expectedResponse.setDocumentCount(10);
+        expectedResponse.setWordCount(5000);
+
+        // Mock the response
+        when(responseSpec.body(DatasetInfoResponse.class)).thenReturn(expectedResponse);
+
+        // Create request
+        DatasetInfoRequest request = new DatasetInfoRequest();
+        request.setApiKey(apiKey);
+        request.setDatasetId(datasetId);
+
+        // Call the method to test
+        DatasetInfoResponse response = client.info(request);
+
+        // Verify the response
+        assertNotNull(response);
+        assertEquals(datasetId, response.getId());
+        assertEquals("Test Dataset", response.getName());
+        assertEquals("This is a test dataset", response.getDescription());
+        assertEquals(1650000000L, response.getCreatedAt());
+        assertEquals(1650000100L, response.getUpdatedAt());
+        assertEquals("high_quality", response.getIndexingTechnique().getCode());
+        assertEquals(10, response.getDocumentCount());
+        assertEquals(5000, response.getWordCount());
+
+        verify(requestHeadersSpec).headers(any(Consumer.class));
+        verify(responseSpec).body(DatasetInfoResponse.class);
+    }
+
+    @Test
+    @DisplayName("Test update dataset method")
+    public void testUpdate() {
+        RestClient.RequestBodySpec requestBodySpec = restClientMock.getRequestBodySpec();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestBodyUriSpec requestBodyUriSpec = restClientMock.getRequestBodyUriSpec();
+
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+        when(requestBodyUriSpec.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build(anyString())).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestBodySpec;
+        });
+
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String datasetId = "dataset-123456";
+        String updatedName = "Updated Dataset Name";
+        String updatedDescription = "This is an updated description";
+
+        // Create expected response
+        DatasetInfoResponse expectedResponse = new DatasetInfoResponse();
+        expectedResponse.setId(datasetId);
+        expectedResponse.setName(updatedName);
+        expectedResponse.setDescription(updatedDescription);
+        expectedResponse.setCreatedAt(1650000000L);
+        expectedResponse.setUpdatedAt(1650100000L);
+        expectedResponse.setIndexingTechnique(IndexingTechniqueEnum.HIGH_QUALITY);
+        expectedResponse.setDocumentCount(10);
+        expectedResponse.setWordCount(5000);
+
+        // Mock the response
+        when(responseSpec.body(DatasetInfoResponse.class)).thenReturn(expectedResponse);
+
+        // Create request
+        DatasetUpdateRequest request = new DatasetUpdateRequest();
+        request.setApiKey(apiKey);
+        request.setDatasetId(datasetId);
+
+        // Call the method to test
+        DatasetInfoResponse response = client.update(request);
+
+        // Verify the response
+        assertNotNull(response);
+        assertEquals(datasetId, response.getId());
+        assertEquals(updatedName, response.getName());
+        assertEquals(updatedDescription, response.getDescription());
+        assertEquals(1650000000L, response.getCreatedAt());
+        assertEquals(1650100000L, response.getUpdatedAt());
+        assertEquals("high_quality", response.getIndexingTechnique().getCode());
+        assertEquals(10, response.getDocumentCount());
+        assertEquals(5000, response.getWordCount());
+
+        // Verify interactions with mocks
+        verify(requestBodySpec).headers(any(Consumer.class));
+
+        // Capture and verify the request body
+        ArgumentCaptor<DatasetUpdateRequest> bodyCaptor = ArgumentCaptor.forClass(DatasetUpdateRequest.class);
+        verify(requestBodySpec).body(bodyCaptor.capture());
+
+        DatasetUpdateRequest capturedBody = bodyCaptor.getValue();
+
+        verify(responseSpec).body(DatasetInfoResponse.class);
     }
 
     @Test

@@ -1067,4 +1067,62 @@ public class DifyDatasetClientImplTest {
         assertEquals("active", actualResponse.getData().get(0).getStatus());
         verify(difyDatasetClient, times(1)).listTextEmbedding(null);
     }
+
+    @Test
+    void testInfo() {
+        // Arrange
+        DatasetInfoRequest request = new DatasetInfoRequest();
+        request.setDatasetId("dataset_123");
+        request.setApiKey("test_api_key");
+
+        DatasetInfoResponse expectedResponse = new DatasetInfoResponse();
+        expectedResponse.setId("dataset_123");
+        expectedResponse.setName("Test Dataset");
+        expectedResponse.setDescription("Dataset for testing");
+        expectedResponse.setCreatedAt(System.currentTimeMillis());
+        expectedResponse.setDocumentCount(10);
+
+        when(difyDatasetClient.info(any(DatasetInfoRequest.class))).thenReturn(expectedResponse);
+
+        // Act
+        DatasetInfoResponse actualResponse = difyDataset.info(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getName(), actualResponse.getName());
+        assertEquals(expectedResponse.getDescription(), actualResponse.getDescription());
+        assertEquals(expectedResponse.getCreatedAt(), actualResponse.getCreatedAt());
+        assertEquals(expectedResponse.getDocumentCount(), actualResponse.getDocumentCount());
+        verify(difyDatasetClient, times(1)).info(any(DatasetInfoRequest.class));
+    }
+
+    @Test
+    void testUpdate() {
+        // Arrange
+        DatasetUpdateRequest request = new DatasetUpdateRequest();
+        request.setDatasetId("dataset_123");
+        request.setApiKey("test_api_key");
+
+        DatasetInfoResponse expectedResponse = new DatasetInfoResponse();
+        expectedResponse.setId("dataset_123");
+        expectedResponse.setName("Updated Dataset");
+        expectedResponse.setDescription("Updated description for testing");
+        expectedResponse.setCreatedAt(System.currentTimeMillis());
+        expectedResponse.setDocumentCount(10);
+
+        when(difyDatasetClient.update(any(DatasetUpdateRequest.class))).thenReturn(expectedResponse);
+
+        // Act
+        DatasetInfoResponse actualResponse = difyDataset.update(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getName(), actualResponse.getName());
+        assertEquals(expectedResponse.getDescription(), actualResponse.getDescription());
+        assertEquals(expectedResponse.getCreatedAt(), actualResponse.getCreatedAt());
+        assertEquals(expectedResponse.getDocumentCount(), actualResponse.getDocumentCount());
+        verify(difyDatasetClient, times(1)).update(any(DatasetUpdateRequest.class));
+    }
 }

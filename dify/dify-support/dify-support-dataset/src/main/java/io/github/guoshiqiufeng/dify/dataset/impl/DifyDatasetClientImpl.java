@@ -47,6 +47,16 @@ public class DifyDatasetClientImpl implements DifyDataset {
     }
 
     @Override
+    public DatasetInfoResponse info(DatasetInfoRequest request) {
+        return difyDatasetClient.info(request);
+    }
+
+    @Override
+    public DatasetInfoResponse update(DatasetUpdateRequest request) {
+        return difyDatasetClient.update(request);
+    }
+
+    @Override
     public void delete(String datasetId, String apiKey) {
         difyDatasetClient.delete(datasetId, apiKey);
     }

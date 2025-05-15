@@ -47,6 +47,22 @@ public interface DifyDatasetClient {
     DifyPageResult<DatasetResponse> page(DatasetPageRequest request);
 
     /**
+     * info
+     *
+     * @param request request parameters
+     * @return dataset data
+     */
+    DatasetInfoResponse info(DatasetInfoRequest request);
+
+    /**
+     * update
+     *
+     * @param request request parameters
+     * @return dataset data
+     */
+    DatasetInfoResponse update(DatasetUpdateRequest request);
+
+    /**
      * Deletes a dataset
      *
      * @param datasetId The ID of the dataset to delete

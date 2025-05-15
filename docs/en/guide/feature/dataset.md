@@ -110,7 +110,76 @@ DatasetPageRequest
 
 DatasetResponse See 1.1
 
-### 1.3 Delete Knowledge Base
+### 1.3 Knowledge Base Details
+
+#### Method
+
+```java
+DatasetInfoResponse info(DatasetInfoRequest request);
+```
+
+#### Request Parameters
+
+DatasetInfoRequest
+
+| Parameter | Type   | Required | Description       |
+|-----------|--------|----------|-------------------|
+| datasetId | String | Yes      | Knowledge base ID |
+
+#### Response Parameters
+
+DatasetInfoResponse
+
+| Parameter              | Type                  | Description                    |
+|------------------------|-----------------------|--------------------------------|
+| id                     | String                | Knowledge base ID              |
+| name                   | String                | Knowledge base name            |
+| description            | String                | Knowledge base description     |
+| permission             | PermissionEnum        | Permission                     |
+| dataSourceType         | String                | Data source type               |
+| indexingTechnique      | IndexingTechniqueEnum | Indexing technique             |
+| appCount               | Integer               | Application count              |
+| documentCount          | Integer               | Document count                 |
+| wordCount              | Integer               | Word count                     |
+| createdBy              | String                | Created by                     |
+| createdAt              | Long                  | Creation timestamp             |
+| updatedBy              | String                | Updated by                     |
+| updatedAt              | Long                  | Update timestamp               |
+| embeddingModel         | String                | Embedding model                |
+| embeddingModelProvider | String                | Embedding model provider       |
+| embeddingAvailable     | Boolean               | Whether embedding is available |
+| retrievalModelDict     | RetrievalModel        | Retrieval model dictionary     |
+| tags                   | `List<String>`        | Tag list                       |
+| docForm                | DocFormEnum           | Document form                  |
+| externalKnowledgeInfo  | ExternalKnowledgeInfo | External knowledge info        |
+
+### 1.4 Update Knowledge Base
+
+#### Method
+
+```java
+DatasetInfoResponse update(DatasetUpdateRequest request);
+```
+
+#### Request Parameters
+
+DatasetUpdateRequest
+
+| Parameter              | Type                  | Required | Description              |
+|------------------------|-----------------------|----------|--------------------------|
+| datasetId              | String                | Yes      | Knowledge base ID        |
+| indexingTechnique      | IndexingTechniqueEnum | No       | Indexing mode            |
+| permission             | PermissionEnum        | No       | Permission               |
+| retrievalModel         | RetrievalModel        | No       | Retrieval model          |
+| embeddingModel         | String                | No       | Embedding model          |
+| embeddingModelProvider | String                | No       | Embedding model provider |
+| partialMemberList      | `List<String>`        | No       | Partial member list      |
+
+#### Response Parameters
+
+DatasetInfoResponse See 1.3
+
+### 1.5 Delete Knowledge Base
 
 #### Method
 

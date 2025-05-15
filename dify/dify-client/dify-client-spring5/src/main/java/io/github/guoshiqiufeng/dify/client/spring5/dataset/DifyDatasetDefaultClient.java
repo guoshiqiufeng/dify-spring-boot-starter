@@ -73,12 +73,49 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
     public DifyPageResult<DatasetResponse> page(DatasetPageRequest request) {
         Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
         return webClient.get()
-                .uri(DatasetUriConstant.V1_DATASETS_URL + "?page={page}&limit={limit}", request.getPage(), request.getLimit())
+                .uri(uri ->
+                        uri.path(DatasetUriConstant.V1_DATASETS_URL)
+                                .queryParam("page", request.getPage())
+                                .queryParam("limit", request.getLimit())
+                                .queryParamIfPresent("tag_ids", Optional.ofNullable(request.getTagIds()).filter(m -> !m.isEmpty()))
+                                .queryParamIfPresent("keyword", Optional.ofNullable(request.getKeyword()).filter(m -> !m.isEmpty()))
+                                .queryParamIfPresent("include_all", Optional.ofNullable(request.getIncludeAll()).filter(m -> !m))
+                                .build()
+                )
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request).accept(h))
                 .retrieve()
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(new ParameterizedTypeReference<DifyPageResult<DatasetResponse>>() {
                 }).block();
+    }
+
+    @Override
+    public DatasetInfoResponse info(DatasetInfoRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        return webClient.get()
+                .uri(uri ->
+                        uri.path(DatasetUriConstant.V1_DATASET_URL)
+                                .build(request.getDatasetId())
+                )
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request).accept(h))
+                .retrieve()
+                .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(DatasetInfoResponse.class).block();
+    }
+
+    @Override
+    public DatasetInfoResponse update(DatasetUpdateRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        return webClient.patch()
+                .uri(uri ->
+                        uri.path(DatasetUriConstant.V1_DATASET_URL)
+                                .build(request.getDatasetId())
+                )
+                .bodyValue(request)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request).accept(h))
+                .retrieve()
+                .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(DatasetInfoResponse.class).block();
     }
 
 

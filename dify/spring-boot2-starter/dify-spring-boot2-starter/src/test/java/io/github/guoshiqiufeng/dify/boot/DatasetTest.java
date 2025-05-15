@@ -22,10 +22,7 @@ import io.github.guoshiqiufeng.dify.dataset.dto.RetrievalModel;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.*;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.document.*;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.*;
-import io.github.guoshiqiufeng.dify.dataset.enums.IndexingTechniqueEnum;
-import io.github.guoshiqiufeng.dify.dataset.enums.MetaDataActionEnum;
-import io.github.guoshiqiufeng.dify.dataset.enums.RerankingModeEnum;
-import io.github.guoshiqiufeng.dify.dataset.enums.SearchMethodEnum;
+import io.github.guoshiqiufeng.dify.dataset.enums.*;
 import io.github.guoshiqiufeng.dify.dataset.enums.document.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
@@ -88,6 +85,19 @@ public class DatasetTest extends BaseDatasetContainerTest {
         DifyPageResult<DatasetResponse> pageResult = difyDataset.page(pageRequest);
         assertNotNull(pageResult);
         log.info("Dataset page: {}", JSONUtil.toJsonStr(pageResult));
+
+        DatasetInfoRequest datasetInfoRequest = new DatasetInfoRequest();
+        datasetInfoRequest.setDatasetId(datasetId);
+        DatasetInfoResponse info = difyDataset.info(datasetInfoRequest);
+        assertNotNull(info);
+        log.info("Dataset info: {}", JSONUtil.toJsonStr(info));
+
+        DatasetUpdateRequest updateRequest = new DatasetUpdateRequest();
+        updateRequest.setDatasetId(datasetId);
+        updateRequest.setPermission(PermissionEnum.ALL_TEAM_MEMBERS);
+        DatasetInfoResponse update = difyDataset.update(updateRequest);
+        assertNotNull(update);
+        log.info("Dataset update: {}", JSONUtil.toJsonStr(update));
     }
 
     @Test
