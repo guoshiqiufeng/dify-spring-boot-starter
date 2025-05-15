@@ -134,6 +134,9 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         request.setApiKey(apiKey);
         request.setPage(page);
         request.setLimit(limit);
+        request.setTagIds(null);
+        request.setKeyword(null);
+        request.setIncludeAll(false);
 
         // Create expected response
         DifyPageResult<DatasetResponse> expectedResponse = new DifyPageResult<>();
@@ -180,6 +183,18 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         String apiKey = "test-api-key";
         String datasetId = "dataset-123456";
 
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build(anyString())).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
+
         // Create request
         DatasetInfoRequest request = new DatasetInfoRequest();
         request.setApiKey(apiKey);
@@ -224,6 +239,18 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         String datasetId = "dataset-123456";
         String updatedName = "Updated Dataset Name";
         String updatedDescription = "This is an updated description";
+
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build(anyString())).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
 
         // Create request
         DatasetUpdateRequest request = new DatasetUpdateRequest();

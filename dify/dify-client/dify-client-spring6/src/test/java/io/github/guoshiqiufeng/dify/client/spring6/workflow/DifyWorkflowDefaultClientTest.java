@@ -33,12 +33,11 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Flux;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.net.URI;
+import java.util.*;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -272,6 +271,24 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         request.setLimit(20);
         request.setStatus("all");
         request.setKeyword("test");
+
+        // We need to mock the UriBuilder for the queryParam functionality
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+
+        when(requestHeadersUriSpec.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("page"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("limit"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("status"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("keyword"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build()).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpec;
+        });
 
         // Call the method to test
         DifyPageResult<WorkflowLogs> response = client.logs(request);

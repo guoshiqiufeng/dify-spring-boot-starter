@@ -47,6 +47,7 @@ import java.util.function.Function;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
@@ -179,6 +180,9 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         request.setApiKey("test-api-key");
         request.setPage(1);
         request.setLimit(10);
+        request.setTagIds(null);
+        request.setKeyword(null);
+        request.setIncludeAll(false);
 
         // Call the method to test
         DifyPageResult<DatasetResponse> response = client.page(request);
@@ -205,6 +209,18 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
         RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
         RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
+
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+        when(requestHeadersUriSpec.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build(anyString())).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpec;
+        });
 
         // Prepare test data
         String apiKey = "test-api-key";
@@ -253,6 +269,18 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         RestClient.RequestBodySpec requestBodySpec = restClientMock.getRequestBodySpec();
         RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
         RestClient.RequestBodyUriSpec requestBodyUriSpec = restClientMock.getRequestBodyUriSpec();
+
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+        when(requestHeadersUriSpec.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build(anyString())).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpec;
+        });
 
         // Prepare test data
         String apiKey = "test-api-key";
