@@ -19,6 +19,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author yanghq
@@ -38,4 +39,10 @@ public class DatasetPageRequest extends BaseDatasetRequest implements Serializab
      * 返回条数，默认 20，范围 1-100
      */
     private Integer limit = 20;
+
+    private String keyword;
+
+    private List<String> tagIds;
+
+    private Boolean includeAll;
 }

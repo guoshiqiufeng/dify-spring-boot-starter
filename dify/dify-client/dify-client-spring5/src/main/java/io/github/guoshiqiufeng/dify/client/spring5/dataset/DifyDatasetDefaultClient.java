@@ -73,7 +73,15 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
     public DifyPageResult<DatasetResponse> page(DatasetPageRequest request) {
         Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
         return webClient.get()
-                .uri(DatasetUriConstant.V1_DATASETS_URL + "?page={page}&limit={limit}", request.getPage(), request.getLimit())
+                .uri(uri ->
+                        uri.path(DatasetUriConstant.V1_DATASETS_URL)
+                                .queryParam("page", request.getPage())
+                                .queryParam("limit", request.getLimit())
+                                .queryParamIfPresent("tag_ids", Optional.ofNullable(request.getTagIds()).filter(m -> !m.isEmpty()))
+                                .queryParamIfPresent("keyword", Optional.ofNullable(request.getKeyword()).filter(m -> !m.isEmpty()))
+                                .queryParamIfPresent("include_all", Optional.ofNullable(request.getIncludeAll()).filter(m -> !m))
+                                .build()
+                )
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request).accept(h))
                 .retrieve()
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
