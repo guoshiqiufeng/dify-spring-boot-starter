@@ -134,8 +134,8 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         request.setApiKey(apiKey);
         request.setPage(page);
         request.setLimit(limit);
-        request.setTagIds(null);
-        request.setKeyword(null);
+        request.setTagIds(List.of("123456"));
+        request.setKeyword("search-keyword");
         request.setIncludeAll(false);
 
         // Create expected response
@@ -242,14 +242,14 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
 
         UriBuilder uriBuilderMock = mock(UriBuilder.class);
         URI uriMock = mock(URI.class);
-        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+        when(requestBodyUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
             Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
 
             when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
             when(uriBuilderMock.build(anyString())).thenReturn(uriMock);
 
             uriFunction.apply(uriBuilderMock);
-            return requestHeadersSpecMock;
+            return requestBodySpecMock;
         });
 
         // Create request

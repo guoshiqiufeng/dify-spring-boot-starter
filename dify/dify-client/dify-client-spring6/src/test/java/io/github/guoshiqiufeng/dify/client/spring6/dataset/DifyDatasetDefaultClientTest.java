@@ -180,8 +180,8 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         request.setApiKey("test-api-key");
         request.setPage(1);
         request.setLimit(10);
-        request.setTagIds(null);
-        request.setKeyword(null);
+        request.setTagIds(List.of("123456"));
+        request.setKeyword("search-keyword");
         request.setIncludeAll(false);
 
         // Call the method to test
@@ -272,14 +272,14 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
 
         UriBuilder uriBuilderMock = mock(UriBuilder.class);
         URI uriMock = mock(URI.class);
-        when(requestHeadersUriSpec.uri(any(Function.class))).thenAnswer(invocation -> {
+        when(requestBodyUriSpec.uri(any(Function.class))).thenAnswer(invocation -> {
             Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
 
             when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
             when(uriBuilderMock.build(anyString())).thenReturn(uriMock);
 
             uriFunction.apply(uriBuilderMock);
-            return requestHeadersSpec;
+            return requestBodySpec;
         });
 
         // Prepare test data
