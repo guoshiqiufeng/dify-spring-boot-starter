@@ -26,6 +26,7 @@ import io.github.guoshiqiufeng.dify.dataset.dto.response.textembedding.TextEmbed
 import io.github.guoshiqiufeng.dify.dataset.dto.response.textembedding.TextEmbeddingIcon;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.textembedding.TextEmbeddingLabel;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.textembedding.TextEmbeddingModel;
+import io.github.guoshiqiufeng.dify.dataset.enums.IndexingTechniqueEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.MetaDataActionEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.SearchMethodEnum;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,10 +34,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -107,6 +112,22 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         String apiKey = "test-api-key";
         int page = 1;
         int limit = 10;
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("page"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("limit"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("tag_ids"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("keyword"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("include_all"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build()).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
 
         // Create request
         DatasetPageRequest request = new DatasetPageRequest();
@@ -151,6 +172,96 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(webClientMock).get();
         verify(responseSpecMock).bodyToMono(any(ParameterizedTypeReference.class));
+    }
+
+    @Test
+    public void testInfo() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String datasetId = "dataset-123456";
+
+        // Create request
+        DatasetInfoRequest request = new DatasetInfoRequest();
+        request.setApiKey(apiKey);
+        request.setDatasetId(datasetId);
+
+        // Create expected response
+        DatasetInfoResponse expectedResponse = new DatasetInfoResponse();
+        expectedResponse.setId(datasetId);
+        expectedResponse.setName("Test Dataset");
+        expectedResponse.setDescription("This is a test dataset");
+        expectedResponse.setCreatedAt(1650000000L);
+        expectedResponse.setUpdatedAt(1650000100L);
+        expectedResponse.setIndexingTechnique(IndexingTechniqueEnum.HIGH_QUALITY);
+        expectedResponse.setDocumentCount(10);
+        expectedResponse.setWordCount(5000);
+
+        // Set up the response mock to return our expected response
+        when(responseSpecMock.bodyToMono(DatasetInfoResponse.class)).thenReturn(Mono.just(expectedResponse));
+
+        // Execute the method
+        DatasetInfoResponse actualResponse = difyDatasetDefaultClient.info(request);
+
+        // Verify the result
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getName(), actualResponse.getName());
+        assertEquals(expectedResponse.getDescription(), actualResponse.getDescription());
+        assertEquals(expectedResponse.getCreatedAt(), actualResponse.getCreatedAt());
+        assertEquals(expectedResponse.getUpdatedAt(), actualResponse.getUpdatedAt());
+        assertEquals(expectedResponse.getIndexingTechnique(), actualResponse.getIndexingTechnique());
+        assertEquals(expectedResponse.getDocumentCount(), actualResponse.getDocumentCount());
+        assertEquals(expectedResponse.getWordCount(), actualResponse.getWordCount());
+
+        // Verify WebClient interactions
+        verify(webClientMock).get();
+        verify(responseSpecMock).bodyToMono(DatasetInfoResponse.class);
+    }
+
+    @Test
+    public void testUpdate() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String datasetId = "dataset-123456";
+        String updatedName = "Updated Dataset Name";
+        String updatedDescription = "This is an updated description";
+
+        // Create request
+        DatasetUpdateRequest request = new DatasetUpdateRequest();
+        request.setApiKey(apiKey);
+        request.setDatasetId(datasetId);
+
+        // Create expected response
+        DatasetInfoResponse expectedResponse = new DatasetInfoResponse();
+        expectedResponse.setId(datasetId);
+        expectedResponse.setName(updatedName);
+        expectedResponse.setDescription(updatedDescription);
+        expectedResponse.setCreatedAt(1650000000L);
+        expectedResponse.setUpdatedAt(1650100000L);
+        expectedResponse.setIndexingTechnique(IndexingTechniqueEnum.HIGH_QUALITY);
+        expectedResponse.setDocumentCount(10);
+        expectedResponse.setWordCount(5000);
+
+        // Set up the response mock to return our expected response
+        when(responseSpecMock.bodyToMono(DatasetInfoResponse.class)).thenReturn(Mono.just(expectedResponse));
+
+        // Execute the method
+        DatasetInfoResponse actualResponse = difyDatasetDefaultClient.update(request);
+
+        // Verify the result
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getName(), actualResponse.getName());
+        assertEquals(expectedResponse.getDescription(), actualResponse.getDescription());
+        assertEquals(expectedResponse.getCreatedAt(), actualResponse.getCreatedAt());
+        assertEquals(expectedResponse.getUpdatedAt(), actualResponse.getUpdatedAt());
+        assertEquals(expectedResponse.getIndexingTechnique(), actualResponse.getIndexingTechnique());
+        assertEquals(expectedResponse.getDocumentCount(), actualResponse.getDocumentCount());
+        assertEquals(expectedResponse.getWordCount(), actualResponse.getWordCount());
+
+        // Verify WebClient interactions
+        verify(webClientMock).patch();
+        verify(requestBodyUriSpecMock).uri(any(Function.class));
+        verify(requestBodySpecMock).bodyValue(request);
+        verify(responseSpecMock).bodyToMono(DatasetInfoResponse.class);
     }
 
     @Test

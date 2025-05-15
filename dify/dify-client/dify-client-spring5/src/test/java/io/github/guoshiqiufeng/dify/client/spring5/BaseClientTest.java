@@ -69,6 +69,7 @@ public abstract class BaseClientTest {
         when(requestBodyUriSpecMock.uri(anyString())).thenReturn(requestBodySpecMock);
         when(requestBodyUriSpecMock.uri(anyString(), any(Object[].class))).thenReturn(requestBodySpecMock);
         when(requestBodyUriSpecMock.uri(anyString(), any(Object.class))).thenReturn(requestBodySpecMock);
+        when(requestBodyUriSpecMock.uri(any(Function.class))).thenReturn(requestBodySpecMock);
         // Handle header method properly
         when(requestBodySpecMock.header(anyString(), any(String[].class))).thenReturn(requestBodySpecMock);
         when(requestBodySpecMock.header(anyString(), anyString())).thenReturn(requestBodySpecMock);
