@@ -107,7 +107,76 @@ DatasetPageRequest
 
 DatasetResponse 查看 1.1
 
-### 1.3 删除知识库
+### 1.3 知识库详情
+
+#### 方法
+
+```java
+DatasetInfoResponse info(DatasetInfoRequest request);
+```
+
+#### 请求参数
+
+DatasetInfoRequest
+
+| 参数名       | 类型     | 是否必须 | 描述     |
+|-----------|--------|------|--------|
+| datasetId | String | 是    | 知识库 id |
+
+#### 响应参数
+
+DatasetInfoResponse
+
+| 参数名                    | 类型                    | 描述     |
+|------------------------|-----------------------|--------|
+| id                      | String                | 知识库 id |
+| name                    | String                | 知识库名称  |
+| description             | String                | 知识库描述  |
+| permission              | PermissionEnum        | 权限     |
+| dataSourceType          | String                | 数据源类型  |
+| indexingTechnique       | IndexingTechniqueEnum | 索引技术   |
+| appCount                | Integer               | 应用数量   |
+| documentCount           | Integer               | 文档数量   |
+| wordCount               | Integer               | 单词数量   |
+| createdBy               | String                | 创建人    |
+| createdAt               | Long                  | 创建时间戳  |
+| updatedBy               | String                | 更新人    |
+| updatedAt               | Long                  | 更新时间戳  |
+| embeddingModel          | String                | 嵌入模型   |
+| embeddingModelProvider  | String                | 嵌入模型提供商 |
+| embeddingAvailable      | Boolean               | 嵌入模型是否可用 |
+| retrievalModelDict      | RetrievalModel        | 检索模型字典 |
+| tags                    | `List<String>`        | 标签列表   |
+| docForm                 | DocFormEnum           | 文档形式   |
+| externalKnowledgeInfo   | ExternalKnowledgeInfo | 外部知识信息 |
+
+### 1.4 修改知识库
+
+#### 方法
+
+```java
+DatasetInfoResponse update(DatasetUpdateRequest request);
+```
+
+#### 请求参数
+
+DatasetUpdateRequest
+
+| 参数名                    | 类型                    | 是否必须 | 描述     |
+|------------------------|-----------------------|------|--------|
+| datasetId              | String                | 是    | 知识库 id |
+| indexingTechnique      | IndexingTechniqueEnum | 否    | 索引模式  |
+| permission             | PermissionEnum        | 否    | 权限     |
+| retrievalModel         | RetrievalModel        | 否    | 检索模型  |
+| embeddingModel         | String                | 否    | 嵌入模型  |
+| embeddingModelProvider | String                | 否    | 嵌入模型提供商 |
+| partialMemberList      | `List<String>`        | 否    | 部分成员列表 |
+
+#### 响应参数
+
+DatasetInfoResponse 查看 1.3
+
+### 1.5 删除知识库
 
 #### 方法
 
