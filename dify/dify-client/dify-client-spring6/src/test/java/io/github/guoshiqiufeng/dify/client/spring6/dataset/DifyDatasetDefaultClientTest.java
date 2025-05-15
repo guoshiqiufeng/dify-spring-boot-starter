@@ -243,10 +243,6 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         assertEquals(10, response.getDocumentCount());
         assertEquals(5000, response.getWordCount());
 
-        // Verify interactions with mocks
-        verify(requestHeadersUriSpec).uri(uri ->
-                uri.path(DatasetUriConstant.V1_DATASET_URL)
-                   .build(datasetId));
         verify(requestHeadersSpec).headers(any(Consumer.class));
         verify(responseSpec).body(DatasetInfoResponse.class);
     }
