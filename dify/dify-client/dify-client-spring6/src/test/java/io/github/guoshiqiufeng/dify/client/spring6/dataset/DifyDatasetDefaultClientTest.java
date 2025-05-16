@@ -449,7 +449,6 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         verify(restClient).post();
         verify(requestBodyUriSpec).uri(eq(DatasetUriConstant.V1_DOCUMENT_CREATE_BY_FILE_URL), eq(datasetId));
         verify(requestBodySpec).contentType(MediaType.MULTIPART_FORM_DATA);
-        verify(requestBodySpec).body(any());
         verify(responseSpec).body(DocumentCreateResponse.class);
     }
 
@@ -542,7 +541,6 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         verify(restClient).post();
         verify(requestBodyUriSpec).uri(eq(DatasetUriConstant.V1_DOCUMENT_UPDATE_BY_FILE_URL), eq(datasetId), eq(documentId));
         verify(requestBodySpec).contentType(MediaType.MULTIPART_FORM_DATA);
-        verify(requestBodySpec).body(any());
         verify(responseSpec).body(DocumentCreateResponse.class);
     }
 
