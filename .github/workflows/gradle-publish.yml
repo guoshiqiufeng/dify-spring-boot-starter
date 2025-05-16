@@ -43,7 +43,9 @@ jobs:
           echo "signing.keyId=${{secrets.SIGNING_KEYID}}" >> ~/.gradle/gradle.properties
           echo "signing.password=${{secrets.SIGNING_PASSWORD}}" >> ~/.gradle/gradle.properties
           echo "signing.secretKeyRingFile=$(echo ~/.gradle/secring.gpg)" >> ~/.gradle/gradle.properties
-
+          # SONATYPE_TOKEN = storedUsername:storedPassword base64 编码
+          SONATYPE_TOKEN=$(echo -n "${{secrets.STORED_USERNAME}}:${{secrets.STORED_PASSWORD}}" | base64)
+          echo "SONATYPE_TOKEN=${SONATYPE_TOKEN}" >> $GITHUB_ENV
       # 构建项目
       #- name: Build with Gradle
       #  run: ./gradlew build
@@ -54,7 +56,82 @@ jobs:
           echo "${{secrets.SIGNING_SECRETKEYRINGFILE}}" > ~/.gradle/secring.gpg.b64
           base64 -d ~/.gradle/secring.gpg.b64 > ~/.gradle/secring.gpg
 
-      # 发布项目
-      - name: Publish
+      # 获取版本号
+      - name: Get Version
         run: |
-          gradle publish publishToMavenCentralPortal -x test
+          APP_VERSION=$(grep "APP_VERSION" gradle.properties | cut -d'=' -f2)
+          echo "获取到版本号: $APP_VERSION"
+          echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
+
+      # 发布项目
+      - name: Build
+        run: |
+          gradle clean build publishMavenJavaPublicationToLocalRepository -x test
+
+      # 遍历 dify 目录下build 文件夹下 找到 所有 repos/bundles 文件夹，聚合所有 文件夹，并压缩
+      - name: Zip Bundles
+        run: |
+          echo "开始收集构建产物..."
+          mkdir -p bundle_temp
+          
+          find_result=$(find . -path "*/build/repos/bundles" -type d)
+          if [ -z "$find_result" ]; then
+            echo "警告: 未找到任何 build/repos/bundles 目录"
+            exit 1
+          fi
+          
+          find . -path "*/build/repos/bundles" -type d | while read dir; do
+            echo "复制目录: $dir"
+            cp -r "$dir/"* bundle_temp/
+          done
+          
+          timestamp=$(date +%Y%m%d%H%M%S)
+          zip_file="bundles-$timestamp.zip"
+          echo "创建压缩包: $zip_file"
+          
+          cd bundle_temp
+          zip -r "../$zip_file" .
+          cd ..
+          
+          echo "BUNDLE_ZIP=$zip_file" >> $GITHUB_ENV
+          echo "压缩完成: $(ls -lh $zip_file | awk '{print $5}')"
+          
+          rm -rf bundle_temp
+
+      - name: Upload Bundles
+        run: |
+          echo "开始上传压缩包: ${{ env.BUNDLE_ZIP }}"
+          echo "使用版本号: ${{ env.APP_VERSION }}"
+          # 上传压缩包
+          http_response=$(curl -v -X 'POST' \
+            "https://central.sonatype.com/api/v1/publisher/upload?name=dify-${{ env.APP_VERSION }}&publishingType=USER_MANAGED" \
+            -H 'accept: text/plain' \
+            -H 'Content-Type: multipart/form-data' \
+            -H "Authorization: Bearer ${{ env.SONATYPE_TOKEN }}" \
+            -F "bundle=@${{ env.BUNDLE_ZIP }}" \
+            -w "\n%{http_code}" \
+            -o response_body.txt)
+          
+          upload_status=$?
+          http_code=$(echo "$http_response" | tail -n1)
+          response_body=$(cat response_body.txt)
+          
+          echo "HTTP 状态码: $http_code"
+          echo "响应内容:"
+          echo "$response_body"
+          
+          if [ $upload_status -eq 0 ] && [ "$http_code" -lt 400 ]; then
+            echo "上传成功"
+          else
+            echo "上传失败"
+            echo "curl 状态码: $upload_status"
+            echo "HTTP 状态码: $http_code"
+            if [ ! -z "$response_body" ]; then
+              echo "错误信息: $response_body"
+            else
+              echo "服务器未返回错误详情"
+            fi
+            exit 1
+          fi
+
+
