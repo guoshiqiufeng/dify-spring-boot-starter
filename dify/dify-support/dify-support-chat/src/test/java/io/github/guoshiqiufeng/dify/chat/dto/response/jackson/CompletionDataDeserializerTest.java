@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.chat.dto.response.jackson;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import io.github.guoshiqiufeng.dify.chat.dto.response.message.CompletionData;
@@ -99,6 +100,21 @@ public class CompletionDataDeserializerTest {
         WorkflowStartedData workflowData = (WorkflowStartedData) data;
         Assertions.assertEquals("workflow-123", workflowData.getId());
         Assertions.assertEquals(1681556000000L, workflowData.getCreatedAt());
+    }
+
+    @Test
+    public void testDeserializeWithInvalidEventType() throws JsonProcessingException {
+        // Prepare test JSON with invalid event type
+        String json = "{\n" +
+                "  \"event\": \"invalid_event_type\",\n" +
+                "  \"id\": \"test-id-123\"\n" +
+                "}";
+
+        // Register the module with our custom deserializer
+        objectMapper.registerModule(new CompletionDataModule());
+
+        objectMapper.readValue(json, CompletionData.class);
+
     }
 
     @Test

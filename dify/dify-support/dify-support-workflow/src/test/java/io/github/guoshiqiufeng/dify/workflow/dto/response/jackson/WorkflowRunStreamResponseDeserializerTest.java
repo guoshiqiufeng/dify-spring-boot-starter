@@ -161,6 +161,22 @@ public final class WorkflowRunStreamResponseDeserializerTest {
     }
 
     @Test
+    public void testDeserializeWithInvalidEventType() throws JsonProcessingException {
+        // Prepare test JSON with invalid event type
+        String json = "{\n" +
+                "  \"event\": \"invalid_event_type\",\n" +
+                "  \"workflow_run_id\": \"wfr-123456\",\n" +
+                "  \"task_id\": \"task-123456\",\n" +
+                "  \"data\": {}\n" +
+                "}";
+
+        // Register custom deserializer module
+        objectMapper.registerModule(new WorkflowRunStreamResponseModule());
+
+        objectMapper.readValue(json, WorkflowRunStreamResponse.class);
+    }
+
+    @Test
     public void testDeserializeWithMissingEventField() throws JsonProcessingException {
         // Prepare test JSON without event field
         String json = "{\n" +
