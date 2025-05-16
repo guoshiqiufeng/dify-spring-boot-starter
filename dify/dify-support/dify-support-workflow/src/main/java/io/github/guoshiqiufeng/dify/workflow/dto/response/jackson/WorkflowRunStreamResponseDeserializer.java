@@ -47,13 +47,21 @@ public class WorkflowRunStreamResponseDeserializer
         if (eventNode == null || !eventNode.isTextual()) {
             return null;
         }
-        StreamEventEnum event = StreamEventEnum.valueOf(eventNode.asText());
+        StreamEventEnum event;
+        Class<?> dataClass;
+        try {
+            event = StreamEventEnum.valueOf(eventNode.asText());
+            dataClass = event.getClazz();
+        } catch (IllegalArgumentException e) {
+            // 如果找不到枚举值，使用默认的Map类型
+            event = null;
+            dataClass = Map.class;
+        }
 
         // 解析 data 字段
         JsonNode dataNode = root.get("data");
         Object data = null;
         if (dataNode != null && !dataNode.isNull()) {
-            Class<?> dataClass = event.getClazz();
             if (dataClass == Map.class) {
                 // 处理 Map 类型
                 data = mapper.convertValue(dataNode, new TypeReference<Map<String, Object>>() {
