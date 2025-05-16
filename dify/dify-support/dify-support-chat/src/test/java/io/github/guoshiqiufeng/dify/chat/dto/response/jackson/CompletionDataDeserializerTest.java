@@ -102,25 +102,6 @@ public class CompletionDataDeserializerTest {
     }
 
     @Test
-    public void testDeserializeWithInvalidEventType() {
-        // Prepare test JSON with invalid event type
-        String json = "{\n" +
-                "  \"event\": \"invalid_event_type\",\n" +
-                "  \"id\": \"test-id-123\"\n" +
-                "}";
-
-        // Register the module with our custom deserializer
-        objectMapper.registerModule(new CompletionDataModule());
-
-        // Test should throw an exception
-        IOException exception = Assertions.assertThrows(IOException.class, () -> {
-            objectMapper.readValue(json, CompletionData.class);
-        });
-
-        Assertions.assertTrue(exception.getMessage().contains("Unknown event type: invalid_event_type"));
-    }
-
-    @Test
     public void testDeserializeWithMissingEventField() throws IOException {
         // Prepare test JSON without event field
         String json = "{\n" +

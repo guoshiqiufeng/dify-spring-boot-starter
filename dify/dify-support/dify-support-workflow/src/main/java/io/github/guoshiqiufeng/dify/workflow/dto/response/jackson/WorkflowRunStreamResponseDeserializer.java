@@ -53,9 +53,7 @@ public class WorkflowRunStreamResponseDeserializer
             event = StreamEventEnum.valueOf(eventNode.asText());
             dataClass = event.getClazz();
         } catch (IllegalArgumentException e) {
-            // 如果找不到枚举值，使用默认的Map类型
-            event = null;
-            dataClass = Map.class;
+            return null;
         }
 
         // 解析 data 字段
