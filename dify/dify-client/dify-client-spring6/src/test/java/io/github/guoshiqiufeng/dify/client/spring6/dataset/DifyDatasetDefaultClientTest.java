@@ -34,8 +34,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriBuilder;
+import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -399,6 +402,151 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
     }
 
     @Test
+    public void testCreateDocumentByFile() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String datasetId = "dataset-123456";
+        String fileName = "test-document.pdf";
+        String fileContent = "Test file content";
+
+        // Create mock file
+        MultipartFile mockFile = mock(MultipartFile.class);
+        when(mockFile.getOriginalFilename()).thenReturn(fileName);
+        when(mockFile.getContentType()).thenReturn("application/pdf");
+        try {
+            when(mockFile.getBytes()).thenReturn(fileContent.getBytes());
+            when(mockFile.getInputStream()).thenReturn(new java.io.ByteArrayInputStream(fileContent.getBytes()));
+        } catch (java.io.IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Create request
+        DocumentCreateByFileRequest request = new DocumentCreateByFileRequest();
+        request.setApiKey(apiKey);
+        request.setDatasetId(datasetId);
+        request.setFile(mockFile);
+
+        // Create expected response
+        DocumentCreateResponse expectedResponse = new DocumentCreateResponse();
+        DocumentInfo documentInfo = new DocumentInfo();
+        documentInfo.setId("document-123456");
+        documentInfo.setName(fileName);
+        expectedResponse.setDocument(documentInfo);
+        expectedResponse.setBatch("batch-123456");
+
+        // Set up the response mock to return our expected response
+        when(responseSpec.body(DocumentCreateResponse.class)).thenReturn(expectedResponse);
+
+        // Execute the method
+        DocumentCreateResponse actualResponse = client.createDocumentByFile(request);
+
+        // Verify the result
+        assertEquals(expectedResponse.getDocument().getId(), actualResponse.getDocument().getId());
+        assertEquals(expectedResponse.getDocument().getName(), actualResponse.getDocument().getName());
+        assertEquals(expectedResponse.getBatch(), actualResponse.getBatch());
+
+        // Verify WebClient interactions
+        verify(restClient).post();
+        verify(requestBodyUriSpec).uri(eq(DatasetUriConstant.V1_DOCUMENT_CREATE_BY_FILE_URL), eq(datasetId));
+        verify(requestBodySpec).contentType(MediaType.MULTIPART_FORM_DATA);
+        verify(requestBodySpec).body(any());
+        verify(responseSpec).body(DocumentCreateResponse.class);
+    }
+
+    @Test
+    public void testUpdateDocumentByText() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String datasetId = "dataset-123456";
+        String documentId = "document-123456";
+        String content = "Updated document content";
+
+        // Create request
+        DocumentUpdateByTextRequest request = new DocumentUpdateByTextRequest();
+        request.setApiKey(apiKey);
+        request.setDatasetId(datasetId);
+        request.setDocumentId(documentId);
+        request.setText(content);
+
+        // Create expected response
+        DocumentCreateResponse expectedResponse = new DocumentCreateResponse();
+        DocumentInfo documentInfo = new DocumentInfo();
+        documentInfo.setId(documentId);
+        expectedResponse.setDocument(documentInfo);
+        expectedResponse.setBatch("batch-update-123456");
+
+        // Set up the response mock to return our expected response
+        when(responseSpec.body(DocumentCreateResponse.class)).thenReturn(expectedResponse);
+
+        // Execute the method
+        DocumentCreateResponse actualResponse = client.updateDocumentByText(request);
+
+        // Verify the result
+        assertEquals(expectedResponse.getDocument().getId(), actualResponse.getDocument().getId());
+        assertEquals(expectedResponse.getBatch(), actualResponse.getBatch());
+
+        // Verify WebClient interactions
+        verify(restClient).post();
+        verify(requestBodyUriSpec).uri(eq(DatasetUriConstant.V1_DOCUMENT_UPDATE_BY_TEXT_URL), eq(datasetId), eq(documentId));
+        verify(requestBodySpec).body(request);
+        verify(responseSpec).body(DocumentCreateResponse.class);
+    }
+
+    @Test
+    public void testUpdateDocumentByFile() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String datasetId = "dataset-123456";
+        String documentId = "document-123456";
+        String fileName = "updated-document.pdf";
+        String fileContent = "Updated file content";
+
+        // Create mock file
+        MultipartFile mockFile = mock(MultipartFile.class);
+        when(mockFile.getOriginalFilename()).thenReturn(fileName);
+        when(mockFile.getContentType()).thenReturn("application/pdf");
+        try {
+            when(mockFile.getBytes()).thenReturn(fileContent.getBytes());
+            when(mockFile.getInputStream()).thenReturn(new java.io.ByteArrayInputStream(fileContent.getBytes()));
+        } catch (java.io.IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Create request
+        DocumentUpdateByFileRequest request = new DocumentUpdateByFileRequest();
+        request.setApiKey(apiKey);
+        request.setDatasetId(datasetId);
+        request.setDocumentId(documentId);
+        request.setFile(mockFile);
+
+        // Create expected response
+        DocumentCreateResponse expectedResponse = new DocumentCreateResponse();
+        DocumentInfo documentInfo = new DocumentInfo();
+        documentInfo.setId(documentId);
+        documentInfo.setName(fileName);
+        expectedResponse.setDocument(documentInfo);
+        expectedResponse.setBatch("batch-update-123456");
+
+        // Set up the response mock to return our expected response
+        when(responseSpec.body(DocumentCreateResponse.class)).thenReturn(expectedResponse);
+
+        // Execute the method
+        DocumentCreateResponse actualResponse = client.updateDocumentByFile(request);
+
+        // Verify the result
+        assertEquals(expectedResponse.getDocument().getId(), actualResponse.getDocument().getId());
+        assertEquals(expectedResponse.getDocument().getName(), actualResponse.getDocument().getName());
+        assertEquals(expectedResponse.getBatch(), actualResponse.getBatch());
+
+        // Verify WebClient interactions
+        verify(restClient).post();
+        verify(requestBodyUriSpec).uri(eq(DatasetUriConstant.V1_DOCUMENT_UPDATE_BY_FILE_URL), eq(datasetId), eq(documentId));
+        verify(requestBodySpec).contentType(MediaType.MULTIPART_FORM_DATA);
+        verify(requestBodySpec).body(any());
+        verify(responseSpec).body(DocumentCreateResponse.class);
+    }
+
+    @Test
     @DisplayName("Test page documents method")
     public void testPageDocument() {
         RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
@@ -715,6 +863,22 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         String documentId = "document-123456";
         String keyword = "test";
         String status = "active";
+
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+        when(requestHeadersUriSpec.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("page"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("limit"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("keyword"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("status"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build()).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpec;
+        });
 
         // Create request
         SegmentPageRequest request = new SegmentPageRequest();
