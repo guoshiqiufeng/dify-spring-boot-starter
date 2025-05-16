@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.guoshiqiufeng.dify.chat.dto.response.message.CompletionData;
 import io.github.guoshiqiufeng.dify.chat.enums.StreamEventEnum;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
@@ -31,6 +32,7 @@ import java.io.IOException;
  * @version 1.0
  * @since 2025/4/15 19:16
  */
+@Slf4j
 public class CompletionDataDeserializer
         extends JsonDeserializer<CompletionData> {
 
@@ -56,7 +58,8 @@ public class CompletionDataDeserializer
 
             return mapper.treeToValue(rootCopy, dataClass);
         } catch (IllegalArgumentException e) {
-            throw new IOException("Unknown event type: " + eventNode.asText(), e);
+            log.warn("Unknown event type: {}", eventNode.asText());
+            return null;
         }
     }
 }

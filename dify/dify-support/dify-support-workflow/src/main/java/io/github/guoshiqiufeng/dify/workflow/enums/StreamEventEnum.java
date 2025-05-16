@@ -15,10 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.workflow.enums;
 
-import io.github.guoshiqiufeng.dify.workflow.dto.response.stream.NodeFinishedData;
-import io.github.guoshiqiufeng.dify.workflow.dto.response.stream.NodeStartedData;
-import io.github.guoshiqiufeng.dify.workflow.dto.response.stream.WorkflowFinishedData;
-import io.github.guoshiqiufeng.dify.workflow.dto.response.stream.WorkflowStartedData;
+import io.github.guoshiqiufeng.dify.workflow.dto.response.stream.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -54,6 +51,21 @@ public enum StreamEventEnum {
      * workflow finished
      */
     workflow_finished(WorkflowFinishedData.class),
+
+    /**
+     * parallel_branch_started
+     */
+    parallel_branch_started(ParallelBranchStartedData.class),
+
+    /**
+     * parallel_branch_finished
+     */
+    parallel_branch_finished(ParallelBranchFinishedData.class),
+
+    /**
+     * agent_log
+     */
+    agent_log(AgentLogData.class),
 
     ;
 
