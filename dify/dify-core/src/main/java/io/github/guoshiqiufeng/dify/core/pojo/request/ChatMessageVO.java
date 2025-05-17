@@ -79,5 +79,8 @@ public class ChatMessageVO implements Serializable {
 
         private String url;
 
+        @JsonProperty("upload_file_id")
+        private String uploadFileId;
+
     }
 }

@@ -48,5 +48,6 @@ public class WorkflowRunRequest extends BaseWorkflowRequest implements Serializa
         private String type = "image";
         private String transferMethod = "remote_url";
         private String url;
+        private String uploadFileId;
     }
 }
