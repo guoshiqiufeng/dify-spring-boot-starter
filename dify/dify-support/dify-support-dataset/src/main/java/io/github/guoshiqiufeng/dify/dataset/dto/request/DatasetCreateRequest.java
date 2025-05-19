@@ -17,6 +17,7 @@ package io.github.guoshiqiufeng.dify.dataset.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.github.guoshiqiufeng.dify.dataset.dto.RetrievalModel;
 import io.github.guoshiqiufeng.dify.dataset.enums.IndexingTechniqueEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.PermissionEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.ProviderEnum;
@@ -72,5 +73,15 @@ public class DatasetCreateRequest extends BaseDatasetRequest implements Serializ
     @JsonAlias("externalKnowledgeId")
     private String externalKnowledgeId;
 
+    @JsonAlias("embeddingModel")
+    @JsonProperty("embedding_model")
+    private String embeddingModel;
 
+    @JsonAlias("embeddingModelProvider")
+    @JsonProperty("embedding_model_provider")
+    private String embeddingModelProvider;
+
+    @JsonAlias("retrievalModel")
+    @JsonProperty("retrieval_model")
+    private RetrievalModel retrievalModel;
 }
