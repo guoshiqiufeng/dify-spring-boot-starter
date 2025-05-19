@@ -57,6 +57,25 @@ public class WebClientUtilTest {
     }
 
     @Test
+    @DisplayName("Test exceptionFunction with 401")
+    public void testExceptionFunctionWithUnauthorized() {
+        // Create a mock ClientResponse
+        ClientResponse clientResponse = Mockito.mock(ClientResponse.class);
+        when(clientResponse.statusCode()).thenReturn(HttpStatus.UNAUTHORIZED);
+        when(clientResponse.bodyToMono(String.class)).thenReturn(Mono.just("UNAUTHORIZED"));
+
+        // Call the exceptionFunction
+        Mono<? extends Throwable> result = WebClientUtil.exceptionFunction(clientResponse);
+
+        // Verify the result - the exceptionFunction returns Mono.error() which triggers onError
+        StepVerifier.create(result.flatMap(Mono::error))
+                .expectErrorMatches(throwable ->
+                        throwable instanceof DifyClientException &&
+                                throwable.getMessage().contains("Access token is invalid"))
+                .verify();
+    }
+
+    @Test
     @DisplayName("Test exceptionFunction with 404 Not Found")
     public void testExceptionFunctionWithNotFound() {
         // Create a mock ClientResponse
