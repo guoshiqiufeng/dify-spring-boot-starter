@@ -429,10 +429,10 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
             Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
 
             when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
-            when(uriBuilderMock.queryParam(eq("sort_by"), anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("conversation_id"), anyString())).thenReturn(uriBuilderMock);
             when(uriBuilderMock.queryParam(eq("limit"), anyInt())).thenReturn(uriBuilderMock);
             when(uriBuilderMock.queryParamIfPresent(eq("user"), any(Optional.class))).thenReturn(uriBuilderMock);
-            when(uriBuilderMock.queryParamIfPresent(eq("last_id"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("first_id"), any(Optional.class))).thenReturn(uriBuilderMock);
             when(uriBuilderMock.build()).thenReturn(uriMock);
 
             uriFunction.apply(uriBuilderMock);
