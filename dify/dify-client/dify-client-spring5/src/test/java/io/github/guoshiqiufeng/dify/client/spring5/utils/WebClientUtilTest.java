@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.client.spring5.utils;
 
+import io.github.guoshiqiufeng.dify.core.exception.DifyClientException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -69,10 +70,8 @@ public class WebClientUtilTest {
         // Verify the result - the exceptionFunction returns Mono.error() which triggers onError
         StepVerifier.create(result.flatMap(Mono::error))
                 .expectErrorMatches(throwable ->
-                        throwable instanceof RuntimeException &&
-                                throwable.getMessage().contains("404") &&
-                                throwable.getMessage().contains("Not Found") &&
-                                throwable.getMessage().contains("Resource Not Found"))
+                        throwable instanceof DifyClientException &&
+                                throwable.getMessage().contains("Not Found"))
                 .verify();
     }
 

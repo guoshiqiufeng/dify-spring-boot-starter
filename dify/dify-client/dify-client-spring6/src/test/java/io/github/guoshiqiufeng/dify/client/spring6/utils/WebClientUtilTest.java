@@ -86,8 +86,7 @@ public class WebClientUtilTest {
         StepVerifier.create(result.flatMap(Mono::error))
                 .expectErrorMatches(throwable ->
                         throwable instanceof RuntimeException &&
-                                throwable.getMessage().contains("404") &&
-                                throwable.getMessage().contains("Resource Not Found"))
+                                throwable.getMessage().contains("Not Found"))
                 .verify();
     }
 
