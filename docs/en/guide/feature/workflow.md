@@ -27,12 +27,12 @@ WorkflowRunResponse runWorkflow(WorkflowRunRequest request);
 
 WorkflowRunRequest
 
-| Parameter name | Type               | Required | Description      |
-|----------------|--------------------|----------|------------------|
-| apiKey         | String             | Yes      | API Key          |
-| userId         | String             | Yes      | User ID          |
-| inputs         | Map<String,Object> | No       | Input parameters |
-| files          | List<WorkflowFile> | No       | File list        |
+| Parameter name | Type                 | Required | Description      |
+|----------------|----------------------|----------|------------------|
+| apiKey         | String               | Yes      | API Key          |
+| userId         | String               | Yes      | User ID          |
+| inputs         | `Map<String,Object>` | No       | Input parameters |
+| files          | `List<WorkflowFile>` | No       | File list        |
 
 WorkflowFile
 
@@ -55,18 +55,18 @@ WorkflowRunResponse
 
 WorkflowRunData
 
-| Parameter name | Type                | Description                                     |
-|----------------|---------------------|-------------------------------------------------|
-| id             | String              | Workflow Run ID                                 |
-| workflowId     | String              | Workflow ID                                     |
-| status         | String              | status (running / succeeded / failed / stopped) |
-| outputs        | Map<String, Object> | outputs                                         |
-| error          | String              | error                                           |
-| elapsedTime    | Float               | elapsedTime                                     |
-| totalTokens    | Integer             | totalTokens                                     |
-| totalSteps     | Integer             | totalSteps                                      |
-| createdAt      | Long                | Creation time (timestamp)                       |
-| finishedAt     | Long                | Completion time (timestamp)                     |
+| Parameter name | Type                  | Description                                     |
+|----------------|-----------------------|-------------------------------------------------|
+| id             | String                | Workflow Run ID                                 |
+| workflowId     | String                | Workflow ID                                     |
+| status         | String                | status (running / succeeded / failed / stopped) |
+| outputs        | `Map<String, Object>` | outputs                                         |
+| error          | String                | error                                           |
+| elapsedTime    | Float                 | elapsedTime                                     |
+| totalTokens    | Integer               | totalTokens                                     |
+| totalSteps     | Integer               | totalSteps                                      |
+| createdAt      | Long                  | Creation time (timestamp)                       |
+| finishedAt     | Long                  | Completion time (timestamp)                     |
 
 #### Request example
 
@@ -153,35 +153,35 @@ WorkflowStartedData
 
 NodeStartedData
 
-| Parameter name    | Type                | Description                                                              |
-|-------------------|---------------------|--------------------------------------------------------------------------|
-| id                | String              | Workflow Run ID                                                          |
-| createdAt         | Long                | Creation time (timestamp)                                                |
-| nodeId            | String              | Node Id                                                                  |
-| nodeType          | String              | Node Type                                                                |
-| title             | String              | Node Name                                                                |
-| index             | Integer             | Execution sequence number                                                |
-| predecessorNodeId | String              | Predecessor node ID                                                      |
-| inputs            | Map<String, Object> | Contains the contents of all predecessor node variables used in the node |
+| Parameter name    | Type                  | Description                                                              |
+|-------------------|-----------------------|--------------------------------------------------------------------------|
+| id                | String                | Workflow Run ID                                                          |
+| createdAt         | Long                  | Creation time (timestamp)                                                |
+| nodeId            | String                | Node Id                                                                  |
+| nodeType          | String                | Node Type                                                                |
+| title             | String                | Node Name                                                                |
+| index             | Integer               | Execution sequence number                                                |
+| predecessorNodeId | String                | Predecessor node ID                                                      |
+| inputs            | `Map<String, Object>` | Contains the contents of all predecessor node variables used in the node |
 
 NodeFinishedData
 
-| Parameter name    | Type                | Description                                         |
-|-------------------|---------------------|-----------------------------------------------------|
-| id                | String              | Workflow Run ID                                     |
-| createdAt         | Long                | Creation time (timestamp)                           |
-| nodeId            | String              | Node Id                                             |
-| nodeType          | String              | Node Type                                           |
-| title             | String              | Node Name                                           |
-| index             | Integer             | Execution sequence number                           |
-| predecessorNodeId | String              | Predecessor node ID                                 |
-| inputs            | Map<String, Object> | Input parameter set                                 |
-| processData       | Map<String, Object> | Node processing data                                |
-| outputs           | Map<String, Object> | outputs                                             |
-| status            | String              | Execution status (running/succeeded/failed/stopped) |
-| error             | String              | Error message (present when status is failed)       |
-| elapsedTime       | Float               | Total elapsed time (seconds)                        |
-| executionMetadata | ExecutionMetadata   | ExecutionMetadata                                   |
+| Parameter name    | Type                  | Description                                         |
+|-------------------|-----------------------|-----------------------------------------------------|
+| id                | String                | Workflow Run ID                                     |
+| createdAt         | Long                  | Creation time (timestamp)                           |
+| nodeId            | String                | Node Id                                             |
+| nodeType          | String                | Node Type                                           |
+| title             | String                | Node Name                                           |
+| index             | Integer               | Execution sequence number                           |
+| predecessorNodeId | String                | Predecessor node ID                                 |
+| inputs            | `Map<String, Object>` | Input parameter set                                 |
+| processData       | `Map<String, Object>` | Node processing data                                |
+| outputs           | `Map<String, Object>` | outputs                                             |
+| status            | String                | Execution status (running/succeeded/failed/stopped) |
+| error             | String                | Error message (present when status is failed)       |
+| elapsedTime       | Float                 | Total elapsed time (seconds)                        |
+| executionMetadata | ExecutionMetadata     | ExecutionMetadata                                   |
 
 ExecutionMetadata
 
@@ -228,17 +228,17 @@ ParallelBranchFinishedData
 
 AgentLogData
 
-| Parameter name  | Type                | Description       |
-|-----------------|---------------------|-------------------|
-| nodeExecutionId | String              | Node execution ID |
-| id              | String              | Log ID            |
-| label           | String              | Label             |
-| parentId        | String              | Parent ID         |
-| error           | String              | Error message     |
-| status          | String              | Status            |
-| data            | Map<String, Object> | Data              |
-| metadata        | MetaData            | Metadata          |
-| nodeId          | String              | Node ID           |
+| Parameter name  | Type                  | Description       |
+|-----------------|-----------------------|-------------------|
+| nodeExecutionId | String                | Node execution ID |
+| id              | String                | Log ID            |
+| label           | String                | Label             |
+| parentId        | String                | Parent ID         |
+| error           | String                | Error message     |
+| status          | String                | Status            |
+| data            | `Map<String, Object>` | Data              |
+| metadata        | MetaData              | Metadata          |
+| nodeId          | String                | Node ID           |
 
 #### Request example
 
@@ -610,19 +610,19 @@ WorkflowInfoResponse info(String workflowRunId, String apiKey);
 
 WorkflowInfoResponse
 
-| Parameter name | Type                | Description                                     |
-|----------------|---------------------|-------------------------------------------------|
-| id             | String              | Workflow Run ID                                 |
-| workflowId     | String              | Workflow ID                                     |
-| status         | String              | status (running / succeeded / failed / stopped) |
-| inputs         | Map<String, Object> | inputs                                          |
-| outputs        | Map<String, Object> | outputs                                         |
-| error          | String              | error                                           |
-| elapsedTime    | Float               | elapsedTime                                     |
-| totalTokens    | Integer             | totalTokens                                     |
-| totalSteps     | Integer             | totalSteps                                      |
-| createdAt      | Long                | Creation time (timestamp)                       |
-| finishedAt     | Long                | Completion time (timestamp)                     |
+| Parameter name | Type                  | Description                                     |
+|----------------|-----------------------|-------------------------------------------------|
+| id             | String                | Workflow Run ID                                 |
+| workflowId     | String                | Workflow ID                                     |
+| status         | String                | status (running / succeeded / failed / stopped) |
+| inputs         | `Map<String, Object>` | inputs                                          |
+| outputs        | `Map<String, Object>` | outputs                                         |
+| error          | String                | error                                           |
+| elapsedTime    | Float                 | elapsedTime                                     |
+| totalTokens    | Integer               | totalTokens                                     |
+| totalSteps     | Integer               | totalSteps                                      |
+| createdAt      | Long                  | Creation time (timestamp)                       |
+| finishedAt     | Long                  | Completion time (timestamp)                     |
 
 ## 2. Workflow Logs
 

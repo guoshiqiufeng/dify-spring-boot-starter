@@ -25,12 +25,12 @@ WorkflowRunResponse runWorkflow(WorkflowRunRequest request);
 
 WorkflowRunRequest
 
-| 参数名    | 类型                 | 是否必须 | 描述     |
-|--------|--------------------|------|--------|
-| apiKey | String             | 是    | apiKey |
-| userId | String             | 是    | 用户 id  |
-| inputs | Map<String,Object> | 否    | 输入参数   |
-| files  | List<WorkflowFile> | 否    | 文件列表   |
+| 参数名    | 类型                   | 是否必须 | 描述     |
+|--------|----------------------|------|--------|
+| apiKey | String               | 是    | apiKey |
+| userId | String               | 是    | 用户 id  |
+| inputs | `Map<String,Object>` | 否    | 输入参数   |
+| files  | `List<WorkflowFile>` | 否    | 文件列表   |
 
 WorkflowFile
 
@@ -53,18 +53,18 @@ WorkflowRunResponse
 
 WorkflowRunData
 
-| 参数名         | 类型                  | 描述                                            |
-|-------------|---------------------|-----------------------------------------------|
-| id          | String              | 运行实例 ID                                       |
-| workflowId  | String              | 工作流 ID                                        |
-| status      | String              | 执行状态 (running / succeeded / failed / stopped) |
-| outputs     | Map<String, Object> | 输出结果                                          |
-| error       | String              | 错误信息                                          |
-| elapsedTime | Float               | 耗时（秒）                                         |
-| totalTokens | Integer             | 总 token 数量                                    |
-| totalSteps  | Integer             | 总步骤数                                          |
-| createdAt   | Long                | 创建时间（时间戳）                                     |
-| finishedAt  | Long                | 完成时间（时间戳）                                     |
+| 参数名         | 类型                    | 描述                                            |
+|-------------|-----------------------|-----------------------------------------------|
+| id          | String                | 运行实例 ID                                       |
+| workflowId  | String                | 工作流 ID                                        |
+| status      | String                | 执行状态 (running / succeeded / failed / stopped) |
+| outputs     | `Map<String, Object>` | 输出结果                                          |
+| error       | String                | 错误信息                                          |
+| elapsedTime | Float                 | 耗时（秒）                                         |
+| totalTokens | Integer               | 总 token 数量                                    |
+| totalSteps  | Integer               | 总步骤数                                          |
+| createdAt   | Long                  | 创建时间（时间戳）                                     |
+| finishedAt  | Long                  | 完成时间（时间戳）                                     |
 
 #### 请求示例
 
@@ -151,35 +151,35 @@ WorkflowStartedData
 
 NodeStartedData
 
-| 参数名               | 类型                  | 描述                     |
-|-------------------|---------------------|------------------------|
-| id                | String              | 运行实例 ID                |
-| createdAt         | Long                | 创建时间（时间戳）              |
-| nodeId            | String              | 节点 ID                  |
-| nodeType          | String              | 节点类型                   |
-| title             | String              | 节点名称                   |
-| index             | Integer             | 执行序号（用于展示追踪节点顺序）       |
-| predecessorNodeId | String              | 前驱节点 ID（可选，用于画布执行路径展示） |
-| inputs            | Map<String, Object> | 包含节点中使用的所有前置节点变量内容     |
+| 参数名               | 类型                    | 描述                     |
+|-------------------|-----------------------|------------------------|
+| id                | String                | 运行实例 ID                |
+| createdAt         | Long                  | 创建时间（时间戳）              |
+| nodeId            | String                | 节点 ID                  |
+| nodeType          | String                | 节点类型                   |
+| title             | String                | 节点名称                   |
+| index             | Integer               | 执行序号（用于展示追踪节点顺序）       |
+| predecessorNodeId | String                | 前驱节点 ID（可选，用于画布执行路径展示） |
+| inputs            | `Map<String, Object>` | 包含节点中使用的所有前置节点变量内容     |
 
 NodeFinishedData
 
-| 参数名               | 类型                  | 描述                                     |
-|-------------------|---------------------|----------------------------------------|
-| id                | String              | 运行实例 ID                                |
-| createdAt         | Long                | 创建时间（时间戳）                              |
-| nodeId            | String              | 节点 ID                                  |
-| nodeType          | String              | 节点类型                                   |
-| title             | String              | 节点名称                                   |
-| index             | Integer             | 执行序号                                   |
-| predecessorNodeId | String              | 前驱节点 ID                                |
-| inputs            | Map<String, Object> | 输入参数集合                                 |
-| processData       | Map<String, Object> | 节点处理数据（可选）                             |
-| outputs           | Map<String, Object> | 输出结果集合                                 |
-| status            | String              | 执行状态（running/succeeded/failed/stopped） |
-| error             | String              | 错误信息（当状态为 failed 时存在）                  |
-| elapsedTime       | Float               | 耗时（秒）                                  |
-| executionMetadata | ExecutionMetadata   | 执行元数据                                  |
+| 参数名               | 类型                    | 描述                                     |
+|-------------------|-----------------------|----------------------------------------|
+| id                | String                | 运行实例 ID                                |
+| createdAt         | Long                  | 创建时间（时间戳）                              |
+| nodeId            | String                | 节点 ID                                  |
+| nodeType          | String                | 节点类型                                   |
+| title             | String                | 节点名称                                   |
+| index             | Integer               | 执行序号                                   |
+| predecessorNodeId | String                | 前驱节点 ID                                |
+| inputs            | `Map<String, Object>` | 输入参数集合                                 |
+| processData       | `Map<String, Object>` | 节点处理数据（可选）                             |
+| outputs           | `Map<String, Object>` | 输出结果集合                                 |
+| status            | String                | 执行状态（running/succeeded/failed/stopped） |
+| error             | String                | 错误信息（当状态为 failed 时存在）                  |
+| elapsedTime       | Float                 | 耗时（秒）                                  |
+| executionMetadata | ExecutionMetadata     | 执行元数据                                  |
 
 ExecutionMetadata 结构
 
@@ -191,18 +191,18 @@ ExecutionMetadata 结构
 
 WorkflowFinishedData
 
-| 参数名         | 类型                  | 描述                                     |
-|-------------|---------------------|----------------------------------------|
-| id          | String              | 运行实例 ID                                |
-| createdAt   | Long                | 创建时间（时间戳）                              |
-| workflowId  | String              | 关联的工作流 ID                              |
-| outputs     | Map<String, Object> | 最终输出结果                                 |
-| status      | String              | 执行状态（running/succeeded/failed/stopped） |
-| error       | String              | 错误信息（当状态为 failed 时存在）                  |
-| elapsedTime | Float               | 总耗时（秒）                                 |
-| totalTokens | Integer             | 工作流总消耗 Token 数                         |
-| totalSteps  | Integer             | 总执行步骤数                                 |
-| finishedAt  | Long                | 完成时间戳（如 1705395332）                    |
+| 参数名         | 类型                    | 描述                                     |
+|-------------|-----------------------|----------------------------------------|
+| id          | String                | 运行实例 ID                                |
+| createdAt   | Long                  | 创建时间（时间戳）                              |
+| workflowId  | String                | 关联的工作流 ID                              |
+| outputs     | `Map<String, Object>` | 最终输出结果                                 |
+| status      | String                | 执行状态（running/succeeded/failed/stopped） |
+| error       | String                | 错误信息（当状态为 failed 时存在）                  |
+| elapsedTime | Float                 | 总耗时（秒）                                 |
+| totalTokens | Integer               | 工作流总消耗 Token 数                         |
+| totalSteps  | Integer               | 总执行步骤数                                 |
+| finishedAt  | Long                  | 完成时间戳（如 1705395332）                    |
 
 ParallelBranchStartedData
 
@@ -226,17 +226,17 @@ ParallelBranchFinishedData
 
 AgentLogData
 
-| 参数名             | 类型                  | 描述     |
-|-----------------|---------------------|--------|
-| nodeExecutionId | String              | 节点执行ID |
-| id              | String              | 日志ID   |
-| label           | String              | 标签     |
-| parentId        | String              | 父ID    |
-| error           | String              | 错误信息   |
-| status          | String              | 状态     |
-| data            | Map<String, Object> | 数据     |
-| metadata        | MetaData            | 元数据    |
-| nodeId          | String              | 节点ID   |
+| 参数名             | 类型                    | 描述     |
+|-----------------|-----------------------|--------|
+| nodeExecutionId | String                | 节点执行ID |
+| id              | String                | 日志ID   |
+| label           | String                | 标签     |
+| parentId        | String                | 父ID    |
+| error           | String                | 错误信息   |
+| status          | String                | 状态     |
+| data            | `Map<String, Object>` | 数据     |
+| metadata        | MetaData              | 元数据    |
+| nodeId          | String                | 节点ID   |
 
 #### 请求示例
 
@@ -477,19 +477,19 @@ WorkflowInfoResponse info(String workflowRunId, String apiKey);
 
 WorkflowInfoResponse
 
-| 参数名         | 类型                  | 描述                                            |
-|-------------|---------------------|-----------------------------------------------|
-| id          | String              | 运行实例 ID                                       |
-| workflowId  | String              | 工作流 ID                                        |
-| status      | String              | 执行状态 (running / succeeded / failed / stopped) |
-| inputs      | Map<String, Object> | 输入参数                                          |
-| outputs     | Map<String, Object> | 输出结果                                          |
-| error       | String              | 错误信息                                          |
-| elapsedTime | Float               | 耗时（秒）                                         |
-| totalTokens | Integer             | 总 token 数量                                    |
-| totalSteps  | Integer             | 总步骤数                                          |
-| createdAt   | Long                | 创建时间（时间戳）                                     |
-| finishedAt  | Long                | 完成时间（时间戳）                                     |
+| 参数名         | 类型                    | 描述                                            |
+|-------------|-----------------------|-----------------------------------------------|
+| id          | String                | 运行实例 ID                                       |
+| workflowId  | String                | 工作流 ID                                        |
+| status      | String                | 执行状态 (running / succeeded / failed / stopped) |
+| inputs      | `Map<String, Object>` | 输入参数                                          |
+| outputs     | `Map<String, Object>` | 输出结果                                          |
+| error       | String                | 错误信息                                          |
+| elapsedTime | Float                 | 耗时（秒）                                         |
+| totalTokens | Integer               | 总 token 数量                                    |
+| totalSteps  | Integer               | 总步骤数                                          |
+| createdAt   | Long                  | 创建时间（时间戳）                                     |
+| finishedAt  | Long                  | 完成时间（时间戳）                                     |
 
 ## 2. 工作流日志
 
