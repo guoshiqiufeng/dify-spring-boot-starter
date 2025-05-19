@@ -48,7 +48,7 @@ import static org.mockito.Mockito.*;
 @SuppressWarnings("unchecked")
 public class DifyServerDefaultClientTest extends BaseClientTest {
 
-    private DifyServerDefaultClient difyServerDefaultClient;
+    private DifyServerDefaultClient client;
 
     @BeforeEach
     public void setup() {
@@ -58,7 +58,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         DifyProperties.Server serverConfig = new DifyProperties.Server();
         serverConfig.setEmail("test@example.com");
         serverConfig.setPassword("password123");
-        difyServerDefaultClient = new DifyServerDefaultClient(serverConfig, new DifyServerTokenDefault(),
+        client = new DifyServerDefaultClient(serverConfig, new DifyServerTokenDefault(),
                 "https://api.dify.ai", clientConfig, webClientBuilderMock);
     }
 
@@ -81,7 +81,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(LoginResultResponse.class)).thenReturn(Mono.just(resultResponseVO));
 
         // Execute the method
-        LoginResponse actualResponse = difyServerDefaultClient.login();
+        LoginResponse actualResponse = client.login();
 
         // Verify the result
         assertNotNull(actualResponse);
@@ -113,7 +113,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(LoginResultResponse.class)).thenReturn(Mono.just(resultResponseVO));
 
         // Execute the method
-        LoginResponse actualResponse = difyServerDefaultClient.refreshToken(refreshToken);
+        LoginResponse actualResponse = client.refreshToken(refreshToken);
 
         // Verify the result
         assertNotNull(actualResponse);
@@ -143,7 +143,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(AppsResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        AppsResponse actualResponse = difyServerDefaultClient.app(appId);
+        AppsResponse actualResponse = client.app(appId);
 
         // Verify the result
         assertNotNull(actualResponse);
@@ -205,7 +205,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(AppsResponseResult.class)).thenReturn(Mono.just(resultResponseVO));
 
         // Execute the method
-        List<AppsResponse> actualResponse = difyServerDefaultClient.apps(mode, name);
+        List<AppsResponse> actualResponse = client.apps(mode, name);
 
         // Verify the result
         assertNotNull(actualResponse);
@@ -241,7 +241,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(ApiKeyResultResponse.class)).thenReturn(Mono.just(resultResponseVO));
 
         // Execute the method
-        List<ApiKeyResponse> actualResponse = difyServerDefaultClient.getAppApiKey(appId);
+        List<ApiKeyResponse> actualResponse = client.getAppApiKey(appId);
 
         // Verify the result
         assertNotNull(actualResponse);
@@ -271,7 +271,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(ApiKeyResponse.class)).thenReturn(Mono.just(apiKey));
 
         // Execute the method
-        List<ApiKeyResponse> actualResponse = difyServerDefaultClient.initAppApiKey(appId);
+        List<ApiKeyResponse> actualResponse = client.initAppApiKey(appId);
 
         // Verify the result
         assertNotNull(actualResponse);
@@ -305,7 +305,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(DatasetApiKeyResult.class)).thenReturn(Mono.just(resultResponseVO));
 
         // Execute the method
-        List<DatasetApiKeyResponse> actualResponse = difyServerDefaultClient.getDatasetApiKey();
+        List<DatasetApiKeyResponse> actualResponse = client.getDatasetApiKey();
 
         // Verify the result
         assertNotNull(actualResponse);
@@ -332,7 +332,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(DatasetApiKeyResponse.class)).thenReturn(Mono.just(apiKey));
 
         // Execute the method
-        List<DatasetApiKeyResponse> actualResponse = difyServerDefaultClient.initDatasetApiKey();
+        List<DatasetApiKeyResponse> actualResponse = client.initDatasetApiKey();
 
         // Verify the result
         assertNotNull(actualResponse);
