@@ -15,8 +15,6 @@
  */
 package io.github.guoshiqiufeng.dify.core.exception;
 
-import lombok.AllArgsConstructor;
-
 /**
  * @author yanghq
  * @version 1.0

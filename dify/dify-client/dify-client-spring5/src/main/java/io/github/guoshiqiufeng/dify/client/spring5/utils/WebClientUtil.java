@@ -39,7 +39,7 @@ public class WebClientUtil {
 
                     log.warn("Status: [{}] {} - {}", statusCode, statusText, errorBody);
                     switch (statusCode) {
-                        case 401 :
+                        case 401:
                             throw new DifyClientException(DiftClientExceptionEnum.UNAUTHORIZED);
                         case 404:
                             throw new DifyClientException(DiftClientExceptionEnum.NOT_FOUND);

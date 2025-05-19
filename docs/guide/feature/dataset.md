@@ -36,18 +36,18 @@ DatasetCreateRequest
 
 **ProviderEnum 枚举值**
 
-| 枚举值      | 描述      |
-|----------|---------|
-| vendor   | 上传文件    |
-| external | 外部知识库   |
+| 枚举值      | 描述    |
+|----------|-------|
+| vendor   | 上传文件  |
+| external | 外部知识库 |
 
 **PermissionEnum 枚举值**
 
-| 枚举值              | 描述          |
-|------------------|-------------|
-| ONLY_ME          | 仅自己         |
-| ALL_TEAM_MEMBERS | 所有团队成员     |
-| PARTIAL_MEMBERS  | 部分团队成员     |
+| 枚举值              | 描述     |
+|------------------|--------|
+| ONLY_ME          | 仅自己    |
+| ALL_TEAM_MEMBERS | 所有团队成员 |
+| PARTIAL_MEMBERS  | 部分团队成员 |
 
 **IndexingTechniqueEnum 枚举值**
 
@@ -152,11 +152,11 @@ DatasetInfoResponse
 
 **ExternalKnowledgeInfo 对象结构**
 
-| 字段名                       | 类型     | 描述           |
-|---------------------------|--------|--------------|
-| externalKnowledgeId       | String | 外部知识库 ID     |
-| externalKnowledgeApiId    | String | 外部知识库 API_ID |
-| externalKnowledgeApiName  | String | 外部知识库 API 名称 |
+| 字段名                          | 类型     | 描述           |
+|------------------------------|--------|--------------|
+| externalKnowledgeId          | String | 外部知识库 ID     |
+| externalKnowledgeApiId       | String | 外部知识库 API_ID |
+| externalKnowledgeApiName     | String | 外部知识库 API 名称 |
 | externalKnowledgeApiEndpoint | String | 外部知识库 API 端点 |
 
 ### 1.4 修改知识库
@@ -316,7 +316,7 @@ DocumentCreateByTextRequest
 | 字段名                   | 类型                   | 描述       |
 |-----------------------|----------------------|----------|
 | searchMethod          | SearchMethodEnum     | 搜索方法     |
-| rerankingMode         | RerankingModeEnum    | 重排序模式   |
+| rerankingMode         | RerankingModeEnum    | 重排序模式    |
 | rerankingEnable       | Boolean              | 是否启用重排序  |
 | rerankingModel        | RerankingModel       | 重排序模型    |
 | weights               | RerankingModelWeight | 权重       |
@@ -328,17 +328,17 @@ DocumentCreateByTextRequest
 
 | 枚举值              | 描述    |
 |------------------|-------|
-| keyword_search    | 关键字检索 |
-| hybrid_search     | 混合检索  |
-| semantic_search   | 语义检索  |
-| full_text_search  | 全文检索  |
+| keyword_search   | 关键字检索 |
+| hybrid_search    | 混合检索  |
+| semantic_search  | 语义检索  |
+| full_text_search | 全文检索  |
 
 **RerankingModeEnum 枚举值**
 
-| 枚举值             | 描述       |
-|-----------------|----------|
-| weighted_score   | 权重       |
-| reranking_model  | 重排序模型   |
+| 枚举值             | 描述    |
+|-----------------|-------|
+| weighted_score  | 权重    |
+| reranking_model | 重排序模型 |
 
 **RerankingModel 对象结构**
 
