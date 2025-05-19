@@ -64,7 +64,7 @@ public class BaseExceptionTest {
         assertEquals("Test error message", exception.getMessage());
 
         // Verify exception is a subclass of RuntimeException
-        assertTrue(exception instanceof RuntimeException);
+        assertInstanceOf(RuntimeException.class, exception);
     }
 
     /**
@@ -78,7 +78,7 @@ public class BaseExceptionTest {
         BaseException exception = new BaseException(errorCode, errorMessage);
 
         // Verify exception message
-        assertNull(exception.getMessage());
+        assertNotNull(exception.getMessage());
     }
 
     /**
@@ -110,6 +110,6 @@ public class BaseExceptionTest {
 
         // Test direct parameters constructor
         BaseException exception2 = new BaseException(404, "Resource not found");
-        assertNull(exception2.getMessage());
+        assertNotNull(exception2.getMessage());
     }
 }
