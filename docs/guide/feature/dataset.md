@@ -43,18 +43,18 @@ DatasetCreateRequest
 
 **PermissionEnum 枚举值**
 
-| 枚举值              | 描述     |
-|------------------|--------|
-| ONLY_ME          | 仅自己    |
-| ALL_TEAM_MEMBERS | 所有团队成员 |
-| PARTIAL_MEMBERS  | 部分团队成员 |
+| 枚举值              | 代码值              | 描述     |
+|------------------|------------------|--------|
+| ONLY_ME          | only_me          | 仅自己    |
+| ALL_TEAM_MEMBERS | all_team_members | 所有团队成员 |
+| PARTIAL_MEMBERS  | partial_members  | 部分团队成员 |
 
 **IndexingTechniqueEnum 枚举值**
 
-| 枚举值          | 描述  |
-|--------------|-----|
-| HIGH_QUALITY | 高质量 |
-| ECONOMY      | 经济型 |
+| 枚举值          | 代码值          | 描述  |
+|--------------|--------------|-----|
+| HIGH_QUALITY | high_quality | 高质量 |
+| ECONOMY      | economy      | 经济型 |
 
 #### 响应参数
 
@@ -363,7 +363,7 @@ DocumentCreateByTextRequest
 | embeddingModelName    | String | 嵌入模型    |
 | embeddingProviderName | String | 嵌入模型提供商 |
 
-**RerankingModelWeight 对象结构**
+**KeywordSetting 对象结构**
 
 | 字段名           | 类型    | 描述    |
 |---------------|-------|-------|
@@ -1110,9 +1110,9 @@ MetaDataResponse 查看 6.1
 #### 方法
 
 ```java
-MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId);
+void deleteMetaData(String datasetId, String metadataId);
 
-MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId, String apiKey);
+void deleteMetaData(String datasetId, String metadataId, String apiKey);
 ```
 
 #### 请求参数
@@ -1131,7 +1131,7 @@ MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId, Strin
 #### 方法
 
 ```java
-MetaDataActionResponse actionMetaData(MetaDataActionRequest request);
+void actionMetaData(MetaDataActionRequest request);
 ```
 
 #### 请求参数
@@ -1159,7 +1159,7 @@ MetaDataActionRequest
 #### 方法
 
 ```java
-DocumentMetaDataUpdateResponse updateDocumentMetaData(DocumentMetaDataUpdateRequest request);
+void updateDocumentMetaData(DocumentMetaDataUpdateRequest request);
 ```
 
 #### 请求参数

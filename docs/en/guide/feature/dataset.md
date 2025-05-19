@@ -46,18 +46,18 @@ DatasetCreateRequest
 
 **PermissionEnum Values**
 
-| Value            | Description          |
-|------------------|----------------------|
-| ONLY_ME          | Only self            |
-| ALL_TEAM_MEMBERS | All team members     |
-| PARTIAL_MEMBERS  | Partial team members |
+| Enum Value       | Code Value       | Description          |
+|------------------|------------------|----------------------|
+| ONLY_ME          | only_me          | Only self            |
+| ALL_TEAM_MEMBERS | all_team_members | All team members     |
+| PARTIAL_MEMBERS  | partial_members  | Partial team members |
 
 **IndexingTechniqueEnum Values**
 
-| Value        | Description  |
-|--------------|--------------|
-| HIGH_QUALITY | High quality |
-| ECONOMY      | Economy      |
+| Enum Value   | Code Value   | Description  |
+|--------------|--------------|--------------|
+| HIGH_QUALITY | high_quality | High quality |
+| ECONOMY      | economy      | Economy      |
 
 #### Response Parameters
 
@@ -268,7 +268,7 @@ DocumentCreateByTextRequest
 | mode  | ModeEnum   | Processing mode |
 | rules | CustomRule | Custom rules    |
 
-**ModeEnum 对象结构**
+**ModeEnum Values**
 
 | Value        | Description       |
 |--------------|-------------------|
@@ -319,6 +319,7 @@ DocumentCreateByTextRequest
 | Field                 | Type                 | Description                       |
 |-----------------------|----------------------|-----------------------------------|
 | searchMethod          | SearchMethodEnum     | Search method                     |
+| rerankingMode         | RerankingModeEnum    | Reranking mode                    |
 | rerankingEnable       | Boolean              | Whether to enable reranking       |
 | rerankingModel        | RerankingModel       | Reranking model                   |
 | weights               | RerankingModelWeight | Weights                           |
@@ -1113,9 +1114,9 @@ MetaDataResponse See 6.1
 #### Method
 
 ```java
-MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId);
+void deleteMetaData(String datasetId, String metadataId);
 
-MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId, String apiKey);
+void deleteMetaData(String datasetId, String metadataId, String apiKey);
 ```
 
 #### Request Parameters
@@ -1134,7 +1135,7 @@ None
 #### Method
 
 ```java
-MetaDataActionResponse actionMetaData(MetaDataActionRequest request);
+void actionMetaData(MetaDataActionRequest request);
 ```
 
 #### Request Parameters
@@ -1150,8 +1151,8 @@ MetaDataActionRequest
 
 | Value   | Description |
 |---------|-------------|
-| ENABLE  | Enable      |
-| DISABLE | Disable     |
+| enable  | Enable      |
+| disable | Disable     |
 
 #### Response Parameters
 
@@ -1162,7 +1163,7 @@ None
 #### Method
 
 ```java
-DocumentMetaDataUpdateResponse updateDocumentMetaData(DocumentMetaDataUpdateRequest request);
+void updateDocumentMetaData(DocumentMetaDataUpdateRequest request);
 ```
 
 #### Request Parameters

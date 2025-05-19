@@ -30,6 +30,16 @@ WorkflowRunRequest
 | apiKey | String             | 是    | apiKey |
 | userId | String             | 是    | 用户 id  |
 | inputs | Map<String,Object> | 否    | 输入参数   |
+| files  | List<WorkflowFile> | 否    | 文件列表   |
+
+WorkflowFile
+
+| 参数名            | 类型     | 是否必须 | 描述                    |
+|----------------|--------|------|-----------------------|
+| type           | String | 否    | 文件类型，默认为 "image"      |
+| transferMethod | String | 否    | 传输方式，默认为 "remote_url" |
+| url            | String | 否    | 文件URL地址               |
+| uploadFileId   | String | 否    | 上传文件ID，与url二选一        |
 
 #### 响应参数
 
@@ -99,7 +109,7 @@ public void test() {
 #### 方法
 
 ```java
-Flux<WorkflowRunResponse> runWorkflowStream(WorkflowRunRequest request);
+Flux<WorkflowRunStreamResponse> runWorkflowStream(WorkflowRunRequest request);
 ```
 
 #### 请求参数
@@ -119,13 +129,16 @@ WorkflowRunStreamResponse
 
 > 根据event类型选择 data 类型
 
-| event             | data                 | 描述    |
-|-------------------|----------------------|-------|
-| workflow_started  | WorkflowStartedData  | 工作流开始 |
-| node_started      | NodeStartedData      | 节点开始  |
-| text_chunk        | Map                  | 文本块   |
-| node_finished     | NodeFinishedData     | 节点结束  |
-| workflow_finished | WorkflowFinishedData | 工作流结束 |
+| event                    | data                       | 描述     |
+|--------------------------|----------------------------|--------|
+| workflow_started         | WorkflowStartedData        | 工作流开始  |
+| node_started             | NodeStartedData            | 节点开始   |
+| text_chunk               | Map                        | 文本块    |
+| node_finished            | NodeFinishedData           | 节点结束   |
+| workflow_finished        | WorkflowFinishedData       | 工作流结束  |
+| parallel_branch_started  | ParallelBranchStartedData  | 并行分支开始 |
+| parallel_branch_finished | ParallelBranchFinishedData | 并行分支结束 |
+| agent_log                | AgentLogData               | 代理日志   |
 
 WorkflowStartedData
 
@@ -190,6 +203,40 @@ WorkflowFinishedData
 | totalTokens | Integer             | 工作流总消耗 Token 数                         |
 | totalSteps  | Integer             | 总执行步骤数                                 |
 | finishedAt  | Long                | 完成时间戳（如 1705395332）                    |
+
+ParallelBranchStartedData
+
+| 参数名                       | 类型     | 描述        |
+|---------------------------|--------|-----------|
+| parallelId                | String | 并行任务ID    |
+| parallelBranchId          | String | 并行分支ID    |
+| parentParallelId          | String | 父并行任务ID   |
+| parentParallelStartNodeId | String | 父并行开始节点ID |
+| iterationId               | String | 迭代ID      |
+| loopId                    | String | 循环ID      |
+| createdAt                 | Long   | 创建时间（时间戳） |
+
+ParallelBranchFinishedData
+
+| 参数名    | 类型     | 描述                            |
+|--------|--------|-------------------------------|
+| status | String | 执行状态                          |
+| error  | String | 错误信息（当状态为 failed 时存在）         |
+| 其余字段   | -      | 继承自 ParallelBranchStartedData |
+
+AgentLogData
+
+| 参数名             | 类型                  | 描述     |
+|-----------------|---------------------|--------|
+| nodeExecutionId | String              | 节点执行ID |
+| id              | String              | 日志ID   |
+| label           | String              | 标签     |
+| parentId        | String              | 父ID    |
+| error           | String              | 错误信息   |
+| status          | String              | 状态     |
+| data            | Map<String, Object> | 数据     |
+| metadata        | MetaData            | 元数据    |
+| nodeId          | String              | 节点ID   |
 
 #### 请求示例
 
@@ -279,138 +326,7 @@ public void test() {
   "taskId": "a11f4e01-4ab5-4490-bdde-98edded75ccd",
   "workflowRunId": "02cd585e-b3c7-4b9b-a34c-6c25fb1e60a2"
 }
-{
-  "data": {
-    "text": "初生",
-    "from_variable_selector": [
-      "1728371143086",
-      "text"
-    ]
-  },
-  "event": "text_chunk",
-  "taskId": "a11f4e01-4ab5-4490-bdde-98edded75ccd",
-  "workflowRunId": "02cd585e-b3c7-4b9b-a34c-6c25fb1e60a2"
-}
-{
-  "data": {
-    "text": "燕归来",
-    "from_variable_selector": [
-      "1728371143086",
-      "text"
-    ]
-  },
-  "event": "text_chunk",
-  "taskId": "a11f4e01-4ab5-4490-bdde-98edded75ccd",
-  "workflowRunId": "02cd585e-b3c7-4b9b-a34c-6c25fb1e60a2"
-}
-{
-  "data": {
-    "text": "，\n花开",
-    "from_variable_selector": [
-      "1728371143086",
-      "text"
-    ]
-  },
-  "event": "text_chunk",
-  "taskId": "a11f4e01-4ab5-4490-bdde-98edded75ccd",
-  "workflowRunId": "02cd585e-b3c7-4b9b-a34c-6c25fb1e60a2"
-}
-{
-  "data": {
-    "text": "满径",
-    "from_variable_selector": [
-      "1728371143086",
-      "text"
-    ]
-  },
-  "event": "text_chunk",
-  "taskId": "a11f4e01-4ab5-4490-bdde-98edded75ccd",
-  "workflowRunId": "02cd585e-b3c7-4b9b-a34c-6c25fb1e60a2"
-}
-{
-  "data": {
-    "text": "香盈",
-    "from_variable_selector": [
-      "1728371143086",
-      "text"
-    ]
-  },
-  "event": "text_chunk",
-  "taskId": "a11f4e01-4ab5-4490-bdde-98edded75ccd",
-  "workflowRunId": "02cd585e-b3c7-4b9b-a34c-6c25fb1e60a2"
-}
-{
-  "data": {
-    "text": "怀。\n",
-    "from_variable_selector": [
-      "1728371143086",
-      "text"
-    ]
-  },
-  "event": "text_chunk",
-  "taskId": "a11f4e01-4ab5-4490-bdde-98edded75ccd",
-  "workflowRunId": "02cd585e-b3c7-4b9b-a34c-6c25fb1e60a2"
-}
-{
-  "data": {
-    "text": "心随",
-    "from_variable_selector": [
-      "1728371143086",
-      "text"
-    ]
-  },
-  "event": "text_chunk",
-  "taskId": "a11f4e01-4ab5-4490-bdde-98edded75ccd",
-  "workflowRunId": "02cd585e-b3c7-4b9b-a34c-6c25fb1e60a2"
-}
-{
-  "data": {
-    "text": "蝶舞",
-    "from_variable_selector": [
-      "1728371143086",
-      "text"
-    ]
-  },
-  "event": "text_chunk",
-  "taskId": "a11f4e01-4ab5-4490-bdde-98edded75ccd",
-  "workflowRunId": "02cd585e-b3c7-4b9b-a34c-6c25fb1e60a2"
-}
-{
-  "data": {
-    "text": "共春",
-    "from_variable_selector": [
-      "1728371143086",
-      "text"
-    ]
-  },
-  "event": "text_chunk",
-  "taskId": "a11f4e01-4ab5-4490-bdde-98edded75ccd",
-  "workflowRunId": "02cd585e-b3c7-4b9b-a34c-6c25fb1e60a2"
-}
-{
-  "data": {
-    "text": "台。",
-    "from_variable_selector": [
-      "1728371143086",
-      "text"
-    ]
-  },
-  "event": "text_chunk",
-  "taskId": "a11f4e01-4ab5-4490-bdde-98edded75ccd",
-  "workflowRunId": "02cd585e-b3c7-4b9b-a34c-6c25fb1e60a2"
-}
-{
-  "data": {
-    "text": "",
-    "from_variable_selector": [
-      "1728371143086",
-      "text"
-    ]
-  },
-  "event": "text_chunk",
-  "taskId": "a11f4e01-4ab5-4490-bdde-98edded75ccd",
-  "workflowRunId": "02cd585e-b3c7-4b9b-a34c-6c25fb1e60a2"
-}
+// 更多文本块输出...
 {
   "data": {
     "elapsedTime": 1.089817,
@@ -516,7 +432,6 @@ public void test() {
   "taskId": "a11f4e01-4ab5-4490-bdde-98edded75ccd",
   "workflowRunId": "02cd585e-b3c7-4b9b-a34c-6c25fb1e60a2"
 }
-
 ```
 
 ### 1.3 停止工作流流式响应
@@ -548,7 +463,7 @@ WorkflowStopResponse
 #### 方法
 
 ```java
-WorkflowRunResponse info(String workflowRunId, String apiKey);
+WorkflowInfoResponse info(String workflowRunId, String apiKey);
 ```
 
 #### 请求参数

@@ -56,6 +56,8 @@ description:
 | 【DataSet】 通过文本创建文档     | ✅  |
 | 【DataSet】 通过文件创建文档     | ✅  |
 | 【DataSet】 创建空知识库       | ✅  |
+| 【DataSet】 查看知识库详情      | ✅  |
+| 【DataSet】 修改知识库详情      | ✅  |
 | 【DataSet】 知识库列表        | ✅  |
 | 【DataSet】 删除知识库        | ✅  |
 | 【DataSet】 通过文本更新文档     | ✅  |

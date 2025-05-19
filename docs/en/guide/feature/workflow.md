@@ -30,8 +30,18 @@ WorkflowRunRequest
 | Parameter name | Type               | Required | Description      |
 |----------------|--------------------|----------|------------------|
 | apiKey         | String             | Yes      | API Key          |
-| userId         | String             | 是        | userId           |
+| userId         | String             | Yes      | User ID          |
 | inputs         | Map<String,Object> | No       | Input parameters |
+| files          | List<WorkflowFile> | No       | File list        |
+
+WorkflowFile
+
+| Parameter name | Type   | Required | Description                                       |
+|----------------|--------|----------|---------------------------------------------------|
+| type           | String | No       | File type, default is "image"                     |
+| transferMethod | String | No       | Transfer method, default "remote_url"             |
+| url            | String | No       | File URL                                          |
+| uploadFileId   | String | No       | Upload file ID, choose either url or uploadFileId |
 
 #### Response Parameters
 
@@ -45,18 +55,18 @@ WorkflowRunResponse
 
 WorkflowRunData
 
-| 参数名         | 类型                  | 描述                                              |
-|-------------|---------------------|-------------------------------------------------|
-| id          | String              | Workflow Run ID                                 |
-| workflowId  | String              | Workflow ID                                     |
-| status      | String              | status (running / succeeded / failed / stopped) |
-| outputs     | Map<String, Object> | outputs                                         |
-| error       | String              | error                                           |
-| elapsedTime | Float               | elapsedTime                                     |
-| totalTokens | Integer             | totalTokens                                     |
-| totalSteps  | Integer             | totalSteps                                      |
-| createdAt   | Long                | Creation time (timestamp)                       |
-| finishedAt  | Long                | Completion time (timestamp)                     |
+| Parameter name | Type                | Description                                     |
+|----------------|---------------------|-------------------------------------------------|
+| id             | String              | Workflow Run ID                                 |
+| workflowId     | String              | Workflow ID                                     |
+| status         | String              | status (running / succeeded / failed / stopped) |
+| outputs        | Map<String, Object> | outputs                                         |
+| error          | String              | error                                           |
+| elapsedTime    | Float               | elapsedTime                                     |
+| totalTokens    | Integer             | totalTokens                                     |
+| totalSteps     | Integer             | totalSteps                                      |
+| createdAt      | Long                | Creation time (timestamp)                       |
+| finishedAt     | Long                | Completion time (timestamp)                     |
 
 #### Request example
 
@@ -101,7 +111,7 @@ public void test() {
 #### Method
 
 ```java
-Flux<WorkflowRunResponse> runWorkflowStream(WorkflowRunRequest request);
+Flux<WorkflowRunStreamResponse> runWorkflowStream(WorkflowRunRequest request);
 ```
 
 #### Request Parameters
@@ -112,26 +122,29 @@ Same as the Run Workflow interface
 
 WorkflowRunStreamResponse
 
-| 参数名           | 类型              | 描述                        |
-|---------------|-----------------|---------------------------|
-| workflowRunId | String          | Workflow Run ID           |
-| taskId        | String          | taskIdD                   |
-| event         | StreamEventEnum | event type                |
-| data          | Object          | Workflow Run Data Objects |
+| Parameter name | Type            | Description               |
+|----------------|-----------------|---------------------------|
+| workflowRunId  | String          | Workflow Run ID           |
+| taskId         | String          | Task ID                   |
+| event          | StreamEventEnum | Event type                |
+| data           | Object          | Workflow Run Data Objects |
 
 > Select data type according to event type
 
-| event             | data                 | 描述                |
-|-------------------|----------------------|-------------------|
-| workflow_started  | WorkflowStartedData  | workflow started  |
-| node_started      | NodeStartedData      | node started      |
-| text_chunk        | Map                  | text chunk        |
-| node_finished     | NodeFinishedData     | node finished     |
-| workflow_finished | WorkflowFinishedData | workflow finished |
+| event                    | data                       | Description              |
+|--------------------------|----------------------------|--------------------------|
+| workflow_started         | WorkflowStartedData        | Workflow started         |
+| node_started             | NodeStartedData            | Node started             |
+| text_chunk               | Map                        | Text chunk               |
+| node_finished            | NodeFinishedData           | Node finished            |
+| workflow_finished        | WorkflowFinishedData       | Workflow finished        |
+| parallel_branch_started  | ParallelBranchStartedData  | Parallel branch started  |
+| parallel_branch_finished | ParallelBranchFinishedData | Parallel branch finished |
+| agent_log                | AgentLogData               | Agent log                |
 
 WorkflowStartedData
 
-| 参数名            | 类型      | 描述                        |
+| Parameter name | Type    | Description               |
 |----------------|---------|---------------------------|
 | id             | String  | Workflow Run ID           |
 | createdAt      | Long    | Creation time (timestamp) |
@@ -140,7 +153,7 @@ WorkflowStartedData
 
 NodeStartedData
 
-| 参数名               | 类型                  | 描述                                                                       |
+| Parameter name    | Type                | Description                                                              |
 |-------------------|---------------------|--------------------------------------------------------------------------|
 | id                | String              | Workflow Run ID                                                          |
 | createdAt         | Long                | Creation time (timestamp)                                                |
@@ -153,7 +166,7 @@ NodeStartedData
 
 NodeFinishedData
 
-| 参数名               | 类型                  | 描述                                                  |
+| Parameter name    | Type                | Description                                         |
 |-------------------|---------------------|-----------------------------------------------------|
 | id                | String              | Workflow Run ID                                     |
 | createdAt         | Long                | Creation time (timestamp)                           |
@@ -172,28 +185,62 @@ NodeFinishedData
 
 ExecutionMetadata
 
-| 参数名         | 类型         | 描述                                     |
-|-------------|------------|----------------------------------------|
-| totalTokens | Integer    | totalTokens                            |
-| totalPrice  | BigDecimal | totalPrice                             |
-| currency    | String     | Currency unit (optional, e.g. USD/RMB) |
+| Parameter name | Type       | Description                            |
+|----------------|------------|----------------------------------------|
+| totalTokens    | Integer    | Total Tokens                           |
+| totalPrice     | BigDecimal | Total Price                            |
+| currency       | String     | Currency unit (optional, e.g. USD/RMB) |
 
 WorkflowFinishedData
 
-| 参数名         | 类型                  | 描述                                                  |
-|-------------|---------------------|-----------------------------------------------------|
-| id          | String              | Workflow Run ID                                     |
-| createdAt   | Long                | Creation time (timestamp)                           |
-| workflowId  | String              | Associated Workflow ID                              |
-| outputs     | Map<String, Object> | Final Output                                        |
-| status      | String              | Execution status (running/succeeded/failed/stopped) |
-| error       | String              | Error message (present when status is failed)       |
-| elapsedTime | Float               | Total elapsed time (seconds)                        |
-| totalTokens | Integer             | Total number of Token consumed by the workflow      |
-| totalSteps  | Integer             | Total number of steps performed                     |
-| finishedAt  | Long                | Completion timestamp (e.g. 1705395332)              |
+| Parameter name | Type                | Description                                         |
+|----------------|---------------------|-----------------------------------------------------|
+| id             | String              | Workflow Run ID                                     |
+| createdAt      | Long                | Creation time (timestamp)                           |
+| workflowId     | String              | Associated Workflow ID                              |
+| outputs        | Map<String, Object> | Final Output                                        |
+| status         | String              | Execution status (running/succeeded/failed/stopped) |
+| error          | String              | Error message (present when status is failed)       |
+| elapsedTime    | Float               | Total elapsed time (seconds)                        |
+| totalTokens    | Integer             | Total number of Token consumed by the workflow      |
+| totalSteps     | Integer             | Total number of steps performed                     |
+| finishedAt     | Long                | Completion timestamp (e.g. 1705395332)              |
 
-#### 请求示例
+ParallelBranchStartedData
+
+| Parameter name            | Type   | Description                   |
+|---------------------------|--------|-------------------------------|
+| parallelId                | String | Parallel task ID              |
+| parallelBranchId          | String | Parallel branch ID            |
+| parentParallelId          | String | Parent parallel task ID       |
+| parentParallelStartNodeId | String | Parent parallel start node ID |
+| iterationId               | String | Iteration ID                  |
+| loopId                    | String | Loop ID                       |
+| createdAt                 | Long   | Creation time (timestamp)     |
+
+ParallelBranchFinishedData
+
+| Parameter name | Type   | Description                                   |
+|----------------|--------|-----------------------------------------------|
+| status         | String | Execution status                              |
+| error          | String | Error message (present when status is failed) |
+| Other fields   | -      | Inherited from ParallelBranchStartedData      |
+
+AgentLogData
+
+| Parameter name  | Type                | Description       |
+|-----------------|---------------------|-------------------|
+| nodeExecutionId | String              | Node execution ID |
+| id              | String              | Log ID            |
+| label           | String              | Label             |
+| parentId        | String              | Parent ID         |
+| error           | String              | Error message     |
+| status          | String              | Status            |
+| data            | Map<String, Object> | Data              |
+| metadata        | MetaData            | Metadata          |
+| nodeId          | String              | Node ID           |
+
+#### Request example
 
 ```java
 
@@ -518,7 +565,6 @@ public void test() {
   "taskId": "a11f4e01-4ab5-4490-bdde-98edded75ccd",
   "workflowRunId": "02cd585e-b3c7-4b9b-a34c-6c25fb1e60a2"
 }
-
 ```
 
 ### 1.3 Stop Workflow Stream
@@ -550,7 +596,7 @@ WorkflowStopResponse
 #### Method
 
 ```java
-WorkflowRunResponse info(String workflowRunId, String apiKey);
+WorkflowInfoResponse info(String workflowRunId, String apiKey);
 ```
 
 #### Request Parameters
@@ -564,19 +610,19 @@ WorkflowRunResponse info(String workflowRunId, String apiKey);
 
 WorkflowInfoResponse
 
-| 参数名         | 类型                  | 描述                                              |
-|-------------|---------------------|-------------------------------------------------|
-| id          | String              | Workflow Run ID                                 |
-| workflowId  | String              | Workflow ID                                     |
-| status      | String              | status (running / succeeded / failed / stopped) |
-| inputs      | Map<String, Object> | inputs                                          |
-| outputs     | Map<String, Object> | outputs                                         |
-| error       | String              | error                                           |
-| elapsedTime | Float               | elapsedTime                                     |
-| totalTokens | Integer             | totalTokens                                     |
-| totalSteps  | Integer             | totalSteps                                      |
-| createdAt   | Long                | Creation time (timestamp)                       |
-| finishedAt  | Long                | Completion time (timestamp)                     |
+| Parameter name | Type                | Description                                     |
+|----------------|---------------------|-------------------------------------------------|
+| id             | String              | Workflow Run ID                                 |
+| workflowId     | String              | Workflow ID                                     |
+| status         | String              | status (running / succeeded / failed / stopped) |
+| inputs         | Map<String, Object> | inputs                                          |
+| outputs        | Map<String, Object> | outputs                                         |
+| error          | String              | error                                           |
+| elapsedTime    | Float               | elapsedTime                                     |
+| totalTokens    | Integer             | totalTokens                                     |
+| totalSteps     | Integer             | totalSteps                                      |
+| createdAt      | Long                | Creation time (timestamp)                       |
+| finishedAt     | Long                | Completion time (timestamp)                     |
 
 ## 2. Workflow Logs
 
