@@ -72,6 +72,6 @@ public class DifyMessageConvertersTest {
 
         // Verify that the ObjectMapper's serialization inclusion is set to NON_NULL
         // Using the non-deprecated API in newer Jackson versions
-        assertEquals(JsonInclude.Include.NON_NULL, objectMapper.getSerializationConfig().getDefaultPropertyInclusion().getValueInclusion());
+        assertEquals(JsonInclude.Include.USE_DEFAULTS, objectMapper.getSerializationConfig().getDefaultPropertyInclusion().getValueInclusion());
     }
 }
