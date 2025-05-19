@@ -15,14 +15,11 @@
  */
 package io.github.guoshiqiufeng.dify.core.exception;
 
-import lombok.AllArgsConstructor;
-
 /**
  * @author yanghq
  * @version 1.0
  * @since 2025/2/27 15:31
  */
-@AllArgsConstructor
 public class BaseException extends RuntimeException {
 
     /**
@@ -34,6 +31,12 @@ public class BaseException extends RuntimeException {
      * 错误消息
      */
     private String msg;
+
+    public BaseException(Integer code, String msg) {
+        super(msg);
+        this.code = code;
+        this.msg = msg;
+    }
 
     public BaseException(BaseExceptionEnum abstractExceptionEnum) {
         super(abstractExceptionEnum.getMsg());

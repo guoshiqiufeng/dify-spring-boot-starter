@@ -22,6 +22,8 @@ import io.github.guoshiqiufeng.dify.client.spring6.utils.DifyExchangeStrategies;
 import io.github.guoshiqiufeng.dify.client.spring6.utils.DifyMessageConverters;
 import io.github.guoshiqiufeng.dify.core.client.BaseDifyClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
+import io.github.guoshiqiufeng.dify.core.exception.DiftClientExceptionEnum;
+import io.github.guoshiqiufeng.dify.core.exception.DifyClientException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -115,7 +117,14 @@ public abstract class BaseDifyDefaultClient implements BaseDifyClient {
                 String statusText = response.getStatusText();
                 String message = StreamUtils.copyToString(response.getBody(), java.nio.charset.StandardCharsets.UTF_8);
                 log.error("【Dify】请求错误，URI：{}，Method：{}，状态码：{}，状态文本：{}，错误信息：{}", url, method, statusCode, statusText, message);
-                throw new RuntimeException(String.format("[%s] %s - %s", statusCode, statusText, message));
+                switch (statusCode) {
+                    case 401:
+                        throw new DifyClientException(DiftClientExceptionEnum.UNAUTHORIZED);
+                    case 404:
+                        throw new DifyClientException(DiftClientExceptionEnum.NOT_FOUND);
+                    default:
+                        throw new RuntimeException(String.format("[%s] %s - %s", statusCode, statusText, message));
+                }
             }
         }
     }

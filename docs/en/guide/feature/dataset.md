@@ -39,18 +39,18 @@ DatasetCreateRequest
 
 **ProviderEnum Values**
 
-| Value       | Description |
-|-------------|-------------|
-| SELF_BUILT  | Self-built  |
-| THIRD_PARTY | Third-party |
+| Value    | Description             |
+|----------|-------------------------|
+| vendor   | Upload file             |
+| external | External knowledge base |
 
 **PermissionEnum Values**
 
-| Value   | Description          |
-|---------|----------------------|
-| ONLY_ME | Visible only to self |
-| TEAM    | Visible to team      |
-| PUBLIC  | Publicly visible     |
+| Value            | Description          |
+|------------------|----------------------|
+| ONLY_ME          | Only self            |
+| ALL_TEAM_MEMBERS | All team members     |
+| PARTIAL_MEMBERS  | Partial team members |
 
 **IndexingTechniqueEnum Values**
 
@@ -153,6 +153,15 @@ DatasetInfoResponse
 | docForm                | DocFormEnum           | Document form                  |
 | externalKnowledgeInfo  | ExternalKnowledgeInfo | External knowledge info        |
 
+**ExternalKnowledgeInfo Object Structure**
+
+| Field                        | Type   | Description                          |
+|------------------------------|--------|--------------------------------------|
+| externalKnowledgeId          | String | External knowledge base ID           |
+| externalKnowledgeApiId       | String | External knowledge base API_ID       |
+| externalKnowledgeApiName     | String | External knowledge base API name     |
+| externalKnowledgeApiEndpoint | String | External knowledge base API endpoint |
+
 ### 1.4 Update Knowledge Base
 
 #### Method
@@ -197,7 +206,7 @@ void delete(String datasetId, String apiKey);
 
 #### Response Parameters
 
-not have
+None
 
 ## 2. Document Management
 
@@ -261,11 +270,11 @@ DocumentCreateByTextRequest
 
 **ModeEnum 对象结构**
 
-| Value        | Description    |
-|--------------|----------------|
-| automatic    | 自动             |
-| hierarchical | parent-child模式 |
-| custom       | 自定义            | 
+| Value        | Description       |
+|--------------|-------------------|
+| automatic    | Automatic         |
+| hierarchical | Parent-child mode |
+| custom       | Custom            | 
 
 **CustomRule Object Structure**
 
@@ -317,6 +326,22 @@ DocumentCreateByTextRequest
 | scoreThresholdEnabled | Boolean              | Whether to enable score threshold |
 | scoreThreshold        | Float                | Score threshold                   |
 
+**SearchMethodEnum Values**
+
+| Value            | Description      |
+|------------------|------------------|
+| keyword_search   | Keyword search   |
+| hybrid_search    | Hybrid search    |
+| semantic_search  | Semantic search  |
+| full_text_search | Full text search |
+
+**RerankingModeEnum Values**
+
+| Value           | Description     |
+|-----------------|-----------------|
+| weighted_score  | Weighted score  |
+| reranking_model | Reranking model |
+
 **RerankingModel Object Structure**
 
 | Field                 | Type   | Description             |
@@ -340,11 +365,11 @@ DocumentCreateByTextRequest
 | embeddingModelName    | String | Embedding model          |
 | embeddingProviderName | String | Embedding model provider |
 
-**RerankingModelWeight Object Structure**
+**KeywordSetting Object Structure**
 
-| 字段名           | 类型    | 描述             |
+| Field         | Type  | Description    |
 |---------------|-------|----------------|
-| keywordWeight | Float | keyword weight |
+| keywordWeight | Float | Keyword weight |
 
 #### Response Parameters
 
@@ -601,7 +626,7 @@ void deleteDocument(String datasetId, String documentId, String apiKey);
 
 #### Response Parameters
 
-not have
+None
 
 ### 2.8 Get Upload File Information
 
@@ -755,7 +780,7 @@ void deleteSegment(String datasetId, String documentId, String segmentId, String
 
 #### Response Parameters
 
-not have
+None
 
 ### 3.4 Update Segment
 
@@ -943,7 +968,7 @@ SegmentChildChunkDeleteRequest
 
 #### Response Parameters
 
-not have
+None
 
 ## 5. Data Retrieval
 
@@ -1102,7 +1127,7 @@ MetaDataDeleteResponse deleteMetaData(String datasetId, String metadataId, Strin
 
 #### Response Parameters
 
-not have
+None
 
 ### 6.4 Metadata Operations
 
@@ -1130,7 +1155,7 @@ MetaDataActionRequest
 
 #### Response Parameters
 
-not have
+None
 
 ### 6.5 Update Document Metadata
 
@@ -1167,7 +1192,7 @@ DocumentMetaDataUpdateRequest
 
 #### Response Parameters
 
-not have
+None
 
 ### 6.6 Get Metadata List
 

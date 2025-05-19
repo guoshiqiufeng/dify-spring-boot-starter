@@ -15,6 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.client.spring6.utils;
 
+import io.github.guoshiqiufeng.dify.core.exception.DiftClientExceptionEnum;
+import io.github.guoshiqiufeng.dify.core.exception.DifyClientException;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -37,8 +39,11 @@ public class WebClientUtil {
                     int statusCode = clientResponse.statusCode().value();
 
                     log.warn("URI: {}, Method: {}, Status: [{}] {}", url, method, statusCode, errorBody);
-
-                    return Mono.error(new RuntimeException(String.format("[%d] %s", statusCode, errorBody)));
+                    return switch (statusCode) {
+                        case 401 -> throw new DifyClientException(DiftClientExceptionEnum.UNAUTHORIZED);
+                        case 404 -> throw new DifyClientException(DiftClientExceptionEnum.NOT_FOUND);
+                        default -> Mono.error(new RuntimeException(String.format("[%d] %s", statusCode, errorBody)));
+                    };
                 });
     }
 

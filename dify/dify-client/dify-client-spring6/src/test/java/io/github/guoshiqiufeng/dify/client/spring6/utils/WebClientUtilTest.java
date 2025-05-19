@@ -66,6 +66,31 @@ public class WebClientUtilTest {
     }
 
     @Test
+    @DisplayName("Test exceptionFunction with 401")
+    public void testExceptionFunctionWithUnauthorized() throws URISyntaxException {
+        // Create a mock ClientResponse and HttpRequest
+        ClientResponse clientResponse = Mockito.mock(ClientResponse.class);
+        HttpRequest httpRequest = Mockito.mock(HttpRequest.class);
+
+        // Configure mocks
+        when(clientResponse.statusCode()).thenReturn(HttpStatus.UNAUTHORIZED);
+        when(clientResponse.bodyToMono(String.class)).thenReturn(Mono.just("unauthorized"));
+        when(clientResponse.request()).thenReturn(httpRequest);
+        when(httpRequest.getURI()).thenReturn(new URI("http://test.com/api/test"));
+        when(httpRequest.getMethod()).thenReturn(HttpMethod.GET);
+
+        // Call the exceptionFunction
+        Mono<? extends Throwable> result = WebClientUtil.exceptionFunction(clientResponse);
+
+        // Verify the result - the exceptionFunction returns Mono.error() which triggers onError
+        StepVerifier.create(result.flatMap(Mono::error))
+                .expectErrorMatches(throwable ->
+                        throwable instanceof RuntimeException &&
+                                throwable.getMessage().contains("Access token is invalid"))
+                .verify();
+    }
+
+    @Test
     @DisplayName("Test exceptionFunction with 404 Not Found")
     public void testExceptionFunctionWithNotFound() throws URISyntaxException {
         // Create a mock ClientResponse and HttpRequest
@@ -86,8 +111,7 @@ public class WebClientUtilTest {
         StepVerifier.create(result.flatMap(Mono::error))
                 .expectErrorMatches(throwable ->
                         throwable instanceof RuntimeException &&
-                                throwable.getMessage().contains("404") &&
-                                throwable.getMessage().contains("Resource Not Found"))
+                                throwable.getMessage().contains("Not Found"))
                 .verify();
     }
 

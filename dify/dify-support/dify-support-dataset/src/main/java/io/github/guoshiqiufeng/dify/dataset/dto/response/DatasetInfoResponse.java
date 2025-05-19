@@ -33,18 +33,6 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class DatasetInfoResponse extends DatasetResponse {
 
-    @JsonAlias("embeddingModel")
-    @JsonProperty("embedding_model")
-    private String embeddingModel;
-
-    @JsonAlias("embeddingModelProvider")
-    @JsonProperty("embedding_model_provider")
-    private String embeddingModelProvider;
-
-    @JsonAlias("embeddingAvailable")
-    @JsonProperty("embedding_available")
-    private Boolean embeddingAvailable;
-
     @JsonAlias("retrievalModelDict")
     @JsonProperty("retrieval_model_dict")
     private RetrievalModel retrievalModelDict;

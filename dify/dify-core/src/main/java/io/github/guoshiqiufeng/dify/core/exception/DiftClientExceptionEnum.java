@@ -13,21 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.workflow.dto.response.stream;
+package io.github.guoshiqiufeng.dify.core.exception;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * @author yanghq
- * @version 0.12.1
- * @since 2025/5/16 17:44
+ * @version 1.0
+ * @since 2025/5/19 13:42
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class ParallelBranchFinishedData extends ParallelBranchStartedData {
+@Getter
+@AllArgsConstructor
+public enum DiftClientExceptionEnum implements BaseExceptionEnum {
 
-    private String status;
+    /**
+     * unauthorized
+     */
+    UNAUTHORIZED(401, "Access token is invalid"),
+    /**
+     * notFound
+     */
+    NOT_FOUND(404, "Not Found"),
 
-    private String error;
+
+    ;
+
+    private final Integer code;
+
+    private final String msg;
 }

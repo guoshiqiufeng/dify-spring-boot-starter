@@ -214,4 +214,56 @@ public class BaseDifyDefaultClientTest {
         String expectedMessageContent = "[400] Bad Request - Error message";
         assertTrue(exception.getMessage().contains(expectedMessageContent));
     }
+
+    @Test
+    @DisplayName("Test DifyResponseErrorHandler handleError method with unauthorized")
+    public void testResponseErrorHandlerHandleErrorWithUnauthorized() throws IOException {
+        // Create a mock ClientHttpResponse
+        ClientHttpResponse mockResponse = Mockito.mock(ClientHttpResponse.class);
+        when(mockResponse.getStatusCode()).thenReturn(HttpStatus.UNAUTHORIZED);
+        when(mockResponse.getStatusText()).thenReturn("Unauthorized");
+        when(mockResponse.getBody()).thenReturn(new ByteArrayInputStream("Error message".getBytes()));
+
+        // Create a concrete subclass to access the DifyResponseErrorHandler
+        BaseDifyDefaultClient client = new BaseDifyDefaultClient() {
+            // No need to implement any methods
+        };
+
+        // Test that handleError throws a RuntimeException for an error response
+        URI uri = URI.create("https://api.dify.ai/endpoint");
+        HttpMethod method = HttpMethod.POST;
+        Exception exception = assertThrows(RuntimeException.class, () ->
+                client.responseErrorHandler.handleError(uri, method, mockResponse)
+        );
+
+        // Verify
+        String expectedMessageContent = "Access token is invalid";
+        assertTrue(exception.getMessage().contains(expectedMessageContent));
+    }
+
+    @Test
+    @DisplayName("Test DifyResponseErrorHandler handleError method with notfound")
+    public void testResponseErrorHandlerHandleErrorWithNotFound() throws IOException {
+        // Create a mock ClientHttpResponse
+        ClientHttpResponse mockResponse = Mockito.mock(ClientHttpResponse.class);
+        when(mockResponse.getStatusCode()).thenReturn(HttpStatus.NOT_FOUND);
+        when(mockResponse.getStatusText()).thenReturn("Not Found");
+        when(mockResponse.getBody()).thenReturn(new ByteArrayInputStream("Error message".getBytes()));
+
+        // Create a concrete subclass to access the DifyResponseErrorHandler
+        BaseDifyDefaultClient client = new BaseDifyDefaultClient() {
+            // No need to implement any methods
+        };
+
+        // Test that handleError throws a RuntimeException for an error response
+        URI uri = URI.create("https://api.dify.ai/endpoint");
+        HttpMethod method = HttpMethod.POST;
+        Exception exception = assertThrows(RuntimeException.class, () ->
+                client.responseErrorHandler.handleError(uri, method, mockResponse)
+        );
+
+        // Verify
+        String expectedMessageContent = "Not Found";
+        assertTrue(exception.getMessage().contains(expectedMessageContent));
+    }
 }

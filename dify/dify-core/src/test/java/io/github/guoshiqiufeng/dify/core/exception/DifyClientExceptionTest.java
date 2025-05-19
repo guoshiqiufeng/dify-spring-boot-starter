@@ -18,39 +18,16 @@ package io.github.guoshiqiufeng.dify.core.exception;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * Test class for BaseException
- *
  * @author yanghq
- * @version 0.10.0
- * @since 2025/4/26
+ * @version 1.0
+ * @since 2025/5/19 15:35
  */
-public class BaseExceptionTest {
-
-    // Test enum implementing BaseExceptionEnum interface
-    private enum TestExceptionEnum implements BaseExceptionEnum {
-        TEST_ERROR(10001, "Test error message"),
-        ANOTHER_ERROR(10002, "Another error message");
-
-        private final Integer code;
-        private final String msg;
-
-        TestExceptionEnum(Integer code, String msg) {
-            this.code = code;
-            this.msg = msg;
-        }
-
-        @Override
-        public Integer getCode() {
-            return code;
-        }
-
-        @Override
-        public String getMsg() {
-            return msg;
-        }
-    }
+public class DifyClientExceptionTest {
 
     /**
      * Test BaseException with enum constructor
@@ -58,10 +35,10 @@ public class BaseExceptionTest {
     @Test
     public void testBaseExceptionWithEnum() {
         // Create exception instance
-        BaseException exception = new BaseException(TestExceptionEnum.TEST_ERROR);
+        DifyClientException exception = new DifyClientException(DiftClientExceptionEnum.UNAUTHORIZED);
 
         // Verify the error message is correctly set
-        assertEquals("Test error message", exception.getMessage());
+        assertEquals("Access token is invalid", exception.getMessage());
 
         // Verify exception is a subclass of RuntimeException
         assertInstanceOf(RuntimeException.class, exception);
@@ -88,14 +65,14 @@ public class BaseExceptionTest {
     public void testThrowAndCatchException() {
         // Verify exception can be correctly thrown and caught
         assertThrows(BaseException.class, () -> {
-            throw new BaseException(TestExceptionEnum.ANOTHER_ERROR);
+            throw new DifyClientException(DiftClientExceptionEnum.UNAUTHORIZED);
         });
 
         // Verify the message after catching exception
         try {
-            throw new BaseException(TestExceptionEnum.ANOTHER_ERROR);
+            throw new DifyClientException(DiftClientExceptionEnum.UNAUTHORIZED);
         } catch (BaseException e) {
-            assertEquals("Another error message", e.getMessage());
+            assertEquals("Access token is invalid", e.getMessage());
         }
     }
 
@@ -105,11 +82,8 @@ public class BaseExceptionTest {
     @Test
     public void testDifferentConstructors() {
         // Test enum constructor
-        BaseException exception1 = new BaseException(TestExceptionEnum.TEST_ERROR);
-        assertEquals("Test error message", exception1.getMessage());
-
-        // Test direct parameters constructor
-        BaseException exception2 = new BaseException(404, "Resource not found");
-        assertNotNull(exception2.getMessage());
+        DifyClientException exception1 = new DifyClientException(DiftClientExceptionEnum.NOT_FOUND);
+        assertEquals("Not Found", exception1.getMessage());
     }
+
 }

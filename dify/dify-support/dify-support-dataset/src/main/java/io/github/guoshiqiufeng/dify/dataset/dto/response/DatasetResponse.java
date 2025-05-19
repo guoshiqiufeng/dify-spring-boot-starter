@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.dataset.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.guoshiqiufeng.dify.dataset.enums.IndexingTechniqueEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.PermissionEnum;
 import lombok.Data;
@@ -104,5 +105,15 @@ public class DatasetResponse implements Serializable {
     @JsonAlias("updated_at")
     private Long updatedAt;
 
+    @JsonAlias("embeddingModel")
+    @JsonProperty("embedding_model")
+    private String embeddingModel;
 
+    @JsonAlias("embeddingModelProvider")
+    @JsonProperty("embedding_model_provider")
+    private String embeddingModelProvider;
+
+    @JsonAlias("embeddingAvailable")
+    @JsonProperty("embedding_available")
+    private Boolean embeddingAvailable;
 }

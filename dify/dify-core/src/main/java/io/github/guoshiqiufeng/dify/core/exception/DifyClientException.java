@@ -13,21 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.workflow.dto.response.stream;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+package io.github.guoshiqiufeng.dify.core.exception;
 
 /**
  * @author yanghq
- * @version 0.12.1
- * @since 2025/5/16 17:44
+ * @version 1.0
+ * @since 2025/5/19 13:41
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class ParallelBranchFinishedData extends ParallelBranchStartedData {
+public class DifyClientException extends BaseException {
 
-    private String status;
-
-    private String error;
+    public DifyClientException(DiftClientExceptionEnum exceptionEnum) {
+        super(exceptionEnum.getCode(), exceptionEnum.getMsg());
+    }
 }
