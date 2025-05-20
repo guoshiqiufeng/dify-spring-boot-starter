@@ -31,7 +31,7 @@ body:
     validations:
       required: true
       
-   - type: dropdown
+  - type: dropdown
     attributes:
       label: springboot used
       description: Which springboot is used?
