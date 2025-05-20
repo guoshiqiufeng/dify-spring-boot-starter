@@ -892,6 +892,9 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         String apiKey = "test-api-key";
         String annotationId = "anno-1";
 
+        // Mock the response to return Mono.empty()
+        when(responseSpecMock.bodyToMono(Void.class)).thenReturn(Mono.empty());
+
         // Execute the method
         client.deleteAppAnnotation(annotationId, apiKey);
 

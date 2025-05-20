@@ -392,7 +392,9 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
                 .uri(DatasetUriConstant.V1_APPS_ANNOTATIONS + "/{annotation_id}", annotationId)
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
                 .retrieve()
-                .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction);
+                .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(Void.class)
+                .block();
     }
 
     @Override
