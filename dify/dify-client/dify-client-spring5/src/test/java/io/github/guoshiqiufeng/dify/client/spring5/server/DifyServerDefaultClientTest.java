@@ -23,6 +23,7 @@ import io.github.guoshiqiufeng.dify.server.constant.ServerUriConstant;
 import io.github.guoshiqiufeng.dify.server.dto.request.DifyLoginRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
@@ -33,8 +34,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -48,7 +48,7 @@ import static org.mockito.Mockito.*;
 @SuppressWarnings("unchecked")
 public class DifyServerDefaultClientTest extends BaseClientTest {
 
-    private DifyServerDefaultClient difyServerDefaultClient;
+    private DifyServerDefaultClient client;
 
     @BeforeEach
     public void setup() {
@@ -58,7 +58,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         DifyProperties.Server serverConfig = new DifyProperties.Server();
         serverConfig.setEmail("test@example.com");
         serverConfig.setPassword("password123");
-        difyServerDefaultClient = new DifyServerDefaultClient(serverConfig, new DifyServerTokenDefault(),
+        client = new DifyServerDefaultClient(serverConfig, new DifyServerTokenDefault(),
                 "https://api.dify.ai", clientConfig, webClientBuilderMock);
     }
 
@@ -81,7 +81,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(LoginResultResponse.class)).thenReturn(Mono.just(resultResponseVO));
 
         // Execute the method
-        LoginResponse actualResponse = difyServerDefaultClient.login();
+        LoginResponse actualResponse = client.login();
 
         // Verify the result
         assertNotNull(actualResponse);
@@ -113,7 +113,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(LoginResultResponse.class)).thenReturn(Mono.just(resultResponseVO));
 
         // Execute the method
-        LoginResponse actualResponse = difyServerDefaultClient.refreshToken(refreshToken);
+        LoginResponse actualResponse = client.refreshToken(refreshToken);
 
         // Verify the result
         assertNotNull(actualResponse);
@@ -143,7 +143,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(AppsResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        AppsResponse actualResponse = difyServerDefaultClient.app(appId);
+        AppsResponse actualResponse = client.app(appId);
 
         // Verify the result
         assertNotNull(actualResponse);
@@ -205,7 +205,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(AppsResponseResult.class)).thenReturn(Mono.just(resultResponseVO));
 
         // Execute the method
-        List<AppsResponse> actualResponse = difyServerDefaultClient.apps(mode, name);
+        List<AppsResponse> actualResponse = client.apps(mode, name);
 
         // Verify the result
         assertNotNull(actualResponse);
@@ -241,7 +241,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(ApiKeyResultResponse.class)).thenReturn(Mono.just(resultResponseVO));
 
         // Execute the method
-        List<ApiKeyResponse> actualResponse = difyServerDefaultClient.getAppApiKey(appId);
+        List<ApiKeyResponse> actualResponse = client.getAppApiKey(appId);
 
         // Verify the result
         assertNotNull(actualResponse);
@@ -249,6 +249,28 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         assertEquals(apiKey.getId(), actualResponse.get(0).getId());
         assertEquals(apiKey.getToken(), actualResponse.get(0).getToken());
         assertEquals(apiKey.getType(), actualResponse.get(0).getType());
+
+        // Verify WebClient interactions
+        verify(webClientMock).get();
+        verify(requestHeadersUriSpecMock).uri(eq(ServerUriConstant.APPS + "/{appId}/api-keys"), eq(appId));
+        verify(responseSpecMock).bodyToMono(ApiKeyResultResponse.class);
+    }
+
+
+    @Test
+    @DisplayName("Test getAppApiKey method on return null")
+    public void testGetAppApiKeyNull() {
+        // Prepare test data
+        String appId = "app-123456";
+
+        // Set up the response mock to return our expected response
+        when(responseSpecMock.bodyToMono(ApiKeyResultResponse.class)).thenReturn(Mono.empty());
+
+        // Execute the method
+        List<ApiKeyResponse> actualResponse = client.getAppApiKey(appId);
+
+        // Verify the result
+        assertNotNull(actualResponse);
 
         // Verify WebClient interactions
         verify(webClientMock).get();
@@ -271,7 +293,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(ApiKeyResponse.class)).thenReturn(Mono.just(apiKey));
 
         // Execute the method
-        List<ApiKeyResponse> actualResponse = difyServerDefaultClient.initAppApiKey(appId);
+        List<ApiKeyResponse> actualResponse = client.initAppApiKey(appId);
 
         // Verify the result
         assertNotNull(actualResponse);
@@ -279,6 +301,27 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         assertEquals(apiKey.getId(), actualResponse.get(0).getId());
         assertEquals(apiKey.getToken(), actualResponse.get(0).getToken());
         assertEquals(apiKey.getType(), actualResponse.get(0).getType());
+
+        // Verify WebClient interactions
+        verify(webClientMock).post();
+        verify(requestBodyUriSpecMock).uri(eq(ServerUriConstant.APPS + "/{appId}/api-keys"), eq(appId));
+        verify(requestBodySpecMock).headers(any());
+        verify(responseSpecMock).bodyToMono(ApiKeyResponse.class);
+    }
+
+    @Test
+    public void testInitAppApiKeyNull() {
+        // Prepare test data
+        String appId = "app-123456";
+
+        // Set up the response mock to return our expected response
+        when(responseSpecMock.bodyToMono(ApiKeyResponse.class)).thenReturn(Mono.empty());
+
+        // Execute the method
+        List<ApiKeyResponse> actualResponse = client.initAppApiKey(appId);
+
+        // Verify the result
+        assertNull(actualResponse);
 
         // Verify WebClient interactions
         verify(webClientMock).post();
@@ -305,7 +348,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(DatasetApiKeyResult.class)).thenReturn(Mono.just(resultResponseVO));
 
         // Execute the method
-        List<DatasetApiKeyResponse> actualResponse = difyServerDefaultClient.getDatasetApiKey();
+        List<DatasetApiKeyResponse> actualResponse = client.getDatasetApiKey();
 
         // Verify the result
         assertNotNull(actualResponse);
@@ -313,6 +356,24 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         assertEquals(apiKey.getId(), actualResponse.get(0).getId());
         assertEquals(apiKey.getToken(), actualResponse.get(0).getToken());
         assertEquals(apiKey.getCreatedAt(), actualResponse.get(0).getCreatedAt());
+
+        // Verify WebClient interactions
+        verify(webClientMock).get();
+        verify(requestHeadersUriSpecMock).uri(ServerUriConstant.DATASETS + "/api-keys");
+        verify(responseSpecMock).bodyToMono(DatasetApiKeyResult.class);
+    }
+
+    @Test
+    public void testGetDatasetApiKeyNull() {
+
+        // set up the response mock to return our expected response
+        when(responseSpecMock.bodyToMono(DatasetApiKeyResult.class)).thenReturn(Mono.empty());
+
+        // Execute the method
+        List<DatasetApiKeyResponse> actualResponse = client.getDatasetApiKey();
+
+        // Verify the result
+        assertNull(actualResponse);
 
         // Verify WebClient interactions
         verify(webClientMock).get();
@@ -332,7 +393,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(DatasetApiKeyResponse.class)).thenReturn(Mono.just(apiKey));
 
         // Execute the method
-        List<DatasetApiKeyResponse> actualResponse = difyServerDefaultClient.initDatasetApiKey();
+        List<DatasetApiKeyResponse> actualResponse = client.initDatasetApiKey();
 
         // Verify the result
         assertNotNull(actualResponse);
@@ -340,6 +401,25 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         assertEquals(apiKey.getId(), actualResponse.get(0).getId());
         assertEquals(apiKey.getToken(), actualResponse.get(0).getToken());
         assertEquals(apiKey.getCreatedAt(), actualResponse.get(0).getCreatedAt());
+
+        // Verify WebClient interactions
+        verify(webClientMock).post();
+        verify(requestBodyUriSpecMock).uri(ServerUriConstant.DATASETS + "/api-keys");
+        verify(requestBodySpecMock).headers(any());
+        verify(responseSpecMock).bodyToMono(DatasetApiKeyResponse.class);
+    }
+
+    @Test
+    public void testInitDatasetApiKeyNull() {
+
+        // Set up the response mock to return our expected response
+        when(responseSpecMock.bodyToMono(DatasetApiKeyResponse.class)).thenReturn(Mono.empty());
+
+        // Execute the method
+        List<DatasetApiKeyResponse> actualResponse = client.initDatasetApiKey();
+
+        // Verify the result
+        assertNull(actualResponse);
 
         // Verify WebClient interactions
         verify(webClientMock).post();

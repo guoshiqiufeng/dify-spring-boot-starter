@@ -39,14 +39,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.net.URI;
+import java.util.*;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -260,7 +260,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         request.setConversationId("conv-123");
         request.setName("New Conversation Name");
         request.setUserId("user-123");
-        request.setAutoGenerate(false);
+        request.setAutoGenerate(null);
 
         // Call the method to test
         MessageConversationsResponse response = client.renameConversation(request);
@@ -283,6 +283,14 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         assertEquals("New Conversation Name", capturedBody.get("name"));
         assertEquals(false, capturedBody.get("auto_generate"));
         assertEquals("user-123", capturedBody.get("user"));
+
+        RenameConversationRequest defaultRequest = new RenameConversationRequest();
+        request.setApiKey(TEST_API_KEY);
+        request.setUserId("user-123");
+        request.setConversationId("conv-123");
+        defaultRequest.setName(null);
+        defaultRequest.setAutoGenerate(false);
+        client.renameConversation(defaultRequest);
     }
 
     @Test
@@ -420,13 +428,15 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         request.setUserId(userId);
         request.setContent(content);
         request.setConversationId(conversationId);
-        request.setInputs(new HashMap<>());
-        ChatMessageSendRequest.ChatMessageFile workflowFile1 = new ChatMessageSendRequest.ChatMessageFile();
-        workflowFile1.setUrl("https://file.com");
-        workflowFile1.setType("image");
-        ChatMessageSendRequest.ChatMessageFile workflowFile2 = new ChatMessageSendRequest.ChatMessageFile();
-        workflowFile2.setUrl("https://file.com");
-        request.setFiles(List.of(workflowFile1, workflowFile2));
+        request.setInputs(null);
+        ChatMessageSendRequest.ChatMessageFile file1 = new ChatMessageSendRequest.ChatMessageFile();
+        file1.setUrl("https://file.com");
+        file1.setType("image");
+        ChatMessageSendRequest.ChatMessageFile file2 = new ChatMessageSendRequest.ChatMessageFile();
+        file2.setType(null);
+        file2.setTransferMethod(null);
+        file2.setUrl("https://file.com");
+        request.setFiles(List.of(file1, file2));
         // Create expected response
         ChatMessageSendResponse expectedResponse = new ChatMessageSendResponse();
         expectedResponse.setId("msg-123456");
@@ -456,6 +466,25 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
     public void testConversations() {
         RestClient restClient = restClientMock.getRestClient();
         RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+        when(requestHeadersUriSpec.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("sort_by"), anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("limit"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("user"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("last_id"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build()).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpec;
+        });
+
         // Prepare test data
         String apiKey = "test-api-key";
         String userId = "test-user-id";
@@ -500,6 +529,8 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         MessageConversationsRequest defaultRequest = new MessageConversationsRequest();
         defaultRequest.setApiKey(apiKey);
         defaultRequest.setUserId(userId);
+        defaultRequest.setSortBy(null);
+        defaultRequest.setLimit(null);
         client.conversations(defaultRequest);
     }
 
@@ -507,6 +538,25 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
     public void testMessages() {
         RestClient restClient = restClientMock.getRestClient();
         RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+        when(requestHeadersUriSpec.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("conversation_id"), anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("limit"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("user"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("first_id"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build()).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpec;
+        });
+
         // Prepare test data
         String apiKey = "test-api-key";
         String userId = "test-user-id";
@@ -518,6 +568,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         request.setApiKey(apiKey);
         request.setUserId(userId);
         request.setConversationId(conversationId);
+        request.setFirstId(null);
         request.setLimit(limit);
 
         // Create expected response
@@ -548,6 +599,14 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(restClient).get();
         verify(responseSpec).body(any(ParameterizedTypeReference.class));
+
+        MessagesRequest defaultRequest = new MessagesRequest();
+        defaultRequest.setApiKey(apiKey);
+        defaultRequest.setUserId(null);
+        defaultRequest.setConversationId(conversationId);
+        defaultRequest.setLimit(null);
+        defaultRequest.setFirstId("1");
+        client.messages(defaultRequest);
     }
 
     @Test

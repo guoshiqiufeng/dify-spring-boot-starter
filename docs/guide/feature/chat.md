@@ -34,6 +34,15 @@ ChatMessageSendRequest
 | files          | `List<ChatMessageFile>` | 否    | 文件     |
 | inputs         | `Map<String, Object>`   | 否    | 自定义参数  |
 
+**ChatMessageFile 结构：**
+
+| 参数名            | 类型     | 描述                                    |
+|----------------|--------|---------------------------------------|
+| type           | String | 文件类型，默认为 "image"                      |
+| transferMethod | String | 传输方式，默认为 "remote_url"                 |
+| url            | String | 远程URL路径，当 transferMethod 为 remote_url |
+| uploadFileId   | String | 上传文件ID，当 transferMethod 为 local_file  |
+
 #### 响应参数
 
 ChatMessageSendResponse
@@ -52,7 +61,7 @@ ChatMessageSendResponse
 #### 方法
 
 ```java
-Flux<ChatMessageSendResponse> sendChatMessageStream(ChatMessageSendRequest sendRequest);
+Flux<ChatMessageSendCompletionResponse> sendChatMessageStream(ChatMessageSendRequest sendRequest);
 ```
 
 #### 请求参数
@@ -61,7 +70,23 @@ Flux<ChatMessageSendResponse> sendChatMessageStream(ChatMessageSendRequest sendR
 
 #### 响应参数
 
-返回消息流，每条消息格式与发送消息响应相同
+返回消息流，包含以下结构：
+
+ChatMessageSendCompletionResponse
+
+| 参数名           | 类型             | 描述               |
+|---------------|----------------|------------------|
+| workflowRunId | String         | 工作流运行ID          |
+| data          | CompletionData | 完成数据，根据事件类型不同而变化 |
+
+其中 `CompletionData` 根据事件类型会具有不同的数据结构，可能的事件类型有：
+
+| 事件类型              | 描述    | 对应数据类                |
+|-------------------|-------|----------------------|
+| workflow_started  | 工作流开始 | WorkflowStartedData  |
+| node_started      | 节点开始  | NodeStartedData      |
+| node_finished     | 节点完成  | NodeFinishedData     |
+| workflow_finished | 工作流完成 | WorkflowFinishedData |
 
 ### 1.3 终止消息流
 
@@ -626,6 +651,11 @@ AppAnnotationReplyRequest
 | embeddingProviderName | String                    | 否    | 嵌入模型提供商 |
 | embeddingModelName    | String                    | 否    | 嵌入模型名称  |
 | scoreThreshold        | Float                     | 否    | 评分阈值    |
+
+**AnnotationReplyActionEnum 可选值：**
+
+- enable - 启用标注回复
+- disable - 禁用标注回复
 
 #### 响应参数
 

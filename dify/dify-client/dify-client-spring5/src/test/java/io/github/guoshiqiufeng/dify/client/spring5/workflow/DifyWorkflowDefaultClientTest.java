@@ -51,14 +51,14 @@ import static org.mockito.Mockito.*;
 @SuppressWarnings("unchecked")
 public class DifyWorkflowDefaultClientTest extends BaseClientTest {
 
-    private DifyWorkflowDefaultClient difyWorkflowDefaultClient;
+    private DifyWorkflowDefaultClient client;
 
     @BeforeEach
     public void setup() {
         super.setup();
         // Create real client with mocked WebClient
         DifyProperties.ClientConfig clientConfig = new DifyProperties.ClientConfig();
-        difyWorkflowDefaultClient = new DifyWorkflowDefaultClient("https://api.dify.ai", clientConfig, webClientBuilderMock);
+        client = new DifyWorkflowDefaultClient("https://api.dify.ai", clientConfig, webClientBuilderMock);
     }
 
     @Test
@@ -83,7 +83,7 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(WorkflowRunResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        WorkflowRunResponse actualResponse = difyWorkflowDefaultClient.runWorkflow(request);
+        WorkflowRunResponse actualResponse = client.runWorkflow(request);
 
         // Verify the result
         assertNotNull(actualResponse);
@@ -107,6 +107,8 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         request.setApiKey(apiKey);
         request.setUserId(userId);
         WorkflowRunRequest.WorkflowFile workflowFile = new WorkflowRunRequest.WorkflowFile();
+        workflowFile.setType(null);
+        workflowFile.setTransferMethod(null);
         workflowFile.setUrl("https://file.com");
         workflowFile.setType("image");
         request.setFiles(List.of(workflowFile));
@@ -122,7 +124,7 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(WorkflowRunResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        WorkflowRunResponse actualResponse = difyWorkflowDefaultClient.runWorkflow(request);
+        WorkflowRunResponse actualResponse = client.runWorkflow(request);
 
         // Verify the result
         assertNotNull(actualResponse);
@@ -134,6 +136,13 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         verify(requestBodySpecMock).header(eq(HttpHeaders.AUTHORIZATION), eq("Bearer " + apiKey));
         verify(requestBodySpecMock).bodyValue(any(ChatMessageVO.class));
         verify(responseSpecMock).bodyToMono(WorkflowRunResponse.class);
+
+        WorkflowRunRequest emptyRequest = new WorkflowRunRequest();
+        emptyRequest.setApiKey(apiKey);
+        emptyRequest.setUserId(userId);
+        emptyRequest.setFiles(null);
+        emptyRequest.setInputs(null);
+        client.runWorkflow(emptyRequest);
     }
 
     @Test
@@ -176,7 +185,7 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToFlux(WorkflowRunStreamResponse.class)).thenReturn(Flux.fromIterable(responses));
 
         // Execute the method
-        Flux<WorkflowRunStreamResponse> actualResponseFlux = difyWorkflowDefaultClient.runWorkflowStream(request);
+        Flux<WorkflowRunStreamResponse> actualResponseFlux = client.runWorkflowStream(request);
         List<WorkflowRunStreamResponse> actualResponses = actualResponseFlux.collectList().block();
 
         // Verify the result
@@ -225,7 +234,7 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(WorkflowInfoResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        WorkflowInfoResponse actualResponse = difyWorkflowDefaultClient.info(workflowRunId, apiKey);
+        WorkflowInfoResponse actualResponse = client.info(workflowRunId, apiKey);
 
         // Verify the result
         assertNotNull(actualResponse);
@@ -261,7 +270,7 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(WorkflowStopResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        WorkflowStopResponse actualResponse = difyWorkflowDefaultClient.stopWorkflowStream(apiKey, taskId, userId);
+        WorkflowStopResponse actualResponse = client.stopWorkflowStream(apiKey, taskId, userId);
 
         // Verify the result
         assertNotNull(actualResponse);
@@ -359,7 +368,7 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(any(ParameterizedTypeReference.class))).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        DifyPageResult<WorkflowLogs> actualResponse = difyWorkflowDefaultClient.logs(request);
+        DifyPageResult<WorkflowLogs> actualResponse = client.logs(request);
 
         // Verify the result
         assertNotNull(actualResponse);
@@ -390,5 +399,11 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         verify(requestHeadersUriSpecMock).uri(any(Function.class));
         verify(requestHeadersSpecMock).header(eq(HttpHeaders.AUTHORIZATION), eq("Bearer " + apiKey));
         verify(responseSpecMock).bodyToMono(any(ParameterizedTypeReference.class));
+
+        WorkflowLogsRequest defaultRequest = new WorkflowLogsRequest();
+        defaultRequest.setApiKey("wf-api-key-123");
+        defaultRequest.setPage(null);
+        defaultRequest.setLimit(null);
+        client.logs(defaultRequest);
     }
 }

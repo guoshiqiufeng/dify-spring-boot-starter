@@ -27,6 +27,9 @@ import io.github.guoshiqiufeng.dify.dataset.impl.DifyDatasetClientImpl;
  */
 public class DifyDatasetBuilder {
 
+    private DifyDatasetBuilder() {
+    }
+
     public static DifyDataset create(DifyDatasetClient difyDatasetClient) {
         return new DifyDatasetClientImpl(difyDatasetClient);
     }
@@ -35,6 +38,10 @@ public class DifyDatasetBuilder {
      * Builder for DifyDatasetClient
      */
     public static class DifyDatasetClientBuilder {
+
+        private DifyDatasetClientBuilder() {
+        }
+
         public static DifyDatasetClient create() {
             return new DifyDatasetDefaultClient();
         }

@@ -36,6 +36,15 @@ ChatMessageSendRequest
 | files          | `List<ChatMessageFile>` | No       | file                  |
 | inputs         | `Map<String, Object>`   | No       | Customized parameters |
 
+**ChatMessageFile Structure:**
+
+| Parameter name | Type   | Description                                        |
+|----------------|--------|----------------------------------------------------|
+| type           | String | File type, default is "image"                      |
+| transferMethod | String | Transfer method, default is "remote_url"           |
+| url            | String | Remote URL path, when transferMethod is remote_url |
+| uploadFileId   | String | Upload file ID, when transferMethod is local_file  |
+
 #### Response parameter
 
 ChatMessageSendResponse
@@ -54,7 +63,7 @@ ChatMessageSendResponse
 #### Method
 
 ```java
-Flux<ChatMessageSendResponse> sendChatMessageStream(ChatMessageSendRequest sendRequest);
+Flux<ChatMessageSendCompletionResponse> sendChatMessageStream(ChatMessageSendRequest sendRequest);
 ```
 
 #### Request Parameters
@@ -63,7 +72,23 @@ Same as the Send Message interface
 
 #### Response parameter
 
-Returns a stream of messages, each of which is formatted in the same way as the send message response
+Returns a message stream with the following structure:
+
+ChatMessageSendCompletionResponse
+
+| Parameter name | Type           | Description                           |
+|----------------|----------------|---------------------------------------|
+| workflowRunId  | String         | Workflow run ID                       |
+| data           | CompletionData | Completion data, varies by event type |
+
+The `CompletionData` structure varies depending on the event type:
+
+| Event Type        | Description       | Corresponding Data Class |
+|-------------------|-------------------|--------------------------|
+| workflow_started  | Workflow started  | WorkflowStartedData      |
+| node_started      | Node started      | NodeStartedData          |
+| node_finished     | Node finished     | NodeFinishedData         |
+| workflow_finished | Workflow finished | WorkflowFinishedData     |
 
 ### 1.3 Termination message flow
 
@@ -234,7 +259,7 @@ MessageConversationsResponse
 #### Method
 
 ```java
-void textToAudio(TextToAudioRequest request);
+ResponseEntity<byte[]> textToAudio(TextToAudioRequest request);
 ```
 
 #### Request Parameters
@@ -628,6 +653,11 @@ AppAnnotationReplyRequest
 | embeddingProviderName | String                    | No       | Embedding model provider |
 | embeddingModelName    | String                    | No       | Embedding model name     |
 | scoreThreshold        | Float                     | No       | Score threshold          |
+
+**AnnotationReplyActionEnum values:**
+
+- enable - Enable annotation reply
+- disable - Disable annotation reply
 
 #### Response Parameters
 

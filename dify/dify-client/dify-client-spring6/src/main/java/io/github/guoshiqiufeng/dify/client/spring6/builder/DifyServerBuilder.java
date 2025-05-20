@@ -30,6 +30,9 @@ import io.github.guoshiqiufeng.dify.server.impl.DifyServerClientImpl;
  */
 public class DifyServerBuilder {
 
+    private DifyServerBuilder() {
+    }
+
     public static DifyServer create(DifyServerClient difyServerClient) {
         return new DifyServerClientImpl(difyServerClient);
     }
@@ -38,6 +41,9 @@ public class DifyServerBuilder {
      * Builder for DifyServerClient
      */
     public static class DifyServerClientBuilder {
+        private DifyServerClientBuilder() {
+        }
+
         public static DifyServerClient create(DifyProperties.Server difyServerProperties) {
             return new DifyServerDefaultClient(difyServerProperties);
         }

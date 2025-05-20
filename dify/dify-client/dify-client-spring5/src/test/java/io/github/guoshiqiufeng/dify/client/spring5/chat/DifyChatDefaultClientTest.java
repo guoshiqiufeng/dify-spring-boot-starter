@@ -36,14 +36,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.net.URI;
+import java.util.*;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -61,7 +60,7 @@ import static org.mockito.Mockito.*;
 @SuppressWarnings("unchecked")
 public class DifyChatDefaultClientTest extends BaseClientTest {
 
-    private DifyChatDefaultClient difyChatDefaultClient;
+    private DifyChatDefaultClient client;
     private static final String TEST_API_KEY = "test-api-key";
 
     @BeforeEach
@@ -69,7 +68,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         super.setup();
         // Create real client with mocked WebClient
         DifyProperties.ClientConfig clientConfig = new DifyProperties.ClientConfig();
-        difyChatDefaultClient = new DifyChatDefaultClient("https://api.dify.ai", clientConfig, webClientBuilderMock);
+        client = new DifyChatDefaultClient("https://api.dify.ai", clientConfig, webClientBuilderMock);
     }
 
     @Test
@@ -109,7 +108,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(FileUploadResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        FileUploadResponse actualResponse = difyChatDefaultClient.fileUpload(request);
+        FileUploadResponse actualResponse = client.fileUpload(request);
 
         // Verify the result
         assertEquals(fileId, actualResponse.getId());
@@ -144,7 +143,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(AppInfoResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        AppInfoResponse actualResponse = difyChatDefaultClient.info(apiKey);
+        AppInfoResponse actualResponse = client.info(apiKey);
 
         // Verify the result
         assertEquals(expectedResponse.getName(), actualResponse.getName());
@@ -173,7 +172,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(AppMetaResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        AppMetaResponse actualResponse = difyChatDefaultClient.meta(apiKey);
+        AppMetaResponse actualResponse = client.meta(apiKey);
 
         // Verify the result
         assertNotNull(actualResponse);
@@ -214,7 +213,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 .thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        ChatMessageSendResponse actualResponse = difyChatDefaultClient.chat(request);
+        ChatMessageSendResponse actualResponse = client.chat(request);
 
         // Verify results
         assertNotNull(actualResponse);
@@ -261,7 +260,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         request.setConversationId("conv-123");
 
         // Call the method to test
-        Flux<ChatMessageSendCompletionResponse> responseFlux = difyChatDefaultClient.streamingChat(request);
+        Flux<ChatMessageSendCompletionResponse> responseFlux = client.streamingChat(request);
 
         // Verify the response using StepVerifier
         assertNotNull(responseFlux);
@@ -294,7 +293,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         String userId = "user-123";
 
         // Call the method to test
-        difyChatDefaultClient.stopMessagesStream(apiKey, taskId, userId);
+        client.stopMessagesStream(apiKey, taskId, userId);
 
         // Verify interactions with mocks
         verify(webClient).post();
@@ -316,11 +315,13 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         request.setUserId(userId);
         request.setContent(content);
         request.setConversationId(conversationId);
-        request.setInputs(new HashMap<>());
-        ChatMessageSendRequest.ChatMessageFile workflowFile = new ChatMessageSendRequest.ChatMessageFile();
-        workflowFile.setUrl("https://file.com");
-        workflowFile.setType("image");
-        request.setFiles(List.of(workflowFile));
+        request.setInputs(null);
+        ChatMessageSendRequest.ChatMessageFile file = new ChatMessageSendRequest.ChatMessageFile();
+        file.setType(null);
+        file.setTransferMethod(null);
+        file.setUrl("https://file.com");
+        file.setType("image");
+        request.setFiles(List.of(file));
         // Create expected response
         ChatMessageSendResponse expectedResponse = new ChatMessageSendResponse();
         expectedResponse.setId("msg-123456");
@@ -332,7 +333,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 .thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        ChatMessageSendResponse actualResponse = difyChatDefaultClient.chat(request);
+        ChatMessageSendResponse actualResponse = client.chat(request);
 
         // Verify results
         assertNotNull(actualResponse);
@@ -354,6 +355,22 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         String userId = "test-user-id";
         String sortBy = "-updated_at";
         Integer limit = 20;
+
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("sort_by"), anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("limit"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("user"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("last_id"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build()).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
 
         // Create request
         MessageConversationsRequest request = new MessageConversationsRequest();
@@ -377,7 +394,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 .thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        DifyPageResult<MessageConversationsResponse> actualResponse = difyChatDefaultClient.conversations(request);
+        DifyPageResult<MessageConversationsResponse> actualResponse = client.conversations(request);
 
         // Verify results
         assertNotNull(actualResponse);
@@ -391,6 +408,13 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         verify(requestHeadersSpecMock).header(eq(HttpHeaders.AUTHORIZATION), eq("Bearer " + apiKey));
         verify(requestHeadersSpecMock).retrieve();
         verify(responseSpecMock).bodyToMono(any(ParameterizedTypeReference.class));
+
+        MessageConversationsRequest defaultRequest = new MessageConversationsRequest();
+        defaultRequest.setApiKey(apiKey);
+        defaultRequest.setUserId(userId);
+        defaultRequest.setSortBy(null);
+        defaultRequest.setLimit(null);
+        client.conversations(defaultRequest);
     }
 
     @Test
@@ -401,11 +425,28 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         String conversationId = "conv-123456";
         Integer limit = 20;
 
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("conversation_id"), anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("limit"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("user"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("first_id"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build()).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
+
         // Create request
         MessagesRequest request = new MessagesRequest();
         request.setApiKey(apiKey);
         request.setUserId(userId);
         request.setConversationId(conversationId);
+        request.setFirstId(null);
         request.setLimit(limit);
 
         // Create expected response
@@ -424,7 +465,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 .thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        DifyPageResult<MessagesResponseVO> actualResponse = difyChatDefaultClient.messages(request);
+        DifyPageResult<MessagesResponseVO> actualResponse = client.messages(request);
 
         // Verify results
         assertNotNull(actualResponse);
@@ -436,6 +477,14 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(webClientMock).get();
         verify(responseSpecMock).bodyToMono(any(ParameterizedTypeReference.class));
+
+        MessagesRequest defaultRequest = new MessagesRequest();
+        defaultRequest.setApiKey(apiKey);
+        defaultRequest.setUserId(null);
+        defaultRequest.setConversationId(conversationId);
+        defaultRequest.setLimit(null);
+        defaultRequest.setFirstId("1");
+        client.messages(defaultRequest);
     }
 
     @Test
@@ -452,7 +501,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 .thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        AppParametersResponseVO actualResponse = difyChatDefaultClient.parameters(apiKey);
+        AppParametersResponseVO actualResponse = client.parameters(apiKey);
 
         // Verify results
         assertNotNull(actualResponse);
@@ -479,7 +528,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         request.setUserId(userId);
         request.setConversationId(conversationId);
         request.setName(newName);
-        request.setAutoGenerate(autoGenerate);
+        request.setAutoGenerate(null);
 
         // Create expected response
         MessageConversationsResponse expectedResponse = new MessageConversationsResponse();
@@ -491,7 +540,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 .thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        MessageConversationsResponse actualResponse = difyChatDefaultClient.renameConversation(request);
+        MessageConversationsResponse actualResponse = client.renameConversation(request);
 
         // Verify results
         assertNotNull(actualResponse);
@@ -503,6 +552,14 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         verify(requestBodyUriSpecMock).uri(ChatUriConstant.V1_CONVERSATIONS_URI + "/{conversationId}/name", conversationId);
         verify(requestBodySpecMock).bodyValue(any(Map.class));
         verify(responseSpecMock).bodyToMono(any(ParameterizedTypeReference.class));
+
+        RenameConversationRequest defaultRequest = new RenameConversationRequest();
+        defaultRequest.setApiKey(apiKey);
+        defaultRequest.setUserId(userId);
+        defaultRequest.setConversationId(conversationId);
+        defaultRequest.setName(null);
+        defaultRequest.setAutoGenerate(null);
+        client.renameConversation(defaultRequest);
     }
 
     @Test
@@ -524,7 +581,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 .thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        List<String> actualResponse = difyChatDefaultClient.messagesSuggested(messageId, apiKey, userId);
+        List<String> actualResponse = client.messagesSuggested(messageId, apiKey, userId);
 
         // Verify results
         assertNotNull(actualResponse);
@@ -550,7 +607,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         String conversationId = "conv-123456";
 
         // Execute the method
-        difyChatDefaultClient.deleteConversation(conversationId, apiKey, userId);
+        client.deleteConversation(conversationId, apiKey, userId);
 
         // Verify WebClient interactions
         verify(webClientMock).method(HttpMethod.DELETE);
@@ -585,7 +642,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 .thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        ResponseEntity<byte[]> actualResponse = difyChatDefaultClient.textToAudio(request);
+        ResponseEntity<byte[]> actualResponse = client.textToAudio(request);
 
         // Verify results
         assertNotNull(actualResponse);
@@ -625,7 +682,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 .thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        MessageFeedbackResponse actualResponse = difyChatDefaultClient.messageFeedback(request);
+        MessageFeedbackResponse actualResponse = client.messageFeedback(request);
 
         // Verify results
         assertNotNull(actualResponse);
@@ -669,7 +726,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(DifyTextVO.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        DifyTextVO actualResponse = difyChatDefaultClient.audioToText(request);
+        DifyTextVO actualResponse = client.audioToText(request);
 
         // Verify results
         assertNotNull(actualResponse);
@@ -714,7 +771,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 .thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        DifyPageResult<AppAnnotationResponse> actualResponse = difyChatDefaultClient.pageAppAnnotation(request);
+        DifyPageResult<AppAnnotationResponse> actualResponse = client.pageAppAnnotation(request);
 
         // Verify results
         assertNotNull(actualResponse);
@@ -761,7 +818,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 .thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        AppAnnotationResponse actualResponse = difyChatDefaultClient.createAppAnnotation(request);
+        AppAnnotationResponse actualResponse = client.createAppAnnotation(request);
 
         // Verify results
         assertNotNull(actualResponse);
@@ -806,7 +863,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 .thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        AppAnnotationResponse actualResponse = difyChatDefaultClient.updateAppAnnotation(request);
+        AppAnnotationResponse actualResponse = client.updateAppAnnotation(request);
 
         // Verify results
         assertNotNull(actualResponse);
@@ -833,7 +890,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         String annotationId = "anno-1";
 
         // Execute the method
-        difyChatDefaultClient.deleteAppAnnotation(annotationId, apiKey);
+        client.deleteAppAnnotation(annotationId, apiKey);
 
         // Verify WebClient interactions
         verify(webClientMock).delete();
@@ -869,7 +926,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 .thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        AppAnnotationReplyResponse actualResponse = difyChatDefaultClient.annotationReply(request);
+        AppAnnotationReplyResponse actualResponse = client.annotationReply(request);
 
         // Verify results
         assertNotNull(actualResponse);
@@ -909,7 +966,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 .thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        AppAnnotationReplyResponse actualResponse = difyChatDefaultClient.queryAnnotationReply(request);
+        AppAnnotationReplyResponse actualResponse = client.queryAnnotationReply(request);
 
         // Verify results
         assertNotNull(actualResponse);

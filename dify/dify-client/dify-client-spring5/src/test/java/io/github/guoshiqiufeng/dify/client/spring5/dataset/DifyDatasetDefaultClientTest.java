@@ -59,14 +59,14 @@ import static org.mockito.Mockito.*;
 @SuppressWarnings("unchecked")
 public class DifyDatasetDefaultClientTest extends BaseClientTest {
 
-    private DifyDatasetDefaultClient difyDatasetDefaultClient;
+    private DifyDatasetDefaultClient client;
 
     @BeforeEach
     public void setup() {
         super.setup();
         // Create real client with mocked WebClient
         DifyProperties.ClientConfig clientConfig = new DifyProperties.ClientConfig();
-        difyDatasetDefaultClient = new DifyDatasetDefaultClient("https://api.dify.ai", clientConfig, webClientBuilderMock);
+        client = new DifyDatasetDefaultClient("https://api.dify.ai", clientConfig, webClientBuilderMock);
     }
 
     @Test
@@ -92,7 +92,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(DatasetResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        DatasetResponse actualResponse = difyDatasetDefaultClient.create(request);
+        DatasetResponse actualResponse = client.create(request);
 
         // Verify the result
         assertEquals(expectedResponse.getId(), actualResponse.getId());
@@ -162,7 +162,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(any(ParameterizedTypeReference.class))).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        DifyPageResult<DatasetResponse> actualResponse = difyDatasetDefaultClient.page(request);
+        DifyPageResult<DatasetResponse> actualResponse = client.page(request);
 
         // Verify the result
         assertEquals(expectedResponse.getTotal(), actualResponse.getTotal());
@@ -215,7 +215,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(DatasetInfoResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        DatasetInfoResponse actualResponse = difyDatasetDefaultClient.info(request);
+        DatasetInfoResponse actualResponse = client.info(request);
 
         // Verify the result
         assertEquals(expectedResponse.getId(), actualResponse.getId());
@@ -272,7 +272,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(DatasetInfoResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        DatasetInfoResponse actualResponse = difyDatasetDefaultClient.update(request);
+        DatasetInfoResponse actualResponse = client.update(request);
 
         // Verify the result
         assertEquals(expectedResponse.getId(), actualResponse.getId());
@@ -301,7 +301,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(Void.class)).thenReturn(Mono.empty());
 
         // Execute the method
-        difyDatasetDefaultClient.delete(datasetId, apiKey);
+        client.delete(datasetId, apiKey);
 
         // Verify WebClient interactions
         verify(webClientMock).delete();
@@ -336,7 +336,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(DocumentCreateResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        DocumentCreateResponse actualResponse = difyDatasetDefaultClient.createDocumentByText(request);
+        DocumentCreateResponse actualResponse = client.createDocumentByText(request);
 
         // Verify the result
         assertEquals(expectedResponse.getDocument().getId(), actualResponse.getDocument().getId());
@@ -387,7 +387,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(DocumentCreateResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        DocumentCreateResponse actualResponse = difyDatasetDefaultClient.createDocumentByFile(request);
+        DocumentCreateResponse actualResponse = client.createDocumentByFile(request);
 
         // Verify the result
         assertEquals(expectedResponse.getDocument().getId(), actualResponse.getDocument().getId());
@@ -428,7 +428,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(DocumentCreateResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        DocumentCreateResponse actualResponse = difyDatasetDefaultClient.updateDocumentByText(request);
+        DocumentCreateResponse actualResponse = client.updateDocumentByText(request);
 
         // Verify the result
         assertEquals(expectedResponse.getDocument().getId(), actualResponse.getDocument().getId());
@@ -480,7 +480,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(DocumentCreateResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        DocumentCreateResponse actualResponse = difyDatasetDefaultClient.updateDocumentByFile(request);
+        DocumentCreateResponse actualResponse = client.updateDocumentByFile(request);
 
         // Verify the result
         assertEquals(expectedResponse.getDocument().getId(), actualResponse.getDocument().getId());
@@ -535,7 +535,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(any(ParameterizedTypeReference.class))).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        DifyPageResult<DocumentInfo> actualResponse = difyDatasetDefaultClient.pageDocument(request);
+        DifyPageResult<DocumentInfo> actualResponse = client.pageDocument(request);
 
         // Verify the result
         assertEquals(expectedResponse.getTotal(), actualResponse.getTotal());
@@ -589,7 +589,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(any(ParameterizedTypeReference.class))).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        DocumentIndexingStatusResponse actualResponse = difyDatasetDefaultClient.indexingStatus(request);
+        DocumentIndexingStatusResponse actualResponse = client.indexingStatus(request);
 
         // Verify the result
         assertNotNull(actualResponse.getData());
@@ -614,7 +614,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         String datasetId = "dataset-123456";
         String documentId = "document-123456";
 
-        difyDatasetDefaultClient.deleteDocument(datasetId, documentId, apiKey);
+        client.deleteDocument(datasetId, documentId, apiKey);
 
         // Verify WebClient interactions
         verify(webClientMock).delete();
@@ -674,7 +674,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(RetrieveResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        RetrieveResponse actualResponse = difyDatasetDefaultClient.retrieve(request);
+        RetrieveResponse actualResponse = client.retrieve(request);
 
         // Verify the result
         assertNotNull(actualResponse);
@@ -734,7 +734,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(TextEmbeddingListResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        TextEmbeddingListResponse actualResponse = difyDatasetDefaultClient.listTextEmbedding(apiKey);
+        TextEmbeddingListResponse actualResponse = client.listTextEmbedding(apiKey);
 
         // Verify the result
         assertNotNull(actualResponse);
@@ -788,7 +788,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(SegmentResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        SegmentResponse actualResponse = difyDatasetDefaultClient.createSegment(request);
+        SegmentResponse actualResponse = client.createSegment(request);
 
         // Verify the result
         assertNotNull(actualResponse.getData());
@@ -849,7 +849,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(any(ParameterizedTypeReference.class))).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        SegmentResponse actualResponse = difyDatasetDefaultClient.pageSegment(request);
+        SegmentResponse actualResponse = client.pageSegment(request);
 
         // Verify the result
         assertNotNull(actualResponse.getData());
@@ -873,7 +873,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         String documentId = "document-123456";
         String segmentId = "segment-123456";
 
-        difyDatasetDefaultClient.deleteSegment(datasetId, documentId, segmentId, apiKey);
+        client.deleteSegment(datasetId, documentId, segmentId, apiKey);
 
         // Verify WebClient interactions
         verify(webClientMock).delete();
@@ -918,7 +918,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(SegmentUpdateResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        SegmentUpdateResponse actualResponse = difyDatasetDefaultClient.updateSegment(request);
+        SegmentUpdateResponse actualResponse = client.updateSegment(request);
 
         // Verify the result
         assertNotNull(actualResponse.getData());
@@ -960,7 +960,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(MetaDataResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        MetaDataResponse actualResponse = difyDatasetDefaultClient.createMetaData(request);
+        MetaDataResponse actualResponse = client.createMetaData(request);
 
         // Verify the result
         assertEquals(expectedResponse.getId(), actualResponse.getId());
@@ -997,7 +997,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(MetaDataResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        MetaDataResponse actualResponse = difyDatasetDefaultClient.updateMetaData(request);
+        MetaDataResponse actualResponse = client.updateMetaData(request);
 
         // Verify the result
         assertEquals(expectedResponse.getId(), actualResponse.getId());
@@ -1022,7 +1022,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(void.class)).thenReturn(Mono.empty());
 
         // Execute the method
-        difyDatasetDefaultClient.deleteMetaData(datasetId, metadataId, apiKey);
+        client.deleteMetaData(datasetId, metadataId, apiKey);
 
         // Verify WebClient interactions
         verify(webClientMock).delete();
@@ -1046,7 +1046,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(Void.class)).thenReturn(Mono.empty());
 
         // Execute the method
-        difyDatasetDefaultClient.actionMetaData(request);
+        client.actionMetaData(request);
 
         // Verify WebClient interactions
         verify(webClientMock).post();
@@ -1096,7 +1096,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(Void.class)).thenReturn(Mono.empty());
 
         // Execute the method
-        difyDatasetDefaultClient.updateDocumentMetaData(request);
+        client.updateDocumentMetaData(request);
 
         // Verify WebClient interactions
         verify(webClientMock).post();
@@ -1138,7 +1138,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(MetaDataListResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        MetaDataListResponse actualResponse = difyDatasetDefaultClient.listMetaData(datasetId, apiKey);
+        MetaDataListResponse actualResponse = client.listMetaData(datasetId, apiKey);
 
         // Verify the result
         assertEquals(expectedResponse.getBuiltInFieldEnabled(), actualResponse.getBuiltInFieldEnabled());
@@ -1188,7 +1188,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(SegmentChildChunkCreateResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        SegmentChildChunkCreateResponse actualResponse = difyDatasetDefaultClient.createSegmentChildChunk(request);
+        SegmentChildChunkCreateResponse actualResponse = client.createSegmentChildChunk(request);
 
         // Verify the result
         assertNotNull(actualResponse.getData());
@@ -1255,7 +1255,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(any(ParameterizedTypeReference.class))).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        DifyPageResult<SegmentChildChunkResponse> actualResponse = difyDatasetDefaultClient.pageSegmentChildChunk(request);
+        DifyPageResult<SegmentChildChunkResponse> actualResponse = client.pageSegmentChildChunk(request);
 
         // Verify the result
         assertEquals(expectedResponse.getTotal(), actualResponse.getTotal());
@@ -1292,7 +1292,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         request.setSegmentId(segmentId);
         request.setChildChunkId(childChunkId);
 
-        difyDatasetDefaultClient.deleteSegmentChildChunk(request);
+        client.deleteSegmentChildChunk(request);
 
         // Verify WebClient interactions
         verify(webClientMock).delete();
@@ -1332,7 +1332,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(SegmentChildChunkUpdateResponse.class)).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        SegmentChildChunkUpdateResponse actualResponse = difyDatasetDefaultClient.updateSegmentChildChunk(request);
+        SegmentChildChunkUpdateResponse actualResponse = client.updateSegmentChildChunk(request);
 
         // Verify the result
         assertNotNull(actualResponse.getData());
@@ -1372,7 +1372,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.bodyToMono(any(ParameterizedTypeReference.class))).thenReturn(Mono.just(expectedResponse));
 
         // Execute the method
-        UploadFileInfoResponse actualResponse = difyDatasetDefaultClient.uploadFileInfo(datasetId, documentId, apiKey);
+        UploadFileInfoResponse actualResponse = client.uploadFileInfo(datasetId, documentId, apiKey);
 
         // Verify the result
         assertEquals(expectedResponse.getId(), actualResponse.getId());
