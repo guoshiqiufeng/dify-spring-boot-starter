@@ -27,6 +27,9 @@ import io.github.guoshiqiufeng.dify.client.spring5.chat.DifyChatDefaultClient;
  */
 public class DifyChatBuilder {
 
+    private DifyChatBuilder() {
+    }
+
     public static DifyChat create(DifyChatClient difyChatClient) {
         return new DifyChatClientImpl(difyChatClient);
     }
@@ -35,6 +38,10 @@ public class DifyChatBuilder {
      * Builder for DifyChatClient
      */
     public static class DifyChatClientBuilder {
+
+        private DifyChatClientBuilder() {
+        }
+
         public static DifyChatClient create() {
             return new DifyChatDefaultClient();
         }

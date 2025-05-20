@@ -26,6 +26,8 @@ import io.github.guoshiqiufeng.dify.workflow.impl.DifyWorkflowClientImpl;
  * @since 2025/4/18 09:53
  */
 public class DifyWorkflowBuilder {
+    private DifyWorkflowBuilder() {
+    }
 
     public static DifyWorkflow create(DifyWorkflowClient difyWorkflowClient) {
         return new DifyWorkflowClientImpl(difyWorkflowClient);
@@ -35,6 +37,9 @@ public class DifyWorkflowBuilder {
      * Builder for DifyWorkflowClient
      */
     public static class DifyWorkflowClientBuilder {
+        private DifyWorkflowClientBuilder() {
+        }
+
         public static DifyWorkflowClient create() {
             return new DifyWorkflowDefaultClient();
         }
