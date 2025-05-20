@@ -36,8 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -290,6 +289,27 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
     }
 
     @Test
+    @DisplayName("Test getAppApiKey method on return null")
+    public void testGetAppApiKeyNull() {
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
+
+        doReturn(null).when(responseSpec).body(ApiKeyResultResponse.class);
+
+        // Call the method to test
+        String appId = "app-123";
+        List<ApiKeyResponse> response = client.getAppApiKey(appId);
+
+        // Verify the response
+        assertNotNull(response);
+
+        // Verify interactions with mocks
+        verify(requestHeadersUriSpec).uri("/console/api/apps/{appId}/api-keys", appId);
+        verify(requestHeadersSpec).headers(any());
+    }
+
+    @Test
     public void testInitAppApiKey() {
         // Prepare test data
         String appId = "app-123456";
@@ -312,6 +332,27 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         assertEquals(apiKey.getId(), actualResponse.get(0).getId());
         assertEquals(apiKey.getToken(), actualResponse.get(0).getToken());
         assertEquals(apiKey.getType(), actualResponse.get(0).getType());
+
+        // Verify WebClient interactions
+        verify(restClient).post();
+        verify(requestBodyUriSpec).uri(eq(ServerUriConstant.APPS + "/{appId}/api-keys"), eq(appId));
+        verify(requestBodySpec).headers(any());
+        verify(responseSpec).body(ApiKeyResponse.class);
+    }
+
+    @Test
+    public void testInitAppApiKeyNull() {
+        // Prepare test data
+        String appId = "app-123456";
+
+        // Set up the response mock to return our expected response
+        when(responseSpec.body(ApiKeyResponse.class)).thenReturn(null);
+
+        // Execute the method
+        List<ApiKeyResponse> actualResponse = client.initAppApiKey(appId);
+
+        // Verify the result
+        assertNull(actualResponse);
 
         // Verify WebClient interactions
         verify(restClient).post();
@@ -354,6 +395,23 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
     }
 
     @Test
+    public void testGetDatasetApiKeyNull() {
+        // Set up the response mock to return our expected response
+        when(responseSpec.body(DatasetApiKeyResult.class)).thenReturn(null);
+
+        // Execute the method
+        List<DatasetApiKeyResponse> actualResponse = client.getDatasetApiKey();
+
+        // Verify the result
+        assertNull(actualResponse);
+
+        // Verify WebClient interactions
+        verify(restClient).get();
+        verify(requestHeadersUriSpec).uri(ServerUriConstant.DATASETS + "/api-keys");
+        verify(responseSpec).body(DatasetApiKeyResult.class);
+    }
+
+    @Test
     public void testInitDatasetApiKey() {
         // Create expected response
         DatasetApiKeyResponse apiKey = new DatasetApiKeyResponse();
@@ -373,6 +431,24 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         assertEquals(apiKey.getId(), actualResponse.get(0).getId());
         assertEquals(apiKey.getToken(), actualResponse.get(0).getToken());
         assertEquals(apiKey.getCreatedAt(), actualResponse.get(0).getCreatedAt());
+
+        // Verify WebClient interactions
+        verify(restClient).post();
+        verify(requestBodyUriSpec).uri(ServerUriConstant.DATASETS + "/api-keys");
+        verify(requestBodySpec).headers(any());
+        verify(responseSpec).body(DatasetApiKeyResponse.class);
+    }
+
+    @Test
+    public void testInitDatasetApiKeyNull() {
+        // Set up the response mock to return our expected response
+        when(responseSpec.body(DatasetApiKeyResponse.class)).thenReturn(null);
+
+        // Execute the method
+        List<DatasetApiKeyResponse> actualResponse = client.initDatasetApiKey();
+
+        // Verify the result
+        assertNull(actualResponse);
 
         // Verify WebClient interactions
         verify(restClient).post();
