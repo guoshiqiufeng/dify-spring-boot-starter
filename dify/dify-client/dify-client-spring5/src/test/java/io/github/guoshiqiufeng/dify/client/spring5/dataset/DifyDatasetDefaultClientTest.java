@@ -613,7 +613,9 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         String apiKey = "test-api-key";
         String datasetId = "dataset-123456";
         String documentId = "document-123456";
-
+        // Mock the response to return Mono.empty()
+        when(responseSpecMock.bodyToMono(Void.class)).thenReturn(Mono.empty());
+        
         client.deleteDocument(datasetId, documentId, apiKey);
 
         // Verify WebClient interactions
@@ -872,6 +874,8 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         String datasetId = "dataset-123456";
         String documentId = "document-123456";
         String segmentId = "segment-123456";
+        // Mock the response to return Mono.empty()
+        when(responseSpecMock.bodyToMono(Void.class)).thenReturn(Mono.empty());
 
         client.deleteSegment(datasetId, documentId, segmentId, apiKey);
 
@@ -1283,7 +1287,8 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         String documentId = "document-123456";
         String segmentId = "segment-123456";
         String childChunkId = "chunk-123456";
-
+        // Mock the response to return Mono.empty()
+        when(responseSpecMock.bodyToMono(Void.class)).thenReturn(Mono.empty());
         // Create request
         SegmentChildChunkDeleteRequest request = new SegmentChildChunkDeleteRequest();
         request.setApiKey(apiKey);
