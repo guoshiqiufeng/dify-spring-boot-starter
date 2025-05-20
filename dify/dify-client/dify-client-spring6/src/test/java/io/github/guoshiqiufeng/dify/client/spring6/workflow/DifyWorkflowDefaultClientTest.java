@@ -140,6 +140,8 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         // Add a file to the request
         List<WorkflowRunRequest.WorkflowFile> files = new ArrayList<>();
         WorkflowRunRequest.WorkflowFile file = new WorkflowRunRequest.WorkflowFile();
+        file.setType(null);
+        file.setTransferMethod(null);
         file.setUrl("https://example.com/image.jpg");
         files.add(file);
         request.setFiles(files);
@@ -175,6 +177,13 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         assertEquals("https://example.com/image.jpg", capturedBody.getFiles().get(0).getUrl());
         assertEquals("image", capturedBody.getFiles().get(0).getType());
         assertEquals("remote_url", capturedBody.getFiles().get(0).getTransferMethod());
+
+        WorkflowRunRequest emptyRequest = new WorkflowRunRequest();
+        emptyRequest.setApiKey("wf-api-key-123");
+        emptyRequest.setUserId("user-123");
+        emptyRequest.setFiles(null);
+        emptyRequest.setInputs(null);
+        client.runWorkflow(emptyRequest);
     }
 
     @Test
@@ -305,5 +314,11 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         // Verify interactions with mocks
         verify(requestHeadersUriSpec).uri(any(Function.class));
         verify(requestHeadersSpec).header(HttpHeaders.AUTHORIZATION, "Bearer wf-api-key-123");
+
+        WorkflowLogsRequest defaultRequest = new WorkflowLogsRequest();
+        defaultRequest.setApiKey("wf-api-key-123");
+        defaultRequest.setPage(null);
+        defaultRequest.setLimit(null);
+        client.logs(defaultRequest);
     }
 }

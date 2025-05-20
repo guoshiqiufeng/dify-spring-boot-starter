@@ -428,13 +428,15 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         request.setUserId(userId);
         request.setContent(content);
         request.setConversationId(conversationId);
-        request.setInputs(new HashMap<>());
-        ChatMessageSendRequest.ChatMessageFile workflowFile1 = new ChatMessageSendRequest.ChatMessageFile();
-        workflowFile1.setUrl("https://file.com");
-        workflowFile1.setType("image");
-        ChatMessageSendRequest.ChatMessageFile workflowFile2 = new ChatMessageSendRequest.ChatMessageFile();
-        workflowFile2.setUrl("https://file.com");
-        request.setFiles(List.of(workflowFile1, workflowFile2));
+        request.setInputs(null);
+        ChatMessageSendRequest.ChatMessageFile file1 = new ChatMessageSendRequest.ChatMessageFile();
+        file1.setUrl("https://file.com");
+        file1.setType("image");
+        ChatMessageSendRequest.ChatMessageFile file2 = new ChatMessageSendRequest.ChatMessageFile();
+        file2.setType(null);
+        file2.setTransferMethod(null);
+        file2.setUrl("https://file.com");
+        request.setFiles(List.of(file1, file2));
         // Create expected response
         ChatMessageSendResponse expectedResponse = new ChatMessageSendResponse();
         expectedResponse.setId("msg-123456");
