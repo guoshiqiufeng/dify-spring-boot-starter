@@ -214,7 +214,6 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
                 .retrieve()
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(Void.class).block();
-        ;
     }
 
     @Override
