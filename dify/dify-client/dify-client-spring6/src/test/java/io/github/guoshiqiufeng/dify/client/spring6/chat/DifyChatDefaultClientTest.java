@@ -260,7 +260,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         request.setConversationId("conv-123");
         request.setName("New Conversation Name");
         request.setUserId("user-123");
-        request.setAutoGenerate(false);
+        request.setAutoGenerate(null);
 
         // Call the method to test
         MessageConversationsResponse response = client.renameConversation(request);
@@ -283,6 +283,14 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         assertEquals("New Conversation Name", capturedBody.get("name"));
         assertEquals(false, capturedBody.get("auto_generate"));
         assertEquals("user-123", capturedBody.get("user"));
+
+        RenameConversationRequest defaultRequest = new RenameConversationRequest();
+        request.setApiKey(TEST_API_KEY);
+        request.setUserId("user-123");
+        request.setConversationId("conv-123");
+        defaultRequest.setName(null);
+        defaultRequest.setAutoGenerate(false);
+        client.renameConversation(defaultRequest);
     }
 
     @Test
@@ -558,6 +566,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         request.setApiKey(apiKey);
         request.setUserId(userId);
         request.setConversationId(conversationId);
+        request.setFirstId(null);
         request.setLimit(limit);
 
         // Create expected response
@@ -591,9 +600,10 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
 
         MessagesRequest defaultRequest = new MessagesRequest();
         defaultRequest.setApiKey(apiKey);
-        defaultRequest.setUserId(userId);
+        defaultRequest.setUserId(null);
         defaultRequest.setConversationId(conversationId);
         defaultRequest.setLimit(null);
+        defaultRequest.setFirstId("1");
         client.messages(defaultRequest);
     }
 
