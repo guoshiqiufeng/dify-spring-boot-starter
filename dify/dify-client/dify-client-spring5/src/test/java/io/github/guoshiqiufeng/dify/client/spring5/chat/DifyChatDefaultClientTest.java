@@ -606,6 +606,9 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         String userId = "test-user-id";
         String conversationId = "conv-123456";
 
+        // Mock the response to return Mono.empty()
+        when(responseSpecMock.bodyToMono(Void.class)).thenReturn(Mono.empty());
+
         // Execute the method
         client.deleteConversation(conversationId, apiKey, userId);
 

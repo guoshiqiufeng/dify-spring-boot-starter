@@ -113,7 +113,8 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
                 .bodyValue(params)
                 .retrieve()
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
-        ;
+                .bodyToMono(Void.class)
+                .block();
     }
 
     @Override
@@ -212,7 +213,7 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
                 .bodyValue(params)
                 .retrieve()
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
-        ;
+                .bodyToMono(Void.class).block();
     }
 
     @Override
