@@ -134,6 +134,9 @@ export default defineUserConfig({
                         text: `v${version}`,
                         children: [
                             {
+                                text: 'v0.x',
+                                link: 'https://guoshiqiufeng.github.io/dify-spring-boot-starter-doc/v0.x/',
+                            }, {
                                 text: '更新日志',
                                 link: 'https://github.com/guoshiqiufeng/dify-spring-boot-starter/releases',
                             }
@@ -241,6 +244,9 @@ export default defineUserConfig({
                         text: `v${version}`,
                         children: [
                             {
+                                text: 'v0.x',
+                                link: 'https://guoshiqiufeng.github.io/dify-spring-boot-starter-doc/v0.x/',
+                            }, {
                                 text: 'Changelog',
                                 link: 'https://github.com/guoshiqiufeng/dify-spring-boot-starter/releases',
                             }
