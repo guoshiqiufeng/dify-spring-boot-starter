@@ -45,7 +45,7 @@ public class DifyPropertiesAutoConfiguration {
         return new PropertiesDifyConnectionDetails(properties);
     }
 
-    static class PropertiesDifyConnectionDetails implements DifyConnectionDetails {
+    public static class PropertiesDifyConnectionDetails implements DifyConnectionDetails {
 
         private final DifyProperties properties;
 
