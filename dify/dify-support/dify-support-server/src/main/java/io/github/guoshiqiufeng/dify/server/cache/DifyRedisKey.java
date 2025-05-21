@@ -22,9 +22,8 @@ package io.github.guoshiqiufeng.dify.server.cache;
  */
 public interface DifyRedisKey {
 
-    String ACCESS_TOKEN = "ai:chat:dify:access_token";
+    String ACCESS_TOKEN = "dify:access_token";
 
-
-    String REFRESH_TOKEN = "ai:chat:dify:refresh_token";
+    String REFRESH_TOKEN = "dify:refresh_token";
 
 }

@@ -43,7 +43,7 @@ public class DifyServerTokenDefault extends BaseDifyServerToken {
         headers.setBearerAuth(accessToken);
     }
 
-    public void obtainToken(DifyServerClient difyServerClient) {
+    private void obtainToken(DifyServerClient difyServerClient) {
         tokenLock.lock();
         try {
             if (accessToken == null) {
