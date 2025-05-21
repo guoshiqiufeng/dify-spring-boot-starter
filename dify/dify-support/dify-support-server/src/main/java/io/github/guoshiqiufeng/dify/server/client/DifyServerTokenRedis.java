@@ -49,7 +49,7 @@ public class DifyServerTokenRedis extends BaseDifyServerToken {
         headers.setBearerAuth(accessToken);
     }
 
-    public String obtainToken(DifyServerClient difyServerClient) {
+    private String obtainToken(DifyServerClient difyServerClient) {
         LoginResponse loginResponse = difyServerClient.login();
         if (loginResponse != null) {
             String accessToken = loginResponse.getAccessToken();
