@@ -123,10 +123,15 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         mockStreamResponse1.setEvent(StreamEventEnum.workflow_started);
 
         WorkflowRunStreamResponse mockStreamResponse2 = new WorkflowRunStreamResponse();
-        mockStreamResponse2.setTaskId("task-123");
+        mockStreamResponse2.setTaskId("task-124");
         mockStreamResponse2.setEvent(StreamEventEnum.workflow_finished);
 
-        Flux<WorkflowRunStreamResponse> mockFlux = Flux.just(mockStreamResponse1, mockStreamResponse2);
+        WorkflowRunStreamResponse mockStreamResponse3 = new WorkflowRunStreamResponse();
+        mockStreamResponse3.setTaskId("task-125");
+        mockStreamResponse3.setEvent(StreamEventEnum.text_chunk);
+        mockStreamResponse3.setData(Map.of("text", "\n\n", "from_variable_selector", "[]"));
+
+        Flux<WorkflowRunStreamResponse> mockFlux = Flux.just(mockStreamResponse1, mockStreamResponse2, mockStreamResponse3);
         doReturn(mockFlux).when(responseSpec).bodyToFlux(WorkflowRunStreamResponse.class);
 
         // Create a workflow run request
