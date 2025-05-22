@@ -159,10 +159,10 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
 
         // Verify the response
         assertNotNull(responses);
-        assertEquals(2, responses.size());
+        assertEquals(3, responses.size());
         assertEquals("task-123", responses.get(0).getTaskId());
         assertEquals(StreamEventEnum.workflow_started, responses.get(0).getEvent());
-        assertEquals("task-123", responses.get(1).getTaskId());
+        assertEquals("task-124", responses.get(1).getTaskId());
         assertEquals(StreamEventEnum.workflow_finished, responses.get(1).getEvent());
 
         // Verify interactions with mocks
