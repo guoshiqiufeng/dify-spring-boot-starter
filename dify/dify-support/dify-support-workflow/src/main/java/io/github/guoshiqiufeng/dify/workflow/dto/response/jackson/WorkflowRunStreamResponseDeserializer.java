@@ -39,7 +39,7 @@ public class WorkflowRunStreamResponseDeserializer
     public WorkflowRunStreamResponse deserialize(JsonParser p, DeserializationContext ctxt)
             throws IOException {
 
-        ObjectMapper mapper = (ObjectMapper) p.getCodec();
+        ObjectMapper mapper = new ObjectMapper();
         JsonNode root = mapper.readTree(p);
 
         // 解析 event 字段

@@ -123,10 +123,15 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         mockStreamResponse1.setEvent(StreamEventEnum.workflow_started);
 
         WorkflowRunStreamResponse mockStreamResponse2 = new WorkflowRunStreamResponse();
-        mockStreamResponse2.setTaskId("task-123");
+        mockStreamResponse2.setTaskId("task-124");
         mockStreamResponse2.setEvent(StreamEventEnum.workflow_finished);
 
-        Flux<WorkflowRunStreamResponse> mockFlux = Flux.just(mockStreamResponse1, mockStreamResponse2);
+        WorkflowRunStreamResponse mockStreamResponse3 = new WorkflowRunStreamResponse();
+        mockStreamResponse3.setTaskId("task-125");
+        mockStreamResponse3.setEvent(StreamEventEnum.text_chunk);
+        mockStreamResponse3.setData(Map.of("text", "\n\n", "from_variable_selector", "[]"));
+
+        Flux<WorkflowRunStreamResponse> mockFlux = Flux.just(mockStreamResponse1, mockStreamResponse2, mockStreamResponse3);
         doReturn(mockFlux).when(responseSpec).bodyToFlux(WorkflowRunStreamResponse.class);
 
         // Create a workflow run request
@@ -154,10 +159,10 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
 
         // Verify the response
         assertNotNull(responses);
-        assertEquals(2, responses.size());
+        assertEquals(3, responses.size());
         assertEquals("task-123", responses.get(0).getTaskId());
         assertEquals(StreamEventEnum.workflow_started, responses.get(0).getEvent());
-        assertEquals("task-123", responses.get(1).getTaskId());
+        assertEquals("task-124", responses.get(1).getTaskId());
         assertEquals(StreamEventEnum.workflow_finished, responses.get(1).getEvent());
 
         // Verify interactions with mocks

@@ -161,6 +161,32 @@ public final class WorkflowRunStreamResponseDeserializerTest {
     }
 
     @Test
+    public void testDeserializeTextChunkDataNewline() throws IOException {
+        // Prepare test JSON
+        String json = "{\n" +
+                "    \"event\": \"text_chunk\",\n" +
+                "    \"workflow_run_id\": \"wfr-123456\",\n" +
+                "    \"task_id\": \"task-123456\",\n" +
+                "    \"data\": {\n" +
+                "        \"text\": \"\\n\\n\",\n" +
+                "        \"from_variable_selector\": [\n" +
+                "        ]\n" +
+                "    }\n" +
+                "}";
+
+        // Register custom deserializer module
+        objectMapper.registerModule(new WorkflowRunStreamResponseModule());
+
+        // Deserialize JSON
+        WorkflowRunStreamResponse response = objectMapper.readValue(json, WorkflowRunStreamResponse.class);
+
+        // Assertions
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(StreamEventEnum.text_chunk, response.getEvent());
+
+    }
+
+    @Test
     public void testDeserializeWithInvalidEventType() throws JsonProcessingException {
         // Prepare test JSON with invalid event type
         String json = "{\n" +
