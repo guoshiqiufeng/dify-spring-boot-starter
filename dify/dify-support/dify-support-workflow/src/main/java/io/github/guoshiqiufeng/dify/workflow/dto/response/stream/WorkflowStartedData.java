@@ -20,6 +20,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.util.Map;
+
 /**
  * @author yanghq
  * @version 1.0
@@ -41,5 +43,7 @@ public class WorkflowStartedData extends BaseWorkflowRunData {
      */
     @JsonAlias("sequence_number")
     private Integer sequenceNumber;
+
+    private Map<String, Object> inputs;
 
 }
