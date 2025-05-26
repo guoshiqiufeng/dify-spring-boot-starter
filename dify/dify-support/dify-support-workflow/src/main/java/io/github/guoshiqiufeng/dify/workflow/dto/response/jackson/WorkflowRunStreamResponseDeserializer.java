@@ -17,10 +17,7 @@ package io.github.guoshiqiufeng.dify.workflow.dto.response.jackson;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.*;
 import io.github.guoshiqiufeng.dify.workflow.dto.response.WorkflowRunStreamResponse;
 import io.github.guoshiqiufeng.dify.workflow.enums.StreamEventEnum;
 
@@ -40,6 +37,8 @@ public class WorkflowRunStreamResponseDeserializer
             throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
         JsonNode root = mapper.readTree(p);
 
         // 解析 event 字段
