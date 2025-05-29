@@ -151,6 +151,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         request.setUserId("user-123");
         request.setContent("Hello, Dify!");
         request.setConversationId("conv-123");
+        request.setInputs(Map.of("key", "value"));
         request.setFiles(List.of(new ChatMessageSendRequest.ChatMessageFile()));
         // Call the method to test
         Flux<ChatMessageSendCompletionResponse> responseFlux = client.streamingChat(request);
@@ -528,9 +529,10 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
 
         MessageConversationsRequest defaultRequest = new MessageConversationsRequest();
         defaultRequest.setApiKey(apiKey);
-        defaultRequest.setUserId(userId);
+        defaultRequest.setUserId(null);
         defaultRequest.setSortBy(null);
         defaultRequest.setLimit(null);
+        defaultRequest.setLastId(null);
         client.conversations(defaultRequest);
     }
 
