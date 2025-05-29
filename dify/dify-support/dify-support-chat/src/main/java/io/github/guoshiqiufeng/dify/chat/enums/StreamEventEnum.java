@@ -49,6 +49,25 @@ public enum StreamEventEnum {
      */
     workflow_finished(WorkflowFinishedData.class),
 
+    /**
+     * parallel_branch_started
+     */
+    parallel_branch_started(ParallelBranchStartedData.class),
+
+    /**
+     * parallel_branch_finished
+     */
+    parallel_branch_finished(ParallelBranchFinishedData.class),
+
+    /**
+     * agent_log
+     */
+    agent_log(AgentLogData.class),
+
+    message(EmptyData.class),
+
+    message_replace(EmptyData.class),
+
     ;
 
     private final Class<? extends CompletionData> clazz;

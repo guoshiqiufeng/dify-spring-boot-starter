@@ -40,6 +40,7 @@ public class WorkflowFinishedData extends CompletionData {
     private Map<String, Object> outputs;
 
     private String status;
+
     private String error;
 
     @JsonProperty("elapsedTime")

@@ -28,8 +28,11 @@ import java.io.IOException;
  * @author yanghq
  * @version 1.0
  * @since 2025/4/15 19:16
+ * is Deprecated, please use
+ * @see io.github.guoshiqiufeng.dify.chat.dto.response.jackson.ChatMessageSendCompletionResponseDeserializer
  */
 @Slf4j
+@Deprecated
 public class CompletionDataDeserializer
         extends JsonDeserializer<CompletionData> {
 

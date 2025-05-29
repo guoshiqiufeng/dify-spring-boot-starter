@@ -15,35 +15,19 @@
  */
 package io.github.guoshiqiufeng.dify.chat.dto.response.message;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Map;
-
 /**
  * @author yanghq
- * @version 1.0
- * @since 2025/4/15 17:44
+ * @version 1.0.3
+ * @since 2025/5/29 10:39
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class WorkflowStartedData extends CompletionData {
+public class ParallelBranchFinishedData extends ParallelBranchStartedData {
 
-    private String id;
+    private String status;
 
-    @JsonProperty("workflowId")
-    @JsonAlias("workflow_id")
-    private String workflowId;
-
-    @JsonProperty("sequenceNumber")
-    @JsonAlias("sequence_number")
-    private Integer sequenceNumber;
-
-    @JsonProperty("createdAt")
-    @JsonAlias("created_at")
-    private Long createdAt;
-
-    private Map<String, Object> inputs;
+    private String error;
 }
