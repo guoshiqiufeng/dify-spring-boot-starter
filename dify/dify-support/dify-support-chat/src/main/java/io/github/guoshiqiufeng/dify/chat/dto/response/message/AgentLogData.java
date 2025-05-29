@@ -13,32 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.chat.dto.response;
+package io.github.guoshiqiufeng.dify.chat.dto.response.message;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.github.guoshiqiufeng.dify.chat.dto.response.jackson.ChatMessageSendCompletionResponseDeserializer;
-import io.github.guoshiqiufeng.dify.chat.dto.response.message.CompletionData;
+import io.github.guoshiqiufeng.dify.chat.dto.response.MetaData;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.io.Serializable;
+import java.util.Map;
 
 /**
  * @author yanghq
- * @version 1.0
- * @since 2025/3/4 10:29
+ * @version 1.0.3
+ * @since 2025/5/29 10:50
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@JsonDeserialize(using = ChatMessageSendCompletionResponseDeserializer.class)
-public class ChatMessageSendCompletionResponse extends ChatMessageSendResponse implements Serializable {
+public class AgentLogData extends CompletionData{
+    @JsonAlias("node_execution_id")
+    private String nodeExecutionId;
 
-    private static final long serialVersionUID = 3819274658903174523L;
+    private String id;
 
-    @JsonAlias("workflow_run_id")
-    private String workflowRunId;
+    private String label;
 
-    // @JsonDeserialize(using = CompletionDataDeserializer.class)
-    private CompletionData data;
+    @JsonAlias("parent_id")
+    private String parentId;
+
+    private String error;
+
+    private String status;
+
+    private Map<String, Object> data;
+
+    private MetaData metadata;
+
+    @JsonAlias("node_id")
+    private String nodeId;
 }

@@ -60,7 +60,8 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Clone Dify repository
-        run: git clone https://github.com/langgenius/dify.git tools/dify
+        #run: git clone https://github.com/langgenius/dify.git tools/dify
+        run: git clone -b 1.4.0 --single-branch https://github.com/langgenius/dify.git tools/dify
 
       # Runs a set of commands using the runners shell
       - name: Start Docker containers
@@ -256,7 +257,7 @@ jobs:
 
       - name: Run Gradle tests
         run: |
-          gradle jacocoTestReport
+          gradle jacocoTestReport --info
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5

@@ -13,32 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.chat.dto.response;
+package io.github.guoshiqiufeng.dify.chat.dto.response.message;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.github.guoshiqiufeng.dify.chat.dto.response.jackson.ChatMessageSendCompletionResponseDeserializer;
-import io.github.guoshiqiufeng.dify.chat.dto.response.message.CompletionData;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.io.Serializable;
-
 /**
  * @author yanghq
- * @version 1.0
- * @since 2025/3/4 10:29
+ * @version 1.0.3
+ * @since 2025/5/29 10:30
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@JsonDeserialize(using = ChatMessageSendCompletionResponseDeserializer.class)
-public class ChatMessageSendCompletionResponse extends ChatMessageSendResponse implements Serializable {
+public class ParallelBranchStartedData extends CompletionData{
 
-    private static final long serialVersionUID = 3819274658903174523L;
 
-    @JsonAlias("workflow_run_id")
-    private String workflowRunId;
+    @JsonAlias("parallel_id")
+    private String parallelId;
 
-    // @JsonDeserialize(using = CompletionDataDeserializer.class)
-    private CompletionData data;
+    @JsonAlias("parallel_branch_id")
+    private String parallelBranchId;
+
+    @JsonAlias("parent_parallel_id")
+    private String parentParallelId;
+
+    @JsonAlias("parent_parallel_start_node_id")
+    private String parentParallelStartNodeId;
+
+    @JsonAlias("iteration_id")
+    private String iterationId;
+
+    @JsonAlias("loop_id")
+    private String loopId;
+
+    /**
+     * created_at (timestamp) 创建时间
+     */
+    @JsonAlias("created_at")
+    private Long createdAt;
 }
