@@ -110,7 +110,10 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         workflowFile.setType(null);
         workflowFile.setTransferMethod(null);
         workflowFile.setUrl("https://file.com");
-        workflowFile.setType("image");
+        WorkflowRunRequest.WorkflowFile workflowFile2 = new WorkflowRunRequest.WorkflowFile();
+        workflowFile2.setType("image");
+        workflowFile2.setTransferMethod("remote_url");
+        workflowFile2.setUrl("https://file.com");
         request.setFiles(List.of(workflowFile));
         Map<String, Object> inputs = new HashMap<>();
         inputs.put("question", "What is the weather today?");
@@ -404,6 +407,8 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         defaultRequest.setApiKey("wf-api-key-123");
         defaultRequest.setPage(null);
         defaultRequest.setLimit(null);
+        defaultRequest.setKeyword("");
+        defaultRequest.setStatus("");
         client.logs(defaultRequest);
     }
 }
