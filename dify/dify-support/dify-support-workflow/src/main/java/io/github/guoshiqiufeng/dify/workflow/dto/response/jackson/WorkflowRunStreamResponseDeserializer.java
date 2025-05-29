@@ -16,10 +16,17 @@
 package io.github.guoshiqiufeng.dify.workflow.dto.response.jackson;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.guoshiqiufeng.dify.workflow.dto.response.WorkflowRunStreamResponse;
 import io.github.guoshiqiufeng.dify.workflow.enums.StreamEventEnum;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.Map;
@@ -29,53 +36,79 @@ import java.util.Map;
  * @version 1.0
  * @since 2025/3/13 11:01
  */
+@Slf4j
 public class WorkflowRunStreamResponseDeserializer
-        extends JsonDeserializer<WorkflowRunStreamResponse> {
+        extends StdDeserializer<WorkflowRunStreamResponse> {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    private static final String CONSTANT_EVENT = "event";
+    private static final String CONSTANT_TASK_ID = "task_id";
+    private static final String CONSTANT_WORKFLOW_RUN_ID = "workflow_run_id";
+    private static final String CONSTANT_DATA = "data";
+
+    static {
+        MAPPER.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    }
+
+    public WorkflowRunStreamResponseDeserializer() {
+        super(WorkflowRunStreamResponse.class);
+    }
 
     @Override
     public WorkflowRunStreamResponse deserialize(JsonParser p, DeserializationContext ctxt)
             throws IOException {
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        ObjectNode root = MAPPER.readTree(p);
 
-        JsonNode root = mapper.readTree(p);
-
-        // 解析 event 字段
-        JsonNode eventNode = root.get("event");
+        JsonNode eventNode = root.get(CONSTANT_EVENT);
         if (eventNode == null || !eventNode.isTextual()) {
-            return null;
+            return builderResponse(root);
         }
+
         StreamEventEnum event;
         Class<?> dataClass;
         try {
             event = StreamEventEnum.valueOf(eventNode.asText());
             dataClass = event.getClazz();
         } catch (IllegalArgumentException e) {
-            return null;
+            log.warn("Unknown event type: {}", eventNode.asText());
+            return builderResponse(root);
         }
 
-        // 解析 data 字段
+        WorkflowRunStreamResponse response = builderResponse(root);
         JsonNode dataNode = root.get("data");
-        Object data = null;
-        if (dataNode != null && !dataNode.isNull()) {
-            if (dataClass == Map.class) {
-                // 处理 Map 类型
-                data = mapper.convertValue(dataNode, new TypeReference<Map<String, Object>>() {
-                });
-            } else {
-                // 处理其他类型（BaseWorkflowRunData 子类）
-                data = mapper.treeToValue(dataNode, dataClass);
+
+        if (root.has(CONSTANT_DATA)) {
+            Object data = null;
+            if (dataNode != null && !dataNode.isNull()) {
+                if (dataClass == Map.class) {
+                    data = MAPPER.convertValue(dataNode, new TypeReference<Map<String, Object>>() {
+                    });
+                } else {
+                    data = MAPPER.treeToValue(dataNode, dataClass);
+                }
+            }
+            response.setData(data);
+        }
+        return response;
+    }
+
+    private static WorkflowRunStreamResponse builderResponse(ObjectNode root) throws JsonProcessingException {
+        WorkflowRunStreamResponse chatMessageSendCompletionResponse = new WorkflowRunStreamResponse();
+        if (root.has(CONSTANT_TASK_ID)) {
+            chatMessageSendCompletionResponse.setTaskId(root.get(CONSTANT_TASK_ID).asText());
+        }
+        if (root.has(CONSTANT_EVENT)) {
+            try {
+                StreamEventEnum streamEventEnum = StreamEventEnum.valueOf(root.get(CONSTANT_EVENT).asText());
+                chatMessageSendCompletionResponse.setEvent(streamEventEnum);
+            } catch (Exception ignored) {
             }
         }
-
-        // 构建响应对象
-        WorkflowRunStreamResponse response = new WorkflowRunStreamResponse();
-        response.setEvent(event);
-        response.setData(data);
-        response.setWorkflowRunId(root.get("workflow_run_id").asText());
-        response.setTaskId(root.get("task_id").asText());
-
-        return response;
+        if (root.has(CONSTANT_WORKFLOW_RUN_ID)) {
+            chatMessageSendCompletionResponse.setWorkflowRunId(root.get(CONSTANT_WORKFLOW_RUN_ID).asText());
+        }
+        return chatMessageSendCompletionResponse;
     }
 }
