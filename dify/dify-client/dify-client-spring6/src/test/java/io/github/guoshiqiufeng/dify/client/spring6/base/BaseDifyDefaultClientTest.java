@@ -158,6 +158,48 @@ public class BaseDifyDefaultClientTest {
     }
 
     @Test
+    @DisplayName("Test BaseDifyDefaultClient constructor with all custom parameters and no clientConfig")
+    public void testConstructorWithAllCustomParametersAndNoClientConfig() {
+        String customBaseUrl = "https://custom-api.dify.ai";
+
+        // Create mocks
+        RestClient.Builder mockRestClientBuilder = Mockito.mock(RestClient.Builder.class);
+        WebClient.Builder mockWebClientBuilder = Mockito.mock(WebClient.Builder.class);
+        RestClient mockRestClient = Mockito.mock(RestClient.class);
+        WebClient mockWebClient = Mockito.mock(WebClient.class);
+
+        // Set up behavior
+        when(mockRestClientBuilder.baseUrl(anyString())).thenReturn(mockRestClientBuilder);
+        when(mockRestClientBuilder.defaultHeaders(any(Consumer.class))).thenReturn(mockRestClientBuilder);
+        when(mockRestClientBuilder.build()).thenReturn(mockRestClient);
+
+        when(mockWebClientBuilder.baseUrl(anyString())).thenReturn(mockWebClientBuilder);
+        when(mockWebClientBuilder.defaultHeaders(any(Consumer.class))).thenReturn(mockWebClientBuilder);
+        when(mockWebClientBuilder.build()).thenReturn(mockWebClient);
+
+        // Create a concrete subclass with all custom parameters
+        BaseDifyDefaultClient client = new BaseDifyDefaultClient(customBaseUrl, null,
+                mockRestClientBuilder, mockWebClientBuilder) {
+            // No need to implement any methods
+        };
+
+        // Verify that the client was created successfully
+        assertNotNull(client);
+        assertNotNull(client.responseErrorHandler);
+        assertEquals(mockRestClient, client.restClient);
+        assertEquals(mockWebClient, client.webClient);
+
+        // Verify interactions with mocks
+        verify(mockRestClientBuilder).baseUrl(customBaseUrl);
+        verify(mockRestClientBuilder).defaultHeaders(any(Consumer.class));
+        verify(mockRestClientBuilder).build();
+
+        verify(mockWebClientBuilder).baseUrl(customBaseUrl);
+        verify(mockWebClientBuilder).defaultHeaders(any(Consumer.class));
+        verify(mockWebClientBuilder).build();
+    }
+
+    @Test
     @DisplayName("Test DifyResponseErrorHandler hasError method with error response")
     public void testResponseErrorHandlerHasErrorWithErrorResponse() throws IOException {
         // Create a mock ClientHttpResponse
