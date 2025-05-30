@@ -13,23 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.chat.client;
+package io.github.guoshiqiufeng.dify.chat.enums;
 
-import io.github.guoshiqiufeng.dify.chat.dto.response.AppSiteResponse;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Unit tests for {@link DifyChatClient}
+ * Unit tests for {@link IconTypeEnum}
  *
  * @author yanghq
  * @version 1.1.0
- * @since 2024/5/30 14:15
+ * @since 2024/5/30 14:09
  */
-@ExtendWith(MockitoExtension.class)
-public class DifyChatClientTest {
-    @Mock
-    private DifyChatClient difyChatClient;
+public class IconTypeEnumTest {
+
+    @Test
+    public void testIconTypeEnum() {
+        // Verify the enum values
+        assertEquals("emoji", IconTypeEnum.emoji.name());
+        assertEquals("image", IconTypeEnum.image.name());
+    }
 }
