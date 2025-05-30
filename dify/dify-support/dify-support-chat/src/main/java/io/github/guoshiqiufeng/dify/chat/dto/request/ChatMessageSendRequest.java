@@ -15,6 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.chat.dto.request;
 
+import io.github.guoshiqiufeng.dify.core.enums.message.MessageFileTransferMethodEnum;
+import io.github.guoshiqiufeng.dify.core.enums.message.MessageFileTypeEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -62,5 +64,13 @@ public class ChatMessageSendRequest extends BaseChatRequest implements Serializa
         private String transferMethod = "remote_url";
         private String url;
         private String uploadFileId;
+
+        public void setMessageFileType(MessageFileTypeEnum messageFileType) {
+            this.type = messageFileType == null ? null : messageFileType.name();
+        }
+
+        public void setMessageFileTransferMethod(MessageFileTransferMethodEnum transferMethod) {
+            this.transferMethod = transferMethod == null ? null : transferMethod.name();
+        }
     }
 }
