@@ -23,13 +23,16 @@ import lombok.Data;
  * @author yanghq
  * @version 1.1.0
  * @since 2025/5/30 14:03
+/**
+ * Response class for the site API endpoint that returns WebApp configuration settings.
+ * Contains visual and functional settings for the Dify WebApp interface.
+ *
+ * @author yanghq
+ * @version 1.1.0
+ * @since 2024/5/30 14:03
  */
 @Data
 public class AppSiteResponse {
-
-    /**
-     * WebApp name
-     */
     private String title;
 
     /**
