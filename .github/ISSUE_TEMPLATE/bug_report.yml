@@ -30,7 +30,7 @@ body:
         - dify-spring-boot-starter-dataset
     validations:
       required: true
-      
+
   - type: dropdown
     attributes:
       label: springboot used

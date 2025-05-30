@@ -29,7 +29,7 @@ import java.util.Map;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class AgentLogData extends CompletionData{
+public class AgentLogData extends CompletionData {
     @JsonAlias("node_execution_id")
     private String nodeExecutionId;
 

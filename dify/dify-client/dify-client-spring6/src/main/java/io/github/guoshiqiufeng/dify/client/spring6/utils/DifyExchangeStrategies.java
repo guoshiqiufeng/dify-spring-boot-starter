@@ -33,7 +33,8 @@ import java.util.function.Consumer;
  */
 public class DifyExchangeStrategies {
 
-    private DifyExchangeStrategies() {}
+    private DifyExchangeStrategies() {
+    }
 
     public static Consumer<WebClient.Builder> exchangeStrategies() {
         ObjectMapper objectMapper = new ObjectMapper();
