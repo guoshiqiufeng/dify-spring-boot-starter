@@ -149,6 +149,11 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         file.setTransferMethod(null);
         file.setUrl("https://example.com/image.jpg");
         files.add(file);
+        WorkflowRunRequest.WorkflowFile file2 = new WorkflowRunRequest.WorkflowFile();
+        file2.setType("image");
+        file2.setTransferMethod("remote_url");
+        file2.setUrl("https://example.com/image.jpg");
+        files.add(file2);
         request.setFiles(files);
 
         // Call the method to test
@@ -324,6 +329,8 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         defaultRequest.setApiKey("wf-api-key-123");
         defaultRequest.setPage(null);
         defaultRequest.setLimit(null);
+        defaultRequest.setStatus("");
+        defaultRequest.setKeyword("");
         client.logs(defaultRequest);
     }
 }

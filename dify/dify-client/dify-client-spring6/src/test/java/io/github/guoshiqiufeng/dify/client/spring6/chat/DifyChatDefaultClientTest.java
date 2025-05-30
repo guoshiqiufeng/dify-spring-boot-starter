@@ -529,10 +529,10 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
 
         MessageConversationsRequest defaultRequest = new MessageConversationsRequest();
         defaultRequest.setApiKey(apiKey);
-        defaultRequest.setUserId(null);
+        defaultRequest.setUserId("");
         defaultRequest.setSortBy(null);
         defaultRequest.setLimit(null);
-        defaultRequest.setLastId(null);
+        defaultRequest.setLastId("");
         client.conversations(defaultRequest);
     }
 
@@ -570,7 +570,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         request.setApiKey(apiKey);
         request.setUserId(userId);
         request.setConversationId(conversationId);
-        request.setFirstId(null);
+        request.setFirstId("1");
         request.setLimit(limit);
 
         // Create expected response
@@ -604,10 +604,10 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
 
         MessagesRequest defaultRequest = new MessagesRequest();
         defaultRequest.setApiKey(apiKey);
-        defaultRequest.setUserId(null);
+        defaultRequest.setUserId("1");
         defaultRequest.setConversationId(conversationId);
         defaultRequest.setLimit(null);
-        defaultRequest.setFirstId("1");
+        defaultRequest.setFirstId("");
         client.messages(defaultRequest);
     }
 

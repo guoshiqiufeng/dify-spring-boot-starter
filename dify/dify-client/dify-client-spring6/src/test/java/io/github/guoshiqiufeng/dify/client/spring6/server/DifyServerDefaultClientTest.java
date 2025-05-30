@@ -245,6 +245,8 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(restClient).get();
         verify(responseSpec).body(AppsResponseResult.class);
+
+        client.apps("", "");
     }
 
     @Test
