@@ -161,6 +161,16 @@ public interface DifyChat {
     AppMetaResponse meta(String apiKey);
 
     /**
+     * app site
+     *
+     * @param apikey The API key for authentication and retrieving app parameters
+     * @return Application site
+     * @since 1.1.0
+     * @since Dify version 1.4.0 or higher
+     */
+    AppSiteResponse site(String apikey);
+
+    /**
      * Paginate application annotations
      *
      * @param request Annotation pagination request containing page parameters and filters

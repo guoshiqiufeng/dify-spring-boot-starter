@@ -292,6 +292,17 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
     }
 
     @Override
+    public AppSiteResponse site(String apiKey) {
+        return this.restClient.get()
+                .uri(ChatUriConstant.V1_PARAMETERS_URI)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(new ParameterizedTypeReference<AppSiteResponse>() {
+                });
+    }
+
+    @Override
     public FileUploadResponse fileUpload(FileUploadRequest request) {
         Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
         Assert.notNull(request.getFile(), "file must not be null");

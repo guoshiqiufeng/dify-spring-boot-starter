@@ -512,6 +512,41 @@ AppMetaResponse
 |-----------|-----------------------|--------|
 | toolIcons | `Map<String, Object>` | 工具图标映射 |
 
+### 3.7 获取应用 WebApp 设置
+
+#### 方法
+
+```java
+AppSiteResponse site(String apikey);
+```
+
+#### 请求参数
+
+| 参数名    | 类型     | 是否必须 | 描述     |
+|--------|--------|------|--------|
+| apiKey | String | 是    | apiKey |
+
+#### 响应参数
+
+AppSiteResponse
+
+| 参数名                    | 类型           | 描述                                           |
+|------------------------|--------------|----------------------------------------------|
+| title                  | String       | WebApp 名称                                    |
+| chatColorTheme         | String       | 聊天颜色主题，十六进制格式                                |
+| chatColorThemeInverted | Boolean      | 聊天颜色主题是否反转                                   |
+| iconType               | IconTypeEnum | 图标类型，emoji - 表情符号，image - 图片                 |
+| icon                   | String       | 图标。如果是 emoji 类型，则为表情符号；如果是 image 类型，则为图片 URL |
+| iconBackground         | String       | 背景颜色，十六进制格式                                  |
+| iconUrl                | String       | 图标 URL                                       |
+| description            | String       | 描述                                           |
+| copyright              | String       | 版权信息                                         |
+| privacyPolicy          | String       | 隐私政策链接                                       |
+| customDisclaimer       | String       | 自定义免责声明                                      |
+| defaultLanguage        | String       | 默认语言                                         |
+| showWorkflowSteps      | Boolean      | 是否显示工作流详情                                    |
+| useIconAsAnswerIcon    | Boolean      | 是否在聊天中用 WebApp 图标替换 🤖                       |
+
 ## 4. 应用标注
 
 > 需要 Dify 1.2.0 或更高版本

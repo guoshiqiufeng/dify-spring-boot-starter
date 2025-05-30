@@ -43,6 +43,7 @@ description:
 | 【CHAT】文件上传             | ✅  |    
 | 【CHAT】获取应用基本信息         | ✅  |    
 | 【CHAT】获取应用Meta信息       | ✅  |  
+| 【CHAT】获取应用 WebApp 设置   | ✅  |  
 | 【CHAT】获取标注列表           | ✅  |  
 | 【CHAT】创建标注             | ✅  |  
 | 【CHAT】更新标注             | ✅  |  
