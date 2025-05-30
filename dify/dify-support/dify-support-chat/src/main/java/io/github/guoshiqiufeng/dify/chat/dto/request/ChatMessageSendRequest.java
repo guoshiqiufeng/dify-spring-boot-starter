@@ -64,13 +64,28 @@ public class ChatMessageSendRequest extends BaseChatRequest implements Serializa
         private String transferMethod = "remote_url";
         private String url;
         private String uploadFileId;
+public void setMessageFileType(MessageFileTypeEnum messageFileType) {
+    if (messageFileType == null) {
+        this.type = null;
+    } else {
+        this.type = messageFileType.name();
+    }
+}
 
-        public void setMessageFileType(MessageFileTypeEnum messageFileType) {
-            this.type = messageFileType == null ? null : messageFileType.name();
-        }
+public void setMessageFileTransferMethod(MessageFileTransferMethodEnum transferMethod) {
+    if (transferMethod == null) {
+        this.transferMethod = null;
+    } else {
+        this.transferMethod = transferMethod.name();
+    }
+}
 
-        public void setMessageFileTransferMethod(MessageFileTransferMethodEnum transferMethod) {
-            this.transferMethod = transferMethod == null ? null : transferMethod.name();
-        }
+public MessageFileTypeEnum getMessageFileType() {
+    return this.type == null ? null : MessageFileTypeEnum.valueOf(this.type);
+}
+
+public MessageFileTransferMethodEnum getMessageFileTransferMethod() {
+    return this.transferMethod == null ? null : MessageFileTransferMethodEnum.valueOf(this.transferMethod);
+}
     }
 }
