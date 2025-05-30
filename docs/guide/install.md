@@ -367,3 +367,13 @@ dependencies {
 
   </CodeGroupItem>
 </CodeGroup>
+
+## 其他
+
+### 快照版本
+
+快照的网址是 `https://central.sonatype.com/repository/maven-snapshots/`
+
+> 快照的有效期为 90 天，请不要长期依赖快照版本，快照版本仅用作版本验证测试，不能用于生产环境。
+
+中央仓库说明: https://central.sonatype.org/publish/publish-portal-snapshots/

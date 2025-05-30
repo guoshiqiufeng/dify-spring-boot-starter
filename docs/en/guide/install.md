@@ -368,3 +368,14 @@ dependencies {
 
   </CodeGroupItem>
 </CodeGroup>
+
+## Other
+
+### Snapshot version
+
+the snapshots url is `https://central.sonatype.com/repository/maven-snapshots/`
+
+> Snapshots are valid for 90 days, please do not rely on the snapshot version for a long time, the snapshot version is
+> only used as a version validation test, and cannot be used in the production environment.
+
+Central Warehouse Description: https://central.sonatype.org/publish/publish-portal-snapshots/

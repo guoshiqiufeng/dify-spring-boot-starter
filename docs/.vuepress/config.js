@@ -134,6 +134,9 @@ export default defineUserConfig({
                         text: `v${version}`,
                         children: [
                             {
+                                text: 'v1.x-SNAPSHOT',
+                                link: 'https://guoshiqiufeng.github.io/dify-spring-boot-starter-doc/v1.x-SNAPSHOT/',
+                            }, {
                                 text: 'v0.x',
                                 link: 'https://guoshiqiufeng.github.io/dify-spring-boot-starter-doc/v0.x/',
                             }, {
