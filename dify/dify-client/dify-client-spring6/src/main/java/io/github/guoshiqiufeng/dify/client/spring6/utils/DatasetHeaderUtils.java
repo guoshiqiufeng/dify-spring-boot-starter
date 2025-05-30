@@ -28,6 +28,8 @@ import java.util.function.Consumer;
  */
 public class DatasetHeaderUtils {
 
+    private DatasetHeaderUtils() {}
+
     public static Consumer<HttpHeaders> getHttpHeadersConsumer(BaseDatasetRequest request) {
         return headers -> {
             if (StrUtil.isNotEmpty(request.getApiKey())) {

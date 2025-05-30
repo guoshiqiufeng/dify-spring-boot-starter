@@ -149,6 +149,11 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         file.setTransferMethod(null);
         file.setUrl("https://example.com/image.jpg");
         files.add(file);
+        WorkflowRunRequest.WorkflowFile file2 = new WorkflowRunRequest.WorkflowFile();
+        file2.setType("image");
+        file2.setTransferMethod("remote_url");
+        file2.setUrl("https://example.com/image.jpg");
+        files.add(file2);
         request.setFiles(files);
 
         // Call the method to test
@@ -178,7 +183,7 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         assertEquals("user-123", capturedBody.getUser());
         assertEquals("How does this workflow work?", capturedBody.getInputs().get("question"));
         assertNotNull(capturedBody.getFiles());
-        assertEquals(1, capturedBody.getFiles().size());
+        assertEquals(2, capturedBody.getFiles().size());
         assertEquals("https://example.com/image.jpg", capturedBody.getFiles().get(0).getUrl());
         assertEquals("image", capturedBody.getFiles().get(0).getType());
         assertEquals("remote_url", capturedBody.getFiles().get(0).getTransferMethod());
@@ -324,6 +329,8 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         defaultRequest.setApiKey("wf-api-key-123");
         defaultRequest.setPage(null);
         defaultRequest.setLimit(null);
+        defaultRequest.setStatus("");
+        defaultRequest.setKeyword("");
         client.logs(defaultRequest);
     }
 }

@@ -33,6 +33,8 @@ import java.util.function.Consumer;
  */
 public class DifyExchangeStrategies {
 
+    private DifyExchangeStrategies() {}
+
     public static Consumer<WebClient.Builder> exchangeStrategies() {
         ObjectMapper objectMapper = new ObjectMapper();
         // 忽略序列化null字段

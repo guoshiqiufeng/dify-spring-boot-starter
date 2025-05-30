@@ -175,6 +175,11 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(webClientMock).get();
         verify(responseSpecMock).bodyToMono(any(ParameterizedTypeReference.class));
+
+        request.setTagIds(List.of());
+        request.setKeyword("");
+        request.setIncludeAll(true);
+        client.page(request);
     }
 
     @Test
@@ -615,7 +620,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         String documentId = "document-123456";
         // Mock the response to return Mono.empty()
         when(responseSpecMock.bodyToMono(Void.class)).thenReturn(Mono.empty());
-        
+
         client.deleteDocument(datasetId, documentId, apiKey);
 
         // Verify WebClient interactions
@@ -816,6 +821,22 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         String keyword = "test";
         String status = "active";
 
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("page"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("limit"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("status"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("keyword"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build()).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
+
         // Create request
         SegmentPageRequest request = new SegmentPageRequest();
         request.setApiKey(apiKey);
@@ -823,6 +844,8 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         request.setDocumentId(documentId);
         request.setKeyword(keyword);
         request.setStatus(status);
+        request.setPage(1);
+        request.setLimit(10);
 
         // Create expected response with segments
         SegmentResponse expectedResponse = new SegmentResponse();
@@ -865,6 +888,10 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(webClientMock).get();
         verify(responseSpecMock).bodyToMono(any(ParameterizedTypeReference.class));
+
+        request.setKeyword("");
+        request.setStatus("");
+        client.pageSegment(request);
     }
 
     @Test

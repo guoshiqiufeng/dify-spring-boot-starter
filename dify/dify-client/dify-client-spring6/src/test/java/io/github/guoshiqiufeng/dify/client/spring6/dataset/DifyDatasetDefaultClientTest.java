@@ -203,6 +203,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
 
         // Verify interactions with mocks
         verify(requestHeadersSpec).headers(any(Consumer.class));
+
+        request.setTagIds(List.of());
+        request.setKeyword("");
+        request.setIncludeAll(true);
+
+        client.page(request);
     }
 
     @Test
@@ -926,6 +932,11 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(restClient).get();
         verify(responseSpec).body(any(ParameterizedTypeReference.class));
+
+        request.setKeyword("");
+        request.setStatus("");
+
+        client.pageSegment(request);
     }
 
     @Test

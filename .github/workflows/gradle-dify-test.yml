@@ -27,7 +27,7 @@ jobs:
     steps:
       - name: Check marketplace access
         run: |
-          MARKETPLACE_URL="https://marketplace.dify.ai/api/v1/plugins/download?unique_identifier=langgenius/ollama:0.0.4@03ff7db65ec6cebcb6065a12b41751f4dbb55c0480a5eb65dbb14e4b9bfe302a"
+          MARKETPLACE_URL="https://marketplace.dify.ai/api/v1/plugins/langgenius/ollama/0.0.6/download"
           echo "Checking access to Dify marketplace URL..."
           if ! curl -s -f -o /dev/null "$MARKETPLACE_URL"; then
             echo "::error::Cannot access $MARKETPLACE_URL - Exiting action"
@@ -184,7 +184,7 @@ jobs:
           curl -sSf -X POST 'http://localhost/console/api/workspaces/current/plugin/install/marketplace' \
             -H 'Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}' \
             -H 'Content-Type: application/json' \
-            --data-raw '{"plugin_unique_identifiers":["langgenius/ollama:0.0.3@9ded90ac00e8510119a24be7396ba77191c9610d5e1e29f59d68fa1229822fc7"]}' \
+            --data-raw '{"plugin_unique_identifiers":["langgenius/ollama:0.0.6@f430f3eb959f4863b1e87171544a8fec179441b90deda5693c85f07712d2a68c"]}' \
             --retry 5 --retry-delay 5
 
       - name: Wait for plugin to be installed

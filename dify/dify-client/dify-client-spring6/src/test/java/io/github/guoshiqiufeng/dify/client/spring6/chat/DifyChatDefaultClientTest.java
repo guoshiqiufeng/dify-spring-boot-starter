@@ -151,6 +151,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         request.setUserId("user-123");
         request.setContent("Hello, Dify!");
         request.setConversationId("conv-123");
+        request.setInputs(Map.of("key", "value"));
         request.setFiles(List.of(new ChatMessageSendRequest.ChatMessageFile()));
         // Call the method to test
         Flux<ChatMessageSendCompletionResponse> responseFlux = client.streamingChat(request);
@@ -528,9 +529,10 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
 
         MessageConversationsRequest defaultRequest = new MessageConversationsRequest();
         defaultRequest.setApiKey(apiKey);
-        defaultRequest.setUserId(userId);
+        defaultRequest.setUserId("");
         defaultRequest.setSortBy(null);
         defaultRequest.setLimit(null);
+        defaultRequest.setLastId("");
         client.conversations(defaultRequest);
     }
 
@@ -568,7 +570,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         request.setApiKey(apiKey);
         request.setUserId(userId);
         request.setConversationId(conversationId);
-        request.setFirstId(null);
+        request.setFirstId("1");
         request.setLimit(limit);
 
         // Create expected response
@@ -602,10 +604,10 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
 
         MessagesRequest defaultRequest = new MessagesRequest();
         defaultRequest.setApiKey(apiKey);
-        defaultRequest.setUserId(null);
+        defaultRequest.setUserId("");
         defaultRequest.setConversationId(conversationId);
         defaultRequest.setLimit(null);
-        defaultRequest.setFirstId("1");
+        defaultRequest.setFirstId("");
         client.messages(defaultRequest);
     }
 
@@ -638,6 +640,36 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         assertEquals(2, actualResponse.size());
         assertEquals("Tell me more about this", actualResponse.get(0));
         assertEquals("What are the alternatives?", actualResponse.get(1));
+
+        // Verify WebClient interactions
+        verify(restClient).get();
+        verify(requestHeadersUriSpec).uri(
+                ChatUriConstant.V1_MESSAGES_URI + "/{messageId}/suggested?user={user}",
+                messageId,
+                userId
+        );
+        verify(responseSpec).body(any(ParameterizedTypeReference.class));
+    }
+
+    @Test
+    public void testMessagesSuggestedForNull() {
+        RestClient restClient = restClientMock.getRestClient();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String userId = "test-user-id";
+        String messageId = "msg-123456";
+
+        // Mock response
+        when(responseSpec.body(any(ParameterizedTypeReference.class)))
+                .thenReturn(null);
+
+        // Execute the method
+        List<String> actualResponse = client.messagesSuggested(messageId, apiKey, userId);
+
+        // Verify results
+        assertNotNull(actualResponse);
 
         // Verify WebClient interactions
         verify(restClient).get();

@@ -30,6 +30,8 @@ import java.util.function.Consumer;
  */
 public class DifyMessageConverters {
 
+    private DifyMessageConverters() {}
+
     public static Consumer<RestClient.Builder> messageConvertersConsumer() {
         return builder ->
                 builder.messageConverters(ms -> ms.stream()
