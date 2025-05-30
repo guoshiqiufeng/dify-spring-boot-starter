@@ -16,9 +16,11 @@
 package io.github.guoshiqiufeng.dify.chat.enums;
 
 /**
+/**
  * @author yanghq
- * @version 1.0
- * @since 2025/5/30 14:09
+ * @version 1.1.0
+ * @since 2024/5/30 14:09
+ */
  */
 public enum IconTypeEnum {
 
