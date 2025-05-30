@@ -27,7 +27,7 @@ jobs:
     steps:
       - name: Check marketplace access
         run: |
-          MARKETPLACE_URL="https://marketplace.dify.ai/api/v1/plugins/download?unique_identifier=langgenius/ollama:0.0.4@03ff7db65ec6cebcb6065a12b41751f4dbb55c0480a5eb65dbb14e4b9bfe302a"
+          MARKETPLACE_URL="https://marketplace.dify.ai/api/v1/plugins/langgenius/ollama/0.0.6/download"
           echo "Checking access to Dify marketplace URL..."
           if ! curl -s -f -o /dev/null "$MARKETPLACE_URL"; then
             echo "::error::Cannot access $MARKETPLACE_URL - Exiting action"
