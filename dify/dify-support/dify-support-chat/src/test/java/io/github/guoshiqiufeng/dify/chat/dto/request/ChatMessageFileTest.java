@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2023, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public class ChatMessageFileTest {
     void shouldSetAndGetMessageFileType(MessageFileTypeEnum type) {
         ChatMessageSendRequest.ChatMessageFile file = new ChatMessageSendRequest.ChatMessageFile();
         file.setMessageFileType(type);
-        
+
         assertEquals(type.name(), file.getType());
         assertEquals(type, file.getMessageFileType());
     }
@@ -64,7 +64,7 @@ public class ChatMessageFileTest {
     void shouldSetAndGetMessageFileTransferMethod(MessageFileTransferMethodEnum method) {
         ChatMessageSendRequest.ChatMessageFile file = new ChatMessageSendRequest.ChatMessageFile();
         file.setMessageFileTransferMethod(method);
-        
+
         assertEquals(method.name(), file.getTransferMethod());
         assertEquals(method, file.getMessageFileTransferMethod());
     }
@@ -72,14 +72,14 @@ public class ChatMessageFileTest {
     @Test
     void shouldHandleStringToEnumConversion() {
         ChatMessageSendRequest.ChatMessageFile file = new ChatMessageSendRequest.ChatMessageFile();
-        
+
         // Manual setting of string values
         file.setType("document");
         file.setTransferMethod("remote_url");
-        
+
         // Verify enum conversion
         assertEquals(MessageFileTypeEnum.document, file.getMessageFileType());
         assertEquals(MessageFileTransferMethodEnum.remote_url, file.getMessageFileTransferMethod());
     }
-    
+
 }

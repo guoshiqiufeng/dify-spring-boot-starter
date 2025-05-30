@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2023, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public class WorkflowFileTest {
     void shouldSetAndGetMessageFileType(MessageFileTypeEnum type) {
         WorkflowRunRequest.WorkflowFile file = new WorkflowRunRequest.WorkflowFile();
         file.setMessageFileType(type);
-        
+
         assertEquals(type.name(), file.getType());
         assertEquals(type, file.getMessageFileType());
     }
@@ -64,7 +64,7 @@ public class WorkflowFileTest {
     void shouldSetAndGetMessageFileTransferMethod(MessageFileTransferMethodEnum method) {
         WorkflowRunRequest.WorkflowFile file = new WorkflowRunRequest.WorkflowFile();
         file.setMessageFileTransferMethod(method);
-        
+
         assertEquals(method.name(), file.getTransferMethod());
         assertEquals(method, file.getMessageFileTransferMethod());
     }
@@ -72,14 +72,14 @@ public class WorkflowFileTest {
     @Test
     void shouldHandleStringToEnumConversion() {
         WorkflowRunRequest.WorkflowFile file = new WorkflowRunRequest.WorkflowFile();
-        
+
         // Manual setting of string values
         file.setType("image");
         file.setTransferMethod("local_file");
-        
+
         // Verify enum conversion
         assertEquals(MessageFileTypeEnum.image, file.getMessageFileType());
         assertEquals(MessageFileTransferMethodEnum.local_file, file.getMessageFileTransferMethod());
     }
-    
+
 }
