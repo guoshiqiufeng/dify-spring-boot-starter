@@ -15,21 +15,23 @@
  */
 package io.github.guoshiqiufeng.dify.chat.enums;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
-/**
+ * Unit tests for {@link IconTypeEnum}
+ *
  * @author yanghq
  * @version 1.1.0
  * @since 2024/5/30 14:09
  */
-public enum IconTypeEnum {
+public class IconTypeEnumTest {
 
-    /**
-     * emoji
-     */
-    emoji,
-
-    /**
-     * image
-     */
-    image
+    @Test
+    public void testIconTypeEnum() {
+        // Verify the enum values
+        assertEquals("emoji", IconTypeEnum.emoji.name());
+        assertEquals("image", IconTypeEnum.image.name());
+    }
 }

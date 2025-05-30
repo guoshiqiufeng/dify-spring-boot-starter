@@ -293,15 +293,13 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
 
     @Override
     public AppSiteResponse site(String apiKey) {
-        Assert.notNull(apiKey, API_KEY_NULL_ERROR);
+        Assert.notNull(apiKey, "apiKey must not be null");
         return this.restClient.get()
                 .uri(ChatUriConstant.V1_SITE_URI)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                 .retrieve()
                 .onStatus(responseErrorHandler)
                 .body(new ParameterizedTypeReference<AppSiteResponse>() {
-                });
-    }
                 });
     }
 
