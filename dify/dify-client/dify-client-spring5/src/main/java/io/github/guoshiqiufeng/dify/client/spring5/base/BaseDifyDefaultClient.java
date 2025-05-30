@@ -117,7 +117,9 @@ public abstract class BaseDifyDefaultClient implements BaseDifyClient {
                 int statusCode = response.getStatusCode().value();
                 String statusText = response.getStatusText();
                 String message = StreamUtils.copyToString(response.getBody(), java.nio.charset.StandardCharsets.UTF_8);
-                log.warn(String.format("URI: %s, Method: %s, Status: [%s] %s - %s", url, method, statusCode, statusText, message));
+                if (log.isWarnEnabled()) {
+                    log.warn(String.format("URI: %s, Method: %s, Status: [%s] %s - %s", url, method, statusCode, statusText, message));
+                }
                 throw new RuntimeException(String.format("[%s] %s - %s", statusCode, statusText, message));
             }
         }
