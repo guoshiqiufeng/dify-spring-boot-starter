@@ -26,7 +26,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ParallelBranchStartedData extends CompletionData{
+public class ParallelBranchStartedData extends CompletionData {
 
 
     @JsonAlias("parallel_id")

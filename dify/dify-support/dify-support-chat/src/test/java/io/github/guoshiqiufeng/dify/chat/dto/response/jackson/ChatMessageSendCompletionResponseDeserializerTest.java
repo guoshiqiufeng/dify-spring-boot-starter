@@ -18,7 +18,6 @@ package io.github.guoshiqiufeng.dify.chat.dto.response.jackson;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendCompletionResponse;
-import io.github.guoshiqiufeng.dify.chat.dto.response.message.CompletionData;
 import io.github.guoshiqiufeng.dify.chat.dto.response.message.NodeStartedData;
 import io.github.guoshiqiufeng.dify.chat.dto.response.message.WorkflowStartedData;
 import org.junit.jupiter.api.Assertions;
@@ -87,7 +86,7 @@ public class ChatMessageSendCompletionResponseDeserializerTest {
         // Assertions for data object
         Assertions.assertNotNull(response.getData());
         Assertions.assertInstanceOf(NodeStartedData.class, response.getData());
-        
+
         NodeStartedData nodeStartedData = (NodeStartedData) response.getData();
         Assertions.assertEquals("node-123", nodeStartedData.getNodeId());
         Assertions.assertEquals("text", nodeStartedData.getNodeType());
@@ -133,7 +132,7 @@ public class ChatMessageSendCompletionResponseDeserializerTest {
         // Assertions for data object
         Assertions.assertNotNull(response.getData());
         Assertions.assertInstanceOf(WorkflowStartedData.class, response.getData());
-        
+
         WorkflowStartedData workflowStartedData = (WorkflowStartedData) response.getData();
         Assertions.assertEquals("workflow-123", workflowStartedData.getId());
         Assertions.assertEquals(1681556000000L, workflowStartedData.getCreatedAt());
@@ -261,4 +260,4 @@ public class ChatMessageSendCompletionResponseDeserializerTest {
         // Data should be null
         Assertions.assertNull(response.getData());
     }
-} 
+}
