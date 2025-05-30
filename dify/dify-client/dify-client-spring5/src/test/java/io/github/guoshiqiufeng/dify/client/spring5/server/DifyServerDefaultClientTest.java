@@ -219,7 +219,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(webClientMock).get();
         verify(responseSpecMock).bodyToMono(AppsResponseResult.class);
 
-        client.apps(null, null);
+        client.apps("", "");
     }
 
     @Test

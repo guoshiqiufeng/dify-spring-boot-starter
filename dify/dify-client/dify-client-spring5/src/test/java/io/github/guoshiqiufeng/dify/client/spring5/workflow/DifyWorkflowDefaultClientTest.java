@@ -404,6 +404,8 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         defaultRequest.setApiKey("wf-api-key-123");
         defaultRequest.setPage(null);
         defaultRequest.setLimit(null);
+        defaultRequest.setKeyword("");
+        defaultRequest.setStatus("");
         client.logs(defaultRequest);
     }
 }

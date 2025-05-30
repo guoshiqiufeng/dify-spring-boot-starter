@@ -321,7 +321,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         file.setTransferMethod(null);
         file.setUrl("https://file.com");
         ChatMessageSendRequest.ChatMessageFile file2 = new ChatMessageSendRequest.ChatMessageFile();
-        file2.setTransferMethod(null);
+        file2.setTransferMethod("remote_url");
         file2.setUrl("https://file.com");
         file2.setType("image");
         request.setFiles(List.of(file, file2));
@@ -415,10 +415,10 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
 
         MessageConversationsRequest defaultRequest = new MessageConversationsRequest();
         defaultRequest.setApiKey(apiKey);
-        defaultRequest.setUserId(null);
+        defaultRequest.setUserId("");
         defaultRequest.setSortBy(null);
         defaultRequest.setLimit(null);
-        defaultRequest.setLastId(null);
+        defaultRequest.setLastId("");
         client.conversations(defaultRequest);
     }
 
@@ -485,10 +485,10 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
 
         MessagesRequest defaultRequest = new MessagesRequest();
         defaultRequest.setApiKey(apiKey);
-        defaultRequest.setUserId(null);
+        defaultRequest.setUserId("");
         defaultRequest.setConversationId(conversationId);
         defaultRequest.setLimit(null);
-        defaultRequest.setFirstId(null);
+        defaultRequest.setFirstId("");
         client.messages(defaultRequest);
     }
 
