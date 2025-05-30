@@ -51,13 +51,31 @@ public class WorkflowRunRequest extends BaseWorkflowRequest implements Serializa
         private String transferMethod = "remote_url";
         private String url;
         private String uploadFileId;
+// Consider creating a common base class or utility class for file handling
+// For example:
 
-        public void setMessageFileType(MessageFileTypeEnum messageFileType) {
-            this.type = messageFileType == null ? null : messageFileType.name();
-        }
+public void setMessageFileType(MessageFileTypeEnum messageFileType) {
+    if (messageFileType == null) {
+        this.type = null;
+    } else {
+        this.type = messageFileType.name();
+    }
+}
 
-        public void setMessageFileTransferMethod(MessageFileTransferMethodEnum transferMethod) {
-            this.transferMethod = transferMethod == null ? null : transferMethod.name();
-        }
+public void setMessageFileTransferMethod(MessageFileTransferMethodEnum transferMethod) {
+    if (transferMethod == null) {
+        this.transferMethod = null;
+    } else {
+        this.transferMethod = transferMethod.name();
+    }
+}
+
+public MessageFileTypeEnum getMessageFileType() {
+    return this.type == null ? null : MessageFileTypeEnum.valueOf(this.type);
+}
+
+public MessageFileTransferMethodEnum getMessageFileTransferMethod() {
+    return this.transferMethod == null ? null : MessageFileTransferMethodEnum.valueOf(this.transferMethod);
+}
     }
 }
