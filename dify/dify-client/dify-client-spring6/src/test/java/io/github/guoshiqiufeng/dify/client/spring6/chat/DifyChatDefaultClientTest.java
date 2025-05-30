@@ -19,6 +19,7 @@ import io.github.guoshiqiufeng.dify.chat.constant.ChatUriConstant;
 import io.github.guoshiqiufeng.dify.chat.dto.request.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.*;
 import io.github.guoshiqiufeng.dify.chat.enums.AnnotationReplyActionEnum;
+import io.github.guoshiqiufeng.dify.chat.enums.IconTypeEnum;
 import io.github.guoshiqiufeng.dify.client.spring6.BaseClientTest;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.enums.ResponseModeEnum;
@@ -1122,5 +1123,60 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 jobId
         );
         verify(responseSpec).body(AppAnnotationReplyResponse.class);
+    }
+
+    @Test
+    @DisplayName("Test site method")
+    public void testSite() {
+        RestClient restClient = restClientMock.getRestClient();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
+
+        // Create expected response
+        AppSiteResponse expectedResponse = new AppSiteResponse();
+        expectedResponse.setTitle("Test App");
+        expectedResponse.setChatColorTheme("#FF5733");
+        expectedResponse.setChatColorThemeInverted(true);
+        expectedResponse.setIconType(IconTypeEnum.emoji);
+        expectedResponse.setIcon("🤖");
+        expectedResponse.setIconBackground("#FFFFFF");
+        expectedResponse.setIconUrl("https://example.com/icon.png");
+        expectedResponse.setDescription("Test description");
+        expectedResponse.setCopyright("© 2024 Test Company");
+        expectedResponse.setPrivacyPolicy("https://example.com/privacy");
+        expectedResponse.setCustomDisclaimer("Test disclaimer");
+        expectedResponse.setDefaultLanguage("en-US");
+        expectedResponse.setShowWorkflowSteps(true);
+        expectedResponse.setUseIconAsAnswerIcon(false);
+
+        // Mock the response
+        when(responseSpec.body(any(ParameterizedTypeReference.class))).thenReturn(expectedResponse);
+
+        // Call the method to test
+        AppSiteResponse actualResponse = client.site(TEST_API_KEY);
+
+        // Verify the response
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getTitle(), actualResponse.getTitle());
+        assertEquals(expectedResponse.getChatColorTheme(), actualResponse.getChatColorTheme());
+        assertEquals(expectedResponse.getChatColorThemeInverted(), actualResponse.getChatColorThemeInverted());
+        assertEquals(expectedResponse.getIconType(), actualResponse.getIconType());
+        assertEquals(expectedResponse.getIcon(), actualResponse.getIcon());
+        assertEquals(expectedResponse.getIconBackground(), actualResponse.getIconBackground());
+        assertEquals(expectedResponse.getIconUrl(), actualResponse.getIconUrl());
+        assertEquals(expectedResponse.getDescription(), actualResponse.getDescription());
+        assertEquals(expectedResponse.getCopyright(), actualResponse.getCopyright());
+        assertEquals(expectedResponse.getPrivacyPolicy(), actualResponse.getPrivacyPolicy());
+        assertEquals(expectedResponse.getCustomDisclaimer(), actualResponse.getCustomDisclaimer());
+        assertEquals(expectedResponse.getDefaultLanguage(), actualResponse.getDefaultLanguage());
+        assertEquals(expectedResponse.getShowWorkflowSteps(), actualResponse.getShowWorkflowSteps());
+        assertEquals(expectedResponse.getUseIconAsAnswerIcon(), actualResponse.getUseIconAsAnswerIcon());
+
+        // Verify interactions with mocks
+        verify(restClient).get();
+        verify(requestHeadersUriSpec).uri(ChatUriConstant.V1_SITE_URI);
+        verify(requestHeadersSpec).header(eq(HttpHeaders.AUTHORIZATION), eq("Bearer " + TEST_API_KEY));
+        verify(responseSpec).body(any(ParameterizedTypeReference.class));
     }
 }
