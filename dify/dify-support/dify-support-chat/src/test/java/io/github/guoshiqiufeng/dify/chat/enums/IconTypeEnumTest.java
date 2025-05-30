@@ -13,31 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.chat.constant;
+package io.github.guoshiqiufeng.dify.chat.enums;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * 常量
+ * Unit tests for {@link IconTypeEnum}
  *
  * @author yanghq
- * @version 1.0
- * @since 2025/3/4 14:33
+ * @version 1.1.0
+ * @since 2024/5/30 14:09
  */
-public interface ChatUriConstant {
+public class IconTypeEnumTest {
 
-    String V1_URL = "/v1";
-
-    String V1_CHAT_MESSAGES_URI = V1_URL + "/chat-messages";
-
-    String V1_CONVERSATIONS_URI = V1_URL + "/conversations";
-
-    String V1_MESSAGES_URI = V1_URL + "/messages";
-
-    String V1_PARAMETERS_URI = V1_URL + "/parameters";
-
-    String V1_SITE_URI = V1_URL + "/site";
-
-    String V1_TEXT_TO_AUDIO_URI = V1_URL + "/text-to-audio";
-
-    String V1_AUDIO_TO_TEXT_URI = V1_URL + "/audio-to-text";
-
+    @Test
+    public void testIconTypeEnum() {
+        // Verify the enum values
+        assertEquals("emoji", IconTypeEnum.emoji.name());
+        assertEquals("image", IconTypeEnum.image.name());
+    }
 }

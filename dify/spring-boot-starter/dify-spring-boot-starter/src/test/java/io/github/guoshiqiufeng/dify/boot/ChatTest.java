@@ -197,6 +197,15 @@ public class ChatTest extends BaseChatContainerTest {
     }
 
     @Test
+    @Order(11)
+    @DisplayName("Test get site")
+    public void testGetSite() {
+        AppSiteResponse site = difyChat.site(apiKey);
+        assertNotNull(site);
+    }
+
+
+    @Test
     @Order(12)
     @DisplayName("Test delete conversation")
     public void testDeleteConversation() {

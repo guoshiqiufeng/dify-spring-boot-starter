@@ -514,6 +514,41 @@ AppMetaResponse
 |----------------|-----------------------|--------------------|
 | toolIcons      | `Map<String, Object>` | Tool icons mapping |
 
+### 3.7 Get Application WebApp Settings
+
+#### Method
+
+```java
+AppSiteResponse site(String apikey);
+```
+
+#### Request Parameters
+
+| Parameter name | Type   | Required | Description |
+|----------------|--------|----------|-------------|
+| apiKey         | String | Yes      | apiKey      |
+
+#### Response Parameters
+
+AppSiteResponse
+
+| Parameter name         | Type         | Description                                                                           |
+|------------------------|--------------|---------------------------------------------------------------------------------------|
+| title                  | String       | WebApp name                                                                           |
+| chatColorTheme         | String       | Chat color theme, in hex format                                                       |
+| chatColorThemeInverted | Boolean      | Whether the chat color theme is inverted                                              |
+| iconType               | IconTypeEnum | Icon type, emoji - emoji, image - picture                                             |
+| icon                   | String       | Icon. If it's emoji type, it's an emoji symbol; if it's image type, it's an image URL |
+| iconBackground         | String       | Background color in hex format                                                        |
+| iconUrl                | String       | Icon URL                                                                              |
+| description            | String       | Description                                                                           |
+| copyright              | String       | Copyright information                                                                 |
+| privacyPolicy          | String       | Privacy policy link                                                                   |
+| customDisclaimer       | String       | Custom disclaimer                                                                     |
+| defaultLanguage        | String       | Default language                                                                      |
+| showWorkflowSteps      | Boolean      | Whether to show workflow details                                                      |
+| useIconAsAnswerIcon    | Boolean      | Whether to replace 🤖 in chat with the WebApp icon                                    |
+
 ## 4. Application Annotation
 
 > required Dify version 1.2.0 or higher

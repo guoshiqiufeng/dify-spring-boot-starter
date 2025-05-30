@@ -19,6 +19,7 @@ import io.github.guoshiqiufeng.dify.chat.dto.request.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.parameter.Enabled;
 import io.github.guoshiqiufeng.dify.chat.enums.AnnotationReplyActionEnum;
+import io.github.guoshiqiufeng.dify.chat.enums.IconTypeEnum;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
 import org.junit.jupiter.api.BeforeAll;
@@ -582,5 +583,50 @@ class DifyChatClientTest {
         assertEquals(expectedResponse.getJobStatus(), actualResponse.getJobStatus());
 
         verify(difyChatClient, times(1)).queryAnnotationReply(any(AppAnnotationReplyQueryRequest.class));
+    }
+
+    @Test
+    void testSite() {
+        // Arrange
+        String apiKey = "test-api-key";
+
+        AppSiteResponse expectedResponse = new AppSiteResponse();
+        expectedResponse.setTitle("Test App");
+        expectedResponse.setChatColorTheme("#FF5733");
+        expectedResponse.setChatColorThemeInverted(true);
+        expectedResponse.setIconType(IconTypeEnum.emoji);
+        expectedResponse.setIcon("🤖");
+        expectedResponse.setIconBackground("#FFFFFF");
+        expectedResponse.setIconUrl("https://example.com/icon.png");
+        expectedResponse.setDescription("Test description");
+        expectedResponse.setCopyright("© 2024 Test Company");
+        expectedResponse.setPrivacyPolicy("https://example.com/privacy");
+        expectedResponse.setCustomDisclaimer("Test disclaimer");
+        expectedResponse.setDefaultLanguage("en-US");
+        expectedResponse.setShowWorkflowSteps(true);
+        expectedResponse.setUseIconAsAnswerIcon(false);
+
+        when(difyChatClient.site(anyString())).thenReturn(expectedResponse);
+
+        // Act
+        AppSiteResponse actualResponse = difyChatClient.site(apiKey);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getTitle(), actualResponse.getTitle());
+        assertEquals(expectedResponse.getChatColorTheme(), actualResponse.getChatColorTheme());
+        assertEquals(expectedResponse.getChatColorThemeInverted(), actualResponse.getChatColorThemeInverted());
+        assertEquals(expectedResponse.getIconType(), actualResponse.getIconType());
+        assertEquals(expectedResponse.getIcon(), actualResponse.getIcon());
+        assertEquals(expectedResponse.getIconBackground(), actualResponse.getIconBackground());
+        assertEquals(expectedResponse.getIconUrl(), actualResponse.getIconUrl());
+        assertEquals(expectedResponse.getDescription(), actualResponse.getDescription());
+        assertEquals(expectedResponse.getCopyright(), actualResponse.getCopyright());
+        assertEquals(expectedResponse.getPrivacyPolicy(), actualResponse.getPrivacyPolicy());
+        assertEquals(expectedResponse.getCustomDisclaimer(), actualResponse.getCustomDisclaimer());
+        assertEquals(expectedResponse.getDefaultLanguage(), actualResponse.getDefaultLanguage());
+        assertEquals(expectedResponse.getShowWorkflowSteps(), actualResponse.getShowWorkflowSteps());
+        assertEquals(expectedResponse.getUseIconAsAnswerIcon(), actualResponse.getUseIconAsAnswerIcon());
+        verify(difyChatClient, times(1)).site(apiKey);
     }
 }

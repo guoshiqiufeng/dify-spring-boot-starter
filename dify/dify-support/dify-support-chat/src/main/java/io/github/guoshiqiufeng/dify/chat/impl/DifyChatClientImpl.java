@@ -117,6 +117,11 @@ public class DifyChatClientImpl implements DifyChat {
     }
 
     @Override
+    public AppSiteResponse site(String apikey) {
+        return difyChatClient.site(apikey);
+    }
+
+    @Override
     public DifyPageResult<AppAnnotationResponse> pageAppAnnotation(AppAnnotationPageRequest request) {
         return difyChatClient.pageAppAnnotation(request);
     }

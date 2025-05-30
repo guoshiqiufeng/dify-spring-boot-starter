@@ -137,6 +137,16 @@ public interface DifyChatClient {
     AppParametersResponseVO parameters(String apiKey);
 
     /**
+     * app site
+     *
+     * @param apikey The API key for authentication and retrieving app parameters
+     * @return Application site
+     * @since 1.1.0
+     * @since Dify version 1.4.0 or higher
+     */
+    AppSiteResponse site(String apikey);
+
+    /**
      * file upload
      *
      * @param request file upload param
