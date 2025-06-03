@@ -23,8 +23,8 @@ export default defineUserConfig({
         }
     },
     head: [
-        ['link', {rel: 'icon', href: '/loki-doc/images/f.ico'}],
-        ['link', {rel: 'shortcut icon', href: '/loki-doc/images/f.ico'}]
+        ['link', {rel: 'icon', href: '/dify-spring-boot-starter/images/f.ico'}],
+        ['link', {rel: 'shortcut icon', href: '/dify-spring-boot-starter/images/f.ico'}]
     ],
     bundler: viteBundler(),
     theme: defaultTheme({
