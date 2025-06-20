@@ -4,7 +4,7 @@ ext {
     ]
 
     libraries = [
-            springBoot3Version = '3.5.0',
+            springBoot3Version = '3.5.3',
             springBoot2Version = '2.7.18',
             hutoolVersion = '5.8.38',
             testcontainersVersion = '1.20.6',
