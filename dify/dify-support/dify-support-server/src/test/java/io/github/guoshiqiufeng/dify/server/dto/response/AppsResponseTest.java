@@ -87,7 +87,15 @@ public class AppsResponseTest {
         Long createdAt = 1619712000L;
         String updatedBy = "user-456";
         Long updatedAt = 1619798400L;
-        List<String> tags = Arrays.asList("tag1", "tag2");
+        AppsResponse.AppsTag appsTag = new AppsResponse.AppsTag();
+        appsTag.setId("1");
+        appsTag.setName("tag");
+        appsTag.setType("app");
+        AppsResponse.AppsTag appsTag2 = new AppsResponse.AppsTag();
+        appsTag2.setId("2");
+        appsTag2.setName("tag2");
+        appsTag2.setType("app");
+        List<AppsResponse.AppsTag> tags = Arrays.asList(appsTag, appsTag2);
         List<String> deletedTools = Collections.singletonList("tool1");
 
         // Act

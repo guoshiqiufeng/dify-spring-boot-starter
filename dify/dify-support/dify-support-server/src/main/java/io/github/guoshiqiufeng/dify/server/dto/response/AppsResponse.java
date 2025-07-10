@@ -82,7 +82,7 @@ public class AppsResponse implements Serializable {
     @JsonAlias("updated_at")
     private Long updatedAt;
 
-    private List<String> tags;
+    private List<AppsTag> tags;
 
     @JsonAlias("deleted_tools")
     private List<String> deletedTools;
@@ -119,5 +119,16 @@ public class AppsResponse implements Serializable {
         private List<String> stop;
 
         private String format;
+    }
+
+    @Data
+    public static class AppsTag implements Serializable {
+        private static final long serialVersionUID = 6681884820860339692L;
+
+        private String id;
+
+        private String name;
+
+        private String type;
     }
 }
