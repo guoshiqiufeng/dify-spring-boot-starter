@@ -227,7 +227,8 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
                 .uri(DatasetUriConstant.V1_DOCUMENT_URL, datasetId, documentId)
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
                 .retrieve()
-                .onStatus(responseErrorHandler);
+                .onStatus(responseErrorHandler)
+                .body(Void.class);
     }
 
 
@@ -273,7 +274,8 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
                 .uri(DatasetUriConstant.V1_DOCUMENTS_SEGMENT_URL, datasetId, documentId, segmentId)
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
                 .retrieve()
-                .onStatus(responseErrorHandler);
+                .onStatus(responseErrorHandler)
+                .body(Void.class);
     }
 
 
@@ -325,7 +327,8 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
                         request.getDatasetId(), request.getDocumentId(), request.getSegmentId(), request.getChildChunkId())
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request).accept(h))
                 .retrieve()
-                .onStatus(responseErrorHandler);
+                .onStatus(responseErrorHandler)
+                .body(Void.class);
     }
 
     @Override
