@@ -406,7 +406,7 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
                 .uri(DatasetUriConstant.V1_APPS_ANNOTATIONS + "/{annotation_id}", annotationId)
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
                 .retrieve()
-                .onStatus(responseErrorHandler);
+                .onStatus(responseErrorHandler).body(Void.class);
     }
 
     @Override
