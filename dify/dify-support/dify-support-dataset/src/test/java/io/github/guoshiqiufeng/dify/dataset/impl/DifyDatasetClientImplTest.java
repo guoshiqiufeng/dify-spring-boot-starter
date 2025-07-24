@@ -1065,7 +1065,44 @@ public class DifyDatasetClientImplTest {
         assertEquals("openai", actualResponse.getData().get(0).getProvider());
         assertEquals("anthropic", actualResponse.getData().get(1).getProvider());
         assertEquals("active", actualResponse.getData().get(0).getStatus());
-        verify(difyDatasetClient, times(1)).listTextEmbedding(apiKey);
+        verify(difyDatasetClient, times(1)).listRerank(apiKey);
+    }
+
+    @Test
+    void testListRerankForNoArgs() {
+        // Arrange
+        String apiKey = "test_api_key";
+
+        List<TextEmbedding> embeddingList = new ArrayList<>();
+
+        TextEmbedding embedding1 = new TextEmbedding();
+        embedding1.setProvider("openai");
+        embedding1.setStatus("active");
+
+        TextEmbedding embedding2 = new TextEmbedding();
+        embedding2.setProvider("anthropic");
+        embedding2.setStatus("active");
+
+        embeddingList.add(embedding1);
+        embeddingList.add(embedding2);
+
+        TextEmbeddingListResponse expectedResponse = new TextEmbeddingListResponse();
+        expectedResponse.setData(embeddingList);
+
+        when(difyDatasetClient.listRerank(null))
+                .thenReturn(expectedResponse);
+
+        // Act
+        TextEmbeddingListResponse actualResponse = difyDataset.listRerank();
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertNotNull(actualResponse.getData());
+        assertEquals(expectedResponse.getData().size(), actualResponse.getData().size());
+        assertEquals("openai", actualResponse.getData().get(0).getProvider());
+        assertEquals("anthropic", actualResponse.getData().get(1).getProvider());
+        assertEquals("active", actualResponse.getData().get(0).getStatus());
+        verify(difyDatasetClient, times(1)).listRerank(null);
     }
 
     @Test
