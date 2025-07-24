@@ -806,7 +806,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
 
         // Verify WebClient interactions
         verify(webClientMock).get();
-        verify(requestHeadersUriSpecMock).uri(DatasetUriConstant.V1_TEXT_EMBEDDING_LIST_URL);
+        verify(requestHeadersUriSpecMock).uri(DatasetUriConstant.V1_RERANK_LIST_URL);
         verify(responseSpecMock).bodyToMono(TextEmbeddingListResponse.class);
     }
 

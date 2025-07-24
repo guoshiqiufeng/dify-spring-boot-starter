@@ -420,7 +420,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
     }
 
     @Test
-    @Order(13)
+    @Order(12)
     @DisplayName("Test file upload info")
     public void testFileUploadInfo() {
         assertNotNull(datasetId, "Dataset ID should be available from previous test");
@@ -432,12 +432,21 @@ public class DatasetTest extends BaseDatasetContainerTest {
     }
 
     @Test
-    @Order(14)
+    @Order(13)
     @DisplayName("Test TextEmbedding")
     public void testTextEmbedding() {
         TextEmbeddingListResponse response = difyDataset.listTextEmbedding();
         assertNotNull(response);
     }
+
+    @Test
+    @Order(14)
+    @DisplayName("Test Rerank")
+    public void testRerank() {
+        TextEmbeddingListResponse response = difyDataset.listRerank();
+        assertNotNull(response);
+    }
+
 
     @Test
     @Order(15)

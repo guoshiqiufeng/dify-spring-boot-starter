@@ -852,7 +852,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
 
         // Verify WebClient interactions
         verify(restClient).get();
-        verify(requestHeadersUriSpec).uri(DatasetUriConstant.V1_TEXT_EMBEDDING_LIST_URL);
+        verify(requestHeadersUriSpec).uri(DatasetUriConstant.V1_RERANK_LIST_URL);
         verify(responseSpec).body(TextEmbeddingListResponse.class);
     }
 
