@@ -461,4 +461,14 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
                 .body(TextEmbeddingListResponse.class);
     }
 
+    @Override
+    public TextEmbeddingListResponse listRerank(String apiKey) {
+        return restClient.get()
+                .uri(DatasetUriConstant.V1_RERANK_LIST_URL)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(TextEmbeddingListResponse.class);
+    }
+
 }

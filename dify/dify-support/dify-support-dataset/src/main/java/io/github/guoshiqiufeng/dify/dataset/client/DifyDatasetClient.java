@@ -266,4 +266,12 @@ public interface DifyDatasetClient {
      */
     TextEmbeddingListResponse listTextEmbedding(String apiKey);
 
+    /**
+     * Lists all rerank
+     *
+     * @param apiKey The API key for authentication and authorization to the Dify API
+     * @return The rerank list response
+     */
+    TextEmbeddingListResponse listRerank(String apiKey);
+
 }

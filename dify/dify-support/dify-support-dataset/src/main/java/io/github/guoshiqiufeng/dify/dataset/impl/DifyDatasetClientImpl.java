@@ -180,4 +180,9 @@ public class DifyDatasetClientImpl implements DifyDataset {
     public TextEmbeddingListResponse listTextEmbedding(String apiKey) {
         return difyDatasetClient.listTextEmbedding(apiKey);
     }
+
+    @Override
+    public TextEmbeddingListResponse listRerank(String apiKey) {
+        return difyDatasetClient.listRerank(apiKey);
+    }
 }

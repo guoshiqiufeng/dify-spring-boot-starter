@@ -68,6 +68,8 @@ public interface DatasetUriConstant {
 
     String V1_TEXT_EMBEDDING_LIST_URL = V1_URL + "/workspaces/current/models/model-types/text-embedding";
 
+    String V1_RERANK_LIST_URL = V1_URL + "/workspaces/current/models/model-types/rerank";
+
     String V1_FILES_UPLOAD = V1_URL + "/files/upload";
 
     String V1_INFO = V1_URL + "/info";

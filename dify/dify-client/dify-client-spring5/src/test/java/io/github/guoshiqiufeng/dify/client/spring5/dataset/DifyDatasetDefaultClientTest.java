@@ -756,6 +756,61 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
     }
 
     @Test
+    public void testListRerank() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+
+        // Create expected response
+        TextEmbeddingListResponse expectedResponse = new TextEmbeddingListResponse();
+        List<TextEmbedding> textEmbeddings = new ArrayList<>();
+
+        // Create a TextEmbedding with proper structure
+        TextEmbedding embedding = new TextEmbedding();
+        embedding.setProvider("openai");
+        embedding.setStatus("active");
+
+        // Create and set TextEmbeddingLabel
+        TextEmbeddingLabel label = new TextEmbeddingLabel();
+        // Assuming TextEmbeddingLabel has name field
+        embedding.setLabel(label);
+
+        // Create and set icons
+        TextEmbeddingIcon smallIcon = new TextEmbeddingIcon();
+        // Assuming TextEmbeddingIcon has url field
+        embedding.setIconSmall(smallIcon);
+
+        TextEmbeddingIcon largeIcon = new TextEmbeddingIcon();
+        embedding.setIconLarge(largeIcon);
+
+        // Create and set models
+        List<TextEmbeddingModel> models = new ArrayList<>();
+        TextEmbeddingModel model = new TextEmbeddingModel();
+        // Assuming TextEmbeddingModel has id and name fields
+        models.add(model);
+        embedding.setModels(models);
+
+        textEmbeddings.add(embedding);
+        expectedResponse.setData(textEmbeddings);
+
+        // Set up the response mock to return our expected response
+        when(responseSpecMock.bodyToMono(TextEmbeddingListResponse.class)).thenReturn(Mono.just(expectedResponse));
+
+        // Execute the method
+        TextEmbeddingListResponse actualResponse = client.listRerank(apiKey);
+
+        // Verify the result
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getData().size(), actualResponse.getData().size());
+        assertEquals(expectedResponse.getData().get(0).getProvider(), actualResponse.getData().get(0).getProvider());
+        assertEquals(expectedResponse.getData().get(0).getStatus(), actualResponse.getData().get(0).getStatus());
+
+        // Verify WebClient interactions
+        verify(webClientMock).get();
+        verify(requestHeadersUriSpecMock).uri(DatasetUriConstant.V1_TEXT_EMBEDDING_LIST_URL);
+        verify(responseSpecMock).bodyToMono(TextEmbeddingListResponse.class);
+    }
+
+    @Test
     public void testCreateSegment() {
         // Prepare test data
         String apiKey = "test-api-key";

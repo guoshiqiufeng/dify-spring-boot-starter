@@ -538,6 +538,12 @@ public class DatasetTest extends BaseDatasetContainerTest {
         difyDataset.deleteDocument(datasetId, documentFileId);
     }
 
+
+    @Test
+    public void testDeletions() {
+        difyDataset.deleteDocument("20d8f9e3-0273-41c9-a594-b7a483129ec5", "5a97fa1a-ca9b-41c5-8a23-fd1f0c45bc9e");
+    }
+
     @Test
     @Order(20)
     @DisplayName("Test dataset deletion")
