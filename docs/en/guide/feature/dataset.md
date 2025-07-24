@@ -1322,4 +1322,95 @@ TextEmbeddingListResponse
 | VIDEO            | video            | Video               |
 | AUDIO            | audio            | Audio               |
 
+### 7.2 Get RERANK List
+
+#### Method
+
+```java
+TextEmbeddingListResponse listRerank();
+
+TextEmbeddingListResponse listRerank(String apikey);
+```
+
+#### Request Parameters
+
+None
+
+#### Response Parameters
+
+TextEmbeddingListResponse
+
+| Parameter | Type                  | Description          |
+|-----------|-----------------------|----------------------|
+| data      | `List<TextEmbedding>` | Embedding model list |
+
+**TextEmbedding Object Structure**
+
+| Parameter | Type                       | Description       |
+|-----------|----------------------------|-------------------|
+| provider  | String                     | Provider name     |
+| label     | TextEmbeddingLabel         | Label information |
+| iconSmall | TextEmbeddingIcon          | Small icon        |
+| iconLarge | TextEmbeddingIcon          | Large icon        |
+| status    | String                     | Status            |
+| models    | `List<TextEmbeddingModel>` | Model list        |
+
+**TextEmbeddingLabel Object Structure**
+
+| Parameter | Type   | Description              |
+|-----------|--------|--------------------------|
+| zhHans    | String | Simplified Chinese label |
+| enUs      | String | English (US) label       |
+
+**TextEmbeddingIcon Object Structure**
+
+| Parameter | Type   | Description                 |
+|-----------|--------|-----------------------------|
+| zhHans    | String | Simplified Chinese icon URL |
+| enUs      | String | English (US) icon URL       |
+
+**TextEmbeddingModel Object Structure**
+
+| Parameter            | Type                         | Description                       |
+|----------------------|------------------------------|-----------------------------------|
+| model                | String                       | Model identifier                  |
+| label                | TextEmbeddingLabel           | Model label                       |
+| modelType            | String                       | Model type                        |
+| features             | `List<ModelFeatureEnum>`     | Feature list                      |
+| fetchFrom            | String                       | Fetch source                      |
+| modelProperties      | TextEmbeddingModelProperties | Model properties                  |
+| deprecated           | Boolean                      | Whether deprecated                |
+| status               | ModelStatusEnum              | Status                            |
+| loadBalancingEnabled | Boolean                      | Whether load balancing is enabled |
+
+**TextEmbeddingModelProperties Object Structure**
+
+| Parameter   | Type    | Description    |
+|-------------|---------|----------------|
+| contextSize | Integer | Context size   |
+| maxChunks   | Integer | Maximum chunks |
+
+**ModelStatusEnum Values**
+
+| Enum Value     | Code Value     | Description    |
+|----------------|----------------|----------------|
+| ACTIVE         | active         | Active         |
+| NO_CONFIGURE   | no-configure   | Not configured |
+| QUOTA_EXCEEDED | quota-exceeded | Quota exceeded |
+| NO_PERMISSION  | no-permission  | No permission  |
+| DISABLED       | disabled       | Disabled       |
+
+**ModelFeatureEnum Values**
+
+| Enum Value       | Code Value       | Description         |
+|------------------|------------------|---------------------|
+| TOOL_CALL        | tool-call        | Tool call           |
+| MULTI_TOOL_CALL  | multi-tool-call  | Multiple tool calls |
+| AGENT_THOUGHT    | agent-thought    | Agent thought       |
+| VISION           | vision           | Vision              |
+| STREAM_TOOL_CALL | stream-tool-call | Stream tool call    |
+| DOCUMENT         | document         | Document            |
+| VIDEO            | video            | Video               |
+| AUDIO            | audio            | Audio               |
+
 

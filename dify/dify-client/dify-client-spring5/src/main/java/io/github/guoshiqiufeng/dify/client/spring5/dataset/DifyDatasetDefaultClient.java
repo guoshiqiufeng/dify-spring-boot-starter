@@ -461,4 +461,14 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
                 .bodyToMono(TextEmbeddingListResponse.class).block();
     }
 
+    @Override
+    public TextEmbeddingListResponse listRerank(String apiKey) {
+        return webClient.get()
+                .uri(DatasetUriConstant.V1_RERANK_LIST_URL)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
+                .retrieve()
+                .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(TextEmbeddingListResponse.class).block();
+    }
+
 }
