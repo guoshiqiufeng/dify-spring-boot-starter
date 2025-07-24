@@ -66,6 +66,8 @@ public enum StreamEventEnum {
 
     message(EmptyData.class),
 
+    message_end(EmptyData.class),
+
     message_replace(EmptyData.class),
 
     ;
