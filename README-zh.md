@@ -52,7 +52,7 @@
         <dependency>
             <groupId>io.github.guoshiqiufeng.dify</groupId>
             <artifactId>dify-bom</artifactId>
-            <version>1.1.2</version>
+            <version>1.2.0</version>
             <type>import</type>
         </dependency>
     </dependencies>
