@@ -16,7 +16,9 @@
 package io.github.guoshiqiufeng.dify.client.spring6.utils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -28,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -66,12 +68,74 @@ public class DifyMessageConvertersTest {
         ObjectMapper objectMapper = new ObjectMapper();
         MappingJackson2HttpMessageConverter jacksonConverter = new MappingJackson2HttpMessageConverter(objectMapper);
         converters.add(jacksonConverter);
+        
+        // Add another converter to verify ordering
+        HttpMessageConverter<?> otherConverter = mock(HttpMessageConverter.class);
+        converters.add(otherConverter);
 
         // Apply the captured consumer to our test list
         consumerCaptor.getValue().accept(converters);
 
-        // Verify that the ObjectMapper's serialization inclusion is set to NON_NULL
-        // Using the non-deprecated API in newer Jackson versions
-        assertEquals(JsonInclude.Include.USE_DEFAULTS, objectMapper.getSerializationConfig().getDefaultPropertyInclusion().getValueInclusion());
+        // Verify that the list now only has two converters (the original one was replaced)
+        assertEquals(2, converters.size());
+        
+        // Verify the first converter is a MappingJackson2HttpMessageConverter
+        assertTrue(converters.get(0) instanceof MappingJackson2HttpMessageConverter);
+        
+        // Get the ObjectMapper from the configured converter
+        ObjectMapper configuredMapper = ((MappingJackson2HttpMessageConverter) converters.get(0)).getObjectMapper();
+        
+        // Verify that the Jackson converter is properly configured
+        assertEquals(JsonInclude.Include.NON_NULL, configuredMapper.getSerializationConfig().getDefaultPropertyInclusion().getValueInclusion());
+        assertFalse(configuredMapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
+        
+        // Verify the second converter is still the other mock converter
+        assertSame(otherConverter, converters.get(1));
+    }
+    
+    @Test
+    @DisplayName("Test messageConvertersConsumer creates new converter when none exists")
+    public void testMessageConvertersConfigurationNoExistingConverter() {
+        // Create a consumer for message converters
+        Consumer<RestClient.Builder> consumer = DifyMessageConverters.messageConvertersConsumer();
+
+        // Create a mock RestClient.Builder
+        RestClient.Builder mockBuilder = mock(RestClient.Builder.class);
+
+        // Create an ArgumentCaptor to capture the Consumer<List<HttpMessageConverter<?>>> argument
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<Consumer<List<HttpMessageConverter<?>>>> consumerCaptor =
+                ArgumentCaptor.forClass(Consumer.class);
+
+        // Mock the behavior
+        when(mockBuilder.messageConverters(consumerCaptor.capture())).thenReturn(mockBuilder);
+
+        // Apply the consumer to the mock builder
+        consumer.accept(mockBuilder);
+
+        // Create a list without any Jackson converter
+        List<HttpMessageConverter<?>> converters = new ArrayList<>();
+        HttpMessageConverter<?> otherConverter = mock(HttpMessageConverter.class);
+        converters.add(otherConverter);
+
+        // Apply the captured consumer to our test list
+        consumerCaptor.getValue().accept(converters);
+
+        // Verify that the list now has two converters (added a new one)
+        assertEquals(2, converters.size());
+        
+        // Verify the first converter is a MappingJackson2HttpMessageConverter
+        assertTrue(converters.get(0) instanceof MappingJackson2HttpMessageConverter);
+        
+        // Get the ObjectMapper from the configured converter
+        ObjectMapper configuredMapper = ((MappingJackson2HttpMessageConverter) converters.get(0)).getObjectMapper();
+        
+        // Verify that the Jackson converter is properly configured
+        assertEquals(JsonInclude.Include.NON_NULL, configuredMapper.getSerializationConfig().getDefaultPropertyInclusion().getValueInclusion());
+        assertFalse(configuredMapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
+        assertFalse(configuredMapper.isEnabled(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
+        
+        // Verify the second converter is still the other mock converter
+        assertSame(otherConverter, converters.get(1));
     }
 }
