@@ -553,7 +553,7 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
 
     @Override
     public DataSetTagsResponse listDatasetTag(String datasetId, String apiKey) {
-        return restClient.post()
+        return restClient.get()
                 .uri(DatasetUriConstant.V1_DATASET_TAGS, datasetId)
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
                 .retrieve()
