@@ -84,6 +84,13 @@ Implementation of the Redis messaging framework.
 | 【KNOWLEDGE】 Update Documents Metadata                       | ✅      |
 | 【KNOWLEDGE】 Get Knowledge Metadata List                     | ✅      |
 | 【KNOWLEDGE】 Get available embedding models                  | ✅      |
+| 【KNOWLEDGE】 Get rerank models                               | ✅      |
+| 【KNOWLEDGE】 Create New Knowledge Base Type Tag              | ✅      |
+| 【KNOWLEDGE】 Modify Knowledge Base Type Tag Name             | ✅      |
+| 【KNOWLEDGE】 Delete Knowledge Base Type Tag                  | ✅      |
+| 【KNOWLEDGE】 Bind Dataset to Knowledge Base Type Tag         | ✅      |
+| 【KNOWLEDGE】 Unbind Dataset and Knowledge Base Type Tag      | ✅      |
+| 【KNOWLEDGE】 Query Tags Bound to a Dataset                   | ✅      |
 | 【SERVER】Get Applications List                               | ✅      |
 | 【SERVER】Get Application Information                         | ✅      |
 | 【SERVER】Get Application API Keys                            | ✅      |
