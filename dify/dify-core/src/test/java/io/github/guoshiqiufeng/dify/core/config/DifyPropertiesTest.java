@@ -90,4 +90,63 @@ class DifyPropertiesTest {
         assertEquals(properties1.hashCode(), properties2.hashCode());
         assertNotEquals(properties1.hashCode(), properties3.hashCode());
     }
+
+    @Test
+    void testClientConfig() {
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        // 默认值
+        assertTrue(config.getSkipNull());
+        assertTrue(config.getLogging());
+
+        // setter/getter
+        config.setSkipNull(false);
+        config.setLogging(false);
+        assertFalse(config.getSkipNull());
+        assertFalse(config.getLogging());
+
+        // 有参构造
+        DifyProperties.ClientConfig config2 = new DifyProperties.ClientConfig(false, false);
+        assertFalse(config2.getSkipNull());
+        assertFalse(config2.getLogging());
+
+        // equals/hashCode
+        DifyProperties.ClientConfig config3 = new DifyProperties.ClientConfig(false, false);
+        assertEquals(config2, config3);
+        assertEquals(config2.hashCode(), config3.hashCode());
+        assertEquals(config, config2);
+    }
+
+    @Test
+    void testSetAndGetClientConfig() {
+        DifyProperties properties = new DifyProperties();
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig(false, true);
+        properties.setClientConfig(config);
+        assertEquals(config, properties.getClientConfig());
+    }
+
+    @Test
+    void testToString() {
+        // 测试DifyProperties的toString
+        DifyProperties properties = new DifyProperties();
+        properties.setUrl("https://test-dify.example.com");
+        assertNotNull(properties.toString());
+        assertTrue(properties.toString().contains("url=https://test-dify.example.com"));
+
+        // 测试Dataset的toString
+        DifyProperties.Dataset dataset = new DifyProperties.Dataset("test-api-key");
+        assertNotNull(dataset.toString());
+        assertTrue(dataset.toString().contains("apiKey=test-api-key"));
+
+        // 测试Server的toString
+        DifyProperties.Server server = new DifyProperties.Server("test@example.com", "test-password");
+        assertNotNull(server.toString());
+        assertTrue(server.toString().contains("email=test@example.com"));
+        assertTrue(server.toString().contains("password=test-password"));
+
+        // 测试ClientConfig的toString
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig(false, false);
+        assertNotNull(config.toString());
+        assertTrue(config.toString().contains("skipNull=false"));
+        assertTrue(config.toString().contains("logging=false"));
+    }
 }

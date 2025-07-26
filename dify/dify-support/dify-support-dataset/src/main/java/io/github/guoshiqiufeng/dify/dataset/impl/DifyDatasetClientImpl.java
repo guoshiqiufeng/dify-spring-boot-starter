@@ -22,6 +22,8 @@ import io.github.guoshiqiufeng.dify.dataset.dto.request.*;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.*;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 /**
  * @author yanghq
  * @version 0.8.0
@@ -184,5 +186,40 @@ public class DifyDatasetClientImpl implements DifyDataset {
     @Override
     public TextEmbeddingListResponse listRerank(String apiKey) {
         return difyDatasetClient.listRerank(apiKey);
+    }
+
+    @Override
+    public TagInfoResponse createTag(TagCreateRequest request) {
+        return difyDatasetClient.createTag(request);
+    }
+
+    @Override
+    public List<TagInfoResponse> listTag(String apiKey) {
+        return difyDatasetClient.listTag(apiKey);
+    }
+
+    @Override
+    public TagInfoResponse updateTag(TagUpdateRequest request) {
+        return difyDatasetClient.updateTag(request);
+    }
+
+    @Override
+    public void deleteTag(String tagId, String apiKey) {
+        difyDatasetClient.deleteTag(tagId, apiKey);
+    }
+
+    @Override
+    public void bindingTag(TagBindingRequest request) {
+        difyDatasetClient.bindingTag(request);
+    }
+
+    @Override
+    public void unbindingTag(TagUnbindingRequest request) {
+        difyDatasetClient.unbindingTag(request);
+    }
+
+    @Override
+    public DataSetTagsResponse listDatasetTag(String datasetId, String apiKey) {
+        return difyDatasetClient.listDatasetTag(datasetId, apiKey);
     }
 }

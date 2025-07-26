@@ -27,12 +27,16 @@ import io.github.guoshiqiufeng.dify.dataset.dto.response.*;
 import io.github.guoshiqiufeng.dify.dataset.utils.MultipartBodyUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -469,6 +473,92 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
                 .retrieve()
                 .onStatus(responseErrorHandler)
                 .body(TextEmbeddingListResponse.class);
+    }
+
+    @Override
+    public TagInfoResponse createTag(TagCreateRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        return restClient.post()
+                .uri(DatasetUriConstant.V1_TAGS)
+                .body(request)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request).accept(h))
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(TagInfoResponse.class);
+    }
+
+    @Override
+    public List<TagInfoResponse> listTag(String apiKey) {
+        return restClient.get()
+                .uri(DatasetUriConstant.V1_TAGS)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(new ParameterizedTypeReference<List<TagInfoResponse>>() {
+                });
+    }
+
+    @Override
+    public TagInfoResponse updateTag(TagUpdateRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        return restClient.patch()
+                .uri(DatasetUriConstant.V1_TAGS)
+                .body(request)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request).accept(h))
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(TagInfoResponse.class);
+    }
+
+    @Override
+    public void deleteTag(String tagId, String apiKey) {
+        // Validate input parameters
+        if (tagId == null || tagId.trim().isEmpty()) {
+            throw new IllegalArgumentException("Tag ID must not be null or empty");
+        }
+        Map<String, String> param = new HashMap<>(1);
+        param.put("tag_id", tagId);
+        restClient.method(HttpMethod.DELETE)
+                .uri(DatasetUriConstant.V1_TAGS)
+                .body(param)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(void.class);
+    }
+
+    @Override
+    public void bindingTag(TagBindingRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        restClient.post()
+                .uri(DatasetUriConstant.V1_TAGS_BINDING)
+                .body(request)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request).accept(h))
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(Void.class);
+    }
+
+    @Override
+    public void unbindingTag(TagUnbindingRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        restClient.post()
+                .uri(DatasetUriConstant.V1_TAGS_UNBINDING)
+                .body(request)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request).accept(h))
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(Void.class);
+    }
+
+    @Override
+    public DataSetTagsResponse listDatasetTag(String datasetId, String apiKey) {
+        return restClient.post()
+                .uri(DatasetUriConstant.V1_DATASET_TAGS, datasetId)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(DataSetTagsResponse.class);
     }
 
 }

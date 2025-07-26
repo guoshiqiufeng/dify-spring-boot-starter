@@ -27,12 +27,16 @@ import io.github.guoshiqiufeng.dify.dataset.dto.response.*;
 import io.github.guoshiqiufeng.dify.dataset.utils.MultipartBodyUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.util.Assert;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -469,6 +473,92 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
                 .retrieve()
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(TextEmbeddingListResponse.class).block();
+    }
+
+    @Override
+    public TagInfoResponse createTag(TagCreateRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        return webClient.post()
+                .uri(DatasetUriConstant.V1_TAGS)
+                .bodyValue(request)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request).accept(h))
+                .retrieve()
+                .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(TagInfoResponse.class).block();
+    }
+
+    @Override
+    public List<TagInfoResponse> listTag(String apiKey) {
+        return webClient.get()
+                .uri(DatasetUriConstant.V1_TAGS)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
+                .retrieve()
+                .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(new ParameterizedTypeReference<List<TagInfoResponse>>() {
+                }).block();
+    }
+
+    @Override
+    public TagInfoResponse updateTag(TagUpdateRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        return webClient.patch()
+                .uri(DatasetUriConstant.V1_TAGS)
+                .bodyValue(request)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request).accept(h))
+                .retrieve()
+                .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(TagInfoResponse.class).block();
+    }
+
+    @Override
+    public void deleteTag(String tagId, String apiKey) {
+        // Validate input parameters
+        if (tagId == null || tagId.trim().isEmpty()) {
+            throw new IllegalArgumentException("Tag ID must not be null or empty");
+        }
+        Map<String, String> param = new HashMap<>(1);
+        param.put("tag_id", tagId);
+        webClient.method(HttpMethod.DELETE)
+                .uri(DatasetUriConstant.V1_TAGS)
+                .bodyValue(param)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
+                .retrieve()
+                .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(Void.class).block();
+    }
+
+    @Override
+    public void bindingTag(TagBindingRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        webClient.post()
+                .uri(DatasetUriConstant.V1_TAGS_BINDING)
+                .bodyValue(request)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request).accept(h))
+                .retrieve()
+                .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(Void.class).block();
+    }
+
+    @Override
+    public void unbindingTag(TagUnbindingRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        webClient.post()
+                .uri(DatasetUriConstant.V1_TAGS_UNBINDING)
+                .bodyValue(request)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request).accept(h))
+                .retrieve()
+                .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(Void.class).block();
+    }
+
+    @Override
+    public DataSetTagsResponse listDatasetTag(String datasetId, String apiKey) {
+        return webClient.post()
+                .uri(DatasetUriConstant.V1_DATASET_TAGS, datasetId)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
+                .retrieve()
+                .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(DataSetTagsResponse.class).block();
     }
 
 }
