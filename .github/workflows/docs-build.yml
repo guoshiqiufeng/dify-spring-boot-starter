@@ -1,4 +1,4 @@
-name: docs build
+name: docs build test
 permissions:
   contents: write
   pull-requests: write

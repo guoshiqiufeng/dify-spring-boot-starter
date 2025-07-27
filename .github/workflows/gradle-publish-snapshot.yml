@@ -1,4 +1,4 @@
-name: Gradle Package
+name: Gradle Package Snapshot
 permissions:
   contents: read
   pull-requests: write
