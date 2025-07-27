@@ -79,4 +79,12 @@ public interface DatasetUriConstant {
     String V1_APPS_ANNOTATIONS = V1_URL + "/apps/annotations";
 
     String V1_APPS_ANNOTATIONS_REPLY = V1_URL + "/apps/annotation-reply";
+
+    String V1_TAGS = V1_DATASETS_URL + "/tags";
+
+    String V1_TAGS_BINDING = V1_TAGS + "/binding";
+
+    String V1_TAGS_UNBINDING = V1_TAGS + "/unbinding";
+
+    String V1_DATASET_TAGS = V1_DATASETS_URL + "/{datasetId}/tags";
 }

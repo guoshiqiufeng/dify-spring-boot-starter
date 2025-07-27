@@ -19,6 +19,8 @@ import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.*;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.*;
 
+import java.util.List;
+
 /**
  * @author yanghq
  * @version 1.0
@@ -351,4 +353,98 @@ public interface DifyDataset {
      * @since 1.2.0
      */
     TextEmbeddingListResponse listRerank(String apiKey);
+
+
+    /**
+     * Create a new tag
+     *
+     * @param request Tag creation request containing tag information
+     * @return TagInfoResponse containing the created tag details
+     * @since 1.3.0
+     */
+    TagInfoResponse createTag(TagCreateRequest request);
+
+    /**
+     * List all tags
+     *
+     * @return List of TagInfoResponse containing all tag information
+     * @since 1.3.0
+     */
+    default List<TagInfoResponse> listTag() {
+        return listTag(null);
+    }
+
+    /**
+     * List all tags
+     *
+     * @param apiKey The API key for authentication and authorization to the Dify API
+     * @return List of TagInfoResponse containing all tag information
+     * @since 1.3.0
+     */
+    List<TagInfoResponse> listTag(String apiKey);
+
+    /**
+     * Update an existing tag
+     *
+     * @param request Tag update request containing updated tag information
+     * @return TagInfoResponse containing the updated tag details
+     * @since 1.3.0
+     */
+    TagInfoResponse updateTag(TagUpdateRequest request);
+
+    /**
+     * Delete a tag by tag ID (default method using null API key)
+     *
+     * @param tagId ID of the tag to be deleted
+     * @since 1.3.0
+     */
+    default void deleteTag(String tagId) {
+        deleteTag(tagId, null);
+    }
+
+    /**
+     * Delete a tag by tag ID with API key authentication
+     *
+     * @param tagId  ID of the tag to be deleted
+     * @param apiKey API key for authentication (can be null)
+     * @since 1.3.0
+     */
+    void deleteTag(String tagId, String apiKey);
+
+    /**
+     * Bind tags to a resource (such as dataset, model, etc.)
+     *
+     * @param request Tag binding request containing binding information
+     * @since 1.3.0
+     */
+    void bindingTag(TagBindingRequest request);
+
+    /**
+     * Unbind tags from a resource
+     *
+     * @param request Tag unbinding request containing unbinding information
+     * @since 1.3.0
+     */
+    void unbindingTag(TagUnbindingRequest request);
+
+    /**
+     * List all tags associated with a specific dataset
+     *
+     * @param datasetId ID of the dataset to query tags for
+     * @return DataSetTagsResponse containing dataset tag information
+     * @since 1.3.0
+     */
+    default DataSetTagsResponse listDatasetTag(String datasetId) {
+        return listDatasetTag(datasetId, null);
+    }
+
+    /**
+     * List all tags associated with a specific dataset
+     *
+     * @param datasetId ID of the dataset to query tags for
+     * @param apiKey    API key for authentication
+     * @return DataSetTagsResponse containing dataset tag information
+     * @since 1.3.0
+     */
+    DataSetTagsResponse listDatasetTag(String datasetId, String apiKey);
 }

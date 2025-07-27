@@ -538,6 +538,41 @@ public class DatasetTest extends BaseDatasetContainerTest {
     }
 
     @Test
+    @Order(17)
+    @DisplayName("Test create tag")
+    public void testTag() {
+        TagCreateRequest tagCreateRequest = new TagCreateRequest();
+        tagCreateRequest.setName("test");
+        TagInfoResponse tag = difyDataset.createTag(tagCreateRequest);
+        assertNotNull(tag);
+
+        TagUpdateRequest tagUpdateRequest = new TagUpdateRequest();
+        tagUpdateRequest.setName("test update");
+        String tagId = tag.getId();
+        tagUpdateRequest.setTagId(tagId);
+        TagInfoResponse tagInfoResponse = difyDataset.updateTag(tagUpdateRequest);
+        assertNotNull(tagInfoResponse);
+
+        List<TagInfoResponse> tagInfoResponses = difyDataset.listTag();
+        assertNotNull(tagInfoResponses);
+
+        TagBindingRequest tagBindingRequest = new TagBindingRequest();
+        tagBindingRequest.setTagIds(List.of(tagId));
+        tagBindingRequest.setTargetId(datasetId);
+        difyDataset.bindingTag(tagBindingRequest);
+
+        DataSetTagsResponse dataSetTagsResponse = difyDataset.listDatasetTag(datasetId);
+        assertNotNull(dataSetTagsResponse);
+
+        TagUnbindingRequest tagUnbindingRequest = new TagUnbindingRequest();
+        tagUnbindingRequest.setTagId(tagId);
+        tagUnbindingRequest.setTargetId(datasetId);
+        difyDataset.unbindingTag(tagUnbindingRequest);
+
+        difyDataset.deleteTag(tagId);
+    }
+
+    @Test
     @Order(19)
     @DisplayName("Test document deletion")
     public void testDocumentDeletion() {

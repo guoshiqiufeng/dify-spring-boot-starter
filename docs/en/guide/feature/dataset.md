@@ -195,7 +195,7 @@ DatasetInfoResponse See 1.3
 ```java
 void delete(String datasetId);
 
-void delete(String datasetId, String apiKey);
+        void delete(String datasetId,String apiKey);
 ```
 
 #### Request Parameters
@@ -613,9 +613,9 @@ DocumentIndexingStatusResponse
 #### Method
 
 ```java
-void deleteDocument(String datasetId, String documentId);
+void deleteDocument(String datasetId,String documentId);
 
-void deleteDocument(String datasetId, String documentId, String apiKey);
+        void deleteDocument(String datasetId,String documentId,String apiKey);
 ```
 
 #### Request Parameters
@@ -634,9 +634,9 @@ None
 #### Method
 
 ```java
-UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId);
+UploadFileInfoResponse uploadFileInfo(String datasetId,String documentId);
 
-UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, String apiKey);
+        UploadFileInfoResponse uploadFileInfo(String datasetId,String documentId,String apiKey);
 ```
 
 #### Request Parameters
@@ -766,9 +766,9 @@ SegmentResponse
 #### Method
 
 ```java
-void deleteSegment(String datasetId, String documentId, String segmentId);
+void deleteSegment(String datasetId,String documentId,String segmentId);
 
-void deleteSegment(String datasetId, String documentId, String segmentId, String apiKey);
+        void deleteSegment(String datasetId,String documentId,String segmentId,String apiKey);
 ```
 
 #### Request Parameters
@@ -1114,9 +1114,9 @@ MetaDataResponse See 6.1
 #### Method
 
 ```java
-void deleteMetaData(String datasetId, String metadataId);
+void deleteMetaData(String datasetId,String metadataId);
 
-void deleteMetaData(String datasetId, String metadataId, String apiKey);
+        void deleteMetaData(String datasetId,String metadataId,String apiKey);
 ```
 
 #### Request Parameters
@@ -1202,7 +1202,7 @@ None
 ```java
 MetaDataListResponse listMetaData(String datasetId);
 
-MetaDataListResponse listMetaData(String datasetId, String apiKey);
+        MetaDataListResponse listMetaData(String datasetId,String apiKey);
 ```
 
 #### Request Parameters
@@ -1238,7 +1238,7 @@ MetaDataListResponse
 ```java
 TextEmbeddingListResponse listTextEmbedding();
 
-TextEmbeddingListResponse listTextEmbedding(String apikey);
+        TextEmbeddingListResponse listTextEmbedding(String apikey);
 ```
 
 #### Request Parameters
@@ -1329,7 +1329,7 @@ TextEmbeddingListResponse
 ```java
 TextEmbeddingListResponse listRerank();
 
-TextEmbeddingListResponse listRerank(String apikey);
+        TextEmbeddingListResponse listRerank(String apikey);
 ```
 
 #### Request Parameters
@@ -1412,5 +1412,181 @@ TextEmbeddingListResponse
 | DOCUMENT         | document         | Document            |
 | VIDEO            | video            | Video               |
 | AUDIO            | audio            | Audio               |
+
+---
+
+## 8. Tag Management
+
+### 8.1 Create Tag
+
+#### Method
+
+```java
+TagInfoResponse createTag(TagCreateRequest request);
+```
+
+#### Request Parameters
+
+TagCreateRequest
+
+| Parameter | Type   | Required | Description             |
+|-----------|--------|----------|-------------------------|
+| name      | String | Yes      | Tag name, max length 50 |
+
+#### Response Parameters
+
+TagInfoResponse
+
+| Parameter    | Type    | Description        |
+|--------------|---------|--------------------|
+| id           | String  | Tag ID             |
+| name         | String  | Tag name           |
+| type         | String  | Tag type           |
+| bindingCount | Integer | Number of bindings |
+
+---
+
+### 8.2 List Tags
+
+#### Method
+
+```java
+List<TagInfoResponse> listTag();
+        List<TagInfoResponse> listTag(String apiKey);
+```
+
+#### Request Parameters
+
+| Parameter | Type   | Required | Description        |
+|-----------|--------|----------|--------------------|
+| apiKey    | String | No       | API key (optional) |
+
+#### Response Parameters
+
+Same as 8.1 TagInfoResponse list
+
+---
+
+### 8.3 Update Tag
+
+#### Method
+
+```java
+TagInfoResponse updateTag(TagUpdateRequest request);
+```
+
+#### Request Parameters
+
+TagUpdateRequest
+
+| Parameter | Type   | Required | Description             |
+|-----------|--------|----------|-------------------------|
+| tagId     | String | Yes      | Tag ID                  |
+| name      | String | Yes      | Tag name, max length 50 |
+
+#### Response Parameters
+
+Same as 8.1 TagInfoResponse
+
+---
+
+### 8.4 Delete Tag
+
+#### Method
+
+```java
+void deleteTag(String tagId);
+        void deleteTag(String tagId,String apiKey);
+```
+
+#### Request Parameters
+
+| Parameter | Type   | Required | Description        |
+|-----------|--------|----------|--------------------|
+| tagId     | String | Yes      | Tag ID             |
+| apiKey    | String | No       | API key (optional) |
+
+#### Response Parameters
+
+None
+
+---
+
+### 8.5 Bind Tags to Resource
+
+#### Method
+
+```java
+void bindingTag(TagBindingRequest request);
+```
+
+#### Request Parameters
+
+TagBindingRequest
+
+| Parameter | Type           | Required | Description               |
+|-----------|----------------|----------|---------------------------|
+| tagIds    | `List<String>` | Yes      | List of tag IDs           |
+| targetId  | String         | Yes      | Target ID (e.g., dataset) |
+
+#### Response Parameters
+
+None
+
+---
+
+### 8.6 Unbind Tag
+
+#### Method
+
+```java
+void unbindingTag(TagUnbindingRequest request);
+```
+
+#### Request Parameters
+
+TagUnbindingRequest
+
+| Parameter | Type   | Required | Description               |
+|-----------|--------|----------|---------------------------|
+| tagId     | String | Yes      | Tag ID                    |
+| targetId  | String | Yes      | Target ID (e.g., dataset) |
+
+#### Response Parameters
+
+None
+
+---
+
+### 8.7 List Tags Bound to Dataset
+
+#### Method
+
+```java
+DataSetTagsResponse listDatasetTag(String datasetId);
+        DataSetTagsResponse listDatasetTag(String datasetId,String apiKey);
+```
+
+#### Request Parameters
+
+| Parameter | Type   | Required | Description        |
+|-----------|--------|----------|--------------------|
+| datasetId | String | Yes      | Dataset ID         |
+| apiKey    | String | No       | API key (optional) |
+
+#### Response Parameters
+
+DataSetTagsResponse
+
+| Parameter | Type                   | Description          |
+|-----------|------------------------|----------------------|
+| data      | `List<DataSetTagInfo>` | List of tag info     |
+| total     | Integer                | Total number of tags |
+
+See DataSetTagInfo structure in implementation for details.
+
+---
+
+> All tag-related APIs require a valid API key. If not provided, the default apikey in the configuration file is used.
 
 

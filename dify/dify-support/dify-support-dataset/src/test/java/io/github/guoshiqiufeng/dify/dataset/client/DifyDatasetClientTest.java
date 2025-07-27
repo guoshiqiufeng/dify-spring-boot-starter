@@ -929,4 +929,183 @@ class DifyDatasetClientTest {
         assertEquals("active", actualResponse.getData().get(0).getStatus());
         verify(difyDatasetClient, times(1)).listTextEmbedding(apiKey);
     }
+
+
+    @Test
+    void testCreateTag() {
+        // Arrange
+        TagCreateRequest request = new TagCreateRequest();
+        request.setName("Test Tag");
+        request.setApiKey("test_api_key");
+
+        TagInfoResponse expectedResponse = new TagInfoResponse();
+        expectedResponse.setId("tag_123");
+        expectedResponse.setName("Test Tag");
+        expectedResponse.setType("custom");
+        expectedResponse.setBindingCount(0);
+
+        when(difyDatasetClient.createTag(any(TagCreateRequest.class)))
+                .thenReturn(expectedResponse);
+
+        // Act
+        TagInfoResponse actualResponse = difyDatasetClient.createTag(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getName(), actualResponse.getName());
+        assertEquals(expectedResponse.getType(), actualResponse.getType());
+        assertEquals(expectedResponse.getBindingCount(), actualResponse.getBindingCount());
+        verify(difyDatasetClient, times(1)).createTag(any(TagCreateRequest.class));
+    }
+
+    @Test
+    void testListTag() {
+        // Arrange
+        String apiKey = "test_api_key";
+
+        TagInfoResponse tag1 = new TagInfoResponse();
+        tag1.setId("tag_123");
+        tag1.setName("Test Tag 1");
+        tag1.setType("custom");
+        tag1.setBindingCount(2);
+
+        TagInfoResponse tag2 = new TagInfoResponse();
+        tag2.setId("tag_456");
+        tag2.setName("Test Tag 2");
+        tag2.setType("system");
+        tag2.setBindingCount(5);
+
+        List<TagInfoResponse> expectedResponse = List.of(tag1, tag2);
+
+        when(difyDatasetClient.listTag(anyString()))
+                .thenReturn(expectedResponse);
+
+        // Act
+        List<TagInfoResponse> actualResponse = difyDatasetClient.listTag(apiKey);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.size(), actualResponse.size());
+        assertEquals(expectedResponse.get(0).getId(), actualResponse.get(0).getId());
+        assertEquals(expectedResponse.get(0).getName(), actualResponse.get(0).getName());
+        assertEquals(expectedResponse.get(0).getType(), actualResponse.get(0).getType());
+        assertEquals(expectedResponse.get(0).getBindingCount(), actualResponse.get(0).getBindingCount());
+        verify(difyDatasetClient, times(1)).listTag(apiKey);
+    }
+
+    @Test
+    void testUpdateTag() {
+        // Arrange
+        TagUpdateRequest request = new TagUpdateRequest();
+        request.setTagId("tag_123");
+        request.setName("Updated Test Tag");
+        request.setApiKey("test_api_key");
+
+        TagInfoResponse expectedResponse = new TagInfoResponse();
+        expectedResponse.setId("tag_123");
+        expectedResponse.setName("Updated Test Tag");
+        expectedResponse.setType("custom");
+        expectedResponse.setBindingCount(3);
+
+        when(difyDatasetClient.updateTag(any(TagUpdateRequest.class)))
+                .thenReturn(expectedResponse);
+
+        // Act
+        TagInfoResponse actualResponse = difyDatasetClient.updateTag(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getName(), actualResponse.getName());
+        assertEquals(expectedResponse.getType(), actualResponse.getType());
+        assertEquals(expectedResponse.getBindingCount(), actualResponse.getBindingCount());
+        verify(difyDatasetClient, times(1)).updateTag(any(TagUpdateRequest.class));
+    }
+
+    @Test
+    void testDeleteTag() {
+        // Arrange
+        String tagId = "tag_123";
+        String apiKey = "test_api_key";
+
+        doNothing().when(difyDatasetClient).deleteTag(anyString(), anyString());
+
+        // Act
+        difyDatasetClient.deleteTag(tagId, apiKey);
+
+        // Assert
+        verify(difyDatasetClient, times(1)).deleteTag(tagId, apiKey);
+    }
+
+    @Test
+    void testBindingTag() {
+        // Arrange
+        TagBindingRequest request = new TagBindingRequest();
+        request.setTagIds(List.of("tag_123", "tag_456"));
+        request.setTargetId("dataset_789");
+        request.setApiKey("test_api_key");
+
+        doNothing().when(difyDatasetClient).bindingTag(any(TagBindingRequest.class));
+
+        // Act
+        difyDatasetClient.bindingTag(request);
+
+        // Assert
+        verify(difyDatasetClient, times(1)).bindingTag(any(TagBindingRequest.class));
+    }
+
+    @Test
+    void testUnbindingTag() {
+        // Arrange
+        TagUnbindingRequest request = new TagUnbindingRequest();
+        request.setTagId("tag_123");
+        request.setTargetId("dataset_789");
+        request.setApiKey("test_api_key");
+
+        doNothing().when(difyDatasetClient).unbindingTag(any(TagUnbindingRequest.class));
+
+        // Act
+        difyDatasetClient.unbindingTag(request);
+
+        // Assert
+        verify(difyDatasetClient, times(1)).unbindingTag(any(TagUnbindingRequest.class));
+    }
+
+    @Test
+    void testListDatasetTag() {
+        // Arrange
+        String datasetId = "dataset_123";
+        String apiKey = "test_api_key";
+
+        DataSetTagInfo tagInfo1 = new DataSetTagInfo();
+        tagInfo1.setId("tag_123");
+        tagInfo1.setName("Test Tag 1");
+
+        DataSetTagInfo tagInfo2 = new DataSetTagInfo();
+        tagInfo2.setId("tag_456");
+        tagInfo2.setName("Test Tag 2");
+
+        List<DataSetTagInfo> tagInfoList = List.of(tagInfo1, tagInfo2);
+
+        DataSetTagsResponse expectedResponse = new DataSetTagsResponse();
+        expectedResponse.setData(tagInfoList);
+        expectedResponse.setTotal(2);
+
+        when(difyDatasetClient.listDatasetTag(anyString(), anyString()))
+                .thenReturn(expectedResponse);
+
+        // Act
+        DataSetTagsResponse actualResponse = difyDatasetClient.listDatasetTag(datasetId, apiKey);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getTotal(), actualResponse.getTotal());
+        assertNotNull(actualResponse.getData());
+        assertEquals(expectedResponse.getData().size(), actualResponse.getData().size());
+        assertEquals(expectedResponse.getData().get(0).getId(), actualResponse.getData().get(0).getId());
+        assertEquals(expectedResponse.getData().get(0).getName(), actualResponse.getData().get(0).getName());
+        verify(difyDatasetClient, times(1)).listDatasetTag(datasetId, apiKey);
+    }
+
 }
