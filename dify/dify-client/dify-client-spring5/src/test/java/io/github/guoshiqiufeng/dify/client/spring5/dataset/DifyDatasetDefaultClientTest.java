@@ -45,8 +45,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -1601,6 +1601,42 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         verify(requestBodyUriSpecMock).uri(DatasetUriConstant.V1_TAGS);
         verify(requestBodySpecMock).bodyValue(any(Map.class));
         verify(responseSpecMock).bodyToMono(Void.class);
+    }
+
+    @Test
+    public void testDeleteTagWithEmptyTagId() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String tagId = "";
+
+        // Execute the method and verify that IllegalArgumentException is thrown
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            client.deleteTag(tagId, apiKey);
+        });
+
+        // Verify the exception message
+        assertEquals("Tag ID must not be null or empty", exception.getMessage());
+
+        // Verify that no WebClient interactions occurred
+        verifyNoInteractions(webClientMock);
+    }
+
+    @Test
+    public void testDeleteTagWithNullTagId() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String tagId = null;
+
+        // Execute the method and verify that IllegalArgumentException is thrown
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            client.deleteTag(tagId, apiKey);
+        });
+
+        // Verify the exception message
+        assertEquals("Tag ID must not be null or empty", exception.getMessage());
+
+        // Verify that no WebClient interactions occurred
+        verifyNoInteractions(webClientMock);
     }
 
     @Test

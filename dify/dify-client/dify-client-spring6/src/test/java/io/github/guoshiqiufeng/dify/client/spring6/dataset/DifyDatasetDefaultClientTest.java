@@ -46,8 +46,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -1659,6 +1658,42 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         verify(restClient).method(org.springframework.http.HttpMethod.DELETE);
         verify(requestBodyUriSpec).uri(DatasetUriConstant.V1_TAGS);
         verify(responseSpec).body(void.class);
+    }
+
+    @Test
+    public void testDeleteTagWithEmptyTagId() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String tagId = "";
+
+        // Execute the method and verify that IllegalArgumentException is thrown
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            client.deleteTag(tagId, apiKey);
+        });
+
+        // Verify the exception message
+        assertEquals("Tag ID must not be null or empty", exception.getMessage());
+
+        // Verify that no WebClient interactions occurred
+        verifyNoInteractions(restClient);
+    }
+
+    @Test
+    public void testDeleteTagWithNullTagId() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String tagId = null;
+
+        // Execute the method and verify that IllegalArgumentException is thrown
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            client.deleteTag(tagId, apiKey);
+        });
+
+        // Verify the exception message
+        assertEquals("Tag ID must not be null or empty", exception.getMessage());
+
+        // Verify that no WebClient interactions occurred
+        verifyNoInteractions(restClient);
     }
 
     @Test
