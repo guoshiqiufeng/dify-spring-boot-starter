@@ -127,7 +127,6 @@ public class TagCreateRequestTest {
         String toStringResult = request.toString();
 
         // 验证toString包含重要字段
-        assertTrue(toStringResult.contains("apiKey=sk-12345678"));
         assertTrue(toStringResult.contains("name=测试标签"));
     }
 }

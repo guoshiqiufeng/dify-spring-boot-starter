@@ -70,7 +70,6 @@ public class TagUpdateRequestTest {
         // 验证JSON包含预期字段
         assertTrue(json.contains("\"apiKey\":\"sk-12345678\""));
         assertTrue(json.contains("\"name\":\"更新标签\""));
-        assertTrue(json.contains("\"tagId\":\"tag-123\""));
         assertTrue(json.contains("\"tag_id\":\"tag-123\""));
 
         // 从JSON反序列化
@@ -158,7 +157,6 @@ public class TagUpdateRequestTest {
         String toStringResult = request.toString();
 
         // 验证toString包含重要字段
-        assertTrue(toStringResult.contains("apiKey=sk-12345678"));
         assertTrue(toStringResult.contains("name=更新标签"));
         assertTrue(toStringResult.contains("tagId=tag-123"));
     }

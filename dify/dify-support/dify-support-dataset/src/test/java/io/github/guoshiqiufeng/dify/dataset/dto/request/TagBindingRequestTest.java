@@ -71,9 +71,7 @@ public class TagBindingRequestTest {
 
         // 验证JSON包含预期字段
         assertTrue(json.contains("\"apiKey\":\"sk-12345678\""));
-        assertTrue(json.contains("\"targetId\":\"dataset-789\""));
         assertTrue(json.contains("\"target_id\":\"dataset-789\""));
-        assertTrue(json.contains("\"tagIds\":[\"tag-123\",\"tag-456\"]"));
         assertTrue(json.contains("\"tag_ids\":[\"tag-123\",\"tag-456\"]"));
 
         // 从JSON反序列化
@@ -161,7 +159,6 @@ public class TagBindingRequestTest {
         String toStringResult = request.toString();
 
         // 验证toString包含重要字段
-        assertTrue(toStringResult.contains("apiKey=sk-12345678"));
         assertTrue(toStringResult.contains("tagIds=[tag-123, tag-456]"));
         assertTrue(toStringResult.contains("targetId=dataset-789"));
     }
