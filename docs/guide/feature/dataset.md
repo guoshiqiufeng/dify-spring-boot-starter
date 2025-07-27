@@ -1408,3 +1408,179 @@ TextEmbeddingListResponse
 | DOCUMENT         | document         | 文档     |
 | VIDEO            | video            | 视频     |
 | AUDIO            | audio            | 音频     |
+
+---
+
+## 8. 标签管理
+
+### 8.1 创建标签
+
+#### 方法
+
+```java
+TagInfoResponse createTag(TagCreateRequest request);
+```
+
+#### 请求参数
+
+TagCreateRequest
+
+| 参数名  | 类型     | 是否必须 | 描述          |
+|------|--------|------|-------------|
+| name | String | 是    | 标签名称，最大长度50 |
+
+#### 响应参数
+
+TagInfoResponse
+
+| 参数名          | 类型      | 描述   |
+|--------------|---------|------|
+| id           | String  | 标签ID |
+| name         | String  | 标签名称 |
+| type         | String  | 标签类型 |
+| bindingCount | Integer | 绑定数量 |
+
+---
+
+### 8.2 查询标签列表
+
+#### 方法
+
+```java
+List<TagInfoResponse> listTag();
+List<TagInfoResponse> listTag(String apiKey);
+```
+
+#### 请求参数
+
+| 参数名    | 类型     | 是否必须 | 描述        |
+|--------|--------|------|-----------|
+| apiKey | String | 否    | API密钥（可选） |
+
+#### 响应参数
+
+同 8.1 TagInfoResponse 列表
+
+---
+
+### 8.3 更新标签
+
+#### 方法
+
+```java
+TagInfoResponse updateTag(TagUpdateRequest request);
+```
+
+#### 请求参数
+
+TagUpdateRequest
+
+| 参数名   | 类型     | 是否必须 | 描述          |
+|-------|--------|------|-------------|
+| tagId | String | 是    | 标签ID        |
+| name  | String | 是    | 标签名称，最大长度50 |
+
+#### 响应参数
+
+同 8.1 TagInfoResponse
+
+---
+
+### 8.4 删除标签
+
+#### 方法
+
+```java
+void deleteTag(String tagId);
+void deleteTag(String tagId, String apiKey);
+```
+
+#### 请求参数
+
+| 参数名    | 类型     | 是否必须 | 描述        |
+|--------|--------|------|-----------|
+| tagId  | String | 是    | 标签ID      |
+| apiKey | String | 否    | API密钥（可选） |
+
+#### 响应参数
+
+无
+
+---
+
+### 8.5 绑定标签到资源
+
+#### 方法
+
+```java
+void bindingTag(TagBindingRequest request);
+```
+
+#### 请求参数
+
+TagBindingRequest
+
+| 参数名      | 类型             | 是否必须 | 描述           |
+|----------|----------------|------|--------------|
+| tagIds   | `List<String>` | 是    | 标签ID列表       |
+| targetId | String         | 是    | 目标ID（如数据集ID） |
+
+#### 响应参数
+
+无
+
+---
+
+### 8.6 解绑标签
+
+#### 方法
+
+```java
+void unbindingTag(TagUnbindingRequest request);
+```
+
+#### 请求参数
+
+TagUnbindingRequest
+
+| 参数名      | 类型     | 是否必须 | 描述           |
+|----------|--------|------|--------------|
+| tagId    | String | 是    | 标签ID         |
+| targetId | String | 是    | 目标ID（如数据集ID） |
+
+#### 响应参数
+
+无
+
+---
+
+### 8.7 查询数据集已绑定标签
+
+#### 方法
+
+```java
+DataSetTagsResponse listDatasetTag(String datasetId);
+DataSetTagsResponse listDatasetTag(String datasetId, String apiKey);
+```
+
+#### 请求参数
+
+| 参数名       | 类型     | 是否必须 | 描述        |
+|-----------|--------|------|-----------|
+| datasetId | String | 是    | 数据集ID     |
+| apiKey    | String | 否    | API密钥（可选） |
+
+#### 响应参数
+
+DataSetTagsResponse
+
+| 参数名   | 类型                     | 描述     |
+|-------|------------------------|--------|
+| data  | `List<DataSetTagInfo>` | 标签信息列表 |
+| total | Integer                | 标签总数   |
+
+DataSetTagInfo 结构请参考实际实现。
+
+---
+
+> 所有标签相关接口均需有效API密钥，未传递时默认使用配置文件中的 apikey。

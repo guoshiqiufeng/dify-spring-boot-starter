@@ -46,8 +46,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -1518,5 +1517,278 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         verify(restClient).get();
         verify(requestHeadersUriSpec).uri(eq(DatasetUriConstant.V1_DOCUMENTS_UPLOAD_FILE), eq(datasetId), eq(documentId));
         verify(responseSpec).body(any(ParameterizedTypeReference.class));
+    }
+
+    @Test
+    public void testCreateTag() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String tagName = "test-tag";
+
+        // Create request
+        TagCreateRequest request = new TagCreateRequest();
+        request.setApiKey(apiKey);
+        request.setName(tagName);
+
+        // Create expected response
+        TagInfoResponse expectedResponse = new TagInfoResponse();
+        expectedResponse.setId("tag-123456");
+        expectedResponse.setName(tagName);
+        expectedResponse.setType("dataset");
+        expectedResponse.setBindingCount(0);
+
+        // Set up the response mock
+        when(responseSpec.body(TagInfoResponse.class)).thenReturn(expectedResponse);
+
+        // Execute the method
+        TagInfoResponse actualResponse = client.createTag(request);
+
+        // Verify the result
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getName(), actualResponse.getName());
+        assertEquals(expectedResponse.getType(), actualResponse.getType());
+        assertEquals(expectedResponse.getBindingCount(), actualResponse.getBindingCount());
+
+        // Verify WebClient interactions
+        verify(restClient).post();
+        verify(requestBodyUriSpec).uri(DatasetUriConstant.V1_TAGS);
+        verify(requestBodySpec).body(request);
+        verify(responseSpec).body(TagInfoResponse.class);
+    }
+
+    @Test
+    public void testListTag() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+
+        // Create expected response
+        List<TagInfoResponse> expectedResponse = new ArrayList<>();
+
+        // Create tag 1
+        TagInfoResponse tag1 = new TagInfoResponse();
+        tag1.setId("tag-123456");
+        tag1.setName("test-tag-1");
+        tag1.setType("dataset");
+        tag1.setBindingCount(2);
+        expectedResponse.add(tag1);
+
+        // Create tag 2
+        TagInfoResponse tag2 = new TagInfoResponse();
+        tag2.setId("tag-789012");
+        tag2.setName("test-tag-2");
+        tag2.setType("dataset");
+        tag2.setBindingCount(1);
+        expectedResponse.add(tag2);
+
+        // Set up the response mock
+        when(responseSpec.body(any(ParameterizedTypeReference.class))).thenReturn(expectedResponse);
+
+        // Execute the method
+        List<TagInfoResponse> actualResponse = client.listTag(apiKey);
+
+        // Verify the result
+        assertEquals(expectedResponse.size(), actualResponse.size());
+        assertEquals(expectedResponse.get(0).getId(), actualResponse.get(0).getId());
+        assertEquals(expectedResponse.get(0).getName(), actualResponse.get(0).getName());
+        assertEquals(expectedResponse.get(0).getType(), actualResponse.get(0).getType());
+        assertEquals(expectedResponse.get(0).getBindingCount(), actualResponse.get(0).getBindingCount());
+        assertEquals(expectedResponse.get(1).getId(), actualResponse.get(1).getId());
+        assertEquals(expectedResponse.get(1).getName(), actualResponse.get(1).getName());
+        assertEquals(expectedResponse.get(1).getType(), actualResponse.get(1).getType());
+        assertEquals(expectedResponse.get(1).getBindingCount(), actualResponse.get(1).getBindingCount());
+
+        // Verify WebClient interactions
+        verify(restClient).get();
+        verify(requestHeadersUriSpec).uri(DatasetUriConstant.V1_TAGS);
+        verify(responseSpec).body(any(ParameterizedTypeReference.class));
+    }
+
+    @Test
+    public void testUpdateTag() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String tagId = "tag-123456";
+        String updatedTagName = "updated-test-tag";
+
+        // Create request
+        TagUpdateRequest request = new TagUpdateRequest();
+        request.setApiKey(apiKey);
+        request.setTagId(tagId);
+        request.setName(updatedTagName);
+
+        // Create expected response
+        TagInfoResponse expectedResponse = new TagInfoResponse();
+        expectedResponse.setId(tagId);
+        expectedResponse.setName(updatedTagName);
+        expectedResponse.setType("dataset");
+        expectedResponse.setBindingCount(0);
+
+        // Set up the response mock
+        when(responseSpec.body(TagInfoResponse.class)).thenReturn(expectedResponse);
+
+        // Execute the method
+        TagInfoResponse actualResponse = client.updateTag(request);
+
+        // Verify the result
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getName(), actualResponse.getName());
+        assertEquals(expectedResponse.getType(), actualResponse.getType());
+        assertEquals(expectedResponse.getBindingCount(), actualResponse.getBindingCount());
+
+        // Verify WebClient interactions
+        verify(restClient).patch();
+        verify(requestBodyUriSpec).uri(DatasetUriConstant.V1_TAGS);
+        verify(requestBodySpec).body(request);
+        verify(responseSpec).body(TagInfoResponse.class);
+    }
+
+    @Test
+    public void testDeleteTag() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String tagId = "tag-123456";
+
+        // Set up the response mock
+        when(responseSpec.body(void.class)).thenReturn(null);
+
+        // Execute the method
+        client.deleteTag(tagId, apiKey);
+
+        // Verify WebClient interactions
+        verify(restClient).method(org.springframework.http.HttpMethod.DELETE);
+        verify(requestBodyUriSpec).uri(DatasetUriConstant.V1_TAGS);
+        verify(responseSpec).body(void.class);
+    }
+
+    @Test
+    public void testDeleteTagWithEmptyTagId() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String tagId = "";
+
+        // Execute the method and verify that IllegalArgumentException is thrown
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            client.deleteTag(tagId, apiKey);
+        });
+
+        // Verify the exception message
+        assertEquals("Tag ID must not be null or empty", exception.getMessage());
+
+        // Verify that no WebClient interactions occurred
+        verifyNoInteractions(restClient);
+    }
+
+    @Test
+    public void testDeleteTagWithNullTagId() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String tagId = null;
+
+        // Execute the method and verify that IllegalArgumentException is thrown
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            client.deleteTag(tagId, apiKey);
+        });
+
+        // Verify the exception message
+        assertEquals("Tag ID must not be null or empty", exception.getMessage());
+
+        // Verify that no WebClient interactions occurred
+        verifyNoInteractions(restClient);
+    }
+
+    @Test
+    public void testBindingTag() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String datasetId = "dataset-123456";
+
+        // Create request
+        TagBindingRequest request = new TagBindingRequest();
+        request.setApiKey(apiKey);
+        request.setTargetId(datasetId);
+        request.setTagIds(List.of("tag-123456", "tag-789012"));
+
+        // Set up the response mock
+        when(responseSpec.body(Void.class)).thenReturn(null);
+
+        // Execute the method
+        client.bindingTag(request);
+
+        // Verify WebClient interactions
+        verify(restClient).post();
+        verify(requestBodyUriSpec).uri(DatasetUriConstant.V1_TAGS_BINDING);
+        verify(requestBodySpec).body(request);
+        verify(responseSpec).body(Void.class);
+    }
+
+    @Test
+    public void testUnbindingTag() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String datasetId = "dataset-123456";
+        String tagId = "tag-123456";
+
+        // Create request
+        TagUnbindingRequest request = new TagUnbindingRequest();
+        request.setApiKey(apiKey);
+        request.setTargetId(datasetId);
+        request.setTagId(tagId);
+
+        // Set up the response mock
+        when(responseSpec.body(Void.class)).thenReturn(null);
+
+        // Execute the method
+        client.unbindingTag(request);
+
+        // Verify WebClient interactions
+        verify(restClient).post();
+        verify(requestBodyUriSpec).uri(DatasetUriConstant.V1_TAGS_UNBINDING);
+        verify(requestBodySpec).body(request);
+        verify(responseSpec).body(Void.class);
+    }
+
+    @Test
+    public void testListDatasetTag() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String datasetId = "dataset-123456";
+
+        // Create expected response
+        DataSetTagsResponse expectedResponse = new DataSetTagsResponse();
+        List<DataSetTagInfo> data = new ArrayList<>();
+
+        // Create tag 1
+        DataSetTagInfo tag1 = new DataSetTagInfo();
+        tag1.setId("tag-123456");
+        tag1.setName("test-tag-1");
+        data.add(tag1);
+
+        // Create tag 2
+        DataSetTagInfo tag2 = new DataSetTagInfo();
+        tag2.setId("tag-789012");
+        tag2.setName("test-tag-2");
+        data.add(tag2);
+
+        expectedResponse.setData(data);
+        expectedResponse.setTotal(2);
+
+        // Set up the response mock
+        when(responseSpec.body(DataSetTagsResponse.class)).thenReturn(expectedResponse);
+
+        // Execute the method
+        DataSetTagsResponse actualResponse = client.listDatasetTag(datasetId, apiKey);
+
+        // Verify the result
+        assertEquals(expectedResponse.getTotal(), actualResponse.getTotal());
+        assertEquals(expectedResponse.getData().size(), actualResponse.getData().size());
+        assertEquals(expectedResponse.getData().get(0).getId(), actualResponse.getData().get(0).getId());
+        assertEquals(expectedResponse.getData().get(0).getName(), actualResponse.getData().get(0).getName());
+        assertEquals(expectedResponse.getData().get(1).getId(), actualResponse.getData().get(1).getId());
+        assertEquals(expectedResponse.getData().get(1).getName(), actualResponse.getData().get(1).getName());
+
+        // Verify WebClient interactions
+        verify(restClient).get();
+        verify(requestHeadersUriSpec).uri(eq(DatasetUriConstant.V1_DATASET_TAGS), eq(datasetId));
+        verify(responseSpec).body(DataSetTagsResponse.class);
     }
 }
