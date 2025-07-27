@@ -1,4 +1,4 @@
-name: Gradle Package publish
+name: Gradle package publish
 permissions:
   contents: read
   pull-requests: write

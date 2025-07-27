@@ -1,4 +1,4 @@
-name: docs
+name: Docs deploy
 permissions:
   contents: write
   pull-requests: write
