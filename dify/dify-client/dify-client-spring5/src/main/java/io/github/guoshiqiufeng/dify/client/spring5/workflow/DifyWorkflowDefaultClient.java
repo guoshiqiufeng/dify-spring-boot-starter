@@ -105,7 +105,7 @@ public class DifyWorkflowDefaultClient extends BaseDifyDefaultClient implements 
     @Override
     public WorkflowStopResponse stopWorkflowStream(String apiKey, String taskId, String userId) {
         HashMap<String, Object> hashMap = new HashMap<>(1);
-        hashMap.put("apiKey", apiKey);
+        hashMap.put("user", userId);
         return webClient.post()
                 .uri(WorkflowConstant.WORKFLOW_TASKS_URL + "/{taskId}/stop", taskId)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
