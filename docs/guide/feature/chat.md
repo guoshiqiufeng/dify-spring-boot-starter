@@ -36,12 +36,33 @@ ChatMessageSendRequest
 
 **ChatMessageFile 结构：**
 
-| 参数名            | 类型     | 描述                                    |
-|----------------|--------|---------------------------------------|
-| type           | String | 文件类型，默认为 "image"                      |
-| transferMethod | String | 传输方式，默认为 "remote_url"                 |
-| url            | String | 远程URL路径，当 transferMethod 为 remote_url |
-| uploadFileId   | String | 上传文件ID，当 transferMethod 为 local_file  |
+| 参数名            | 类型                         | 描述                                    |
+|----------------|----------------------------|---------------------------------------|
+| id             | String                     | 文件 ID                                |
+| filename       | String                     | 文件名                                 |
+| type           | String                     | 文件类型，默认为 "image"                      |
+| url            | String                     | 预览图片地址                              |
+| transferMethod | String                     | 传输方式，默认为 "remote_url"                 |
+| mimeType       | String                     | 文件 MIME 类型                           |
+| size           | Long                       | 文件大小（字节）                           |
+| belongsTo      | String                     | 文件归属方，user 或 assistant              |
+| uploadFileId   | String                     | 上传文件ID                               |
+| agentThoughts  | `List<MessageFileAgentThought>` | Agent思考内容（仅Agent模式下不为空）            |
+
+**MessageFileAgentThought 结构：**
+
+| 参数名            | 类型             | 描述                                           |
+|----------------|----------------|----------------------------------------------|
+| id             | String         | agent_thought ID，每一轮Agent迭代都会有一个唯一的id          |
+| messageId      | String         | 消息唯一ID                                      |
+| position       | Integer        | agent_thought在消息中的位置，如第一轮迭代position为1         |
+| thought        | String         | agent的思考内容                                   |
+| observation    | String         | 工具调用的返回结果                                  |
+| tool           | String         | 使用的工具列表，以 ; 分割多个工具                         |
+| toolInput      | String         | 工具的输入，JSON格式的字符串(object)。如：{"dalle3": {"prompt": "a cute cat"}} |
+| createdAt      | Long           | 创建时间戳，如：1705395332                         |
+| messageFiles   | `List<String>` | 当前agent_thought 关联的文件ID                     |
+| conversationId | String         | 会话ID                                         |
 
 #### 响应参数
 

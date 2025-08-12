@@ -75,6 +75,10 @@ public class MessagesResponseVOTest {
         messageFile.setFilename("image.jpg");
         messageFile.setType("image");
         messageFile.setUrl("https://example.com/image.jpg");
+        messageFile.setMimeType("image/jpeg");
+        messageFile.setSize(102400L);
+        messageFile.setTransferMethod("remote_url");
+        messageFile.setUploadFileId("upload_file_123456");
         messageFile.setBelongsTo("user");
 
         // Create agent thoughts for message file
@@ -120,6 +124,10 @@ public class MessagesResponseVOTest {
         assertEquals("file_123456", retrievedFile.getId());
         assertEquals("image", retrievedFile.getType());
         assertEquals("https://example.com/image.jpg", retrievedFile.getUrl());
+        assertEquals("image/jpeg", retrievedFile.getMimeType());
+        assertEquals(Long.valueOf(102400), retrievedFile.getSize());
+        assertEquals("remote_url", retrievedFile.getTransferMethod());
+        assertEquals("upload_file_123456", retrievedFile.getUploadFileId());
         assertEquals("user", retrievedFile.getBelongsTo());
 
         // Assert agent thoughts are set correctly
@@ -199,6 +207,10 @@ public class MessagesResponseVOTest {
                 "      \"id\": \"file_123456\",\n" +
                 "      \"type\": \"image\",\n" +
                 "      \"url\": \"https://example.com/image.jpg\",\n" +
+                "      \"mime_type\": \"image/jpeg\",\n" +
+                "      \"size\": 102400,\n" +
+                "      \"transfer_method\": \"remote_url\",\n" +
+                "      \"upload_file_id\": \"upload_file_123456\",\n" +
                 "      \"belongs_to\": \"user\",\n" +
                 "      \"agent_thoughts\": [\n" +
                 "        {\n" +
@@ -233,6 +245,10 @@ public class MessagesResponseVOTest {
         assertEquals(1, deserialized.getMessageFiles().size());
 
         MessagesResponseVO.MessageFile messageFile = deserialized.getMessageFiles().get(0);
+        assertEquals("image/jpeg", messageFile.getMimeType());
+        assertEquals(Long.valueOf(102400), messageFile.getSize());
+        assertEquals("remote_url", messageFile.getTransferMethod());
+        assertEquals("upload_file_123456", messageFile.getUploadFileId());
         assertEquals("user", messageFile.getBelongsTo());
 
         assertNotNull(messageFile.getAgentThoughts());
