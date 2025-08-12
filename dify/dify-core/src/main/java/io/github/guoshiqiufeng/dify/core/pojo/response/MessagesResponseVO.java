@@ -78,6 +78,8 @@ public class MessagesResponseVO implements Serializable {
          * id (string) ID
          */
         private String id;
+
+        private String filename;
         /**
          * type (string) 文件类型，image 图片
          */
@@ -86,11 +88,23 @@ public class MessagesResponseVO implements Serializable {
          * url (string) 预览图片地址
          */
         private String url;
+
+        @JsonAlias("mime_type")
+        private String mimeType;
+
+        private Long size;
+
+        @JsonAlias("transfer_method")
+        private String transferMethod;
+
         /**
          * belongs_to (string) 文件归属方，user 或 assistant
          */
         @JsonAlias("belongs_to")
         private String belongsTo;
+
+        @JsonAlias("upload_file_id")
+        private String uploadFileId;
 
         /**
          * agent_thoughts (array[object]) Agent思考内容（仅Agent模式下不为空）

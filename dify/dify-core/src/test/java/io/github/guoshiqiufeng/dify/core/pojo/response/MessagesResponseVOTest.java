@@ -72,6 +72,7 @@ public class MessagesResponseVOTest {
         List<MessagesResponseVO.MessageFile> messageFiles = new ArrayList<>();
         MessagesResponseVO.MessageFile messageFile = new MessagesResponseVO.MessageFile();
         messageFile.setId("file_123456");
+        messageFile.setFilename("image.jpg");
         messageFile.setType("image");
         messageFile.setUrl("https://example.com/image.jpg");
         messageFile.setBelongsTo("user");
