@@ -41,30 +41,12 @@ ChatMessageSendRequest
 | Parameter name | Type                        | Description                                       |
 |----------------|-----------------------------|---------------------------------------------------|
 | id             | String                      | File ID                                           |
-| filename       | String                      | File name                                         |
 | type           | String                      | File type, default is "image"                     |
 | url            | String                      | Preview image URL                                 |
 | transferMethod | String                      | Transfer method, default is "remote_url"          |
-| mimeType       | String                      | File MIME type                                    |
-| size           | Long                        | File size in bytes                                |
 | belongsTo      | String                      | File owner, user or assistant                     |
 | uploadFileId   | String                      | Upload file ID                                    |
-| agentThoughts  | `List<MessageFileAgentThought>` | Agent thoughts (not empty only in Agent mode) |
 
-**MessageFileAgentThought Structure:**
-
-| Parameter name | Type           | Description                                                                 |
-|----------------|----------------|-----------------------------------------------------------------------------|
-| id             | String         | agent_thought ID, each Agent iteration has a unique id                     |
-| messageId      | String         | Message unique ID                                                           |
-| position       | Integer        | agent_thought position in the message, e.g., position 1 for the first iteration |
-| thought        | String         | Agent's thought content                                                     |
-| observation    | String         | Tool call result                                                            |
-| tool           | String         | List of tools used, separated by ;                                          |
-| toolInput      | String         | Tool input, JSON formatted string (object). E.g.: {"dalle3": {"prompt": "a cute cat"}} |
-| createdAt      | Long           | Creation timestamp, e.g.: 1705395332                                        |
-| messageFiles   | `List<String>` | File IDs associated with the current agent_thought                          |
-| conversationId | String         | Conversation ID                                                             |
 
 #### Response parameter
 
@@ -170,6 +152,55 @@ DifyPageResult<MessagesResponseVO> messages(MessagesRequest request);
 | conversationId | String  | Yes      | Chat session number                     |
 | firstId        | String  | No       | First record id                         |
 | limit          | Integer | No       | Number of records per page, default 20条 |
+
+#### Response parameter
+
+| Parameter name | Type                    | Description                  |
+|----------------|-------------------------|------------------------------|
+| id             | String                  | Message ID                   |
+| conversationId | String                  | Conversation ID              |
+| inputs         | `Map<String, Object>`   | User input parameters        |
+| query          | String                  | User input/question content  |
+| messageFiles   | `List<MessageFile>`     | Message files                |
+| answer         | String                  | Answer message content       |
+| createdAt      | Long                    | Creation timestamp           |
+| feedback       | Feedback                | Feedback information         |
+
+**MessageFile Structure:**
+
+| Parameter name   | Type                        | Description                                       |
+|------------------|-----------------------------|---------------------------------------------------|
+| id               | String                      | File ID                                           |
+| filename         | String                      | File name                                         |
+| type             | String                      | File type, e.g., "image"                          |
+| url              | String                      | Preview image URL                                 |
+| mimeType         | String                      | File MIME type                                    |
+| size             | Long                        | File size in bytes                                |
+| transferMethod   | String                      | Transfer method                                   |
+| belongsTo        | String                      | File owner, "user" or "assistant"                 |
+| uploadFileId     | String                      | Upload file ID                                    |
+| agentThoughts    | `List<MessageFileAgentThought>` | Agent thoughts (not empty only in Agent mode) |
+
+**MessageFileAgentThought Structure:**
+
+| Parameter name   | Type           | Description                                                                 |
+|------------------|----------------|-----------------------------------------------------------------------------|
+| id               | String         | agent_thought ID, each Agent iteration has a unique id                     |
+| messageId        | String         | Message unique ID                                                           |
+| position         | Integer        | agent_thought position in the message, e.g., position 1 for the first iteration |
+| thought          | String         | Agent's thought content                                                     |
+| observation      | String         | Tool call result                                                            |
+| tool             | String         | List of tools used, separated by ;                                          |
+| toolInput        | String         | Tool input, JSON formatted string (object). E.g.: {"dalle3": {"prompt": "a cute cat"}} |
+| createdAt        | Long           | Creation timestamp, e.g.: 1705395332                                        |
+| messageFiles     | `List<String>` | File IDs associated with the current agent_thought                          |
+| conversationId   | String         | Conversation ID                                                             |
+
+**Feedback Structure:**
+
+| Parameter name | Type   | Description              |
+|----------------|--------|--------------------------|
+| rating         | String | like/dislike rating      |
 
 ### 1.6 Get Suggested Responses
 
