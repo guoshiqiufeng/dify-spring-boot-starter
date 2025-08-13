@@ -15,10 +15,12 @@
  */
 package io.github.guoshiqiufeng.dify.client.spring6.builder;
 
+import cn.hutool.core.util.StrUtil;
 import io.github.guoshiqiufeng.dify.client.spring6.dataset.DifyDatasetDefaultClient;
 import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
 import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;
 import io.github.guoshiqiufeng.dify.dataset.impl.DifyDatasetClientImpl;
+import org.springframework.http.HttpHeaders;
 
 /**
  * @author yanghq
@@ -55,6 +57,13 @@ public class DifyDatasetBuilder {
 
         public static class Builder extends BaseDifyBuilder<Builder> {
 
+            protected String apiKey;
+
+            public Builder apiKey(String apiKey) {
+                this.apiKey = apiKey;
+                return this;
+            }
+
             /**
              * Build the DifyDatasetClient
              *
@@ -62,6 +71,10 @@ public class DifyDatasetBuilder {
              */
             public DifyDatasetClient build() {
                 initDefaults();
+                if(StrUtil.isNotEmpty(apiKey)) {
+                    restClientBuilder = restClientBuilder.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey);
+                    webClientBuilder = webClientBuilder.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey);
+                }
                 return new DifyDatasetDefaultClient(baseUrl, clientConfig, restClientBuilder, webClientBuilder);
             }
         }

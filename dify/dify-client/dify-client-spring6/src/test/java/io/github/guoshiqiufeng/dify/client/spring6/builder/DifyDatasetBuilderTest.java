@@ -21,6 +21,7 @@ import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
 import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -158,6 +159,41 @@ public class DifyDatasetBuilderTest {
                 DifyDatasetBuilder.DifyDatasetClientBuilder
                         .builder()
                         .baseUrl("https://custom-dify-api.example.com")
+                        .clientConfig(new DifyProperties.ClientConfig())
+                        .restClientBuilder(RestClient.builder())
+                        .webClientBuilder(WebClient.builder())
+                        .build());
+
+        assertNotNull(difyDataset, "DifyDataset should not be null");
+    }
+
+    @Test
+    @Order(10)
+    @DisplayName("Test Customized Tokens")
+    public void testCustomizedTokens() {
+        String apiKey = "aa";
+        DifyDataset difyDataset = DifyDatasetBuilder.create(
+                DifyDatasetBuilder.DifyDatasetClientBuilder
+                        .builder()
+                        .baseUrl("https://custom-dify-api.example.com")
+                        .clientConfig(new DifyProperties.ClientConfig())
+                        .restClientBuilder(RestClient.builder().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " +apiKey))
+                        .webClientBuilder(WebClient.builder().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " +apiKey))
+                        .build());
+
+        assertNotNull(difyDataset, "DifyDataset should not be null");
+    }
+
+    @Test
+    @Order(11)
+    @DisplayName("Test Customized Tokens By ApiKey")
+    public void testCustomizedTokensApiKey() {
+        String apiKey = "aa";
+        DifyDataset difyDataset = DifyDatasetBuilder.create(
+                DifyDatasetBuilder.DifyDatasetClientBuilder
+                        .builder()
+                        .baseUrl("https://custom-dify-api.example.com")
+                        .apiKey(apiKey)
                         .clientConfig(new DifyProperties.ClientConfig())
                         .restClientBuilder(RestClient.builder())
                         .webClientBuilder(WebClient.builder())
