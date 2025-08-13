@@ -53,6 +53,18 @@ DifyChat difyChat = DifyChatBuilder.create(
 The server client requires authentication credentials:
 
 ```java
+
+DifyDataset difyDataset = DifyDatasetBuilder.create(
+        DifyDatasetBuilder.DifyDatasetClientBuilder
+                .builder()
+                .baseUrl("https://custom-dify-api.example.com")
+                .apiKey('ak-aaaa')
+                .build());
+```
+
+The server client requires authentication credentials:
+
+```java
 DifyProperties.Server serverProps = new DifyProperties.Server("admin@example.com", "password");
 
 DifyServer difyServer = DifyServerBuilder.create(
