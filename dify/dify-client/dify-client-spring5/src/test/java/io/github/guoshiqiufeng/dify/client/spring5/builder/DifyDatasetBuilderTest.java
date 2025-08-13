@@ -147,4 +147,21 @@ public class DifyDatasetBuilderTest {
 
         assertNotNull(difyDataset, "DifyDataset should not be null");
     }
+
+    @Test
+    @Order(11)
+    @DisplayName("Test Customized Tokens By ApiKey")
+    public void testCustomizedTokensApiKey() {
+        String apiKey = "aa";
+        DifyDataset difyDataset = DifyDatasetBuilder.create(
+                DifyDatasetBuilder.DifyDatasetClientBuilder
+                        .builder()
+                        .baseUrl("https://custom-dify-api.example.com")
+                        .apiKey(apiKey)
+                        .clientConfig(new DifyProperties.ClientConfig())
+                        .webClientBuilder(WebClient.builder())
+                        .build());
+
+        assertNotNull(difyDataset, "DifyDataset should not be null");
+    }
 }

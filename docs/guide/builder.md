@@ -48,6 +48,17 @@ DifyChat difyChat = DifyChatBuilder.create(
 ```
 
 ### 带身份验证的服务器客户端
+数据集客户端需要apiKey凭据：
+
+```java
+
+DifyDataset difyDataset = DifyDatasetBuilder.create(
+        DifyDatasetBuilder.DifyDatasetClientBuilder
+                .builder()
+                .baseUrl("https://custom-dify-api.example.com")
+                .apiKey('ak-aaaa')
+                .build());
+```
 
 服务器客户端需要身份验证凭据：
 
