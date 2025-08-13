@@ -23,6 +23,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author yanghq
@@ -41,4 +43,24 @@ public class ChatMessageSendCompletionResponse extends ChatMessageSendResponse i
 
     // @JsonDeserialize(using = CompletionDataDeserializer.class)
     private CompletionData data;
+
+    private Integer position;
+
+    private String thought;
+
+    private String observation;
+
+    private String tool;
+
+    @JsonAlias("tool_labels")
+    private Map<String, Object> toolLabels;
+
+    @JsonAlias("tool_input")
+    private String toolInput;
+
+    /**
+     * message_files (array[string]) 当前agent_thought 关联的文件ID
+     */
+    @JsonAlias("message_files")
+    private List<String> messageFiles;
 }
