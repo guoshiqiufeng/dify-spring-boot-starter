@@ -659,6 +659,44 @@ UploadFileInfoResponse
 | createdBy   | String  | 创建人     |
 | createdAt   | Long    | 创建时间戳   |
 
+## 2.9 文档状态管理
+
+### 2.9.1 更新文档状态
+
+#### 方法
+
+```java
+DatasetStatusResponse changeDocumentStatus(String datasetId, Set<String> documentIds, DocActionEnum status);
+
+DatasetStatusResponse changeDocumentStatus(String datasetId, Set<String> documentIds, DocActionEnum status, String apiKey);
+```
+
+#### 请求参数
+
+| 参数名         | 类型            | 是否必须 | 描述       |
+|-------------|---------------|------|----------|
+| datasetId   | String        | 是    | 知识库 id   |
+| documentIds | `Set<String>` | 是    | 文档 ID 集合 |
+| status      | DocActionEnum | 是    | 状态       |
+| apiKey      | String        | 否    | API 密钥   |
+
+**DocActionEnum 枚举值**
+
+| 枚举值        | 描述   |
+|------------|------|
+| enable     | 启用   |
+| disable    | 禁用   |
+| archive    | 归档   |
+| un_archive | 取消归档 |
+
+#### 响应参数
+
+DatasetStatusResponse
+
+| 参数名    | 类型     | 描述                   |
+|--------|--------|----------------------|
+| result | String | 操作结果，成功时返回 "success" |
+
 ## 3. 分段管理
 
 ### 3.1 创建分段
@@ -1448,6 +1486,7 @@ TagInfoResponse
 
 ```java
 List<TagInfoResponse> listTag();
+
 List<TagInfoResponse> listTag(String apiKey);
 ```
 
@@ -1492,6 +1531,7 @@ TagUpdateRequest
 
 ```java
 void deleteTag(String tagId);
+
 void deleteTag(String tagId, String apiKey);
 ```
 
@@ -1560,6 +1600,7 @@ TagUnbindingRequest
 
 ```java
 DataSetTagsResponse listDatasetTag(String datasetId);
+
 DataSetTagsResponse listDatasetTag(String datasetId, String apiKey);
 ```
 

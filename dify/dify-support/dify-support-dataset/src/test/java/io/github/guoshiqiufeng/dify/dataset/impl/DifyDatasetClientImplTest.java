@@ -34,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -1465,6 +1466,27 @@ public class DifyDatasetClientImplTest {
     }
 
     @Test
+    void testChangeDocumentStatusNoApiKey() {
+        // Arrange
+        String datasetId = "dataset_123";
+        String documentId = "doc_123";
+
+        DatasetStatusResponse expectedResponse = new DatasetStatusResponse();
+        expectedResponse.setResult("success");
+        when(difyDatasetClient.changeDocumentStatus(anyString(), any(), any(), any()))
+                .thenReturn(expectedResponse);
+
+        // Act
+        Set<String> documentIds = Set.of(documentId);
+        DatasetStatusResponse statusResponse = difyDataset.changeDocumentStatus(datasetId, documentIds, DocActionEnum.enable);
+
+        // Assert
+        assertNotNull(statusResponse);
+        assertNotNull(statusResponse.getResult());
+        verify(difyDatasetClient, times(1)).changeDocumentStatus(datasetId, documentIds, DocActionEnum.enable, null);
+    }
+
+    @Test
     void testChangeDocumentStatus() {
         // Arrange
         String datasetId = "dataset_123";
@@ -1473,15 +1495,16 @@ public class DifyDatasetClientImplTest {
 
         DatasetStatusResponse expectedResponse = new DatasetStatusResponse();
         expectedResponse.setResult("success");
-        when(difyDatasetClient.changeDocumentStatus(anyString(), anyString(), anyString(), anyString()))
+        when(difyDatasetClient.changeDocumentStatus(anyString(), any(), any(), anyString()))
                 .thenReturn(expectedResponse);
 
         // Act
-        DatasetStatusResponse statusResponse = difyDataset.changeDocumentStatus(datasetId, documentId, DocActionEnum.enable.name(), apiKey);
+        Set<String> documentIds = Set.of(documentId);
+        DatasetStatusResponse statusResponse = difyDataset.changeDocumentStatus(datasetId, documentIds, DocActionEnum.enable, apiKey);
 
         // Assert
         assertNotNull(statusResponse);
         assertNotNull(statusResponse.getResult());
-        verify(difyDatasetClient, times(1)).listDatasetTag(datasetId, apiKey);
+        verify(difyDatasetClient, times(1)).changeDocumentStatus(datasetId, documentIds, DocActionEnum.enable, apiKey);
     }
 }

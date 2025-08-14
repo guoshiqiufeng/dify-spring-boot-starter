@@ -560,10 +560,12 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
     }
 
     @Override
-    public DatasetStatusResponse changeDocumentStatus(String datasetId, String documentId, String status, String apiKey) {
+    public DatasetStatusResponse changeDocumentStatus(String datasetId, Set<String> documentIds, DocActionEnum status, String apiKey) {
+        Map<String, Set<String>> param = new HashMap<>(1);
+        param.put("document_ids", documentIds);
         return restClient.patch()
-                .uri(DatasetUriConstant.V1_DOCUMENT_STATUS, datasetId, status)
-                .body(documentId.split(","))
+                .uri(DatasetUriConstant.V1_DOCUMENT_STATUS, datasetId, status.name())
+                .body(param)
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
                 .retrieve()
                 .onStatus(responseErrorHandler)

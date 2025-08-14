@@ -71,7 +71,7 @@ public class DifyDatasetBuilder {
              */
             public DifyDatasetClient build() {
                 initDefaults();
-                if(StrUtil.isNotEmpty(apiKey)) {
+                if (StrUtil.isNotEmpty(apiKey)) {
                     restClientBuilder = restClientBuilder.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey);
                     webClientBuilder = webClientBuilder.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey);
                 }

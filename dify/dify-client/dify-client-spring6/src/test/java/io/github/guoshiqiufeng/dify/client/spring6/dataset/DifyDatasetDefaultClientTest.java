@@ -29,6 +29,7 @@ import io.github.guoshiqiufeng.dify.dataset.dto.response.textembedding.TextEmbed
 import io.github.guoshiqiufeng.dify.dataset.enums.IndexingTechniqueEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.MetaDataActionEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.SearchMethodEnum;
+import io.github.guoshiqiufeng.dify.dataset.enums.document.DocActionEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -1790,5 +1792,39 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         verify(restClient).get();
         verify(requestHeadersUriSpec).uri(eq(DatasetUriConstant.V1_DATASET_TAGS), eq(datasetId));
         verify(responseSpec).body(DataSetTagsResponse.class);
+    }
+
+    @Test
+    public void testChangeDocumentStatus() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String datasetId = "dataset-123456";
+        Set<String> documentIds = Set.of("document-123456", "document-789012");
+
+        // Create expected response
+        DatasetStatusResponse expectedResponse = new DatasetStatusResponse();
+        expectedResponse.setResult("success");
+
+        // Set up the response mock
+        when(responseSpec.body(DatasetStatusResponse.class)).thenReturn(expectedResponse);
+
+        // Execute the method
+        DatasetStatusResponse actualResponse = client.changeDocumentStatus(datasetId, documentIds, DocActionEnum.enable, apiKey);
+
+        // Verify the result
+        assertEquals(expectedResponse.getResult(), actualResponse.getResult());
+
+        // Verify RestClient interactions
+        verify(restClient).patch();
+        verify(requestBodyUriSpec).uri(eq(DatasetUriConstant.V1_DOCUMENT_STATUS), eq(datasetId), eq(DocActionEnum.enable.name()));
+//        verify(requestBodySpec).body(argThat(body -> {
+//            if (body instanceof Map) {
+//                Map<String, Set<String>> bodyMap = (Map<String, Set<String>>) body;
+//                return bodyMap.containsKey("document_ids") && bodyMap.get("document_ids").equals(documentIds);
+//            }
+//            return false;
+//        }));
+        verify(requestBodySpec).headers(any(Consumer.class));
+        verify(responseSpec).body(DatasetStatusResponse.class);
     }
 }

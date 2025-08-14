@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -569,6 +570,16 @@ public class DatasetTest extends BaseDatasetContainerTest {
         difyDataset.unbindingTag(tagUnbindingRequest);
 
         difyDataset.deleteTag(tagId);
+    }
+
+    @Test
+    @Order(18)
+    @DisplayName("Test document status change")
+    public void changeDocumentStatus() {
+        assertNotNull(datasetId, "Dataset ID should be available from previous test");
+        assertNotNull(documentTextId, "Document ID should be available from previous test");
+
+        difyDataset.changeDocumentStatus(datasetId, Set.of(documentTextId), DocActionEnum.archive);
     }
 
     @Test

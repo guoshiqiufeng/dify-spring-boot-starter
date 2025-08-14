@@ -21,6 +21,7 @@ import io.github.guoshiqiufeng.dify.dataset.dto.response.*;
 import io.github.guoshiqiufeng.dify.dataset.enums.document.DocActionEnum;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author yanghq
@@ -452,19 +453,25 @@ public interface DifyDataset {
     /**
      * 更新指定文档状态。
      *
-     * @param datasetId  知识库的唯一标识符。
-     * @param documentId 文档的唯一标识符。
+     * @param datasetId   知识库的唯一标识符。
+     * @param documentIds 文档的唯一标识符。
+     * @param status      状态
+     * @return 结果 默认成功
+     * @since 1.3.3
      */
-    default DatasetStatusResponse changeDocumentStatus(String datasetId, String documentId, String status) {
-        return changeDocumentStatus(datasetId, documentId, status, null);
+    default DatasetStatusResponse changeDocumentStatus(String datasetId, Set<String> documentIds, DocActionEnum status) {
+        return changeDocumentStatus(datasetId, documentIds, status, null);
     }
 
     /**
      * 更新指定文档状态。
      *
-     * @param datasetId  知识库的唯一标识符。
-     * @param documentId 文档的唯一标识符。
-     * @param apiKey apiKey
+     * @param datasetId   知识库的唯一标识符。
+     * @param documentIds 文档的唯一标识符。
+     * @param status      状态
+     * @param apiKey      apiKey
+     * @return 结果 默认成功
+     * @since 1.3.3
      */
-    DatasetStatusResponse changeDocumentStatus(String datasetId, String documentId, String status, String apiKey);
+    DatasetStatusResponse changeDocumentStatus(String datasetId, Set<String> documentIds, DocActionEnum status, String apiKey);
 }

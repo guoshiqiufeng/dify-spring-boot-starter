@@ -24,6 +24,7 @@ import io.github.guoshiqiufeng.dify.dataset.enums.document.DocActionEnum;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author yanghq
@@ -225,7 +226,7 @@ public class DifyDatasetClientImpl implements DifyDataset {
     }
 
     @Override
-    public DatasetStatusResponse changeDocumentStatus(String datasetId, String documentId, String status, String apiKey) {
-        return difyDatasetClient.changeDocumentStatus(datasetId, documentId, status, apiKey);
+    public DatasetStatusResponse changeDocumentStatus(String datasetId, Set<String> documentIds, DocActionEnum status, String apiKey) {
+        return difyDatasetClient.changeDocumentStatus(datasetId, documentIds, status, apiKey);
     }
 }
