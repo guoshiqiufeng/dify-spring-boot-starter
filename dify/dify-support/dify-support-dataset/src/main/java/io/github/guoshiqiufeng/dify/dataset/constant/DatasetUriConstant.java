@@ -87,4 +87,6 @@ public interface DatasetUriConstant {
     String V1_TAGS_UNBINDING = V1_TAGS + "/unbinding";
 
     String V1_DATASET_TAGS = V1_DATASETS_URL + "/{datasetId}/tags";
+
+    String V1_DOCUMENT_STATUS = V1_DOCUMENTS_URL + "/status/{action}";
 }

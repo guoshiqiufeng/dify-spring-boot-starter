@@ -24,6 +24,7 @@ import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;
 import io.github.guoshiqiufeng.dify.dataset.constant.DatasetUriConstant;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.*;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.*;
+import io.github.guoshiqiufeng.dify.dataset.enums.document.DocActionEnum;
 import io.github.guoshiqiufeng.dify.dataset.utils.MultipartBodyUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -34,10 +35,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author yanghq
@@ -561,4 +559,14 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
                 .body(DataSetTagsResponse.class);
     }
 
+    @Override
+    public DatasetStatusResponse changeDocumentStatus(String datasetId, String documentId, String status, String apiKey) {
+        return restClient.patch()
+                .uri(DatasetUriConstant.V1_DOCUMENT_STATUS, datasetId, status)
+                .body(documentId.split(","))
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(DatasetStatusResponse.class);
+    }
 }
