@@ -195,7 +195,7 @@ DatasetInfoResponse See 1.3
 ```java
 void delete(String datasetId);
 
-        void delete(String datasetId,String apiKey);
+void delete(String datasetId, String apiKey);
 ```
 
 #### Request Parameters
@@ -613,9 +613,9 @@ DocumentIndexingStatusResponse
 #### Method
 
 ```java
-void deleteDocument(String datasetId,String documentId);
+void deleteDocument(String datasetId, String documentId);
 
-        void deleteDocument(String datasetId,String documentId,String apiKey);
+void deleteDocument(String datasetId, String documentId, String apiKey);
 ```
 
 #### Request Parameters
@@ -634,9 +634,9 @@ None
 #### Method
 
 ```java
-UploadFileInfoResponse uploadFileInfo(String datasetId,String documentId);
+UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId);
 
-        UploadFileInfoResponse uploadFileInfo(String datasetId,String documentId,String apiKey);
+UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, String apiKey);
 ```
 
 #### Request Parameters
@@ -661,6 +661,44 @@ UploadFileInfoResponse
 | mimeType    | String  | MIME type          |
 | createdBy   | String  | Created by         |
 | createdAt   | Long    | Creation timestamp |
+
+## 2.9 Document Status Management
+
+### 2.9.1 Update Document Status
+
+#### Method
+
+```java
+DatasetStatusResponse changeDocumentStatus(String datasetId, Set<String> documentIds, DocActionEnum status);
+
+DatasetStatusResponse changeDocumentStatus(String datasetId, Set<String> documentIds, DocActionEnum status, String apiKey);
+```
+
+#### Request Parameters
+
+| Parameter   | Type          | Required | Description        |
+|-------------|---------------|----------|--------------------|
+| datasetId   | String        | Yes      | Knowledge base ID  |
+| documentIds | `Set<String>` | Yes      | Document ID set    |
+| status      | DocActionEnum | Yes      | Status             |
+| apiKey      | String        | No       | API key (optional) |
+
+**DocActionEnum Values**
+
+| Value      | Description |
+|------------|-------------|
+| enable     | Enable      |
+| disable    | Disable     |
+| archive    | Archive     |
+| un_archive | Unarchive   |
+
+#### Response Parameters
+
+DatasetStatusResponse
+
+| Parameter | Type   | Description                                    |
+|-----------|--------|------------------------------------------------|
+| result    | String | Operation result, returns "success" on success |
 
 ## 3. Segment Management
 
@@ -766,9 +804,9 @@ SegmentResponse
 #### Method
 
 ```java
-void deleteSegment(String datasetId,String documentId,String segmentId);
+void deleteSegment(String datasetId, String documentId, String segmentId);
 
-        void deleteSegment(String datasetId,String documentId,String segmentId,String apiKey);
+void deleteSegment(String datasetId, String documentId, String segmentId, String apiKey);
 ```
 
 #### Request Parameters
@@ -1114,9 +1152,9 @@ MetaDataResponse See 6.1
 #### Method
 
 ```java
-void deleteMetaData(String datasetId,String metadataId);
+void deleteMetaData(String datasetId, String metadataId);
 
-        void deleteMetaData(String datasetId,String metadataId,String apiKey);
+void deleteMetaData(String datasetId, String metadataId, String apiKey);
 ```
 
 #### Request Parameters
@@ -1202,7 +1240,7 @@ None
 ```java
 MetaDataListResponse listMetaData(String datasetId);
 
-        MetaDataListResponse listMetaData(String datasetId,String apiKey);
+MetaDataListResponse listMetaData(String datasetId, String apiKey);
 ```
 
 #### Request Parameters
@@ -1238,7 +1276,7 @@ MetaDataListResponse
 ```java
 TextEmbeddingListResponse listTextEmbedding();
 
-        TextEmbeddingListResponse listTextEmbedding(String apikey);
+TextEmbeddingListResponse listTextEmbedding(String apikey);
 ```
 
 #### Request Parameters
@@ -1329,7 +1367,7 @@ TextEmbeddingListResponse
 ```java
 TextEmbeddingListResponse listRerank();
 
-        TextEmbeddingListResponse listRerank(String apikey);
+TextEmbeddingListResponse listRerank(String apikey);
 ```
 
 #### Request Parameters
@@ -1452,7 +1490,8 @@ TagInfoResponse
 
 ```java
 List<TagInfoResponse> listTag();
-        List<TagInfoResponse> listTag(String apiKey);
+
+List<TagInfoResponse> listTag(String apiKey);
 ```
 
 #### Request Parameters
@@ -1496,7 +1535,8 @@ Same as 8.1 TagInfoResponse
 
 ```java
 void deleteTag(String tagId);
-        void deleteTag(String tagId,String apiKey);
+
+void deleteTag(String tagId, String apiKey);
 ```
 
 #### Request Parameters
@@ -1564,7 +1604,8 @@ None
 
 ```java
 DataSetTagsResponse listDatasetTag(String datasetId);
-        DataSetTagsResponse listDatasetTag(String datasetId,String apiKey);
+
+DataSetTagsResponse listDatasetTag(String datasetId, String apiKey);
 ```
 
 #### Request Parameters

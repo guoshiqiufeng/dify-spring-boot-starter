@@ -177,8 +177,8 @@ public class DifyDatasetBuilderTest {
                         .builder()
                         .baseUrl("https://custom-dify-api.example.com")
                         .clientConfig(new DifyProperties.ClientConfig())
-                        .restClientBuilder(RestClient.builder().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " +apiKey))
-                        .webClientBuilder(WebClient.builder().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " +apiKey))
+                        .restClientBuilder(RestClient.builder().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey))
+                        .webClientBuilder(WebClient.builder().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey))
                         .build());
 
         assertNotNull(difyDataset, "DifyDataset should not be null");

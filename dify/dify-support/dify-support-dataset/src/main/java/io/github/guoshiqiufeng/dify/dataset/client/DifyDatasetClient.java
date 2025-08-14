@@ -21,6 +21,7 @@ import io.github.guoshiqiufeng.dify.dataset.dto.response.*;
 import io.github.guoshiqiufeng.dify.dataset.enums.document.DocActionEnum;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Dify Dataset Client Interface
@@ -342,12 +343,12 @@ public interface DifyDatasetClient {
     /**
      * Change the status of a document
      *
-     * @param datasetId  ID of the dataset containing the document
-     * @param documentId ID of the document to change status
-     * @param status     New status for the document
-     * @param apiKey     API key for authentication (can be null)
+     * @param datasetId   ID of the dataset containing the document
+     * @param documentIds ID of the document to change status
+     * @param status      New status for the document
+     * @param apiKey      API key for authentication (can be null)
      * @return DatasetStatusResponse containing the updated document status
      * @since 1.3.3
      */
-    DatasetStatusResponse changeDocumentStatus(String datasetId, String documentId, String status, String apiKey);
+    DatasetStatusResponse changeDocumentStatus(String datasetId, Set<String> documentIds, DocActionEnum status, String apiKey);
 }

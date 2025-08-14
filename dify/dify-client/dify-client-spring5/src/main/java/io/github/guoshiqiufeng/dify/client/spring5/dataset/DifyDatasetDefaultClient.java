@@ -35,10 +35,7 @@ import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.util.Assert;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author yanghq
@@ -563,10 +560,12 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
     }
 
     @Override
-    public DatasetStatusResponse changeDocumentStatus(String datasetId, String documentId, String status, String apiKey) {
+    public DatasetStatusResponse changeDocumentStatus(String datasetId, Set<String> documentIds, DocActionEnum status, String apiKey) {
+        Map<String, Set<String>> param = new HashMap<>(1);
+        param.put("document_ids", documentIds);
         return webClient.patch()
-                .uri(DatasetUriConstant.V1_DOCUMENT_STATUS, datasetId, status)
-                .bodyValue(documentId.split(","))
+                .uri(DatasetUriConstant.V1_DOCUMENT_STATUS, datasetId, status.name())
+                .bodyValue(param)
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
                 .retrieve()
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)

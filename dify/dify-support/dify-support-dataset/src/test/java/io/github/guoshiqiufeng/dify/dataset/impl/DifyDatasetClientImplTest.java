@@ -34,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -1465,6 +1466,27 @@ public class DifyDatasetClientImplTest {
     }
 
     @Test
+    void testChangeDocumentStatusNoApiKey() {
+        // Arrange
+        String datasetId = "dataset_123";
+        String apiKey = "test_api_key";
+        String documentId = "doc_123";
+
+        DatasetStatusResponse expectedResponse = new DatasetStatusResponse();
+        expectedResponse.setResult("success");
+        when(difyDatasetClient.changeDocumentStatus(anyString(), any(), any(), null))
+                .thenReturn(expectedResponse);
+
+        // Act
+        DatasetStatusResponse statusResponse = difyDataset.changeDocumentStatus(datasetId, Set.of(documentId), DocActionEnum.enable);
+
+        // Assert
+        assertNotNull(statusResponse);
+        assertNotNull(statusResponse.getResult());
+        verify(difyDatasetClient, times(1)).listDatasetTag(datasetId, apiKey);
+    }
+
+    @Test
     void testChangeDocumentStatus() {
         // Arrange
         String datasetId = "dataset_123";
@@ -1473,11 +1495,11 @@ public class DifyDatasetClientImplTest {
 
         DatasetStatusResponse expectedResponse = new DatasetStatusResponse();
         expectedResponse.setResult("success");
-        when(difyDatasetClient.changeDocumentStatus(anyString(), anyString(), anyString(), anyString()))
+        when(difyDatasetClient.changeDocumentStatus(anyString(), any(), any(), anyString()))
                 .thenReturn(expectedResponse);
 
         // Act
-        DatasetStatusResponse statusResponse = difyDataset.changeDocumentStatus(datasetId, documentId, DocActionEnum.enable.name(), apiKey);
+        DatasetStatusResponse statusResponse = difyDataset.changeDocumentStatus(datasetId, Set.of(documentId), DocActionEnum.enable, apiKey);
 
         // Assert
         assertNotNull(statusResponse);

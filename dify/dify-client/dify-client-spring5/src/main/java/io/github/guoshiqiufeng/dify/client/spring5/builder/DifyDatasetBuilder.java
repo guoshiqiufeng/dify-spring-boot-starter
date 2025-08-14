@@ -72,7 +72,7 @@ public class DifyDatasetBuilder {
              */
             public DifyDatasetClient build() {
                 initDefaults();
-                if(StrUtil.isNotEmpty(apiKey)) {
+                if (StrUtil.isNotEmpty(apiKey)) {
                     webClientBuilder = webClientBuilder.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey);
                 }
                 return new DifyDatasetDefaultClient(baseUrl, clientConfig, webClientBuilder);

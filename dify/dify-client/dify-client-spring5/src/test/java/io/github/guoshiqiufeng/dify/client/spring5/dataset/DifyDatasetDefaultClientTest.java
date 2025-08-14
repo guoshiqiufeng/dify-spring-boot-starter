@@ -29,6 +29,7 @@ import io.github.guoshiqiufeng.dify.dataset.dto.response.textembedding.TextEmbed
 import io.github.guoshiqiufeng.dify.dataset.enums.IndexingTechniqueEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.MetaDataActionEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.SearchMethodEnum;
+import io.github.guoshiqiufeng.dify.dataset.enums.document.DocActionEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.ParameterizedTypeReference;
@@ -39,14 +40,10 @@ import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -1734,5 +1731,37 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         verify(webClientMock).get();
         verify(requestHeadersUriSpecMock).uri(eq(DatasetUriConstant.V1_DATASET_TAGS), eq(datasetId));
         verify(responseSpecMock).bodyToMono(DataSetTagsResponse.class);
+    }
+
+    @Test
+    public void testChangeDocumentStatus() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String datasetId = "dataset-123456";
+        Set<String> documentIds = Set.of("document-123456", "document-789012");
+
+        // Set up the response mock
+        DatasetStatusResponse expectedResponse = new DatasetStatusResponse();
+        expectedResponse.setResult("success");
+
+        when(responseSpecMock.bodyToMono(DatasetStatusResponse.class)).thenReturn(Mono.just(expectedResponse));
+
+        // Execute the method
+        DatasetStatusResponse actualResponse = client.changeDocumentStatus(datasetId, documentIds, DocActionEnum.enable, apiKey);
+
+        // Verify the result
+        assertEquals(expectedResponse.getResult(), actualResponse.getResult());
+
+        // Verify WebClient interactions
+        verify(webClientMock).patch();
+        verify(requestBodyUriSpecMock).uri(eq(DatasetUriConstant.V1_DOCUMENT_STATUS), eq(datasetId), eq(DocActionEnum.enable.name()));
+        verify(requestBodySpecMock).bodyValue(argThat(body -> {
+            if (body instanceof Map) {
+                Map<String, Set<String>> bodyMap = (Map<String, Set<String>>) body;
+                return bodyMap.containsKey("document_ids") && bodyMap.get("document_ids").equals(documentIds);
+            }
+            return false;
+        }));
+        verify(responseSpecMock).bodyToMono(DatasetStatusResponse.class);
     }
 }

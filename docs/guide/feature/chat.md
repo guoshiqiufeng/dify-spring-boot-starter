@@ -36,14 +36,14 @@ ChatMessageSendRequest
 
 **ChatMessageFile 结构：**
 
-| 参数名            | 类型                         | 描述                                    |
-|----------------|----------------------------|---------------------------------------|
-| id             | String                     | 文件 ID                                |
-| type           | String                     | 文件类型，默认为 "image"                      |
-| url            | String                     | 预览图片地址                              |
-| transferMethod | String                     | 传输方式，默认为 "remote_url"                 |
-| belongsTo      | String                     | 文件归属方，user 或 assistant              |
-| uploadFileId   | String                     | 上传文件ID                               |
+| 参数名            | 类型     | 描述                     |
+|----------------|--------|------------------------|
+| id             | String | 文件 ID                  |
+| type           | String | 文件类型，默认为 "image"       |
+| url            | String | 预览图片地址                 |
+| transferMethod | String | 传输方式，默认为 "remote_url"  |
+| belongsTo      | String | 文件归属方，user 或 assistant |
+| uploadFileId   | String | 上传文件ID                 |
 
 #### 响应参数
 
@@ -152,52 +152,52 @@ DifyPageResult<MessagesResponseVO> messages(MessagesRequest request);
 
 #### 响应参数
 
-| 参数名            | 类型                    | 描述              |
-|----------------|-------------------------|-----------------|
-| id             | String                  | 消息 ID           |
-| conversationId | String                  | 会话 ID           |
-| inputs         | `Map<String, Object>`   | 用户输入参数        |
-| query          | String                  | 用户输入/问题内容     |
-| messageFiles   | `List<MessageFile>`     | 消息文件           |
-| answer         | String                  | 回答消息内容        |
-| createdAt      | Long                    | 创建时间戳         |
-| feedback       | Feedback                | 反馈信息           |
+| 参数名            | 类型                    | 描述        |
+|----------------|-----------------------|-----------|
+| id             | String                | 消息 ID     |
+| conversationId | String                | 会话 ID     |
+| inputs         | `Map<String, Object>` | 用户输入参数    |
+| query          | String                | 用户输入/问题内容 |
+| messageFiles   | `List<MessageFile>`   | 消息文件      |
+| answer         | String                | 回答消息内容    |
+| createdAt      | Long                  | 创建时间戳     |
+| feedback       | Feedback              | 反馈信息      |
 
 **MessageFile 结构：**
 
-| 参数名            | 类型                         | 描述                                    |
-|----------------|----------------------------|---------------------------------------|
-| id             | String                     | 文件 ID                                |
-| filename       | String                     | 文件名                                 |
-| type           | String                     | 文件类型，如 "image"                      |
-| url            | String                     | 预览图片地址                              |
-| mimeType       | String                     | 文件 MIME 类型                           |
-| size           | Long                       | 文件大小（字节）                           |
-| transferMethod | String                     | 传输方式                                 |
-| belongsTo      | String                     | 文件归属方，"user" 或 "assistant"              |
-| uploadFileId   | String                     | 上传文件ID                               |
-| agentThoughts  | `List<MessageFileAgentThought>` | Agent思考内容（仅Agent模式下不为空）            |
+| 参数名            | 类型                              | 描述                         |
+|----------------|---------------------------------|----------------------------|
+| id             | String                          | 文件 ID                      |
+| filename       | String                          | 文件名                        |
+| type           | String                          | 文件类型，如 "image"             |
+| url            | String                          | 预览图片地址                     |
+| mimeType       | String                          | 文件 MIME 类型                 |
+| size           | Long                            | 文件大小（字节）                   |
+| transferMethod | String                          | 传输方式                       |
+| belongsTo      | String                          | 文件归属方，"user" 或 "assistant" |
+| uploadFileId   | String                          | 上传文件ID                     |
+| agentThoughts  | `List<MessageFileAgentThought>` | Agent思考内容（仅Agent模式下不为空）    |
 
 **MessageFileAgentThought 结构：**
 
-| 参数名            | 类型             | 描述                                           |
-|----------------|----------------|----------------------------------------------|
-| id             | String         | agent_thought ID，每一轮Agent迭代都会有一个唯一的id          |
-| messageId      | String         | 消息唯一ID                                      |
-| position       | Integer        | agent_thought在消息中的位置，如第一轮迭代position为1         |
-| thought        | String         | agent的思考内容                                   |
-| observation    | String         | 工具调用的返回结果                                  |
-| tool           | String         | 使用的工具列表，以 ; 分割多个工具                         |
+| 参数名            | 类型             | 描述                                                              |
+|----------------|----------------|-----------------------------------------------------------------|
+| id             | String         | agent_thought ID，每一轮Agent迭代都会有一个唯一的id                           |
+| messageId      | String         | 消息唯一ID                                                          |
+| position       | Integer        | agent_thought在消息中的位置，如第一轮迭代position为1                           |
+| thought        | String         | agent的思考内容                                                      |
+| observation    | String         | 工具调用的返回结果                                                       |
+| tool           | String         | 使用的工具列表，以 ; 分割多个工具                                              |
 | toolInput      | String         | 工具的输入，JSON格式的字符串(object)。如：{"dalle3": {"prompt": "a cute cat"}} |
-| createdAt      | Long           | 创建时间戳，如：1705395332                         |
-| messageFiles   | `List<String>` | 当前agent_thought 关联的文件ID                     |
-| conversationId | String         | 会话ID                                         |
+| createdAt      | Long           | 创建时间戳，如：1705395332                                              |
+| messageFiles   | `List<String>` | 当前agent_thought 关联的文件ID                                         |
+| conversationId | String         | 会话ID                                                            |
 
 **Feedback 结构：**
 
-| 参数名    | 类型     | 描述           |
-|--------|--------|--------------|
-| rating | String | 点赞/点踩 评级    |
+| 参数名    | 类型     | 描述       |
+|--------|--------|----------|
+| rating | String | 点赞/点踩 评级 |
 
 ### 1.6 获取建议回复
 
