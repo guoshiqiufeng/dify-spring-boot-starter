@@ -26,6 +26,7 @@ import io.github.guoshiqiufeng.dify.dataset.enums.IndexingTechniqueEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.MetaDataActionEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.RerankingModeEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.SearchMethodEnum;
+import io.github.guoshiqiufeng.dify.dataset.enums.document.DocActionEnum;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -1461,5 +1462,26 @@ public class DifyDatasetClientImplTest {
         assertEquals(expectedResponse.getData().get(0).getId(), actualResponse.getData().get(0).getId());
         assertEquals(expectedResponse.getData().get(0).getName(), actualResponse.getData().get(0).getName());
         verify(difyDatasetClient, times(1)).listDatasetTag(datasetId, null);
+    }
+
+    @Test
+    void testChangeDocumentStatus() {
+        // Arrange
+        String datasetId = "dataset_123";
+        String apiKey = "test_api_key";
+        String documentId = "doc_123";
+
+        DatasetStatusResponse expectedResponse = new DatasetStatusResponse();
+        expectedResponse.setResult("success");
+        when(difyDatasetClient.changeDocumentStatus(anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(expectedResponse);
+
+        // Act
+        DatasetStatusResponse statusResponse = difyDataset.changeDocumentStatus(datasetId, documentId, DocActionEnum.enable.name(), apiKey);
+
+        // Assert
+        assertNotNull(statusResponse);
+        assertNotNull(statusResponse.getResult());
+        verify(difyDatasetClient, times(1)).listDatasetTag(datasetId, apiKey);
     }
 }

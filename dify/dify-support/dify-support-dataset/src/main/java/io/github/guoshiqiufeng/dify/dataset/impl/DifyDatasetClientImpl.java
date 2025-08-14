@@ -20,6 +20,7 @@ import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
 import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.*;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.*;
+import io.github.guoshiqiufeng.dify.dataset.enums.document.DocActionEnum;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -221,5 +222,10 @@ public class DifyDatasetClientImpl implements DifyDataset {
     @Override
     public DataSetTagsResponse listDatasetTag(String datasetId, String apiKey) {
         return difyDatasetClient.listDatasetTag(datasetId, apiKey);
+    }
+
+    @Override
+    public DatasetStatusResponse changeDocumentStatus(String datasetId, String documentId, String status, String apiKey) {
+        return difyDatasetClient.changeDocumentStatus(datasetId, documentId, status, apiKey);
     }
 }
