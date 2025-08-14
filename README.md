@@ -52,7 +52,7 @@ Provide springboot starter for dify to simplify development.
         <dependency>
             <groupId>io.github.guoshiqiufeng.dify</groupId>
             <artifactId>dify-bom</artifactId>
-            <version>1.3.2</version>
+            <version>1.3.3</version>
             <type>import</type>
         </dependency>
     </dependencies>
