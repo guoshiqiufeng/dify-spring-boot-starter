@@ -662,9 +662,8 @@ UploadFileInfoResponse
 | createdBy   | String  | Created by         |
 | createdAt   | Long    | Creation timestamp |
 
-## 2.9 Document Status Management
 
-### 2.9.1 Update Document Status
+### 2.9 Update Document Status
 
 #### Method
 
