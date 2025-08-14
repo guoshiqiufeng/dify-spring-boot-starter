@@ -577,9 +577,9 @@ public class DatasetTest extends BaseDatasetContainerTest {
     @DisplayName("Test document status change")
     public void changeDocumentStatus() {
         assertNotNull(datasetId, "Dataset ID should be available from previous test");
-        assertNotNull(documentFileId, "Document File ID should be available from previous test");
+        assertNotNull(documentTextId, "Document ID should be available from previous test");
 
-        difyDataset.changeDocumentStatus(datasetId, Set.of(documentFileId), DocActionEnum.archive);
+        difyDataset.changeDocumentStatus(datasetId, Set.of(documentTextId), DocActionEnum.archive);
     }
 
     @Test
