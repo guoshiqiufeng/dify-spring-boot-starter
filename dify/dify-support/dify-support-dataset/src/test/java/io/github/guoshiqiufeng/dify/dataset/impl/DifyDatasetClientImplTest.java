@@ -1469,21 +1469,21 @@ public class DifyDatasetClientImplTest {
     void testChangeDocumentStatusNoApiKey() {
         // Arrange
         String datasetId = "dataset_123";
-        String apiKey = "test_api_key";
         String documentId = "doc_123";
 
         DatasetStatusResponse expectedResponse = new DatasetStatusResponse();
         expectedResponse.setResult("success");
-        when(difyDatasetClient.changeDocumentStatus(anyString(), any(), any(), null))
+        when(difyDatasetClient.changeDocumentStatus(anyString(), any(), any(), any()))
                 .thenReturn(expectedResponse);
 
         // Act
-        DatasetStatusResponse statusResponse = difyDataset.changeDocumentStatus(datasetId, Set.of(documentId), DocActionEnum.enable);
+        Set<String> documentIds = Set.of(documentId);
+        DatasetStatusResponse statusResponse = difyDataset.changeDocumentStatus(datasetId, documentIds, DocActionEnum.enable);
 
         // Assert
         assertNotNull(statusResponse);
         assertNotNull(statusResponse.getResult());
-        verify(difyDatasetClient, times(1)).listDatasetTag(datasetId, apiKey);
+        verify(difyDatasetClient, times(1)).changeDocumentStatus(datasetId, documentIds, DocActionEnum.enable, null);
     }
 
     @Test
@@ -1499,11 +1499,12 @@ public class DifyDatasetClientImplTest {
                 .thenReturn(expectedResponse);
 
         // Act
-        DatasetStatusResponse statusResponse = difyDataset.changeDocumentStatus(datasetId, Set.of(documentId), DocActionEnum.enable, apiKey);
+        Set<String> documentIds = Set.of(documentId);
+        DatasetStatusResponse statusResponse = difyDataset.changeDocumentStatus(datasetId, documentIds, DocActionEnum.enable, apiKey);
 
         // Assert
         assertNotNull(statusResponse);
         assertNotNull(statusResponse.getResult());
-        verify(difyDatasetClient, times(1)).listDatasetTag(datasetId, apiKey);
+        verify(difyDatasetClient, times(1)).changeDocumentStatus(datasetId, documentIds, DocActionEnum.enable, apiKey);
     }
 }
