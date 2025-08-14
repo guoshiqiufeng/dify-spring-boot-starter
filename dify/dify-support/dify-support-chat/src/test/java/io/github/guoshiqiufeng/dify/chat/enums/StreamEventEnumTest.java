@@ -77,7 +77,7 @@ public class StreamEventEnumTest {
     @DisplayName("Test enum count")
     public void testEnumCount() {
         // Verify the expected number of enum values
-        assertEquals(10, StreamEventEnum.values().length);
+        assertEquals(12, StreamEventEnum.values().length);
     }
 
     @Test
