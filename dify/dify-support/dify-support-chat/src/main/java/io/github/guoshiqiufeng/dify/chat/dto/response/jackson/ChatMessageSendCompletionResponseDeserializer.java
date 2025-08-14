@@ -17,6 +17,7 @@ package io.github.guoshiqiufeng.dify.chat.dto.response.jackson;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -31,6 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author yanghq
@@ -45,6 +48,14 @@ public class ChatMessageSendCompletionResponseDeserializer extends StdDeserializ
     private static final String CONSTANT_EVENT = "event";
     private static final String CONSTANT_WORKFLOW_RUN_ID = "workflow_run_id";
     private static final String CONSTANT_DATA = "data";
+
+    public static final String POSITION = "position";
+    public static final String THOUGHT = "thought";
+    public static final String OBSERVATION = "observation";
+    public static final String TOOL = "tool";
+    public static final String TOOL_LABELS = "tool_labels";
+    public static final String TOOL_INPUT = "tool_input";
+    public static final String MESSAGE_FILES = "message_files";
 
     static {
         MAPPER.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -94,6 +105,39 @@ public class ChatMessageSendCompletionResponseDeserializer extends StdDeserializ
         BeanUtils.copyProperties(chatMessageSendResponse, chatMessageSendCompletionResponse);
         if (root.has(CONSTANT_WORKFLOW_RUN_ID)) {
             chatMessageSendCompletionResponse.setWorkflowRunId(root.get(CONSTANT_WORKFLOW_RUN_ID).asText());
+        }
+        if (root.has(POSITION)) {
+            chatMessageSendCompletionResponse.setPosition(root.get(POSITION).asInt());
+        }
+        if (root.has(THOUGHT)) {
+            chatMessageSendCompletionResponse.setThought(root.get(THOUGHT).asText());
+        }
+        if (root.has(OBSERVATION)) {
+            chatMessageSendCompletionResponse.setObservation(root.get(OBSERVATION).asText());
+        }
+        if (root.has(TOOL)) {
+            chatMessageSendCompletionResponse.setTool(root.get(TOOL).asText());
+        }
+        if (root.has(TOOL_LABELS)) {
+            JsonNode toolLabelsNode = root.get(TOOL_LABELS);
+            Map<String, Object> toolLabels = MAPPER.convertValue(
+                    toolLabelsNode,
+                    new TypeReference<Map<String, Object>>() {
+                    }
+            );
+            chatMessageSendCompletionResponse.setToolLabels(toolLabels);
+        }
+        if (root.has(TOOL_INPUT)) {
+            chatMessageSendCompletionResponse.setToolInput(root.get(TOOL_INPUT).asText());
+        }
+        if (root.has(MESSAGE_FILES)) {
+            JsonNode messageFilesNode = root.get(MESSAGE_FILES);
+            List<String> messageFiles = MAPPER.convertValue(
+                    messageFilesNode,
+                    new TypeReference<List<String>>() {
+                    }
+            );
+            chatMessageSendCompletionResponse.setMessageFiles(messageFiles);
         }
         return chatMessageSendCompletionResponse;
     }
