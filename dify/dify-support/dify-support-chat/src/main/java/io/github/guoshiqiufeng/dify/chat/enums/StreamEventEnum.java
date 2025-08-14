@@ -64,6 +64,10 @@ public enum StreamEventEnum {
      */
     agent_log(AgentLogData.class),
 
+    agent_message(EmptyData.class),
+
+    agent_thought(EmptyData.class),
+
     message(EmptyData.class),
 
     message_end(EmptyData.class),
