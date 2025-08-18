@@ -260,4 +260,39 @@ public class ChatMessageSendCompletionResponseDeserializerTest {
         // Data should be null
         Assertions.assertNull(response.getData());
     }
+
+    @Test
+    public void testDeserializeWithError() throws IOException {
+        // Prepare test JSON with node_started event but null data
+        String json = "{\n" +
+                "  \"event\": \"error\",\n" +
+                "  \"message\": \"t-ghi\",\n" +
+                "  \"code\": \"code-ghi\",\n" +
+                "  \"status\": 1,\n" +
+                "  \"message_id\": \"msg-jkl\",\n" +
+                "  \"task_id\": \"task-mno\",\n" +
+                "  \"id\": \"id-pqr\",\n" +
+                "  \"created_at\": 1681556500000,\n" +
+                "  \"workflow_run_id\": \"workflow-run-ghi\",\n" +
+                "  \"data\": null\n" +
+                "}";
+
+        // Deserialize the JSON
+        ChatMessageSendCompletionResponse response = objectMapper.readValue(json, ChatMessageSendCompletionResponse.class);
+
+        // Assertions for base properties
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals("error", response.getEvent());
+        Assertions.assertEquals("t-ghi", response.getMessage());
+        Assertions.assertEquals("code-ghi", response.getCode());
+        Assertions.assertEquals(1, response.getStatus());
+        Assertions.assertEquals("msg-jkl", response.getMessageId());
+        Assertions.assertEquals("task-mno", response.getTaskId());
+        Assertions.assertEquals("id-pqr", response.getId());
+        Assertions.assertEquals(1681556500000L, response.getCreatedAt());
+        Assertions.assertEquals("workflow-run-ghi", response.getWorkflowRunId());
+
+        // Data should be null
+        Assertions.assertNull(response.getData());
+    }
 }
