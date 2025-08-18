@@ -63,4 +63,25 @@ public class ChatMessageSendCompletionResponse extends ChatMessageSendResponse i
      */
     @JsonAlias("message_files")
     private List<String> messageFiles;
+
+    /**
+     * HTTP 状态码
+     *
+     * @return
+     */
+    private Integer status;
+
+    /**
+     * 错误码
+     *
+     * @return
+     */
+    private String code;
+
+    /**
+     * 错误消息
+     *
+     * @return
+     */
+    private String message;
 }

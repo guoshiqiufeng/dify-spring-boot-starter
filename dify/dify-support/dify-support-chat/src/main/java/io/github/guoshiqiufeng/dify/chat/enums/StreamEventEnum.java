@@ -74,6 +74,10 @@ public enum StreamEventEnum {
 
     message_replace(EmptyData.class),
 
+    error(EmptyData.class),
+
+    ping(EmptyData.class),
+
     ;
 
     private final Class<? extends CompletionData> clazz;

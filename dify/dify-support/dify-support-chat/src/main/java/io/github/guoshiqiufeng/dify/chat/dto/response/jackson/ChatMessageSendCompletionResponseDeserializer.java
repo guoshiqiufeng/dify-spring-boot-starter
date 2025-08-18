@@ -47,6 +47,10 @@ public class ChatMessageSendCompletionResponseDeserializer extends StdDeserializ
 
     private static final String CONSTANT_EVENT = "event";
     private static final String CONSTANT_WORKFLOW_RUN_ID = "workflow_run_id";
+    private static final String CONSTANT_TASK_ID = "task_id";
+    private static final String CONSTANT_STATUS = "status";
+    private static final String CONSTANT_CODE = "code";
+    private static final String CONSTANT_MESSAGE = "message";
     private static final String CONSTANT_DATA = "data";
 
     public static final String POSITION = "position";
@@ -138,6 +142,19 @@ public class ChatMessageSendCompletionResponseDeserializer extends StdDeserializ
                     }
             );
             chatMessageSendCompletionResponse.setMessageFiles(messageFiles);
+        }
+
+        if (root.has(CONSTANT_TASK_ID)) {
+            chatMessageSendCompletionResponse.setTaskId(root.get(CONSTANT_TASK_ID).asText());
+        }
+        if (root.has(CONSTANT_STATUS)) {
+            chatMessageSendCompletionResponse.setStatus(root.get(CONSTANT_STATUS).asInt());
+        }
+        if (root.has(CONSTANT_CODE)) {
+            chatMessageSendCompletionResponse.setCode(root.get(CONSTANT_CODE).asText());
+        }
+        if (root.has(CONSTANT_MESSAGE)) {
+            chatMessageSendCompletionResponse.setMessage(root.get(CONSTANT_MESSAGE).asText());
         }
         return chatMessageSendCompletionResponse;
     }
