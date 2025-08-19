@@ -262,6 +262,46 @@ public class ChatMessageSendCompletionResponseDeserializerTest {
     }
 
     @Test
+    public void testDeserializeWithAgentThought() throws IOException {
+        // Prepare test JSON with node_started event but null data
+        String json = "{\n" +
+                "    \"event\": \"agent_thought\",\n" +
+                "    \"conversation_id\": \"f10c0118-3d3a-4402-a094-26862b10e33d\",\n" +
+                "    \"message_id\": \"ce331ffb-2b8a-41f1-a01b-f7fab9748906\",\n" +
+                "    \"created_at\": 1755051876,\n" +
+                "    \"task_id\": \"4f4bb0ab-a332-4205-94b8-d49495a2c6e2\",\n" +
+                "    \"id\": \"f1a0a900-fa97-4874-bb17-6b4d3ce16e1b\",\n" +
+                "    \"position\": 1,\n" +
+                "    \"thought\": \"\",\n" +
+                "    \"observation\": \"\",\n" +
+                "    \"tool\": \"standard_nl2sql\",\n" +
+                "    \"tool_labels\": {\n" +
+                "        \"standard_nl2sql\": {\n" +
+                "            \"en_US\": \"standard_nl2sql\",\n" +
+                "            \"zh_Hans\": \"standard_nl2sql\"\n" +
+                "        }\n" +
+                "    },\n" +
+                "    \"tool_input\": \"{\\\"standard_nl2sql\\\": {\\\"BOT_USER_INPUT\\\": \\\"按单位统计银行账户数量\\\", \\\"tenantCode\\\": \\\"default\\\"}}\",\n" +
+                "    \"message_files\": [\n" +
+                "\n" +
+                "    ]\n" +
+                "}";
+
+        // Deserialize the JSON
+        ChatMessageSendCompletionResponse response = objectMapper.readValue(json, ChatMessageSendCompletionResponse.class);
+
+        // Assertions for base properties
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals("agent_thought", response.getEvent());
+        Assertions.assertEquals("ce331ffb-2b8a-41f1-a01b-f7fab9748906", response.getMessageId());
+        Assertions.assertEquals("4f4bb0ab-a332-4205-94b8-d49495a2c6e2", response.getTaskId());
+        Assertions.assertEquals(1, response.getPosition());
+
+        // Data should be null
+        Assertions.assertNull(response.getData());
+    }
+
+    @Test
     public void testDeserializeWithError() throws IOException {
         // Prepare test JSON with node_started event but null data
         String json = "{\n" +
