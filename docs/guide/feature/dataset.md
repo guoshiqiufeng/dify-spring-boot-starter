@@ -659,7 +659,6 @@ UploadFileInfoResponse
 | createdBy   | String  | 创建人     |
 | createdAt   | Long    | 创建时间戳   |
 
-
 ### 2.9 更新文档状态
 
 #### 方法

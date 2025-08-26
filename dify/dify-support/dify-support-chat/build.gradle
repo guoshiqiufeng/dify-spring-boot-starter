@@ -1,12 +1,16 @@
 dependencies {
     api project(":dify:dify-core")
     api "${lib["hutool-core"]}"
+    api "${lib["hutool-extra"]}"
 
     implementation "io.projectreactor:reactor-core"
     implementation "org.springframework:spring-webflux"
+    implementation "org.springframework:spring-context"
 
     implementation "com.fasterxml.jackson.core:jackson-databind"
 
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.springframework:spring-test'
+    testImplementation "org.mockito:mockito-core:${mockitoVersion}"
+    testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
 }

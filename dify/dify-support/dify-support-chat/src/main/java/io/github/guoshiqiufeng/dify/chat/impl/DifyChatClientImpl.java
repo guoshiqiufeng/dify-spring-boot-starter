@@ -19,6 +19,7 @@ import io.github.guoshiqiufeng.dify.chat.DifyChat;
 import io.github.guoshiqiufeng.dify.chat.client.DifyChatClient;
 import io.github.guoshiqiufeng.dify.chat.dto.request.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.*;
+import io.github.guoshiqiufeng.dify.chat.pipeline.DifyChatPipelineUtils;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +49,8 @@ public class DifyChatClientImpl implements DifyChat {
 
     @Override
     public Flux<ChatMessageSendCompletionResponse> sendChatMessageStream(ChatMessageSendRequest sendRequest) {
-        return difyChatClient.streamingChat(sendRequest);
+        return difyChatClient.streamingChat(sendRequest)
+                .doOnNext(DifyChatPipelineUtils::processChat);
     }
 
     @Override

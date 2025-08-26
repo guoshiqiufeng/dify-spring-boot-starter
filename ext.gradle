@@ -13,7 +13,8 @@ ext {
     ]
 
     lib = [
-            "hutool-core": "cn.hutool:hutool-core:${hutoolVersion}",
-            "hutool-json": "cn.hutool:hutool-json:${hutoolVersion}"
+            "hutool-core" : "cn.hutool:hutool-core:${hutoolVersion}",
+            "hutool-extra": "cn.hutool:hutool-extra:${hutoolVersion}",
+            "hutool-json" : "cn.hutool:hutool-json:${hutoolVersion}"
     ]
 }
