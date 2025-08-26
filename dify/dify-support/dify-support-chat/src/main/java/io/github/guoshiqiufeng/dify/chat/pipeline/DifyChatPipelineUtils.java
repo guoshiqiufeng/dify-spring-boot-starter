@@ -15,10 +15,12 @@
  */
 package io.github.guoshiqiufeng.dify.chat.pipeline;
 
+import cn.hutool.core.exceptions.UtilException;
 import cn.hutool.extra.spring.SpringUtil;
 import io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendCompletionResponse;
 import io.github.guoshiqiufeng.dify.core.pipeline.PipelineContext;
 import io.github.guoshiqiufeng.dify.core.pipeline.PipelineHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 
 /**
@@ -26,6 +28,7 @@ import org.springframework.beans.BeanUtils;
  * @version 1.0
  * @since 2025/8/26 09:37
  */
+@Slf4j
 public class DifyChatPipelineUtils {
 
     private static final String CHAT_CODE = "CHAT";
@@ -37,7 +40,13 @@ public class DifyChatPipelineUtils {
      * @return 拦截处理后消息
      */
     public static ChatMessageSendCompletionResponse processChat(ChatMessageSendCompletionResponse completionResponse) {
-        PipelineHandler pipelineHandler = SpringUtil.getBean(PipelineHandler.class);
+        PipelineHandler pipelineHandler;
+        try {
+            pipelineHandler = SpringUtil.getBean(PipelineHandler.class);
+        } catch (UtilException e) {
+            log.warn("PipelineHandler get error. {}", e.getMessage());
+            return completionResponse;
+        }
         if (pipelineHandler == null) {
             return completionResponse;
         }
