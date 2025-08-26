@@ -662,7 +662,6 @@ UploadFileInfoResponse
 | createdBy   | String  | Created by         |
 | createdAt   | Long    | Creation timestamp |
 
-
 ### 2.9 Update Document Status
 
 #### Method

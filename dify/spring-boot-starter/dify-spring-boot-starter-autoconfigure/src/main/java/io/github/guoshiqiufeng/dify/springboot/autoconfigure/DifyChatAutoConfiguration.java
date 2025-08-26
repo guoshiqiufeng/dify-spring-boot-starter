@@ -18,8 +18,13 @@ package io.github.guoshiqiufeng.dify.springboot.autoconfigure;
 import io.github.guoshiqiufeng.dify.chat.DifyChat;
 import io.github.guoshiqiufeng.dify.chat.client.DifyChatClient;
 import io.github.guoshiqiufeng.dify.chat.impl.DifyChatClientImpl;
+import io.github.guoshiqiufeng.dify.chat.pipeline.ChatMessagePipelineModel;
 import io.github.guoshiqiufeng.dify.client.spring6.chat.DifyChatDefaultClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
+import io.github.guoshiqiufeng.dify.core.pipeline.PipelineHandler;
+import io.github.guoshiqiufeng.dify.core.pipeline.PipelineModel;
+import io.github.guoshiqiufeng.dify.core.pipeline.PipelineProcess;
+import io.github.guoshiqiufeng.dify.core.pipeline.PipelineTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -28,6 +33,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author yanghq
@@ -54,6 +63,29 @@ public class DifyChatAutoConfiguration {
     @ConditionalOnMissingBean({DifyChat.class})
     public DifyChatClientImpl difyChatHandler(DifyChatClient difyChatClient) {
         return new DifyChatClientImpl(difyChatClient);
+    }
+
+    @Bean("chatTemplate")
+    @ConditionalOnMissingBean(name = "chatTemplate")
+    public PipelineTemplate<ChatMessagePipelineModel> chatTemplate(List<PipelineProcess<ChatMessagePipelineModel>> processList) {
+        PipelineTemplate<ChatMessagePipelineModel> processTemplate = new PipelineTemplate<>();
+        processTemplate.setProcessList(processList);
+        return processTemplate;
+    }
+
+    /**
+     * pipeline流程控制器
+     *
+     * @return PipelineHandler
+     */
+    @Bean
+    @ConditionalOnMissingBean(PipelineHandler.class)
+    public PipelineHandler pipelineHandler(List<PipelineProcess<ChatMessagePipelineModel>> produceProcessList) {
+        PipelineHandler processHandler = new PipelineHandler();
+        Map<String, PipelineTemplate<? extends PipelineModel>> templateConfig = new HashMap<>(2);
+        templateConfig.put("CHAT", chatTemplate(produceProcessList));
+        processHandler.setTemplateConfig(templateConfig);
+        return processHandler;
     }
 
 }
