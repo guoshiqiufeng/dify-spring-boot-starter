@@ -74,14 +74,14 @@ export default defineUserConfig({
                                 '/guide/feature/server',
                             ]
                         },
-                        //{     text: '接收消息',
-                        //     collapsible: true,
-                        //     children: [
-                        //         '/guide/listener/introduction',
-                        //         '/guide/listener/auto',
-                        //         '/guide/listener/non-auto',
-                        //     ]
-                        // }
+                        {
+                            text: '事件',
+                            collapsible: true,
+                            children: [
+                                '/guide/event/introduction',
+                                '/guide/event/chat',
+                            ]
+                        }
                     ],
                     "/config/": [
                         {
@@ -113,14 +113,13 @@ export default defineUserConfig({
                                     '/guide/feature/server',
                                 ]
                             },
-                            // {
-                            //     text: '接收消息',
-                            //     children: [
-                            //         '/guide/listener/introduction',
-                            //         '/guide/listener/auto',
-                            //         '/guide/listener/non-auto',
-                            //     ]
-                            // }
+                            {
+                                text: '事件',
+                                children: [
+                                    '/guide/event/introduction',
+                                    '/guide/event/chat'
+                                ]
+                            }
                         ]
                     },
                     {
@@ -186,15 +185,14 @@ export default defineUserConfig({
                                 '/en/guide/feature/server',
                             ]
                         },
-                        // {
-                        //     text: 'Receive message',
-                        //     collapsible: true,
-                        //     children: [
-                        //         '/en/guide/listener/introduction',
-                        //         '/en/guide/listener/auto',
-                        //         '/en/guide/listener/non-auto',
-                        //     ]
-                        // }
+                        {
+                            text: 'Event',
+                            collapsible: true,
+                            children: [
+                                '/en/guide/event/introduction',
+                                '/en/guide/event/chat',
+                            ]
+                        }
                     ],
                     "/en/config/": [
                         {
@@ -226,14 +224,13 @@ export default defineUserConfig({
                                     '/en/guide/feature/server',
                                 ]
                             },
-                            // {
-                            //     text: 'Receive message',
-                            //     children: [
-                            //         '/en/guide/listener/introduction',
-                            //         '/en/guide/listener/auto',
-                            //         '/en/guide/listener/non-auto',
-                            //     ]
-                            // }
+                            {
+                                text: 'Event',
+                                children: [
+                                    '/en/guide/event/introduction',
+                                    '/en/guide/event/chat',
+                                ]
+                            }
                         ]
                     },
                     {
