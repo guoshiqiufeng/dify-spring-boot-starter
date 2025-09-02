@@ -109,6 +109,11 @@ public class DifyChatClientImpl implements DifyChat {
     }
 
     @Override
+    public ResponseEntity<byte[]> filePreview(FilePreviewRequest request) {
+        return difyChatClient.filePreview(request);
+    }
+
+    @Override
     public AppInfoResponse info(String apiKey) {
         return difyChatClient.info(apiKey);
     }

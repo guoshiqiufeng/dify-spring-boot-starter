@@ -43,6 +43,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -336,6 +337,28 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
                 .retrieve()
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
                 .bodyToMono(FileUploadResponse.class).block();
+    }
+
+    @Override
+    public ResponseEntity<byte[]> filePreview(FilePreviewRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        Assert.notNull(request.getFileId(), "fileId must not be null");
+        Assert.notNull(request.getApiKey(), "apiKey must not be null");
+
+        // Build the URI with path variable and optional query parameter
+        return webClient.get()
+                .uri(uriBuilder -> {
+                    UriBuilder builder = uriBuilder.path(ChatUriConstant.V1_FILES_PREVIEW_URI);
+                    if (request.getAsAttachment() != null && request.getAsAttachment()) {
+                        builder.queryParam("as_attachment", "true");
+                    }
+                    return builder.build(request.getFileId());
+                })
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
+                .retrieve()
+                .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                .toEntity(byte[].class)
+                .block();
     }
 
     @Override

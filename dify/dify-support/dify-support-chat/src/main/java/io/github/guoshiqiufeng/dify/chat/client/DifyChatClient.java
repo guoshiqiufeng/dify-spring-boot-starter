@@ -156,6 +156,17 @@ public interface DifyChatClient {
     FileUploadResponse fileUpload(FileUploadRequest request);
 
     /**
+     * file preview
+     * Preview or download an uploaded file. This endpoint allows you to access files previously uploaded via the file upload API.
+     * Files can only be accessed within the message scope that belongs to the requesting application.
+     *
+     * @param request file preview request containing file ID and download mode
+     * @return file content response with appropriate headers for browser display or download
+     * @since 1.0.0
+     */
+    ResponseEntity<byte[]> filePreview(FilePreviewRequest request);
+
+    /**
      * app info
      *
      * @param apiKey The API key for authentication and retrieving app parameters

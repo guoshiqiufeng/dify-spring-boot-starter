@@ -598,6 +598,136 @@ AppSiteResponse
 | showWorkflowSteps      | Boolean      | 是否显示工作流详情                                    |
 | useIconAsAnswerIcon    | Boolean      | 是否在聊天中用 WebApp 图标替换 🤖                       |
 
+### 3.8 文件预览
+
+#### 方法
+
+```java
+ResponseEntity<byte[]> filePreview(FilePreviewRequest request);
+```
+
+#### 请求参数
+
+FilePreviewRequest
+
+| 参数名          | 类型      | 是否必须 | 描述                               |
+|--------------|---------|------|----------------------------------|
+| apiKey       | String  | 是    | apiKey                           |
+| userId       | String  | 是    | 用户 id                            |
+| fileId       | String  | 是    | 要预览的文件的唯一标识符，从文件上传 API 响应中获得     |
+| asAttachment | Boolean | 否    | 是否强制将文件作为附件下载。默认为 false（在浏览器中预览） |
+
+#### 响应参数
+
+返回带有适当浏览器显示或下载标头的文件内容。
+
+##### 响应头说明
+
+- **Content-Type**: 根据文件 MIME 类型设置
+- **Content-Length**: 文件大小（以字节为单位，如果可用）
+- **Content-Disposition**: 如果 asAttachment=true 则设置为 "attachment"
+- **Cache-Control**: 用于性能的缓存标头
+- **Accept-Ranges**: 对于音频/视频文件设置为 "bytes"
+
+#### 使用示例
+
+##### 基本使用
+
+```java
+// 创建文件预览请求
+FilePreviewRequest request = new FilePreviewRequest("file-id-123")
+    .setApiKey("your-api-key")
+    .setUserId("user-123");
+
+// 执行文件预览
+ResponseEntity<byte[]> response = difyChat.filePreview(request);
+
+// 获取文件内容
+byte[] fileContent = response.getBody();
+```
+
+##### 预览文件（在浏览器中显示）
+
+```java
+import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
+
+private void previewFile(String fileId, HttpServletResponse response) {
+    try {
+        FilePreviewRequest request = new FilePreviewRequest(fileId)
+                .setApiKey("your-api-key")
+                .setUserId("user-123")
+                .setAsAttachment(false); // 在浏览器中预览
+
+        ResponseEntity<byte[]> responseEntity = difyChat.filePreview(request);
+
+        // 设置响应头
+        String contentType = responseEntity.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
+        response.setContentType(contentType != null ? contentType : "application/octet-stream");
+
+        String contentLength = responseEntity.getHeaders().getFirst(HttpHeaders.CONTENT_LENGTH);
+        if (contentLength != null) {
+            response.setContentLength(Integer.parseInt(contentLength));
+        }
+
+        // 复制缓存控制头
+        String cacheControl = responseEntity.getHeaders().getFirst(HttpHeaders.CACHE_CONTROL);
+        if (cacheControl != null) {
+            response.setHeader(HttpHeaders.CACHE_CONTROL, cacheControl);
+        }
+
+        // 写入文件内容
+        if (responseEntity.getBody() != null) {
+            response.getOutputStream().write(responseEntity.getBody());
+            response.getOutputStream().flush();
+        }
+
+    } catch (Exception e) {
+        log.error("File preview error: {}", e.getMessage());
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+}
+```
+
+##### 下载文件（作为附件）
+
+```java
+import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
+
+private void downloadFile(String fileId, String filename, HttpServletResponse response) {
+    try {
+        FilePreviewRequest request = new FilePreviewRequest(fileId, true, "your-api-key", "user-123");
+
+        ResponseEntity<byte[]> responseEntity = difyChat.filePreview(request);
+
+        // 设置响应头
+        String contentType = responseEntity.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
+        response.setContentType(contentType != null ? contentType : "application/octet-stream");
+
+        String contentDisposition = responseEntity.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION);
+        if (contentDisposition != null) {
+            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, contentDisposition);
+        } else {
+            // 设置自定义文件名
+            String safeFilename = filename != null ? filename : "download";
+            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, 
+                "attachment; filename=\"" + safeFilename + "\"");
+        }
+
+        // 写入文件内容
+        if (responseEntity.getBody() != null) {
+            response.getOutputStream().write(responseEntity.getBody());
+            response.getOutputStream().flush();
+        }
+
+    } catch (Exception e) {
+        log.error("File download error: {}", e.getMessage());
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+}
+```
+
 ## 4. 应用标注
 
 > 需要 Dify 1.2.0 或更高版本

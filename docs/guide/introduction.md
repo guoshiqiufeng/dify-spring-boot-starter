@@ -41,6 +41,7 @@ description:
 | 【CHAT】文本转语音             | ✅  |    
 | 【CHAT】语音转文本             | ✅  |    
 | 【CHAT】文件上传              | ✅  |    
+| 【CHAT】文件预览              | ✅  |  
 | 【CHAT】获取应用基本信息          | ✅  |    
 | 【CHAT】获取应用Meta信息        | ✅  |  
 | 【CHAT】获取应用 WebApp 设置    | ✅  |  
