@@ -1,281 +1,212 @@
-# This is a basic workflow to help you get started with Actions
-
 name: Gradle dify test
 
-# Controls when the workflow will run
 on:
   pull_request:
     paths:
       - 'dify/**'
       - '.github/workflows/gradle-dify-test.yml'
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 permissions:
   contents: read
   pull-requests: write
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    env:
+      DIFY_NETWORK: docker_default  # 显式定义网络名称
+      OLLAMA_CONTAINER: ollama
+      DIFY_VERSION: 1.7.2
+      PLUGIN_ID: "langgenius/ollama:0.0.6@f430f3eb959f4863b1e87171544a8fec179441b90deda5693c85f07712d2a68c"
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Check marketplace access
         run: |
-          MARKETPLACE_URL="https://marketplace.dify.ai/api/v1/plugins/langgenius/ollama/0.0.6/download"
-          echo "Checking access to Dify marketplace URL..."
-          if ! curl -s -f -o /dev/null "$MARKETPLACE_URL"; then
-            echo "::error::Cannot access $MARKETPLACE_URL - Exiting action"
-            exit 1
-          fi
-          echo "Marketplace URL is accessible."
+          curl -sf --max-time 10 "https://marketplace.dify.ai/api/v1/plugins/langgenius/ollama/0.0.6/download" \
+            || { echo "::error::Cannot access marketplace URL"; exit 1; }
+          echo "Marketplace URL accessible"
 
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up version environment variable
+      - name: Setup version
         run: |
-          APP_VERSION=$(grep -oP 'APP_VERSION=\K[^\s]+' gradle.properties)
-          echo "Using version: $APP_VERSION"
+          APP_VERSION=$(grep -oP 'APP_VERSION=\K[^\s]+' gradle.properties || echo "unknown")
           echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
+          echo "Using version: $APP_VERSION"
 
-      - name: Set up JDK 21
+      - name: Setup JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
-          cache: gradle
+          cache: 'gradle'
 
-      # Using Gradle's official action for better caching
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "8.10.2"
-          gradle-home-cache-cleanup: true
 
-      # Runs a single command using the runners shell
       - name: Clone Dify repository
-        #run: git clone https://github.com/langgenius/dify.git tools/dify
-        run: git clone -b 1.7.2 --single-branch https://github.com/langgenius/dify.git tools/dify
+        run: |
+          git clone -b ${{ env.DIFY_VERSION }} --depth 1 \
+            https://github.com/langgenius/dify.git tools/dify
 
-      # Runs a set of commands using the runners shell
-      - name: Start Docker containers
+      - name: Extract DSL version from Dify
+        id: dsl_version
+        run: |
+          # 读取 CURRENT_DSL_VERSION 值
+          DSL_VERSION=$(grep -m1 'CURRENT_DSL_VERSION' tools/dify/api/services/app_dsl_service.py | \
+            sed -E 's/.*CURRENT_DSL_VERSION[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/' | \
+            tr -d '\r\n' | tr -d '[:space:]')
+          
+          # 额外验证（确保是有效版本号）
+          if ! [[ "$DSL_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Invalid DSL version format: '$DSL_VERSION'"
+            exit 1
+          fi
+          
+          echo "✅ Extracted DSL version: $DSL_VERSION"
+          
+          # 安全写入环境变量（关键修复）
+          echo "CURRENT_DSL_VERSION=$DSL_VERSION" | tr -d '\n' >> $GITHUB_ENV
+
+      - name: Start Dify containers
         run: |
           cd tools/dify/docker
           cp .env.example .env
           docker compose up -d
+          echo "Waiting for Dify API to be ready..."
+          timeout 120 bash -c 'until curl -sSf http://localhost/console/api/init; do sleep 5; done'
           docker compose ps
 
-      - name: Set up Ollama
+      - name: Setup Ollama
         run: |
-          # Instead of running Ollama directly on the host, run it in a Docker container and connect to Dify network
-          docker run -d --name ollama -p 11434:11434 ollama/ollama
+          docker run -d --name ${{ env.OLLAMA_CONTAINER }} -p 11434:11434 \
+            --network ${{ env.DIFY_NETWORK }} ollama/ollama
           
-          # Test if Ollama is running
-          max_retries=10
-          retry_delay=2
-          for ((i=1; i<=max_retries; i++)); do
-            echo "Attempt $i: Checking Ollama health..."
-            if curl -sSf -X GET http://localhost:11434/api/tags --connect-timeout 5; then
-              echo "Ollama is ready!"
-              break
-            else
-              echo "Ollama not ready yet, waiting ${retry_delay}s..."
-              sleep $retry_delay
-            fi
-            if [ $i -eq $max_retries ]; then
-              echo "Error: Failed to connect to Ollama after $max_retries attempts"
-              exit 1
-            fi
-          done
+          echo "Waiting for Ollama to be ready..."
+          timeout 60 bash -c 'until curl -sSf http://localhost:11434/api/tags; do sleep 2; done'
           
-          # Find Dify network and connect Ollama to it
-          DIFY_NETWORK=$(docker network ls | grep docker_default | awk '{print $1}')
-          if [ -n "$DIFY_NETWORK" ]; then
-            echo "Connecting Ollama to Dify network: $DIFY_NETWORK"
-            docker network connect $DIFY_NETWORK ollama
-          else
-            echo "Warning: Could not find Dify network"
-          fi
-      - name: Pull Ollama model
+          # Verify network connectivity
+          docker inspect ${{ env.OLLAMA_CONTAINER }} | grep -q ${{ env.DIFY_NETWORK }} \
+            || echo "::warning::Ollama not connected to ${{ env.DIFY_NETWORK }} network"
+
+      - name: Pull Ollama models
         run: |
-          # Pull model in the Ollama container
-          docker exec ollama ollama pull bge-m3:latest
-          docker exec ollama ollama pull qwen2.5:1.5b
-      - name: Check network configuration
+          docker exec ${{ env.OLLAMA_CONTAINER }} ollama pull bge-m3:latest
+          docker exec ${{ env.OLLAMA_CONTAINER }} ollama pull qwen2.5:1.5b
+
+      - name: Initialize Dify
         run: |
-          echo "Host network information:"
-          ip addr show
-          
-          echo "Docker network information:"
-          docker network ls
-          
-          # Get the network name used by Dify
-          NETWORK_NAME=$(docker network ls | grep dify | awk '{print $2}')
-          if [ -n "$NETWORK_NAME" ]; then
-            echo "Docker network details for $NETWORK_NAME:"
-            docker network inspect $NETWORK_NAME
-          fi
-          
-          # Get host IP
-          HOST_IP=$(hostname -I | awk '{print $1}')
-          echo "Host IP: $HOST_IP"
-          
-          # Test Ollama accessibility from host
-          echo "Testing Ollama from host:"
-          curl -s http://localhost:11434/api/tags || echo "Failed to connect to Ollama from host"
-          
-          # Test from a container
-          echo "Testing Ollama from container:"
-          docker run --rm curlimages/curl curl -s http://${HOST_IP}:11434/api/tags || echo "Failed to connect to Ollama from container"
-      - name: Initialize Dify application
-        run: |
-          cd tools/dify/docker
-          curl -sSf -X GET 'http://localhost/console/api/init' \
-            -H 'Accept: */*' \
+          curl -sf -X GET 'http://localhost/console/api/init' \
             -H 'Content-Type: application/json' \
-            --retry 10 --retry-delay 5
+            --retry 5 --retry-delay 5
+
       - name: Create admin user
         run: |
-          cd tools/dify/docker
-          curl -sSf -X POST 'http://localhost/console/api/setup' \
-            -H 'Accept: */*' \
+          curl -sf -X POST 'http://localhost/console/api/setup' \
             -H 'Content-Type: application/json' \
-            --data-raw '{"email":"admin@admin.com","name":"admin","password":"admin123456"}' \
+            --data '{"email":"admin@admin.com","name":"admin","password":"admin123456"}' \
             --retry 5 --retry-delay 5
+
       - name: Get admin token
         id: get_token
         run: |
-          cd tools/dify/docker
           sudo apt-get update && sudo apt-get install -y jq
-          echo "Attempting to login..."
-          RESPONSE=$(curl -v -X POST 'http://localhost/console/api/login' \
-            -H 'Accept: */*' \
+          RESPONSE=$(curl -sf -X POST 'http://localhost/console/api/login' \
             -H 'Content-Type: application/json' \
-            --data-raw '{"email":"admin@admin.com","password":"admin123456"}' \
-            --retry 5 --retry-delay 5)
-          
-          echo "Login response: $RESPONSE"
-          
-          if [ -z "$RESPONSE" ]; then
-            echo "Error: Failed to get response from login API"
-            exit 1
-          fi
+            --data '{"email":"admin@admin.com","password":"admin123456"}')
           
           TOKEN=$(echo "$RESPONSE" | jq -r '.data.access_token')
-          if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
-            echo "Error: Failed to extract token from response"
-            echo "Response: $RESPONSE"
-            exit 1
-          fi
-          
-          echo "Successfully obtained token"
+          [ -z "$TOKEN" ] && { echo "::error::Failed to get token"; exit 1; }
           echo "admin_token=$TOKEN" >> $GITHUB_OUTPUT
 
-      - name: Add dify Ollama Plugin
+      - name: Install Ollama Plugin
         run: |
-          cd tools/dify/docker
-          
-          curl -sSf -X POST 'http://localhost/console/api/workspaces/current/plugin/install/marketplace' \
-            -H 'Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}' \
+          curl -sf -X POST 'http://localhost/console/api/workspaces/current/plugin/install/marketplace' \
+            -H "Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}" \
             -H 'Content-Type: application/json' \
-            --data-raw '{"plugin_unique_identifiers":["langgenius/ollama:0.0.6@f430f3eb959f4863b1e87171544a8fec179441b90deda5693c85f07712d2a68c"]}' \
-            --retry 5 --retry-delay 5
+            --data '{"plugin_unique_identifiers":["${{ env.PLUGIN_ID }}"]}'
 
-      - name: Wait for plugin to be installed
+      - name: Verify plugin installation
         run: |
-          cd tools/dify/docker
-          echo "Checking if plugin is installed correctly..."
-          MAX_ATTEMPTS=10
-          ATTEMPT=0
-          PLUGIN_FOUND=false
-          
-          while [ $ATTEMPT -lt $MAX_ATTEMPTS ] && [ "$PLUGIN_FOUND" != "true" ]; do
-            RESPONSE=$(curl -sSf -X GET 'http://localhost/console/api/workspaces/current/plugin/list' \
+          MAX_ATTEMPTS=15
+          for i in $(seq 1 $MAX_ATTEMPTS); do
+            if curl -sSf -X GET 'http://localhost/console/api/workspaces/current/plugin/list' \
               -H "Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}" \
-              -H 'Content-Type: application/json')
-          
-            # Install jq if not already installed
-            apt-get update && apt-get install -y jq || true
-          
-            # Use jq to check if the plugin_id exists
-            if echo "$RESPONSE" | jq -e '.plugins[] | select(.plugin_id=="langgenius/ollama")' > /dev/null; then
-              echo "✅ Plugin 'langgenius/ollama' found and installed correctly!"
-              PLUGIN_FOUND=true
-            else
-              echo "Plugin not yet installed (attempt $ATTEMPT/$MAX_ATTEMPTS). Waiting..."
-              sleep 1
-              ATTEMPT=$((ATTEMPT+1))
+              | jq -e '.plugins[] | select(.plugin_id=="langgenius/ollama")' >/dev/null; then
+              echo "✅ Plugin installed successfully"
+              exit 0
             fi
+            echo "⏳ Waiting for plugin installation ($i/$MAX_ATTEMPTS)"
+            sleep 3
           done
-          
-          if [ "$PLUGIN_FOUND" != "true" ]; then
-            echo "❌ Plugin installation failed or timed out!"
-            exit 1
-          fi
-      - name: Add dify Ollama model
-        run: |
-          cd tools/dify/docker
-          
-          # Get Docker container name and network info for Ollama
-          OLLAMA_CONTAINER_NAME="ollama"
-          
-          curl 'http://localhost/console/api/workspaces/current/model-providers/langgenius/ollama/ollama/models' \
-            -H 'Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}' \
-            -H 'content-type: application/json' \
-            --data-raw "{\"model\":\"bge-m3:latest\",\"model_type\":\"text-embedding\",\"credentials\":{\"mode\":\"chat\",\"context_size\":\"4096\",\"max_tokens\":\"4096\",\"vision_support\":\"false\",\"function_call_support\":\"false\",\"base_url\":\"http://${OLLAMA_CONTAINER_NAME}:11434\"},\"load_balancing\":{\"enabled\":false,\"configs\":[]}}"
-          
-          curl 'http://localhost/console/api/workspaces/current/model-providers/langgenius/ollama/ollama/models' \
-            -H 'Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}' \
-            -H 'content-type: application/json' \
-            --data-raw "{\"model\":\"qwen2.5:1.5b\",\"model_type\":\"llm\",\"credentials\":{\"mode\":\"chat\",\"context_size\":\"40960\",\"max_tokens\":\"4096\",\"vision_support\":\"false\",\"function_call_support\":\"false\",\"base_url\":\"http://${OLLAMA_CONTAINER_NAME}:11434\"},\"load_balancing\":{\"enabled\":false,\"configs\":[]}}"
+          echo "::error::Plugin installation failed after $MAX_ATTEMPTS attempts"
+          exit 1
 
-      - name: Add test chat
+      - name: Add Ollama models
         run: |
-          cd tools/dify/docker
+          # Use Docker network name for internal communication
+          BASE_URL="http://ollama:11434"
           
-          OLLAMA_CONTAINER_NAME="ollama"
+          curl -sf -X POST 'http://localhost/console/api/workspaces/current/model-providers/langgenius/ollama/ollama/models' \
+            -H "Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}" \
+            -H 'Content-Type: application/json' \
+            --data '{
+              "model": "bge-m3:latest",
+              "model_type": "text-embedding",
+              "credentials": {
+                "mode": "chat",
+                "context_size": "4096",
+                "max_tokens": "4096",
+                "base_url": "'"$BASE_URL"'"
+              }
+            }'
           
-          curl 'http://localhost/console/api/apps/imports' \
-            -H 'Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}' \
-            -H 'content-type: application/json' \
-            --data-raw $'{"mode":"yaml-content","yaml_content":"app:\\n  description: \'\'\\n  icon: 🤖\\n  icon_background: \'#FFEAD5\'\\n  mode: chat\\n  name: test\\n  use_icon_as_answer_icon: false\\ndependencies:\\n- current_identifier: null\\n  type: marketplace\\n  value:\\n    marketplace_plugin_unique_identifier: langgenius/ollama:0.0.3@9ded90ac00e8510119a24be7396ba77191c9610d5e1e29f59d68fa1229822fc7\\nkind: app\\nmodel_config:\\n  agent_mode:\\n    enabled: false\\n    max_iteration: 5\\n    strategy: function_call\\n    tools: []\\n  annotation_reply:\\n    enabled: false\\n  chat_prompt_config: {}\\n  completion_prompt_config: {}\\n  dataset_configs:\\n    datasets:\\n      datasets: []\\n    reranking_enable: false\\n    retrieval_model: multiple\\n    top_k: 4\\n  dataset_query_variable: \'\'\\n  external_data_tools: []\\n  file_upload:\\n    allowed_file_extensions:\\n    - .JPG\\n    - .JPEG\\n    - .PNG\\n    - .GIF\\n    - .WEBP\\n    - .SVG\\n    - .MP4\\n    - .MOV\\n    - .MPEG\\n    - .MPGA\\n    allowed_file_types: []\\n    allowed_file_upload_methods:\\n    - remote_url\\n    - local_file\\n    enabled: false\\n    image:\\n      detail: high\\n      enabled: false\\n      number_limits: 3\\n      transfer_methods:\\n      - remote_url\\n      - local_file\\n    number_limits: 3\\n  model:\\n    completion_params:\\n      stop: []\\n    mode: chat\\n    name: qwen2.5:1.5b\\n    provider: langgenius/ollama/ollama\\n  more_like_this:\\n    enabled: false\\n  opening_statement: \'\'\\n  pre_prompt: \'\'\\n  prompt_type: simple\\n  retriever_resource:\\n    enabled: true\\n  sensitive_word_avoidance:\\n    configs: []\\n    enabled: false\\n    type: \'\'\\n  speech_to_text:\\n    enabled: false\\n  suggested_questions: []\\n  suggested_questions_after_answer:\\n    enabled: false\\n  text_to_speech:\\n    enabled: false\\n    language: \'\'\\n    voice: \'\'\\n  user_input_form: []\\nversion: 0.3.1\\n"}'
+          curl -sf -X POST 'http://localhost/console/api/workspaces/current/model-providers/langgenius/ollama/ollama/models' \
+            -H "Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}" \
+            -H 'Content-Type: application/json' \
+            --data '{
+              "model": "qwen2.5:1.5b",
+              "model_type": "llm",
+              "credentials": {
+                "mode": "chat",
+                "context_size": "40960",
+                "max_tokens": "4096",
+                "base_url": "'"$BASE_URL"'"
+              }
+            }'
 
-      - name: Set default model
+      - name: Import test chat app
         run: |
-          cd tools/dify/docker
           
-          curl 'http://localhost/console/api/workspaces/current/default-model' \
+           curl 'http://localhost/console/api/apps/imports' \
             -H 'Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}' \
             -H 'content-type: application/json' \
-            --data-raw '{"model_settings":[{"model_type":"llm","provider":"langgenius/ollama/ollama","model":"qwen2.5:1.5b"},{"model_type":"text-embedding","provider":"langgenius/ollama/ollama","model":"bge-m3:latest"},{"model_type":"rerank"},{"model_type":"speech2text"},{"model_type":"tts"}]}'
+            --data-raw $'{"mode":"yaml-content","yaml_content":"app:\\n  description: \'\'\\n  icon: 🤖\\n  icon_background: \'#FFEAD5\'\\n  mode: chat\\n  name: test\\n  use_icon_as_answer_icon: false\\ndependencies:\\n- current_identifier: null\\n  type: marketplace\\n  value:\\n    marketplace_plugin_unique_identifier: ${{ env.PLUGIN_ID }}\\nkind: app\\nmodel_config:\\n  agent_mode:\\n    enabled: false\\n    max_iteration: 5\\n    strategy: function_call\\n    tools: []\\n  annotation_reply:\\n    enabled: false\\n  chat_prompt_config: {}\\n  completion_prompt_config: {}\\n  dataset_configs:\\n    datasets:\\n      datasets: []\\n    reranking_enable: false\\n    retrieval_model: multiple\\n    top_k: 4\\n  dataset_query_variable: \'\'\\n  external_data_tools: []\\n  file_upload:\\n    allowed_file_extensions:\\n    - .JPG\\n    - .JPEG\\n    - .PNG\\n    - .GIF\\n    - .WEBP\\n    - .SVG\\n    - .MP4\\n    - .MOV\\n    - .MPEG\\n    - .MPGA\\n    allowed_file_types: []\\n    allowed_file_upload_methods:\\n    - remote_url\\n    - local_file\\n    enabled: false\\n    image:\\n      detail: high\\n      enabled: false\\n      number_limits: 3\\n      transfer_methods:\\n      - remote_url\\n      - local_file\\n    number_limits: 3\\n  model:\\n    completion_params:\\n      stop: []\\n    mode: chat\\n    name: qwen2.5:1.5b\\n    provider: langgenius/ollama/ollama\\n  more_like_this:\\n    enabled: false\\n  opening_statement: \'\'\\n  pre_prompt: \'\'\\n  prompt_type: simple\\n  retriever_resource:\\n    enabled: true\\n  sensitive_word_avoidance:\\n    configs: []\\n    enabled: false\\n    type: \'\'\\n  speech_to_text:\\n    enabled: false\\n  suggested_questions: []\\n  suggested_questions_after_answer:\\n    enabled: false\\n  text_to_speech:\\n    enabled: false\\n    language: \'\'\\n    voice: \'\'\\n  user_input_form: []\\nversion: ${{ env.CURRENT_DSL_VERSION }}\\n"}'
+
+
+      - name: Set default models
+        run: |
+          curl -sf -X POST 'http://localhost/console/api/workspaces/current/default-model' \
+            -H "Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}" \
+            -H 'Content-Type: application/json' \
+            --data '{
+              "model_settings": [
+                {"model_type": "llm", "provider": "langgenius/ollama/ollama", "model": "qwen2.5:1.5b"},
+                {"model_type": "text-embedding", "provider": "langgenius/ollama/ollama", "model": "bge-m3:latest"}
+              ]
+            }'
 
       - name: Run Gradle tests
         run: |
-          gradle jacocoTestReport --info
+          ./gradlew jacocoTestReport --info --no-daemon
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          codecov_yml_path: .github/.codecov.yml
           flags: v${{ env.APP_VERSION }}
-
-          #- name: Upload test results to Codecov
-          #  if: ${{ !cancelled() }}
-          #  uses: codecov/test-results-action@v1
-          #  with:
-          #    token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Upload test results to Codecov shell
-        if: ${{ !cancelled() }}
-        run: |
-          cd tools
-          curl -Os https://cli.codecov.io/latest/linux/codecov
-          sudo chmod +x codecov
-          ./codecov do-upload -C ${{ github.sha }} --report-type test_results -t ${{ secrets.CODECOV_TOKEN }} -F v${{ env.APP_VERSION }}
+          name: GitHub-Actions-${{ github.job }}
