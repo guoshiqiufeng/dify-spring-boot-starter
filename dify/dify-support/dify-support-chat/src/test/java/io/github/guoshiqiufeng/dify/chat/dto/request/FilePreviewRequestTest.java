@@ -42,7 +42,7 @@ public class FilePreviewRequestTest {
     public void testFileIdOnlyConstructor() {
         String fileId = "test-file-id-123";
         FilePreviewRequest request = new FilePreviewRequest(fileId);
-        
+
         assertEquals(fileId, request.getFileId());
         assertFalse(request.getAsAttachment()); // Default is false
         assertNull(request.getApiKey());
@@ -55,9 +55,9 @@ public class FilePreviewRequestTest {
         Boolean asAttachment = true;
         String apiKey = "test-api-key";
         String userId = "test-user-id";
-        
+
         FilePreviewRequest request = new FilePreviewRequest(fileId, asAttachment, apiKey, userId);
-        
+
         assertEquals(fileId, request.getFileId());
         assertEquals(asAttachment, request.getAsAttachment());
         assertEquals(apiKey, request.getApiKey());
@@ -67,17 +67,17 @@ public class FilePreviewRequestTest {
     @Test
     public void testSettersAndGetters() {
         FilePreviewRequest request = new FilePreviewRequest();
-        
+
         String fileId = "test-file-id-456";
         Boolean asAttachment = true;
         String apiKey = "test-api-key-456";
         String userId = "test-user-id-456";
-        
+
         request.setFileId(fileId)
                 .setAsAttachment(asAttachment)
-                .setApiKey(apiKey)
-                .setUserId(userId);
-        
+                .setApiKey(apiKey);
+        request.setUserId(userId);
+
         assertEquals(fileId, request.getFileId());
         assertEquals(asAttachment, request.getAsAttachment());
         assertEquals(apiKey, request.getApiKey());
@@ -88,10 +88,10 @@ public class FilePreviewRequestTest {
     public void testChainedSetters() {
         FilePreviewRequest request = new FilePreviewRequest()
                 .setFileId("test-file-id")
-                .setAsAttachment(false)
-                .setApiKey("test-api-key")
-                .setUserId("test-user-id");
-        
+                .setAsAttachment(false);
+        request.setApiKey("test-api-key");
+        request.setUserId("test-user-id");
+
         assertNotNull(request);
         assertEquals("test-file-id", request.getFileId());
         assertFalse(request.getAsAttachment());
@@ -102,9 +102,9 @@ public class FilePreviewRequestTest {
     @Test
     public void testJsonSerialization() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        
+
         FilePreviewRequest request = new FilePreviewRequest("test-file-123", true, "api-key-123", "user-123");
-        
+
         String json = objectMapper.writeValueAsString(request);
         assertNotNull(json);
         assertTrue(json.contains("test-file-123"));
@@ -116,7 +116,7 @@ public class FilePreviewRequestTest {
     @Test
     public void testJsonDeserialization() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        
+
         String json = """
                 {
                     "fileId": "test-file-456",
@@ -125,9 +125,9 @@ public class FilePreviewRequestTest {
                     "userId": "user-456"
                 }
                 """;
-        
+
         FilePreviewRequest request = objectMapper.readValue(json, FilePreviewRequest.class);
-        
+
         assertNotNull(request);
         assertEquals("test-file-456", request.getFileId());
         assertFalse(request.getAsAttachment());
@@ -140,10 +140,10 @@ public class FilePreviewRequestTest {
         FilePreviewRequest request1 = new FilePreviewRequest("file-id", true, "api-key", "user-id");
         FilePreviewRequest request2 = new FilePreviewRequest("file-id", true, "api-key", "user-id");
         FilePreviewRequest request3 = new FilePreviewRequest("different-file-id", true, "api-key", "user-id");
-        
+
         assertEquals(request1, request2);
         assertEquals(request1.hashCode(), request2.hashCode());
-        
+
         assertNotEquals(request1, request3);
         assertNotEquals(request1.hashCode(), request3.hashCode());
     }
@@ -152,7 +152,7 @@ public class FilePreviewRequestTest {
     public void testToString() {
         FilePreviewRequest request = new FilePreviewRequest("test-file", false, "test-key", "test-user");
         String toString = request.toString();
-        
+
         assertNotNull(toString);
         assertTrue(toString.contains("FilePreviewRequest"));
     }
@@ -170,7 +170,7 @@ public class FilePreviewRequestTest {
         FilePreviewRequest request = new FilePreviewRequest();
         request.setFileId("test-file-id");
         request.setAsAttachment(null);
-        
+
         assertNull(request.getAsAttachment());
     }
 }
