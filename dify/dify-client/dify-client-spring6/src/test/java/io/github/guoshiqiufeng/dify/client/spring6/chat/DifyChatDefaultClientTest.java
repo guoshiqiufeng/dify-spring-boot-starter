@@ -1179,4 +1179,85 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         verify(requestHeadersSpec).header(eq(HttpHeaders.AUTHORIZATION), eq("Bearer " + TEST_API_KEY));
         verify(responseSpec).body(any(ParameterizedTypeReference.class));
     }
+    
+    @Test
+    @DisplayName("Test filePreview method with valid request")
+    public void testFilePreview() {
+        RestClient restClient = restClientMock.getRestClient();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
+        
+        // Prepare test data
+        String apiKey = TEST_API_KEY;
+        String fileId = "file-123456";
+        Boolean asAttachment = true;
+        
+        // Create request
+        FilePreviewRequest request = new FilePreviewRequest();
+        request.setApiKey(apiKey);
+        request.setFileId(fileId);
+        request.setAsAttachment(asAttachment);
+        
+        // Create expected response
+        byte[] fileContent = "mock file content".getBytes();
+        ResponseEntity<byte[]> expectedResponse = ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header("Content-Disposition", "attachment; filename=\"test.pdf\"")
+                .body(fileContent);
+        
+        // Set up the URI builder mock
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+        
+        when(requestHeadersUriSpec.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+            
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("as_attachment"), eq("true"))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build(fileId)).thenReturn(uriMock);
+            
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpec;
+        });
+        
+        // Mock response
+        when(responseSpec.toEntity(byte[].class)).thenReturn(expectedResponse);
+        
+        // Execute the method
+        ResponseEntity<byte[]> actualResponse = client.filePreview(request);
+        
+        // Verify results
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getStatusCode(), actualResponse.getStatusCode());
+        assertEquals(expectedResponse.getHeaders().getContentType(), actualResponse.getHeaders().getContentType());
+        assertArrayEquals(expectedResponse.getBody(), actualResponse.getBody());
+        
+        // Verify interactions with mocks
+        verify(restClient).get();
+        verify(requestHeadersUriSpec).uri(any(Function.class));
+        verify(requestHeadersSpec).header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey);
+        verify(responseSpec).toEntity(byte[].class);
+        
+        // Test with asAttachment = false
+        FilePreviewRequest request2 = new FilePreviewRequest();
+        request2.setApiKey(apiKey);
+        request2.setFileId(fileId);
+        request2.setAsAttachment(false);
+        
+        when(requestHeadersUriSpec.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+            
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build(fileId)).thenReturn(uriMock);
+            
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpec;
+        });
+        
+        client.filePreview(request2);
+        
+        // Verify the second call
+        verify(restClient, times(2)).get();
+    }
 }

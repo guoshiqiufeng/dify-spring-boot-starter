@@ -600,6 +600,136 @@ AppSiteResponse
 | showWorkflowSteps      | Boolean      | Whether to show workflow details                                                      |
 | useIconAsAnswerIcon    | Boolean      | Whether to replace 🤖 in chat with the WebApp icon                                    |
 
+
+### 3.8 File preview
+
+#### Method
+
+```java
+ResponseEntity<byte[]> filePreview(FilePreviewRequest request);
+```
+
+#### Request Parameters
+FilePreviewRequest
+
+| Parameter name | Type    | Required | Description                                                                                  |
+|----------------|---------|----------|----------------------------------------------------------------------------------------------|
+| apiKey         | String  | Yes      | apiKey                                                                                       |
+| userId         | String  | Yes      | userId                                                                                       |
+| fileId         | String  | Yes      | Unique identifier of the file to preview, obtained from file upload API response            |
+| asAttachment   | Boolean | No       | Whether to force the file to be downloaded as an attachment. Default is false (preview in browser) |
+
+#### Response Parameters
+
+Returns file content with appropriate headers for browser display or download.
+
+##### Response Headers
+
+- **Content-Type**: Set according to file MIME type
+- **Content-Length**: File size in bytes (if available)
+- **Content-Disposition**: Set to "attachment" if asAttachment=true
+- **Cache-Control**: Cache headers for performance
+- **Accept-Ranges**: Set to "bytes" for audio/video files
+
+#### Usage Examples
+
+##### Basic Usage
+
+```java
+// Create file preview request
+FilePreviewRequest request = new FilePreviewRequest("file-id-123")
+    .setApiKey("your-api-key")
+    .setUserId("user-123");
+
+// Execute file preview
+ResponseEntity<byte[]> response = difyChat.filePreview(request);
+
+// Get file content
+byte[] fileContent = response.getBody();
+```
+
+##### Preview File (Display in Browser)
+
+```java
+import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
+
+private void previewFile(String fileId, HttpServletResponse response) {
+    try {
+        FilePreviewRequest request = new FilePreviewRequest(fileId)
+                .setApiKey("your-api-key")
+                .setUserId("user-123")
+                .setAsAttachment(false); // Preview in browser
+
+        ResponseEntity<byte[]> responseEntity = difyChat.filePreview(request);
+
+        // Set response headers
+        String contentType = responseEntity.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
+        response.setContentType(contentType != null ? contentType : "application/octet-stream");
+
+        String contentLength = responseEntity.getHeaders().getFirst(HttpHeaders.CONTENT_LENGTH);
+        if (contentLength != null) {
+            response.setContentLength(Integer.parseInt(contentLength));
+        }
+
+        // Copy cache control headers
+        String cacheControl = responseEntity.getHeaders().getFirst(HttpHeaders.CACHE_CONTROL);
+        if (cacheControl != null) {
+            response.setHeader(HttpHeaders.CACHE_CONTROL, cacheControl);
+        }
+
+        // Write file content
+        if (responseEntity.getBody() != null) {
+            response.getOutputStream().write(responseEntity.getBody());
+            response.getOutputStream().flush();
+        }
+
+    } catch (Exception e) {
+        log.error("File preview error: {}", e.getMessage());
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+}
+```
+
+##### Download File (As Attachment)
+
+```java
+import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
+
+private void downloadFile(String fileId, String filename, HttpServletResponse response) {
+    try {
+        FilePreviewRequest request = new FilePreviewRequest(fileId, true, "your-api-key", "user-123");
+
+        ResponseEntity<byte[]> responseEntity = difyChat.filePreview(request);
+
+        // Set response headers
+        String contentType = responseEntity.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
+        response.setContentType(contentType != null ? contentType : "application/octet-stream");
+
+        String contentDisposition = responseEntity.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION);
+        if (contentDisposition != null) {
+            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, contentDisposition);
+        } else {
+            // Set custom filename
+            String safeFilename = filename != null ? filename : "download";
+            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, 
+                "attachment; filename=\"" + safeFilename + "\"");
+        }
+
+        // Write file content
+        if (responseEntity.getBody() != null) {
+            response.getOutputStream().write(responseEntity.getBody());
+            response.getOutputStream().flush();
+        }
+
+    } catch (Exception e) {
+        log.error("File download error: {}", e.getMessage());
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+}
+```
+
 ## 4. Application Annotation
 
 > required Dify version 1.2.0 or higher

@@ -27,7 +27,7 @@ import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
@@ -359,6 +359,66 @@ class DifyChatClientImplTest {
         assertEquals(expectedResponse.getId(), actualResponse.getId());
         assertEquals(expectedResponse.getName(), actualResponse.getName());
         verify(difyChatClient, times(1)).fileUpload(request);
+    }
+
+    @Test
+    void testFilePreview() {
+        // Arrange
+        String apiKey = "test-api-key";
+        String fileId = "test-file-id-123";
+
+        FilePreviewRequest request = new FilePreviewRequest(fileId);
+        request.setApiKey(apiKey);
+        request.setUserId("test-user-id");
+        request.setAsAttachment(false);
+
+        byte[] expectedContent = "file content".getBytes();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_PNG);
+        headers.setContentLength(expectedContent.length);
+        
+        ResponseEntity<byte[]> expectedResponse = new ResponseEntity<>(expectedContent, headers, HttpStatus.OK);
+
+        when(difyChatClient.filePreview(any(FilePreviewRequest.class))).thenReturn(expectedResponse);
+
+        // Act
+        ResponseEntity<byte[]> actualResponse = difyChat.filePreview(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
+        assertArrayEquals(expectedContent, actualResponse.getBody());
+        assertEquals(MediaType.IMAGE_PNG, actualResponse.getHeaders().getContentType());
+        verify(difyChatClient, times(1)).filePreview(request);
+    }
+
+    @Test
+    void testFilePreviewAsAttachment() {
+        // Arrange
+        String apiKey = "test-api-key";
+        String fileId = "test-file-id-456";
+
+        FilePreviewRequest request = new FilePreviewRequest(fileId, true, apiKey, "test-user-id");
+
+        byte[] expectedContent = "attachment content".getBytes();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDisposition(ContentDisposition.attachment().filename("test-file.pdf").build());
+        
+        ResponseEntity<byte[]> expectedResponse = new ResponseEntity<>(expectedContent, headers, HttpStatus.OK);
+
+        when(difyChatClient.filePreview(any(FilePreviewRequest.class))).thenReturn(expectedResponse);
+
+        // Act
+        ResponseEntity<byte[]> actualResponse = difyChat.filePreview(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
+        assertArrayEquals(expectedContent, actualResponse.getBody());
+        assertEquals(MediaType.APPLICATION_OCTET_STREAM, actualResponse.getHeaders().getContentType());
+        assertNotNull(actualResponse.getHeaders().getContentDisposition());
+        verify(difyChatClient, times(1)).filePreview(request);
     }
 
     @Test

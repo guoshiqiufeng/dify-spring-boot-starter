@@ -40,4 +40,6 @@ public interface ChatUriConstant {
 
     String V1_AUDIO_TO_TEXT_URI = V1_URL + "/audio-to-text";
 
+    String V1_FILES_PREVIEW_URI = V1_URL + "/files/{fileId}/preview";
+
 }

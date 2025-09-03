@@ -42,6 +42,7 @@ Implementation of the Redis messaging framework.
 | 【CHAT】text-to-speech                                        | ✅      |
 | 【CHAT】speech-to-text                                        | ✅      |
 | 【CHAT】File Upload                                           | ✅      |
+| 【CHAT】File Preview                                          | ✅      |  
 | 【CHAT】Get Application Basic Information                     | ✅      |
 | 【CHAT】Get Application Meta Information                      | ✅      |
 | 【CHAT】Get Application WebApp Settings                       | ✅      |
