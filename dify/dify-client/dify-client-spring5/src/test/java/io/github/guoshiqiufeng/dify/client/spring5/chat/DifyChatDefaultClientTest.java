@@ -1076,4 +1076,63 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         verify(requestHeadersSpecMock).header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey);
         verify(responseSpecMock).bodyToMono(any(ParameterizedTypeReference.class));
     }
+    
+    @Test
+    @DisplayName("Test filePreview method with valid request")
+    public void testFilePreview() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String fileId = "file-123456";
+        Boolean asAttachment = true;
+        
+        // Create request
+        FilePreviewRequest request = new FilePreviewRequest();
+        request.setApiKey(apiKey);
+        request.setFileId(fileId);
+        request.setAsAttachment(asAttachment);
+        
+        // Create expected response
+        byte[] fileContent = "mock file content".getBytes();
+        ResponseEntity<byte[]> expectedResponse = ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header("Content-Disposition", "attachment; filename=\"test.pdf\"")
+                .body(fileContent);
+        
+        // Set up the URI builder mock
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+        
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+            
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("as_attachment"), eq("true"))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build(fileId)).thenReturn(uriMock);
+            
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
+        
+        // Mock response
+        when(responseSpecMock.toEntity(byte[].class)).thenReturn(Mono.just(expectedResponse));
+        
+        // Execute the method
+        ResponseEntity<byte[]> actualResponse = client.filePreview(request);
+        
+        // Verify results
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getStatusCode(), actualResponse.getStatusCode());
+        assertEquals(expectedResponse.getHeaders().getContentType(), actualResponse.getHeaders().getContentType());
+        assertArrayEquals(expectedResponse.getBody(), actualResponse.getBody());
+        
+        // Verify WebClient interactions
+        verify(webClientMock).get();
+        verify(requestHeadersUriSpecMock).uri(any(Function.class));
+        verify(requestHeadersSpecMock).header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey);
+        verify(responseSpecMock).toEntity(byte[].class);
+        
+        // Test with asAttachment = false
+        request.setAsAttachment(false);
+        client.filePreview(request);
+    }
 }
