@@ -41,6 +41,6 @@ public class SubChunkSegmentation implements Serializable {
 
     @JsonAlias("chunkOverlap")
     @JsonProperty("chunk_overlap")
-    private Integer chunkOverlap;
+    private Integer chunkOverlap = 50;
 
 }

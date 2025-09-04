@@ -218,7 +218,8 @@ public class DatasetTest extends BaseDatasetContainerTest {
         request.setDatasetId(datasetId);
         request.setDocumentId(documentTextId);
         request.setName("Updated Text Document");
-
+        request.setDocForm(DocFormEnum.hierarchical_model);
+        request.setDocLanguage("zh-cn");
         ProcessRule processRule = new ProcessRule();
         processRule.setMode(ModeEnum.hierarchical);
         CustomRule rule = new CustomRule();
@@ -253,7 +254,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
         request.setDatasetId(datasetId);
         request.setDocumentId(documentFileId);
         request.setFile(testFile);
-
+        request.setDocForm(DocFormEnum.hierarchical_model);
         DocumentCreateResponse response = difyDataset.updateDocumentByFile(request);
         assertNotNull(response);
         log.info("Updated file document: {}", JSONUtil.toJsonStr(response));
@@ -326,7 +327,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
             updateRequest.setDatasetId(datasetId);
             updateRequest.setDocumentId(documentTextId);
             updateRequest.setSegmentId(segmentId);
-            updateRequest.setSegment(new SegmentParam().setContent("Updated test segment content."));
+            updateRequest.setSegment(new SegmentParam().setContent("Updated test segment content.").setRegenerateChildChunks(true));
 
             SegmentUpdateResponse updateResponse = difyDataset.updateSegment(updateRequest);
             assertNotNull(updateResponse);
