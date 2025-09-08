@@ -110,7 +110,7 @@ jobs:
         run: |
           docker run -d --name ${{ env.OLLAMA_CONTAINER }} -p 11434:11434 \
             --network ${{ env.DIFY_NETWORK }} \
-            -v ${{ env.OLLAMA_VOLUME }}:/var/lib/ollama \  # 挂载命名卷
+            -v ${{ env.OLLAMA_VOLUME }}:/var/lib/ollama \
             ollama/ollama
           
           echo "Waiting for Ollama to be ready..."
