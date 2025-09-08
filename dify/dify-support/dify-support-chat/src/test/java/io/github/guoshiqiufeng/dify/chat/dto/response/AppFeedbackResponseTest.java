@@ -18,8 +18,6 @@ package io.github.guoshiqiufeng.dify.chat.dto.response;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -45,8 +43,8 @@ class AppFeedbackResponseTest {
         response.setFromSource("user");
         response.setFromEndUserId("test-user-id");
         response.setFromAccountId("test-account-id");
-        response.setCreatedAt(LocalDateTime.of(2025, 4, 24, 9, 24, 38));
-        response.setUpdatedAt(LocalDateTime.of(2025, 4, 24, 9, 24, 38));
+        response.setCreatedAt(1745586278L); // 2025-04-24T09:24:38 as timestamp
+        response.setUpdatedAt(1745586278L); // 2025-04-24T09:24:38 as timestamp
 
         assertEquals("test-id", response.getId());
         assertEquals("test-app-id", response.getAppId());
@@ -57,8 +55,8 @@ class AppFeedbackResponseTest {
         assertEquals("user", response.getFromSource());
         assertEquals("test-user-id", response.getFromEndUserId());
         assertEquals("test-account-id", response.getFromAccountId());
-        assertEquals(LocalDateTime.of(2025, 4, 24, 9, 24, 38), response.getCreatedAt());
-        assertEquals(LocalDateTime.of(2025, 4, 24, 9, 24, 38), response.getUpdatedAt());
+        assertEquals(1745586278L, response.getCreatedAt());
+        assertEquals(1745586278L, response.getUpdatedAt());
     }
 
     @Test

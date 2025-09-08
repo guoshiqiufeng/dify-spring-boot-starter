@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.chat.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -88,11 +89,11 @@ public class AppFeedbackResponse implements Serializable {
      * 创建时间
      */
     @JsonProperty("created_at")
-    private LocalDateTime createdAt;
+    private Long createdAt;
 
     /**
      * 更新时间
      */
     @JsonProperty("updated_at")
-    private LocalDateTime updatedAt;
+    private Long updatedAt;
 }
