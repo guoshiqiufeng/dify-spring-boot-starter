@@ -89,11 +89,11 @@ public class AppFeedbackResponse implements Serializable {
      * 创建时间
      */
     @JsonProperty("created_at")
-    private Long createdAt;
+    private LocalDateTime createdAt;
 
     /**
      * 更新时间
      */
     @JsonProperty("updated_at")
-    private Long updatedAt;
+    private LocalDateTime updatedAt;
 }
