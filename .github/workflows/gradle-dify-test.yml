@@ -100,30 +100,26 @@ jobs:
 
       - name: Setup Ollama
         run: |
+          # 修复：挂载到 CORRECT 路径 /root/.ollama
           docker run -d --name ${{ env.OLLAMA_CONTAINER }} -p 11434:11434 \
             --network ${{ env.DIFY_NETWORK }} \
-            -v ${{ env.OLLAMA_VOLUME }}:/var/lib/ollama \
+            -v ${{ env.OLLAMA_VOLUME }}:/root/.ollama \  # ✅ 关键修复
             ollama/ollama
 
           echo "Waiting for Ollama to be ready..."
           timeout 60 bash -c 'until curl -sSf http://localhost:11434/api/tags; do sleep 2; done'
 
-          # 首先尝试使用缓存中的模型
-          echo "Checking for cached models..."
-          if docker exec ${{ env.OLLAMA_CONTAINER }} ollama list | grep -q "${{ env.MODEL_EMBEDDING }}"; then
-            echo "✅ Embedding model found in cache"
-          else
-            echo "::warning::Embedding model not found in cache, pulling..."
-            docker exec ${{ env.OLLAMA_CONTAINER }} ollama pull ${{ env.MODEL_EMBEDDING}}
+          # 验证模型是否存在（缓存可能损坏）
+          if ! docker exec ${{ env.OLLAMA_CONTAINER }} ollama list | grep -q "${{ env.MODEL_EMBEDDING }}"; then
+            echo "::warning::Embedding model not found in cache, will pull"
+            docker exec ${{ env.OLLAMA_CONTAINER }} ollama pull ${{ env.MODEL_EMBEDDING }}
           fi
-
-          if docker exec ${{ env.OLLAMA_CONTAINER }} ollama list | grep -q "${{ env.MODEL_LLM }}"; then
-            echo "✅ LLM model found in cache"
-          else
-            echo "::warning::LLM model not found in cache, pulling..."
+          if ! docker exec ${{ env.OLLAMA_CONTAINER }} ollama list | grep -q "${{ env.MODEL_LLM }}"; then
+            echo "::warning::LLM model not found in cache, will pull"
             docker exec ${{ env.OLLAMA_CONTAINER }} ollama pull ${{ env.MODEL_LLM }}
           fi
 
+      # === 缓存保存移到模型下载之后 ===
       - name: Save Ollama models cache
         #if: steps.cache-restore.outputs.cache-hit != 'true'
         run: |
@@ -139,11 +135,11 @@ jobs:
             exit 1
           fi
 
-          # 检查卷大小
+          # 检查 CORRECT 路径的卷内容
           VOLUME_SIZE=$(docker run --rm -v ${{ env.OLLAMA_VOLUME }}:/volume busybox du -sh /volume | cut -f1)
           echo "📦 Ollama volume size: $VOLUME_SIZE"
 
-          # 打包卷内容
+          # 打包 CORRECT 路径的内容
           docker run --rm -v ${{ env.OLLAMA_VOLUME }}:/volume -v $(pwd):/backup busybox \
             sh -c "cd /volume && tar czf /backup/ollama-data.tar ."
 
@@ -151,6 +147,12 @@ jobs:
           TAR_SIZE_BYTES=$(du -b ollama-data.tar | cut -f1)
           TAR_SIZE_HUMAN=$(du -h ollama-data.tar | cut -f1)
           echo "📦 Tar file size: $TAR_SIZE_HUMAN ($TAR_SIZE_BYTES bytes)"
+
+          # 关键：确保缓存大小合理（>500MB）
+          if [ "$TAR_SIZE_BYTES" -lt 500000000 ]; then
+            echo "::error::Tar file too small ($TAR_SIZE_HUMAN), expected >500MB. Cache not saved."
+            exit 1
+          fi
 
           mkdir -p ./ollama-cache
           mv ollama-data.tar ./ollama-cache/
@@ -162,6 +164,8 @@ jobs:
         with:
           path: ./ollama-cache
           key: ${{ steps.cache-key.outputs.cache-key }}
+          # 添加恢复步骤的调试信息
+          restore-keys: ${{ steps.cache-key.outputs.cache-key }}
 
       # === 缓存机制结束 ===
 
