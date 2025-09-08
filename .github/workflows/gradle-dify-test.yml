@@ -84,7 +84,6 @@ jobs:
       - name: Set Ollama cache key
         id: cache-key
         run: |
-          # 生成安全的缓存键（替换特殊字符）
           EMBEDDING_SAFE=$(echo "${{ env.MODEL_EMBEDDING }}" | tr ':/' '_')
           LLM_SAFE=$(echo "${{ env.MODEL_LLM }}" | tr ':/' '_')
           echo "cache-key=ollama-models-${EMBEDDING_SAFE}-${LLM_SAFE}" >> $GITHUB_OUTPUT
@@ -99,41 +98,63 @@ jobs:
           path: ./ollama-cache
           key: ${{ steps.cache-key.outputs.cache-key }}
 
-      - name: Extract cache to volume
-        if: steps.cache-restore.outputs.cache-hit == 'true'
-        run: |
-          # 将缓存解压到 Docker 卷
-          docker run --rm -v ${{ env.OLLAMA_VOLUME }}:/volume -v $(pwd):/cache busybox \
-            sh -c "cd /volume && tar xzf /cache/ollama-cache/ollama-data.tar"
-
       - name: Setup Ollama
         run: |
           docker run -d --name ${{ env.OLLAMA_CONTAINER }} -p 11434:11434 \
             --network ${{ env.DIFY_NETWORK }} \
             -v ${{ env.OLLAMA_VOLUME }}:/var/lib/ollama \
             ollama/ollama
-          
+
           echo "Waiting for Ollama to be ready..."
           timeout 60 bash -c 'until curl -sSf http://localhost:11434/api/tags; do sleep 2; done'
-          
-          # 验证模型是否存在（缓存可能损坏）
-          if ! docker exec ${{ env.OLLAMA_CONTAINER }} ollama list | grep -q "${{ env.MODEL_EMBEDDING }}"; then
-            echo "::warning::Embedding model not found in cache, will pull"
-            docker exec ${{ env.OLLAMA_CONTAINER }} ollama pull ${{ env.MODEL_EMBEDDING }}
+
+          # 首先尝试使用缓存中的模型
+          echo "Checking for cached models..."
+          if docker exec ${{ env.OLLAMA_CONTAINER }} ollama list | grep -q "${{ env.MODEL_EMBEDDING }}"; then
+            echo "✅ Embedding model found in cache"
+          else
+            echo "::warning::Embedding model not found in cache, pulling..."
+            docker exec ${{ env.OLLAMA_CONTAINER }} ollama pull ${{ env.MODEL_EMBEDDING}}
           fi
-          if ! docker exec ${{ env.OLLAMA_CONTAINER }} ollama list | grep -q "${{ env.MODEL_LLM }}"; then
-            echo "::warning::LLM model not found in cache, will pull"
+
+          if docker exec ${{ env.OLLAMA_CONTAINER }} ollama list | grep -q "${{ env.MODEL_LLM }}"; then
+            echo "✅ LLM model found in cache"
+          else
+            echo "::warning::LLM model not found in cache, pulling..."
             docker exec ${{ env.OLLAMA_CONTAINER }} ollama pull ${{ env.MODEL_LLM }}
           fi
 
       - name: Save Ollama models cache
         if: steps.cache-restore.outputs.cache-hit != 'true'
         run: |
-          # 将卷内容打包
+          echo "🔍 Preparing cache for first-time run..."
+
+          # 验证模型是否真正存在
+          if ! docker exec ${{ env.OLLAMA_CONTAINER }} ollama list | grep -q "${{ env.MODEL_EMBEDDING }}"; then
+            echo "::error::Embedding model not available for caching"
+            exit 1
+          fi
+          if ! docker exec ${{ env.OLLAMA_CONTAINER }} ollama list | grep -q "${{ env.MODEL_LLM }}"; then
+            echo "::error::LLM model not available for caching"
+            exit 1
+          fi
+
+          # 检查卷大小
+          VOLUME_SIZE=$(docker run --rm -v ${{ env.OLLAMA_VOLUME }}:/volume busybox du -sh /volume | cut -f1)
+          echo "📦 Ollama volume size: $VOLUME_SIZE"
+
+          # 打包卷内容
           docker run --rm -v ${{ env.OLLAMA_VOLUME }}:/volume -v $(pwd):/backup busybox \
             sh -c "cd /volume && tar czf /backup/ollama-data.tar ."
+
+          # 验证 tar 文件大小（必须大于 1GB）
+          TAR_SIZE_BYTES=$(du -b ollama-data.tar | cut -f1)
+          TAR_SIZE_HUMAN=$(du -h ollama-data.tar | cut -f1)
+          echo "📦 Tar file size: $TAR_SIZE_HUMAN ($TAR_SIZE_BYTES bytes)"
+
           mkdir -p ./ollama-cache
           mv ollama-data.tar ./ollama-cache/
+          echo "✅ Cache prepared with proper size"
 
       - name: Upload Ollama cache
         if: steps.cache-restore.outputs.cache-hit != 'true'
@@ -141,6 +162,7 @@ jobs:
         with:
           path: ./ollama-cache
           key: ${{ steps.cache-key.outputs.cache-key }}
+
       # === 缓存机制结束 ===
 
       - name: Initialize Dify
