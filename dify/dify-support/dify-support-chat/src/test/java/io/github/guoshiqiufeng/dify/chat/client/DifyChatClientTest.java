@@ -738,4 +738,105 @@ class DifyChatClientTest {
 
         verify(difyChatClient, times(1)).feedbacks(any(AppFeedbackPageRequest.class));
     }
+
+    @Test
+    void testConversationVariables() {
+        // Arrange
+        ConversationVariableRequest request = new ConversationVariableRequest();
+        request.setApiKey("test-api-key");
+        request.setUserId("user-123");
+        request.setConversationId("conv-123456");
+        request.setVariableName("customer_name");
+
+        DifyPageResult<ConversationVariableResponse> expectedResponse = new DifyPageResult<>();
+        expectedResponse.setData(new ArrayList<>());
+
+        ConversationVariableResponse variable1 = new ConversationVariableResponse();
+        variable1.setId("variable-uuid-1");
+        variable1.setName("customer_name");
+        variable1.setValueType("string");
+        variable1.setValue("John Doe");
+        variable1.setDescription("客户名称（从对话中提取）");
+        variable1.setCreatedAt(1650000000000L);
+        variable1.setUpdatedAt(1650000000000L);
+
+        ConversationVariableResponse variable2 = new ConversationVariableResponse();
+        variable2.setId("variable-uuid-2");
+        variable2.setName("order_details");
+        variable2.setValueType("json");
+        variable2.setValue("{\"product\":\"Widget\",\"quantity\":5,\"price\":19.99}");
+        variable2.setDescription("客户的订单详情");
+        variable2.setCreatedAt(1650000000000L);
+        variable2.setUpdatedAt(1650000000000L);
+
+        expectedResponse.getData().add(variable1);
+        expectedResponse.getData().add(variable2);
+
+        when(difyChatClient.conversationVariables(any(ConversationVariableRequest.class))).thenReturn(expectedResponse);
+
+        // Act
+        DifyPageResult<ConversationVariableResponse> actualResponse = difyChatClient.conversationVariables(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertNotNull(actualResponse.getData());
+        assertEquals(2, actualResponse.getData().size());
+
+        ConversationVariableResponse actualVariable1 = actualResponse.getData().get(0);
+        assertEquals(variable1.getId(), actualVariable1.getId());
+        assertEquals(variable1.getName(), actualVariable1.getName());
+        assertEquals(variable1.getValueType(), actualVariable1.getValueType());
+        assertEquals(variable1.getValue(), actualVariable1.getValue());
+        assertEquals(variable1.getDescription(), actualVariable1.getDescription());
+        assertEquals(variable1.getCreatedAt(), actualVariable1.getCreatedAt());
+        assertEquals(variable1.getUpdatedAt(), actualVariable1.getUpdatedAt());
+
+        ConversationVariableResponse actualVariable2 = actualResponse.getData().get(1);
+        assertEquals(variable2.getId(), actualVariable2.getId());
+        assertEquals(variable2.getName(), actualVariable2.getName());
+        assertEquals(variable2.getValueType(), actualVariable2.getValueType());
+        assertEquals(variable2.getValue(), actualVariable2.getValue());
+        assertEquals(variable2.getDescription(), actualVariable2.getDescription());
+        assertEquals(variable2.getCreatedAt(), actualVariable2.getCreatedAt());
+        assertEquals(variable2.getUpdatedAt(), actualVariable2.getUpdatedAt());
+
+        verify(difyChatClient, times(1)).conversationVariables(any(ConversationVariableRequest.class));
+    }
+
+    @Test
+    void testUpdateConversationVariable() {
+        // Arrange
+        UpdateConversationVariableRequest request = new UpdateConversationVariableRequest();
+        request.setApiKey("test-api-key");
+        request.setUserId("user-123");
+        request.setConversationId("conv-123456");
+        request.setVariableId("variable-uuid-1");
+        request.setValue("Updated Value");
+
+        ConversationVariableResponse expectedResponse = new ConversationVariableResponse();
+        expectedResponse.setId("variable-uuid-1");
+        expectedResponse.setName("customer_name");
+        expectedResponse.setValueType("string");
+        expectedResponse.setValue("Updated Value");
+        expectedResponse.setDescription("客户名称（从对话中提取）");
+        expectedResponse.setCreatedAt(1650000000000L);
+        expectedResponse.setUpdatedAt(1650000001000L);
+
+        when(difyChatClient.updateConversationVariable(any(UpdateConversationVariableRequest.class))).thenReturn(expectedResponse);
+
+        // Act
+        ConversationVariableResponse actualResponse = difyChatClient.updateConversationVariable(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getName(), actualResponse.getName());
+        assertEquals(expectedResponse.getValueType(), actualResponse.getValueType());
+        assertEquals(expectedResponse.getValue(), actualResponse.getValue());
+        assertEquals(expectedResponse.getDescription(), actualResponse.getDescription());
+        assertEquals(expectedResponse.getCreatedAt(), actualResponse.getCreatedAt());
+        assertEquals(expectedResponse.getUpdatedAt(), actualResponse.getUpdatedAt());
+
+        verify(difyChatClient, times(1)).updateConversationVariable(any(UpdateConversationVariableRequest.class));
+    }
 }

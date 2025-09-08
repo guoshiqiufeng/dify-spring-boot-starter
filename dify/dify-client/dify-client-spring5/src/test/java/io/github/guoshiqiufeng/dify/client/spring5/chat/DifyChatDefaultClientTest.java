@@ -1212,4 +1212,176 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         verify(requestHeadersSpecMock).header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey);
         verify(responseSpecMock).bodyToMono(any(ParameterizedTypeReference.class));
     }
+
+    @Test
+    @DisplayName("Test conversationVariables method with valid request")
+    public void testConversationVariables() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String userId = "user-123";
+        String conversationId = "conv-123456";
+        String variableName = "customer_name";
+
+        // Create request
+        ConversationVariableRequest request = new ConversationVariableRequest();
+        request.setApiKey(apiKey);
+        request.setUserId(userId);
+        request.setConversationId(conversationId);
+        request.setVariableName(variableName);
+
+        // Create expected response
+        DifyPageResult<ConversationVariableResponse> expectedResponse = new DifyPageResult<>();
+        expectedResponse.setData(new ArrayList<>());
+
+        ConversationVariableResponse variable1 = new ConversationVariableResponse();
+        variable1.setId("variable-uuid-1");
+        variable1.setName("customer_name");
+        variable1.setValueType("string");
+        variable1.setValue("John Doe");
+        variable1.setDescription("客户名称（从对话中提取）");
+        variable1.setCreatedAt(1650000000000L);
+        variable1.setUpdatedAt(1650000000000L);
+
+        ConversationVariableResponse variable2 = new ConversationVariableResponse();
+        variable2.setId("variable-uuid-2");
+        variable2.setName("order_details");
+        variable2.setValueType("json");
+        variable2.setValue("{\"product\":\"Widget\",\"quantity\":5,\"price\":19.99}");
+        variable2.setDescription("客户的订单详情");
+        variable2.setCreatedAt(1650000000000L);
+        variable2.setUpdatedAt(1650000000000L);
+
+        expectedResponse.getData().add(variable1);
+        expectedResponse.getData().add(variable2);
+
+        // Set up the URI builder mock
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("variable_name"), eq(variableName))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("user"), eq(userId))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build(eq(conversationId))).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
+
+        // Mock response
+        when(responseSpecMock.bodyToMono(any(ParameterizedTypeReference.class)))
+                .thenReturn(Mono.just(expectedResponse));
+
+        // Execute the method
+        DifyPageResult<ConversationVariableResponse> actualResponse = client.conversationVariables(request);
+
+        // Verify results
+        assertNotNull(actualResponse);
+        assertNotNull(actualResponse.getData());
+        assertEquals(2, actualResponse.getData().size());
+
+        ConversationVariableResponse actualVariable1 = actualResponse.getData().get(0);
+        assertEquals(variable1.getId(), actualVariable1.getId());
+        assertEquals(variable1.getName(), actualVariable1.getName());
+        assertEquals(variable1.getValueType(), actualVariable1.getValueType());
+        assertEquals(variable1.getValue(), actualVariable1.getValue());
+        assertEquals(variable1.getDescription(), actualVariable1.getDescription());
+        assertEquals(variable1.getCreatedAt(), actualVariable1.getCreatedAt());
+        assertEquals(variable1.getUpdatedAt(), actualVariable1.getUpdatedAt());
+
+        ConversationVariableResponse actualVariable2 = actualResponse.getData().get(1);
+        assertEquals(variable2.getId(), actualVariable2.getId());
+        assertEquals(variable2.getName(), actualVariable2.getName());
+        assertEquals(variable2.getValueType(), actualVariable2.getValueType());
+        assertEquals(variable2.getValue(), actualVariable2.getValue());
+        assertEquals(variable2.getDescription(), actualVariable2.getDescription());
+        assertEquals(variable2.getCreatedAt(), actualVariable2.getCreatedAt());
+        assertEquals(variable2.getUpdatedAt(), actualVariable2.getUpdatedAt());
+
+        // Verify WebClient interactions
+        verify(webClientMock).get();
+        verify(requestHeadersUriSpecMock).uri(any(Function.class));
+        verify(requestHeadersSpecMock).header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey);
+        verify(responseSpecMock).bodyToMono(any(ParameterizedTypeReference.class));
+
+        // Test without variable name
+        ConversationVariableRequest request2 = new ConversationVariableRequest();
+        request2.setApiKey(apiKey);
+        request2.setUserId(userId);
+        request2.setConversationId(conversationId);
+        request2.setVariableName(null);
+
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("user"), eq(userId))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build(eq(conversationId))).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
+
+        client.conversationVariables(request2);
+    }
+
+    @Test
+    @DisplayName("Test updateConversationVariable method with valid request")
+    public void testUpdateConversationVariable() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String userId = "user-123";
+        String conversationId = "conv-123456";
+        String variableId = "variable-uuid-1";
+        String newValue = "Updated Value";
+
+        // Create request
+        UpdateConversationVariableRequest request = new UpdateConversationVariableRequest();
+        request.setApiKey(apiKey);
+        request.setUserId(userId);
+        request.setConversationId(conversationId);
+        request.setVariableId(variableId);
+        request.setValue(newValue);
+
+        // Create expected response
+        ConversationVariableResponse expectedResponse = new ConversationVariableResponse();
+        expectedResponse.setId(variableId);
+        expectedResponse.setName("customer_name");
+        expectedResponse.setValueType("string");
+        expectedResponse.setValue(newValue);
+        expectedResponse.setDescription("客户名称（从对话中提取）");
+        expectedResponse.setCreatedAt(1650000000000L);
+        expectedResponse.setUpdatedAt(1650000001000L);
+
+        // Mock response
+        when(responseSpecMock.bodyToMono(eq(ConversationVariableResponse.class)))
+                .thenReturn(Mono.just(expectedResponse));
+
+        // Execute the method
+        ConversationVariableResponse actualResponse = client.updateConversationVariable(request);
+
+        // Verify results
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getName(), actualResponse.getName());
+        assertEquals(expectedResponse.getValueType(), actualResponse.getValueType());
+        assertEquals(expectedResponse.getValue(), actualResponse.getValue());
+        assertEquals(expectedResponse.getDescription(), actualResponse.getDescription());
+        assertEquals(expectedResponse.getCreatedAt(), actualResponse.getCreatedAt());
+        assertEquals(expectedResponse.getUpdatedAt(), actualResponse.getUpdatedAt());
+
+        // Verify WebClient interactions
+        verify(webClientMock).put();
+        verify(requestBodyUriSpecMock).uri(
+                ChatUriConstant.V1_CONVERSATIONS_VARIABLES_UPDATE_URI,
+                conversationId,
+                variableId
+        );
+        verify(requestBodySpecMock).header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey);
+        verify(requestBodySpecMock).contentType(MediaType.APPLICATION_JSON);
+        verify(requestBodySpecMock).bodyValue(any(Map.class));
+        verify(responseSpecMock).bodyToMono(eq(ConversationVariableResponse.class));
+    }
 }

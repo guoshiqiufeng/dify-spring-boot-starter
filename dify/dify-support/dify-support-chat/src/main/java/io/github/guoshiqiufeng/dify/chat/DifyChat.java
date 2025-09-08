@@ -251,4 +251,21 @@ public interface DifyChat {
      */
     AppAnnotationReplyResponse queryAnnotationReply(AppAnnotationReplyQueryRequest request);
 
+    /**
+     * 获取会话变量列表
+     *
+     * @param request 会话变量请求对象，包含会话ID和可选的变量名称
+     * @return DifyPageResult<ConversationVariableResponse> 分页结果，包含会话变量列表信息
+     * @since 1.4.1
+     */
+    DifyPageResult<ConversationVariableResponse> conversationVariables(ConversationVariableRequest request);
+
+    /**
+     * 更新会话变量
+     *
+     * @param request 更新会话变量请求对象，包含会话ID、变量ID和新值
+     * @return ConversationVariableResponse 更新后的会话变量信息
+     * @since 1.4.1
+     */
+    ConversationVariableResponse updateConversationVariable(UpdateConversationVariableRequest request);
 }

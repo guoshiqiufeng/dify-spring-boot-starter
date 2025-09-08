@@ -253,4 +253,21 @@ public interface DifyChatClient {
      */
     AppAnnotationReplyResponse queryAnnotationReply(AppAnnotationReplyQueryRequest request);
 
+    /**
+     * Getting a list of session variables
+     *
+     * @param request Session variable request object with session ID and optional variable name
+     * @return DifyPageResult<ConversationVariableResponse> Paginated results with information about the list of session variables
+     * @since 1.4.1
+     */
+    DifyPageResult<ConversationVariableResponse> conversationVariables(ConversationVariableRequest request);
+
+    /**
+     * 更新会话变量
+     *
+     * @param request 更新会话变量请求对象，包含会话ID、变量ID和新值
+     * @return ConversationVariableResponse 更新后的会话变量信息
+     * @since 1.4.1
+     */
+    ConversationVariableResponse updateConversationVariable(UpdateConversationVariableRequest request);
 }

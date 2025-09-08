@@ -471,6 +471,48 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
                 });
     }
 
+    @Override
+    public DifyPageResult<ConversationVariableResponse> conversationVariables(ConversationVariableRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        Assert.notNull(request.getConversationId(), "conversationId must not be null");
+
+        return restClient.get()
+                .uri(uriBuilder -> {
+                    UriBuilder builder = uriBuilder.path(ChatUriConstant.V1_CONVERSATIONS_VARIABLES_URI);
+                    if (request.getVariableName() != null && !request.getVariableName().isEmpty()) {
+                        builder.queryParam("variable_name", request.getVariableName());
+                    }
+                    builder.queryParam("user", request.getUserId());
+                    return builder.build(request.getConversationId());
+                })
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(new ParameterizedTypeReference<DifyPageResult<ConversationVariableResponse>>() {
+                });
+    }
+
+    @Override
+    public ConversationVariableResponse updateConversationVariable(UpdateConversationVariableRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        Assert.notNull(request.getConversationId(), "conversationId must not be null");
+        Assert.notNull(request.getVariableId(), "variableId must not be null");
+        Assert.notNull(request.getValue(), "value must not be null");
+
+        Map<String, Object> values = new HashMap<>(2);
+        values.put("value", request.getValue());
+        values.put("user", request.getUserId());
+
+        return restClient.put()
+                .uri(ChatUriConstant.V1_CONVERSATIONS_VARIABLES_UPDATE_URI, request.getConversationId(), request.getVariableId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(values)
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(ConversationVariableResponse.class);
+    }
+
     private ChatMessageVO builderChatMessage(ResponseModeEnum responseMode, ChatMessageSendRequest sendRequest) {
         ChatMessageVO chatMessage = new ChatMessageVO();
         chatMessage.setResponseMode(responseMode);
