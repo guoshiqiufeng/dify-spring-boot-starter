@@ -221,6 +221,43 @@ List<String> messagesSuggested(String messageId, String apiKey, String userId);
 
 Return to the list of suggested response texts
 
+### 1.7 Get Application Feedback List
+
+#### Method
+
+```java
+DifyPageResult<AppFeedbackResponse> feedbacks(AppFeedbackPageRequest request);
+```
+
+#### Request Parameters
+
+AppFeedbackPageRequest
+
+| Parameter name | Type    | Required | Description                               |
+|----------------|---------|----------|-------------------------------------------|
+| apiKey         | String  | Yes      | apiKey                                    |
+| userId         | String  | Yes      | User id                                   |
+| page           | Integer | No       | Page number, default 1                    |
+| limit          | Integer | No       | Records per page, default 20, range 1-100 |
+
+#### Response Parameters
+
+AppFeedbackResponse
+
+| Parameter name | Type          | Description           |
+|----------------|---------------|-----------------------|
+| id             | String        | Feedback id           |
+| appId          | String        | Application id        |
+| conversationId | String        | Conversation id       |
+| messageId      | String        | Message id            |
+| rating         | String        | Rating (like/dislike) |
+| content        | String        | Feedback content      |
+| fromSource     | String        | Source                |
+| fromEndUserId  | String        | End user id           |
+| fromAccountId  | String        | Account id            |
+| createdAt      | LocalDateTime | Creation timestamp    |
+| updatedAt      | LocalDateTime | Update timestamp      |
+
 ## 2. Session
 
 ### 2.1 Get session list
@@ -600,7 +637,6 @@ AppSiteResponse
 | showWorkflowSteps      | Boolean      | Whether to show workflow details                                                      |
 | useIconAsAnswerIcon    | Boolean      | Whether to replace 🤖 in chat with the WebApp icon                                    |
 
-
 ### 3.8 File preview
 
 #### Method
@@ -610,13 +646,14 @@ ResponseEntity<byte[]> filePreview(FilePreviewRequest request);
 ```
 
 #### Request Parameters
+
 FilePreviewRequest
 
-| Parameter name | Type    | Required | Description                                                                                  |
-|----------------|---------|----------|----------------------------------------------------------------------------------------------|
-| apiKey         | String  | Yes      | apiKey                                                                                       |
-| userId         | String  | Yes      | userId                                                                                       |
-| fileId         | String  | Yes      | Unique identifier of the file to preview, obtained from file upload API response            |
+| Parameter name | Type    | Required | Description                                                                                        |
+|----------------|---------|----------|----------------------------------------------------------------------------------------------------|
+| apiKey         | String  | Yes      | apiKey                                                                                             |
+| userId         | String  | Yes      | userId                                                                                             |
+| fileId         | String  | Yes      | Unique identifier of the file to preview, obtained from file upload API response                   |
 | asAttachment   | Boolean | No       | Whether to force the file to be downloaded as an attachment. Default is false (preview in browser) |
 
 #### Response Parameters
@@ -638,8 +675,8 @@ Returns file content with appropriate headers for browser display or download.
 ```java
 // Create file preview request
 FilePreviewRequest request = new FilePreviewRequest("file-id-123")
-    .setApiKey("your-api-key")
-    .setUserId("user-123");
+                .setApiKey("your-api-key")
+                .setUserId("user-123");
 
 // Execute file preview
 ResponseEntity<byte[]> response = difyChat.filePreview(request);

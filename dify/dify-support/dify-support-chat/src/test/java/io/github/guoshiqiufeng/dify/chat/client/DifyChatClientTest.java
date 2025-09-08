@@ -374,7 +374,7 @@ class DifyChatClientTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_PNG);
         headers.setContentLength(expectedContent.length);
-        
+
         ResponseEntity<byte[]> expectedResponse = new ResponseEntity<>(expectedContent, headers, HttpStatus.OK);
 
         when(difyChatClient.filePreview(any(FilePreviewRequest.class))).thenReturn(expectedResponse);
@@ -402,7 +402,7 @@ class DifyChatClientTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         headers.setContentDisposition(ContentDisposition.attachment().filename("test-file.pdf").build());
-        
+
         ResponseEntity<byte[]> expectedResponse = new ResponseEntity<>(expectedContent, headers, HttpStatus.OK);
 
         when(difyChatClient.filePreview(any(FilePreviewRequest.class))).thenReturn(expectedResponse);
@@ -688,5 +688,54 @@ class DifyChatClientTest {
         assertEquals(expectedResponse.getShowWorkflowSteps(), actualResponse.getShowWorkflowSteps());
         assertEquals(expectedResponse.getUseIconAsAnswerIcon(), actualResponse.getUseIconAsAnswerIcon());
         verify(difyChatClient, times(1)).site(apiKey);
+    }
+
+    @Test
+    void testFeedbacks() {
+        // Arrange
+        AppFeedbackPageRequest request = new AppFeedbackPageRequest();
+        request.setApiKey("test-api-key");
+        request.setUserId("user-123");
+        request.setPage(1);
+        request.setLimit(20);
+
+        DifyPageResult<AppFeedbackResponse> expectedResponse = new DifyPageResult<>();
+        expectedResponse.setData(new ArrayList<>());
+
+        AppFeedbackResponse feedback = new AppFeedbackResponse();
+        feedback.setId("8c0fbed8-e2f9-49ff-9f0e-15a35bdd0e25");
+        feedback.setAppId("f252d396-fe48-450e-94ec-e184218e7346");
+        feedback.setConversationId("2397604b-9deb-430e-b285-4726e51fd62d");
+        feedback.setMessageId("709c0b0f-0a96-4a4e-91a4-ec0889937b11");
+        feedback.setRating("like");
+        feedback.setContent("message feedback information-3");
+        feedback.setFromSource("user");
+        feedback.setFromEndUserId("74286412-9a1a-42c1-929c-01edb1d381d5");
+        feedback.setFromAccountId(null);
+
+        expectedResponse.getData().add(feedback);
+
+        when(difyChatClient.feedbacks(any(AppFeedbackPageRequest.class))).thenReturn(expectedResponse);
+
+        // Act
+        DifyPageResult<AppFeedbackResponse> actualResponse = difyChatClient.feedbacks(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertNotNull(actualResponse.getData());
+        assertEquals(1, actualResponse.getData().size());
+
+        AppFeedbackResponse actualFeedback = actualResponse.getData().get(0);
+        assertEquals(feedback.getId(), actualFeedback.getId());
+        assertEquals(feedback.getAppId(), actualFeedback.getAppId());
+        assertEquals(feedback.getConversationId(), actualFeedback.getConversationId());
+        assertEquals(feedback.getMessageId(), actualFeedback.getMessageId());
+        assertEquals(feedback.getRating(), actualFeedback.getRating());
+        assertEquals(feedback.getContent(), actualFeedback.getContent());
+        assertEquals(feedback.getFromSource(), actualFeedback.getFromSource());
+        assertEquals(feedback.getFromEndUserId(), actualFeedback.getFromEndUserId());
+        assertEquals(feedback.getFromAccountId(), actualFeedback.getFromAccountId());
+
+        verify(difyChatClient, times(1)).feedbacks(any(AppFeedbackPageRequest.class));
     }
 }

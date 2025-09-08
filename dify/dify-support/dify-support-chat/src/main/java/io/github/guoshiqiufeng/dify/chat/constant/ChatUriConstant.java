@@ -42,4 +42,6 @@ public interface ChatUriConstant {
 
     String V1_FILES_PREVIEW_URI = V1_URL + "/files/{fileId}/preview";
 
+    String V1_APPS_FEEDBACKS = V1_URL + "/app/feedbacks";
+
 }

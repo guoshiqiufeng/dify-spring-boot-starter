@@ -1076,7 +1076,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         verify(requestHeadersSpecMock).header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey);
         verify(responseSpecMock).bodyToMono(any(ParameterizedTypeReference.class));
     }
-    
+
     @Test
     @DisplayName("Test filePreview method with valid request")
     public void testFilePreview() {
@@ -1084,55 +1084,132 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         String apiKey = "test-api-key";
         String fileId = "file-123456";
         Boolean asAttachment = true;
-        
+
         // Create request
         FilePreviewRequest request = new FilePreviewRequest();
         request.setApiKey(apiKey);
         request.setFileId(fileId);
         request.setAsAttachment(asAttachment);
-        
+
         // Create expected response
         byte[] fileContent = "mock file content".getBytes();
         ResponseEntity<byte[]> expectedResponse = ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
                 .header("Content-Disposition", "attachment; filename=\"test.pdf\"")
                 .body(fileContent);
-        
+
         // Set up the URI builder mock
         UriBuilder uriBuilderMock = mock(UriBuilder.class);
         URI uriMock = mock(URI.class);
-        
+
         when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
             Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
-            
+
             when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
             when(uriBuilderMock.queryParam(eq("as_attachment"), eq("true"))).thenReturn(uriBuilderMock);
             when(uriBuilderMock.build(fileId)).thenReturn(uriMock);
-            
+
             uriFunction.apply(uriBuilderMock);
             return requestHeadersSpecMock;
         });
-        
+
         // Mock response
         when(responseSpecMock.toEntity(byte[].class)).thenReturn(Mono.just(expectedResponse));
-        
+
         // Execute the method
         ResponseEntity<byte[]> actualResponse = client.filePreview(request);
-        
+
         // Verify results
         assertNotNull(actualResponse);
         assertEquals(expectedResponse.getStatusCode(), actualResponse.getStatusCode());
         assertEquals(expectedResponse.getHeaders().getContentType(), actualResponse.getHeaders().getContentType());
         assertArrayEquals(expectedResponse.getBody(), actualResponse.getBody());
-        
+
         // Verify WebClient interactions
         verify(webClientMock).get();
         verify(requestHeadersUriSpecMock).uri(any(Function.class));
         verify(requestHeadersSpecMock).header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey);
         verify(responseSpecMock).toEntity(byte[].class);
-        
+
         // Test with asAttachment = false
         request.setAsAttachment(false);
         client.filePreview(request);
+    }
+
+    @Test
+    @DisplayName("Test feedbacks method with valid request")
+    public void testFeedbacks() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        int page = 1;
+        int limit = 20;
+
+        // Create request
+        AppFeedbackPageRequest request = new AppFeedbackPageRequest();
+        request.setApiKey(apiKey);
+        request.setPage(page);
+        request.setLimit(limit);
+
+        // Create expected response
+        DifyPageResult<AppFeedbackResponse> expectedResponse = new DifyPageResult<>();
+        expectedResponse.setData(new ArrayList<>());
+
+        AppFeedbackResponse feedback = new AppFeedbackResponse();
+        feedback.setId("8c0fbed8-e2f9-49ff-9f0e-15a35bdd0e25");
+        feedback.setAppId("f252d396-fe48-450e-94ec-e184218e7346");
+        feedback.setConversationId("2397604b-9deb-430e-b285-4726e51fd62d");
+        feedback.setMessageId("709c0b0f-0a96-4a4e-91a4-ec0889937b11");
+        feedback.setRating("like");
+        feedback.setContent("message feedback information-3");
+        feedback.setFromSource("user");
+        feedback.setFromEndUserId("74286412-9a1a-42c1-929c-01edb1d381d5");
+        feedback.setFromAccountId(null);
+
+        expectedResponse.getData().add(feedback);
+
+        // Set up the URI builder mock
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("page"), eq(page))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("limit"), eq(limit))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build()).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
+
+        // Mock response
+        when(responseSpecMock.bodyToMono(any(ParameterizedTypeReference.class)))
+                .thenReturn(Mono.just(expectedResponse));
+
+        // Execute the method
+        DifyPageResult<AppFeedbackResponse> actualResponse = client.feedbacks(request);
+
+        // Verify results
+        assertNotNull(actualResponse);
+        assertNotNull(actualResponse.getData());
+        assertEquals(1, actualResponse.getData().size());
+
+        AppFeedbackResponse actualFeedback = actualResponse.getData().get(0);
+        assertEquals(feedback.getId(), actualFeedback.getId());
+        assertEquals(feedback.getAppId(), actualFeedback.getAppId());
+        assertEquals(feedback.getConversationId(), actualFeedback.getConversationId());
+        assertEquals(feedback.getMessageId(), actualFeedback.getMessageId());
+        assertEquals(feedback.getRating(), actualFeedback.getRating());
+        assertEquals(feedback.getContent(), actualFeedback.getContent());
+        assertEquals(feedback.getFromSource(), actualFeedback.getFromSource());
+        assertEquals(feedback.getFromEndUserId(), actualFeedback.getFromEndUserId());
+        assertEquals(feedback.getFromAccountId(), actualFeedback.getFromAccountId());
+
+        // Verify WebClient interactions
+        verify(webClientMock).get();
+        verify(requestHeadersUriSpecMock).uri(any(Function.class));
+        verify(requestHeadersSpecMock).header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey);
+        verify(responseSpecMock).bodyToMono(any(ParameterizedTypeReference.class));
     }
 }

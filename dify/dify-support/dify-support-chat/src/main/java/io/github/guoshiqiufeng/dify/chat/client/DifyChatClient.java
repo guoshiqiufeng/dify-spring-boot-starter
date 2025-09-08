@@ -96,6 +96,15 @@ public interface DifyChatClient {
     List<String> messagesSuggested(String messageId, String apiKey, String userId);
 
     /**
+     * Get application feedback list
+     *
+     * @param request Feedback list request containing pagination parameters
+     * @return DifyPageResult<AppFeedbackResponse> Paginated result with feedback list
+     * @since 1.4.1
+     */
+    DifyPageResult<AppFeedbackResponse> feedbacks(AppFeedbackPageRequest request);
+
+    /**
      * Deletes a specific conversation
      *
      * @param conversationId The ID of the conversation to delete
