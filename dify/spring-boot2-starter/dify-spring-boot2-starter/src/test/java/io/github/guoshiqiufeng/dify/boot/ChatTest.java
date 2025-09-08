@@ -219,6 +219,17 @@ public class ChatTest extends BaseChatContainerTest {
 
     @Test
     @Order(12)
+    @DisplayName("Test conversationVariables")
+    public void testConversationVariables() {
+        ConversationVariableRequest conversationVariableRequest = new ConversationVariableRequest();
+        conversationVariableRequest.setConversationId(conversationId);
+        conversationVariableRequest.setApiKey(apiKey);
+        conversationVariableRequest.setUserId(userId);
+        DifyPageResult<ConversationVariableResponse> conversationVariableResponseDifyPageResult = difyChat.conversationVariables(conversationVariableRequest);
+    }
+
+    @Test
+    @Order(15)
     @DisplayName("Test delete conversation")
     public void testDeleteConversation() {
         difyChat.deleteConversation(conversationId, apiKey, userId);

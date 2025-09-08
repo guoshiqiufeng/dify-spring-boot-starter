@@ -472,6 +472,49 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
                 }).block();
     }
 
+    @Override
+    public DifyPageResult<ConversationVariableResponse> conversationVariables(ConversationVariableRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        Assert.notNull(request.getConversationId(), "conversationId must not be null");
+
+        return webClient.get()
+                .uri(uriBuilder -> {
+                    UriBuilder builder = uriBuilder.path(ChatUriConstant.V1_CONVERSATIONS_VARIABLES_URI);
+                    if (request.getVariableName() != null && !request.getVariableName().isEmpty()) {
+                        builder.queryParam("variable_name", request.getVariableName());
+                    }
+                    builder.queryParam("user", request.getUserId());
+                    return builder.build(request.getConversationId());
+                })
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
+                .retrieve()
+                .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(new ParameterizedTypeReference<DifyPageResult<ConversationVariableResponse>>() {
+                }).block();
+    }
+
+    @Override
+    public ConversationVariableResponse updateConversationVariable(UpdateConversationVariableRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        Assert.notNull(request.getConversationId(), "conversationId must not be null");
+        Assert.notNull(request.getVariableId(), "variableId must not be null");
+        Assert.notNull(request.getValue(), "value must not be null");
+
+        Map<String, Object> values = new HashMap<>(2);
+        values.put("value", request.getValue());
+        values.put("user", request.getUserId());
+
+        return webClient.put()
+                .uri(ChatUriConstant.V1_CONVERSATIONS_VARIABLES_UPDATE_URI, request.getConversationId(), request.getVariableId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(values)
+                .retrieve()
+                .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                .bodyToMono(ConversationVariableResponse.class)
+                .block();
+    }
+
     private ChatMessageVO builderChatMessage(ResponseModeEnum responseMode, ChatMessageSendRequest sendRequest) {
         ChatMessageVO chatMessage = new ChatMessageVO();
         chatMessage.setResponseMode(responseMode);

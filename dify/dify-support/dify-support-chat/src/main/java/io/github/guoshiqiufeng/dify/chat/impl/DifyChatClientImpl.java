@@ -162,4 +162,14 @@ public class DifyChatClientImpl implements DifyChat {
     public DifyPageResult<AppFeedbackResponse> feedbacks(AppFeedbackPageRequest request) {
         return difyChatClient.feedbacks(request);
     }
+
+    @Override
+    public DifyPageResult<ConversationVariableResponse> conversationVariables(ConversationVariableRequest request) {
+        return difyChatClient.conversationVariables(request);
+    }
+
+    @Override
+    public ConversationVariableResponse updateConversationVariable(UpdateConversationVariableRequest request) {
+        return difyChatClient.updateConversationVariable(request);
+    }
 }

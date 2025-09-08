@@ -19,80 +19,54 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
- * 应用反馈响应对象
+ * 会话变量响应对象
  *
  * @author yanghq
- * @version 1.0
- * @since 2025/9/8 15:30
+ * @version 1.4.1
+ * @since 2025/9/8 17:30
  */
 @Data
-public class AppFeedbackResponse implements Serializable {
+public class ConversationVariableResponse implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 反馈ID
+     * 变量ID
      */
     private String id;
 
     /**
-     * 应用ID
+     * 变量名称
      */
-    @JsonProperty("app_id")
-    private String appId;
+    private String name;
 
     /**
-     * 会话ID
+     * 值类型 (string/json)
      */
-    @JsonProperty("conversation_id")
-    private String conversationId;
+    @JsonProperty("value_type")
+    private String valueType;
 
     /**
-     * 消息ID
+     * 变量值
      */
-    @JsonProperty("message_id")
-    private String messageId;
+    private String value;
 
     /**
-     * 评级 (like/dislike)
+     * 描述
      */
-    private String rating;
+    private String description;
 
     /**
-     * 反馈内容
-     */
-    private String content;
-
-    /**
-     * 来源
-     */
-    @JsonProperty("from_source")
-    private String fromSource;
-
-    /**
-     * 来自终端用户ID
-     */
-    @JsonProperty("from_end_user_id")
-    private String fromEndUserId;
-
-    /**
-     * 来自账户ID
-     */
-    @JsonProperty("from_account_id")
-    private String fromAccountId;
-
-    /**
-     * 创建时间
+     * 创建时间 (时间戳)
      */
     @JsonProperty("created_at")
-    private LocalDateTime createdAt;
+    private Long createdAt;
 
     /**
-     * 更新时间
+     * 更新时间 (时间戳)
      */
     @JsonProperty("updated_at")
-    private LocalDateTime updatedAt;
+    private Long updatedAt;
 }

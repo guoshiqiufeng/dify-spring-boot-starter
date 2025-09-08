@@ -258,6 +258,73 @@ AppFeedbackResponse
 | createdAt      | LocalDateTime | Creation timestamp    |
 | updatedAt      | LocalDateTime | Update timestamp      |
 
+### 1.8 Get Conversation Variables
+
+#### Method
+
+```java
+DifyPageResult<ConversationVariableResponse> conversationVariables(ConversationVariableRequest request);
+```
+
+#### Request Parameters
+
+ConversationVariableRequest
+
+| Parameter name | Type   | Required | Description                            |
+|----------------|--------|----------|----------------------------------------|
+| apiKey         | String | Yes      | apiKey                                 |
+| userId         | String | Yes      | User id                                |
+| conversationId | String | Yes      | Conversation id                        |
+| variableName   | String | No       | Variable name, return all if not empty |
+
+#### Response Parameters
+
+ConversationVariableResponse
+
+| Parameter name | Type   | Description                    |
+|----------------|--------|--------------------------------|
+| id             | String | Variable id                    |
+| name           | String | Variable name                  |
+| valueType      | String | Value type (string/json)       |
+| value          | String | Variable value                 |
+| description    | String | Description                    |
+| createdAt      | Long   | Creation timestamp (timestamp) |
+| updatedAt      | Long   | Update timestamp (timestamp)   |
+
+### 1.9 Update Conversation Variable
+
+#### Method
+
+```java
+ConversationVariableResponse updateConversationVariable(UpdateConversationVariableRequest request);
+```
+
+#### Request Parameters
+
+UpdateConversationVariableRequest
+
+| Parameter name | Type   | Required | Description        |
+|----------------|--------|----------|--------------------|
+| apiKey         | String | Yes      | apiKey             |
+| userId         | String | Yes      | User id            |
+| conversationId | String | Yes      | Conversation id    |
+| variableId     | String | Yes      | Variable id        |
+| value          | String | Yes      | New variable value |
+
+#### Response Parameters
+
+ConversationVariableResponse
+
+| Parameter name | Type   | Description                    |
+|----------------|--------|--------------------------------|
+| id             | String | Variable id                    |
+| name           | String | Variable name                  |
+| valueType      | String | Value type (string/json)       |
+| value          | String | Variable value                 |
+| description    | String | Description                    |
+| createdAt      | Long   | Creation timestamp (timestamp) |
+| updatedAt      | Long   | Update timestamp (timestamp)   |
+
 ## 2. Session
 
 ### 2.1 Get session list
@@ -750,8 +817,8 @@ private void downloadFile(String fileId, String filename, HttpServletResponse re
         } else {
             // Set custom filename
             String safeFilename = filename != null ? filename : "download";
-            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, 
-                "attachment; filename=\"" + safeFilename + "\"");
+            response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                    "attachment; filename=\"" + safeFilename + "\"");
         }
 
         // Write file content

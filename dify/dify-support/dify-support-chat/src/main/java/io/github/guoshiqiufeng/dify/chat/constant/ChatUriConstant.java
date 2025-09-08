@@ -44,4 +44,8 @@ public interface ChatUriConstant {
 
     String V1_APPS_FEEDBACKS = V1_URL + "/app/feedbacks";
 
+    String V1_CONVERSATIONS_VARIABLES_URI = V1_CONVERSATIONS_URI + "/{conversationId}/variables";
+
+    String V1_CONVERSATIONS_VARIABLES_UPDATE_URI = V1_CONVERSATIONS_VARIABLES_URI + "/{variableId}";
+
 }
