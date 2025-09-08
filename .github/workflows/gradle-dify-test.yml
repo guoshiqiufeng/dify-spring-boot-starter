@@ -17,7 +17,7 @@ jobs:
     env:
       DIFY_NETWORK: docker_default
       OLLAMA_CONTAINER: ollama
-      DIFY_VERSION: 1.8.1
+      DIFY_VERSION: 1.7.2
       PLUGIN_ID: "langgenius/ollama:0.0.6@f430f3eb959f4863b1e87171544a8fec179441b90deda5693c85f07712d2a68c"
       MODEL_EMBEDDING: bge-m3:latest
       MODEL_LLM: qwen2.5:1.5b
