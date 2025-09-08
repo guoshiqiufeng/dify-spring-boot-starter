@@ -67,6 +67,15 @@ public interface DifyChat {
     MessageFeedbackResponse messageFeedback(MessageFeedbackRequest messageFeedbackRequest);
 
     /**
+     * 获取应用反馈列表
+     *
+     * @param request 反馈列表请求对象，包含分页信息
+     * @return DifyPageResult<AppFeedbackResponse> 分页结果，包含反馈列表信息
+     */
+    DifyPageResult<AppFeedbackResponse> feedbacks(AppFeedbackPageRequest request);
+
+
+    /**
      * 获取会话列表
      *
      * @param request 会话查询请求对象，包含分页、过滤条件等信息

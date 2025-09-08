@@ -219,6 +219,43 @@ List<String> messagesSuggested(String messageId, String apiKey, String userId);
 
 返回建议回复文本列表
 
+### 1.7 获取应用反馈列表
+
+#### 方法
+
+```java
+DifyPageResult<AppFeedbackResponse> feedbacks(AppFeedbackPageRequest request);
+```
+
+#### 请求参数
+
+AppFeedbackPageRequest
+
+| 参数名    | 类型      | 是否必须 | 描述                  |
+|--------|---------|------|---------------------|
+| apiKey | String  | 是    | apiKey              |
+| userId | String  | 是    | 用户 id               |
+| page   | Integer | 否    | 页码，默认1              |
+| limit  | Integer | 否    | 每页记录数，默认20，范围 1-100 |
+
+#### 响应参数
+
+AppFeedbackResponse
+
+| 参数名            | 类型            | 描述                |
+|----------------|---------------|-------------------|
+| id             | String        | 反馈 id             |
+| appId          | String        | 应用 id             |
+| conversationId | String        | 会话 id             |
+| messageId      | String        | 消息 id             |
+| rating         | String        | 评级 (like/dislike) |
+| content        | String        | 反馈内容              |
+| fromSource     | String        | 来源                |
+| fromEndUserId  | String        | 终端用户 id           |
+| fromAccountId  | String        | 账户 id             |
+| createdAt      | LocalDateTime | 创建时间戳             |
+| updatedAt      | LocalDateTime | 更新时间戳             |
+
 ## 2. 会话
 
 ### 2.1 获取会话列表
@@ -636,8 +673,8 @@ FilePreviewRequest
 ```java
 // 创建文件预览请求
 FilePreviewRequest request = new FilePreviewRequest("file-id-123")
-    .setApiKey("your-api-key")
-    .setUserId("user-123");
+                .setApiKey("your-api-key")
+                .setUserId("user-123");
 
 // 执行文件预览
 ResponseEntity<byte[]> response = difyChat.filePreview(request);
@@ -711,8 +748,8 @@ private void downloadFile(String fileId, String filename, HttpServletResponse re
         } else {
             // 设置自定义文件名
             String safeFilename = filename != null ? filename : "download";
-            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, 
-                "attachment; filename=\"" + safeFilename + "\"");
+            response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                    "attachment; filename=\"" + safeFilename + "\"");
         }
 
         // 写入文件内容

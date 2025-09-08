@@ -455,6 +455,22 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
                 .body(AppAnnotationReplyResponse.class);
     }
 
+    @Override
+    public DifyPageResult<AppFeedbackResponse> feedbacks(AppFeedbackPageRequest request) {
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        return restClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ChatUriConstant.V1_APPS_FEEDBACKS)
+                        .queryParam("page", request.getPage())
+                        .queryParam("limit", request.getLimit())
+                        .build())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(new ParameterizedTypeReference<DifyPageResult<AppFeedbackResponse>>() {
+                });
+    }
+
     private ChatMessageVO builderChatMessage(ResponseModeEnum responseMode, ChatMessageSendRequest sendRequest) {
         ChatMessageVO chatMessage = new ChatMessageVO();
         chatMessage.setResponseMode(responseMode);

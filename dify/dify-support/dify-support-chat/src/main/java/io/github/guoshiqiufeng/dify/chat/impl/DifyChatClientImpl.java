@@ -157,4 +157,9 @@ public class DifyChatClientImpl implements DifyChat {
     public AppAnnotationReplyResponse queryAnnotationReply(AppAnnotationReplyQueryRequest request) {
         return difyChatClient.queryAnnotationReply(request);
     }
+
+    @Override
+    public DifyPageResult<AppFeedbackResponse> feedbacks(AppFeedbackPageRequest request) {
+        return difyChatClient.feedbacks(request);
+    }
 }

@@ -131,6 +131,19 @@ public class ChatTest extends BaseChatContainerTest {
 
     @Test
     @Order(5)
+    @DisplayName("Test feedbacks")
+    public void testFeedbacks() {
+        AppFeedbackPageRequest request = new AppFeedbackPageRequest();
+        request.setApiKey(apiKey);
+
+        DifyPageResult<AppFeedbackResponse> response = difyChat.feedbacks(request);
+        assertNotNull(response);
+        assertNotNull(response.getData());
+        assertNotNull(response.getData().getFirst());
+    }
+
+    @Test
+    @Order(6)
     @DisplayName("Test get conversations")
     public void testGetConversations() {
         MessageConversationsRequest request = new MessageConversationsRequest();
@@ -145,7 +158,7 @@ public class ChatTest extends BaseChatContainerTest {
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     @DisplayName("Test get messages")
     public void testGetMessages() {
         MessagesRequest request = new MessagesRequest();

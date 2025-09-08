@@ -33,6 +33,7 @@ Implementation of the Redis messaging framework.
 | 【CHAT】Send Message Stream                                   | ✅      |
 | 【CHAT】Stop Message Stream                                   | ✅      |
 | 【CHAT】Message Feedback (Likes)                              | ✅      |
+| 【CHAT】Message Feedbacks                                     | ✅      |
 | 【CHAT】Get session list                                      | ✅      |
 | 【CHAT】Getting a list of messages                            | ✅      |
 | 【CHAT】Get a list of suggested messages                      | ✅      |
