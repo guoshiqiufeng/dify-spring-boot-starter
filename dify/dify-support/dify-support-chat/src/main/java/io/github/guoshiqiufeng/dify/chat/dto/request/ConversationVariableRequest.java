@@ -24,7 +24,7 @@ import java.io.Serializable;
  * 会话变量请求对象
  *
  * @author yanghq
- * @version 1.0
+ * @version 1.4.1
  * @since 2025/9/8 17:30
  */
 @Data

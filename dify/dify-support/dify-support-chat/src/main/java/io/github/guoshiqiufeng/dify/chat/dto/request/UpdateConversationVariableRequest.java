@@ -15,9 +15,10 @@
  */
 package io.github.guoshiqiufeng.dify.chat.dto.request;
 
-import io.github.guoshiqiufeng.dify.core.pojo.request.BaseRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
 
 /**
  * 更新会话变量请求对象
@@ -28,7 +29,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class UpdateConversationVariableRequest extends BaseRequest {
+public class UpdateConversationVariableRequest extends BaseChatRequest implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
