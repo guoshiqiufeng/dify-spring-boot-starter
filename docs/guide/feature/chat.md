@@ -256,6 +256,73 @@ AppFeedbackResponse
 | createdAt      | LocalDateTime | 创建时间戳             |
 | updatedAt      | LocalDateTime | 更新时间戳             |
 
+### 1.8 获取会话变量列表
+
+#### 方法
+
+```java
+DifyPageResult<ConversationVariableResponse> conversationVariables(ConversationVariableRequest request);
+```
+
+#### 请求参数
+
+ConversationVariableRequest
+
+| 参数名            | 类型     | 是否必须 | 描述             |
+|----------------|--------|------|----------------|
+| apiKey         | String | 是    | apiKey         |
+| userId         | String | 是    | 用户 id          |
+| conversationId | String | 是    | 会话 id          |
+| variableName   | String | 否    | 变量名称，为空则返回所有变量 |
+
+#### 响应参数
+
+ConversationVariableResponse
+
+| 参数名         | 类型     | 描述                |
+|-------------|--------|-------------------|
+| id          | String | 变量 id             |
+| name        | String | 变量名称              |
+| valueType   | String | 值类型 (string/json) |
+| value       | String | 变量值               |
+| description | String | 描述                |
+| createdAt   | Long   | 创建时间戳 (时间戳)       |
+| updatedAt   | Long   | 更新时间戳 (时间戳)       |
+
+### 1.9 更新会话变量
+
+#### 方法
+
+```java
+ConversationVariableResponse updateConversationVariable(UpdateConversationVariableRequest request);
+```
+
+#### 请求参数
+
+UpdateConversationVariableRequest
+
+| 参数名            | 类型     | 是否必须 | 描述     |
+|----------------|--------|------|--------|
+| apiKey         | String | 是    | apiKey |
+| userId         | String | 是    | 用户 id  |
+| conversationId | String | 是    | 会话 id  |
+| variableId     | String | 是    | 变量 id  |
+| value          | String | 是    | 新的变量值  |
+
+#### 响应参数
+
+ConversationVariableResponse
+
+| 参数名         | 类型     | 描述                |
+|-------------|--------|-------------------|
+| id          | String | 变量 id             |
+| name        | String | 变量名称              |
+| valueType   | String | 值类型 (string/json) |
+| value       | String | 变量值               |
+| description | String | 描述                |
+| createdAt   | Long   | 创建时间戳 (时间戳)       |
+| updatedAt   | Long   | 更新时间戳 (时间戳)       |
+
 ## 2. 会话
 
 ### 2.1 获取会话列表
