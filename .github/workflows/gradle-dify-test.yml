@@ -15,10 +15,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      DIFY_NETWORK: docker_default  # 显式定义网络名称
+      DIFY_NETWORK: docker_default
       OLLAMA_CONTAINER: ollama
       DIFY_VERSION: 1.8.1
       PLUGIN_ID: "langgenius/ollama:0.0.6@f430f3eb959f4863b1e87171544a8fec179441b90deda5693c85f07712d2a68c"
+      MODEL_EMBEDDING: bge-m3:latest
+      MODEL_LLM: qwen2.5:1.5b
+      OLLAMA_VOLUME: ollama_data  # 新增：命名卷名称
 
     steps:
       - name: Check marketplace access
@@ -56,20 +59,16 @@ jobs:
       - name: Extract DSL version from Dify
         id: dsl_version
         run: |
-          # 读取 CURRENT_DSL_VERSION 值
           DSL_VERSION=$(grep -m1 'CURRENT_DSL_VERSION' tools/dify/api/services/app_dsl_service.py | \
             sed -E 's/.*CURRENT_DSL_VERSION[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/' | \
             tr -d '\r\n' | tr -d '[:space:]')
           
-          # 额外验证（确保是有效版本号）
           if ! [[ "$DSL_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "::error::Invalid DSL version format: '$DSL_VERSION'"
             exit 1
           fi
           
           echo "✅ Extracted DSL version: $DSL_VERSION"
-          
-          # 安全写入环境变量（关键修复）
           echo "CURRENT_DSL_VERSION=$DSL_VERSION" | tr -d '\n' >> $GITHUB_ENV
 
       - name: Start Dify containers
@@ -81,27 +80,72 @@ jobs:
           timeout 120 bash -c 'until curl -sSf http://localhost/console/api/init; do sleep 5; done'
           docker compose ps
 
+      # === 新增：Ollama 模型缓存机制 ===
+      - name: Set Ollama cache key
+        id: cache-key
+        run: |
+          # 生成安全的缓存键（替换特殊字符）
+          EMBEDDING_SAFE=$(echo "${{ env.MODEL_EMBEDDING }}" | tr ':/' '_')
+          LLM_SAFE=$(echo "${{ env.MODEL_LLM }}" | tr ':/' '_')
+          echo "cache-key=ollama-models-${EMBEDDING_SAFE}-${LLM_SAFE}" >> $GITHUB_OUTPUT
+
+      - name: Create Ollama volume
+        run: docker volume create ${{ env.OLLAMA_VOLUME }}
+
+      - name: Restore Ollama models cache
+        id: cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: ./ollama-cache
+          key: ${{ steps.cache-key.outputs.cache-key }}
+
+      - name: Extract cache to volume
+        if: steps.cache-restore.outputs.cache-hit == 'true'
+        run: |
+          # 将缓存解压到 Docker 卷
+          docker run --rm -v ${{ env.OLLAMA_VOLUME }}:/volume -v $(pwd):/cache busybox \
+            sh -c "cd /volume && tar xzf /cache/ollama-cache/ollama-data.tar"
+
       - name: Setup Ollama
         run: |
           docker run -d --name ${{ env.OLLAMA_CONTAINER }} -p 11434:11434 \
-            --network ${{ env.DIFY_NETWORK }} ollama/ollama
+            --network ${{ env.DIFY_NETWORK }} \
+            -v ${{ env.OLLAMA_VOLUME }}:/var/lib/ollama \  # 挂载命名卷
+            ollama/ollama
           
           echo "Waiting for Ollama to be ready..."
           timeout 60 bash -c 'until curl -sSf http://localhost:11434/api/tags; do sleep 2; done'
           
-          # Verify network connectivity
-          docker inspect ${{ env.OLLAMA_CONTAINER }} | grep -q ${{ env.DIFY_NETWORK }} \
-            || echo "::warning::Ollama not connected to ${{ env.DIFY_NETWORK }} network"
+          # 验证模型是否存在（缓存可能损坏）
+          if ! docker exec ${{ env.OLLAMA_CONTAINER }} ollama list | grep -q "${{ env.MODEL_EMBEDDING }}"; then
+            echo "::warning::Embedding model not found in cache, will pull"
+            docker exec ${{ env.OLLAMA_CONTAINER }} ollama pull ${{ env.MODEL_EMBEDDING }}
+          fi
+          if ! docker exec ${{ env.OLLAMA_CONTAINER }} ollama list | grep -q "${{ env.MODEL_LLM }}"; then
+            echo "::warning::LLM model not found in cache, will pull"
+            docker exec ${{ env.OLLAMA_CONTAINER }} ollama pull ${{ env.MODEL_LLM }}
+          fi
 
-      - name: Pull Ollama models
+      - name: Save Ollama models cache
+        if: steps.cache-restore.outputs.cache-hit != 'true'
         run: |
-          docker exec ${{ env.OLLAMA_CONTAINER }} ollama pull bge-m3:latest
-          docker exec ${{ env.OLLAMA_CONTAINER }} ollama pull qwen2.5:1.5b
+          # 将卷内容打包
+          docker run --rm -v ${{ env.OLLAMA_VOLUME }}:/volume -v $(pwd):/backup busybox \
+            sh -c "cd /volume && tar czf /backup/ollama-data.tar ."
+          mkdir -p ./ollama-cache
+          mv ollama-data.tar ./ollama-cache/
+
+      - name: Upload Ollama cache
+        if: steps.cache-restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ./ollama-cache
+          key: ${{ steps.cache-key.outputs.cache-key }}
+      # === 缓存机制结束 ===
 
       - name: Initialize Dify
         run: |
           curl -sf -X GET 'http://localhost/console/api/init' \
-            -H 'Content-Type: application/json' \
             --retry 5 --retry-delay 5
 
       - name: Create admin user
@@ -148,25 +192,23 @@ jobs:
 
       - name: Add Ollama models
         run: |
-          # Use Docker network name for internal communication
           BASE_URL="http://ollama:11434"
 
           curl -X POST 'http://localhost/console/api/workspaces/current/model-providers/langgenius/ollama/ollama/models/credentials' \
             -H "Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}" \
             -H 'Content-Type: application/json' \
-            --data-raw '{"credentials":{"base_url":"'"$BASE_URL"'","mode":"chat","context_size":"4096","max_tokens":"4096","vision_support":"false","function_call_support":"false","__model_name":"bge-m3:latest","__model_type":"text-embedding"},"name":"local","model":"bge-m3:latest","model_type":"text-embedding"}'
+            --data-raw '{"credentials":{"base_url":"'"$BASE_URL"'","mode":"chat","context_size":"4096","max_tokens":"4096","vision_support":"false","function_call_support":"false","__model_name":"'"${{ env.MODEL_EMBEDDING }}"'","__model_type":"text-embedding"},"name":"local","model":"'"${{ env.MODEL_EMBEDDING }}"'","model_type":"text-embedding"}'
 
           curl -X POST 'http://localhost/console/api/workspaces/current/model-providers/langgenius/ollama/ollama/models/credentials' \
             -H "Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}" \
             -H 'Content-Type: application/json' \
-            --data-raw '{"credentials":{"base_url":"'"$BASE_URL"'","mode":"chat","context_size":"4096","max_tokens":"4096","vision_support":"false","function_call_support":"false","__model_name":"qwen2.5:1.5b","__model_type":"llm"},"name":"local","model":"qwen2.5:1.5b","model_type":"llm"}'
-          
+            --data-raw '{"credentials":{"base_url":"'"$BASE_URL"'","mode":"chat","context_size":"4096","max_tokens":"4096","vision_support":"false","function_call_support":"false","__model_name":"'"${{ env.MODEL_LLM }}"'","__model_type":"llm"},"name":"local","model":"'"${{ env.MODEL_LLM }}"'","model_type":"llm"}'
           
           curl -sf -X POST 'http://localhost/console/api/workspaces/current/model-providers/langgenius/ollama/ollama/models' \
             -H "Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}" \
             -H 'Content-Type: application/json' \
             --data '{
-              "model": "bge-m3:latest",
+              "model": "'"${{ env.MODEL_EMBEDDING }}"'",
               "model_type": "text-embedding",
               "credentials": {
                 "mode": "chat",
@@ -180,7 +222,7 @@ jobs:
             -H "Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}" \
             -H 'Content-Type: application/json' \
             --data '{
-              "model": "qwen2.5:1.5b",
+              "model": "'"${{ env.MODEL_LLM }}"'",
               "model_type": "llm",
               "credentials": {
                 "mode": "chat",
@@ -192,15 +234,10 @@ jobs:
 
       - name: Import test chat app
         run: |
-          
-           curl 'http://localhost/console/api/apps/imports' \
-            -H 'Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}' \
-            -H 'content-type: application/json' \
-            --data-raw $'{"mode":"yaml-content","yaml_content":"app:\\n  description: \'\'\\n  icon: 🤖\\n  icon_background: \'#FFEAD5\'\\n  mode: chat\\n  name: test\\n  use_icon_as_answer_icon: false\\ndependencies:\\n- current_identifier: null\\n  type: marketplace\\n  value:\\n    marketplace_plugin_unique_identifier: ${{ env.PLUGIN_ID }}\\nkind: app\\nmodel_config:\\n  agent_mode:\\n    enabled: false\\n    max_iteration: 5\\n    strategy: function_call\\n    tools: []\\n  annotation_reply:\\n    enabled: false\\n  chat_prompt_config: {}\\n  completion_prompt_config: {}\\n  dataset_configs:\\n    datasets:\\n      datasets: []\\n    reranking_enable: false\\n    retrieval_model: multiple\\n    top_k: 4\\n  dataset_query_variable: \'\'\\n  external_data_tools: []\\n  file_upload:\\n    allowed_file_extensions:\\n    - .JPG\\n    - .JPEG\\n    - .PNG\\n    - .GIF\\n    - .WEBP\\n    - .SVG\\n    - .MP4\\n    - .MOV\\n    - .MPEG\\n    - .MPGA\\n    allowed_file_types: []\\n    allowed_file_upload_methods:\\n    - remote_url\\n    - local_file\\n    enabled: false\\n    image:\\n      detail: high\\n      enabled: false\\n      number_limits: 3\\n      transfer_methods:\\n      - remote_url\\n      - local_file\\n    number_limits: 3\\n  model:\\n    completion_params:\\n      stop: []\\n    mode: chat\\n    name: qwen2.5:1.5b\\n    provider: langgenius/ollama/ollama\\n  more_like_this:\\n    enabled: false\\n  opening_statement: \'\'\\n  pre_prompt: \'\'\\n  prompt_type: simple\\n  retriever_resource:\\n    enabled: true\\n  sensitive_word_avoidance:\\n    configs: []\\n    enabled: false\\n    type: \'\'\\n  speech_to_text:\\n    enabled: false\\n  suggested_questions: []\\n  suggested_questions_after_answer:\\n    enabled: false\\n  text_to_speech:\\n    enabled: false\\n    language: \'\'\\n    voice: \'\'\\n  user_input_form: []\\nversion: ${{ env.CURRENT_DSL_VERSION }}\\n"}'
-
-           curl 'http://localhost/console/api/workspaces/current/model-providers/langgenius/ollama/ollama/models' \
+          curl 'http://localhost/console/api/apps/imports' \
             -H "Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}" \
-            -H 'content-type: application/json'
+            -H 'content-type: application/json' \
+            --data-raw $'{"mode":"yaml-content","yaml_content":"app:\\n  description: \'\'\\n  icon: 🤖\\n  icon_background: \'#FFEAD5\'\\n  mode: chat\\n  name: test\\n  use_icon_as_answer_icon: false\\ndependencies:\\n- current_identifier: null\\n  type: marketplace\\n  value:\\n    marketplace_plugin_unique_identifier: ${{ env.PLUGIN_ID }}\\nkind: app\\nmodel_config:\\n  agent_mode:\\n    enabled: false\\n    max_iteration: 5\\n    strategy: function_call\\n    tools: []\\n  annotation_reply:\\n    enabled: false\\n  chat_prompt_config: {}\\n  completion_prompt_config: {}\\n  dataset_configs:\\n    datasets:\\n      datasets: []\\n    reranking_enable: false\\n    retrieval_model: multiple\\n    top_k: 4\\n  dataset_query_variable: \'\'\\n  external_data_tools: []\\n  file_upload:\\n    allowed_file_extensions:\\n    - .JPG\\n    - .JPEG\\n    - .PNG\\n    - .GIF\\n    - .WEBP\\n    - .SVG\\n    - .MP4\\n    - .MOV\\n    - .MPEG\\n    - .MPGA\\n    allowed_file_types: []\\n    allowed_file_upload_methods:\\n    - remote_url\\n    - local_file\\n    enabled: false\\n    image:\\n      detail: high\\n      enabled: false\\n      number_limits: 3\\n      transfer_methods:\\n      - remote_url\\n      - local_file\\n    number_limits: 3\\n  model:\\n    completion_params:\\n      stop: []\\n    mode: chat\\n    name: ${{ env.MODEL_LLM }}\\n    provider: langgenius/ollama/ollama\\n  more_like_this:\\n    enabled: false\\n  opening_statement: \'\'\\n  pre_prompt: \'\'\\n  prompt_type: simple\\n  retriever_resource:\\n    enabled: true\\n  sensitive_word_avoidance:\\n    configs: []\\n    enabled: false\\n    type: \'\'\\n  speech_to_text:\\n    enabled: false\\n  suggested_questions: []\\n  suggested_questions_after_answer:\\n    enabled: false\\n  text_to_speech:\\n    enabled: false\\n    language: \'\'\\n    voice: \'\'\\n  user_input_form: []\\nversion: ${{ env.CURRENT_DSL_VERSION }}\\n"}'
 
       - name: Set default models
         run: |
@@ -209,8 +246,8 @@ jobs:
             -H 'Content-Type: application/json' \
             --data '{
               "model_settings": [
-                {"model_type": "llm", "provider": "langgenius/ollama/ollama", "model": "qwen2.5:1.5b"},
-                {"model_type": "text-embedding", "provider": "langgenius/ollama/ollama", "model": "bge-m3:latest"}
+                {"model_type": "llm", "provider": "langgenius/ollama/ollama", "model": "'${{ env.MODEL_LLM }}'"},
+                {"model_type": "text-embedding", "provider": "langgenius/ollama/ollama", "model": "'${{ env.MODEL_EMBEDDING }}'"}
               ]
             }'
 
