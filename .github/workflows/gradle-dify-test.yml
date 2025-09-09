@@ -121,7 +121,7 @@ jobs:
 
       # === 缓存保存移到模型下载之后 ===
       - name: Save Ollama models cache
-        #if: steps.cache-restore.outputs.cache-hit != 'true'
+        if: steps.cache-restore.outputs.cache-hit != 'true'
         run: |
           echo "🔍 Preparing cache for first-time run..."
 
@@ -159,7 +159,7 @@ jobs:
           echo "✅ Cache prepared with proper size"
 
       - name: Upload Ollama cache
-        #if: steps.cache-restore.outputs.cache-hit != 'true'
+        if: steps.cache-restore.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
           path: ./ollama-cache
