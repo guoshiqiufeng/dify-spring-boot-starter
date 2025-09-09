@@ -164,8 +164,6 @@ jobs:
         with:
           path: ./ollama-cache
           key: ${{ steps.cache-key.outputs.cache-key }}
-          # 添加恢复步骤的调试信息
-          restore-keys: ${{ steps.cache-key.outputs.cache-key }}
 
       # === 缓存机制结束 ===
 
