@@ -1,5 +1,7 @@
 ## dify-spring-boot-starter
 
+## ![cover-v5-optimized](./docs/.vuepress/public/images/icon.png)
+
 <p align="center">
   <a href="https://guoshiqiufeng.github.io/dify-spring-boot-starter/en">Documentation</a> ·
   <a href="https://github.com/guoshiqiufeng/dify-spring-boot-starter-examples">Examples</a> ·

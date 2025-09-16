@@ -18,6 +18,8 @@ features:
 footer: Apache License 2.0 | Copyright © 2024-present fubluesky
 ---
 
+## ![cover-v5-optimized](.vuepress/public/images/icon.png)
+
 ### 最新版本
 
 <div style="text-align: center;">
