@@ -54,9 +54,9 @@ public class RetrieveRequestTest {
         retrieveRequest.setQuery(query);
 
         // Create and set RetrievalModel
-        RetrievalModel retrievalModel = new RetrievalModel();
+        RetrieveRetrievalModel retrievalModel = new RetrieveRetrievalModel();
         retrievalModel.setSearchMethod(SearchMethodEnum.hybrid_search);
-        retrievalModel.setRerankingMode(RerankingModeEnum.weighted_score);
+        //retrievalModel.setRerankingMode(RerankingModeEnum.weighted_score);
         retrievalModel.setRerankingEnable(true);
         retrievalModel.setTopK(5);
         retrieveRequest.setRetrievalModel(retrievalModel);
@@ -67,7 +67,7 @@ public class RetrieveRequestTest {
         assertEquals(query, retrieveRequest.getQuery());
         assertNotNull(retrieveRequest.getRetrievalModel());
         assertEquals(SearchMethodEnum.hybrid_search, retrieveRequest.getRetrievalModel().getSearchMethod());
-        assertEquals(RerankingModeEnum.weighted_score, retrieveRequest.getRetrievalModel().getRerankingMode());
+        //assertEquals(RerankingModeEnum.weighted_score, retrieveRequest.getRetrievalModel().getRerankingMode());
         assertTrue(retrieveRequest.getRetrievalModel().getRerankingEnable());
         assertEquals(5, retrieveRequest.getRetrievalModel().getTopK());
     }
@@ -83,7 +83,7 @@ public class RetrieveRequestTest {
         retrieveRequest.setDatasetId("ds-12345");
         retrieveRequest.setQuery("How does machine learning work?");
 
-        RetrievalModel retrievalModel = new RetrievalModel();
+        RetrieveRetrievalModel retrievalModel = new RetrieveRetrievalModel();
         retrievalModel.setSearchMethod(SearchMethodEnum.semantic_search);
         retrievalModel.setTopK(3);
         retrieveRequest.setRetrievalModel(retrievalModel);
@@ -167,4 +167,4 @@ public class RetrieveRequestTest {
         assertTrue(request.getRetrievalModel().getRerankingEnable());
         assertEquals(5, request.getRetrievalModel().getTopK());
     }
-} 
+}

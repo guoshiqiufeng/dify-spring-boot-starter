@@ -642,7 +642,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         request.setQuery(query);
 
         // Configure retrieval model
-        RetrievalModel retrievalModel = new RetrievalModel();
+        RetrieveRetrievalModel retrievalModel = new RetrieveRetrievalModel();
         retrievalModel.setTopK(topK);
         retrievalModel.setSearchMethod(SearchMethodEnum.hybrid_search);
         request.setRetrievalModel(retrievalModel);

@@ -22,6 +22,7 @@ import io.github.guoshiqiufeng.dify.dataset.enums.SearchMethodEnum;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author yanghq
@@ -122,5 +123,31 @@ public class RetrievalModel implements Serializable {
         private Float keywordWeight;
 
 
+    }
+
+    @Data
+    public static class FilteringConditions implements Serializable {
+
+        private static final long serialVersionUID = 8013169022821234651L;
+
+        @JsonAlias("logicalOperator")
+        @JsonProperty("logical_operator")
+        private String logicalOperator;
+
+        @JsonAlias("conditions")
+        @JsonProperty("conditions")
+        private List<Condition> conditions;
+    }
+
+    @Data
+    public static class Condition implements Serializable {
+
+        private static final long serialVersionUID = 3546069712805309094L;
+
+        private String name;
+
+        @JsonAlias("comparisonOperator")
+        @JsonProperty("comparison_operator")
+        private String comparisonOperator;
     }
 }
