@@ -18,6 +18,7 @@ package io.github.guoshiqiufeng.dify.dataset.dto.request;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.guoshiqiufeng.dify.dataset.dto.RetrievalModel;
+import io.github.guoshiqiufeng.dify.dataset.enums.SearchMethodEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -41,6 +42,7 @@ public class RetrieveRequest extends BaseDatasetRequest implements Serializable 
 
     @JsonProperty("retrieval_model")
     @JsonAlias("retrievalModel")
-    private RetrievalModel retrievalModel;
+    private RetrieveRetrievalModel retrievalModel;
+
 
 }

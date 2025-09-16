@@ -1021,7 +1021,9 @@ RetrieveRequest
 |----------------|----------------|------|--------|
 | datasetId      | String         | 是    | 知识库 id |
 | query          | String         | 是    | 检索查询内容 |
-| retrievalModel | RetrievalModel | 否    | 检索模型   |
+| retrievalModel | RetrieveRetrievalModel | 否    | 检索模型   |
+
+> 1.4.2 之前的版本 retrievalModel 为 RetrievalModel类型
 
 #### 响应参数
 

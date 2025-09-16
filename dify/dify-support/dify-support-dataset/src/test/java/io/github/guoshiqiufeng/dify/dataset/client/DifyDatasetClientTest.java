@@ -607,11 +607,11 @@ class DifyDatasetClientTest {
         request.setQuery("Test query");
 
         // 创建检索模型设置
-        RetrievalModel retrievalModel = new RetrievalModel();
+        RetrieveRetrievalModel retrievalModel = new RetrieveRetrievalModel();
         retrievalModel.setSearchMethod(SearchMethodEnum.hybrid_search);
         retrievalModel.setTopK(5);
         retrievalModel.setRerankingEnable(true);
-        retrievalModel.setRerankingMode(RerankingModeEnum.weighted_score);
+        //retrievalModel.setRerankingMode(RerankingModeEnum.weighted_score);
         request.setRetrievalModel(retrievalModel);
 
         request.setDatasetId("dataset_123");

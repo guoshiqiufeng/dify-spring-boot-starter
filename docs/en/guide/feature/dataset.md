@@ -1025,8 +1025,8 @@ RetrieveRequest
 |----------------|----------------|----------|-------------------------|
 | datasetId      | String         | Yes      | Knowledge base ID       |
 | query          | String         | Yes      | Retrieval query content |
-| retrievalModel | RetrievalModel | No       | Retrieval model         |
-
+| retrievalModel | RetrieveRetrievalModel | No       | Retrieval model         |
+> 1.4.2 之前的版本 retrievalModel 为 RetrievalModel类型
 #### Response Parameters
 
 RetrieveResponse
