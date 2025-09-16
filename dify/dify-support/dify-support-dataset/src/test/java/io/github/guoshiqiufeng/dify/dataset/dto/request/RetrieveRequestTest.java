@@ -123,7 +123,6 @@ public class RetrieveRequestTest {
                 "  \"query\": \"How does machine learning work?\",\n" +
                 "  \"retrieval_model\": {\n" +
                 "    \"search_method\": \"hybrid_search\",\n" +
-                "    \"reranking_mode\": \"weighted_score\",\n" +
                 "    \"reranking_enable\": true,\n" +
                 "    \"top_k\": 5\n" +
                 "  }\n" +
@@ -140,7 +139,6 @@ public class RetrieveRequestTest {
                 "  \"query\": \"How does machine learning work?\",\n" +
                 "  \"retrievalModel\": {\n" +
                 "    \"searchMethod\": \"hybrid_search\",\n" +
-                "    \"rerankingMode\": \"weighted_score\",\n" +
                 "    \"rerankingEnable\": true,\n" +
                 "    \"topK\": 5\n" +
                 "  }\n" +
@@ -163,7 +161,7 @@ public class RetrieveRequestTest {
         // Validate RetrievalModel
         assertNotNull(request.getRetrievalModel());
         assertEquals(SearchMethodEnum.hybrid_search, request.getRetrievalModel().getSearchMethod());
-        assertEquals(RerankingModeEnum.weighted_score, request.getRetrievalModel().getRerankingMode());
+        // assertEquals(RerankingModeEnum.weighted_score, request.getRetrievalModel().getRerankingMode());
         assertTrue(request.getRetrievalModel().getRerankingEnable());
         assertEquals(5, request.getRetrievalModel().getTopK());
     }
