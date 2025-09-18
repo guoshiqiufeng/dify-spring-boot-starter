@@ -83,7 +83,7 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
                                 .queryParam("limit", request.getLimit())
                                 .queryParamIfPresent("tag_ids", Optional.ofNullable(request.getTagIds()).filter(m -> !m.isEmpty()))
                                 .queryParamIfPresent("keyword", Optional.ofNullable(request.getKeyword()).filter(m -> !m.isEmpty()))
-                                .queryParamIfPresent("include_all", Optional.ofNullable(request.getIncludeAll()).filter(m -> !m))
+                                .queryParamIfPresent("include_all", Optional.ofNullable(request.getIncludeAll()))
                                 .build()
                 )
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request).accept(h))
