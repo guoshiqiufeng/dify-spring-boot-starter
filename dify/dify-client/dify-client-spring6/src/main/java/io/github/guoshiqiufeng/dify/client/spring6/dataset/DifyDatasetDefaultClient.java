@@ -207,6 +207,33 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
                 });
     }
 
+    @Override
+    public DocumentInfo getDocument(String datasetId, String documentId, String apiKey) {
+        Assert.notNull(datasetId, "datasetId can not be null");
+        Assert.notNull(documentId, "documentId can not be null");
+        return restClient.get()
+                .uri(DatasetUriConstant.V1_DOCUMENT_URL, datasetId, documentId)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(DocumentInfo.class);
+    }
+
+    @Override
+    public DocumentInfo getDocument(String datasetId, String documentId, String metadata, String apiKey) {
+        Assert.notNull(datasetId, "datasetId can not be null");
+        Assert.notNull(documentId, "documentId can not be null");
+        return restClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(DatasetUriConstant.V1_DOCUMENT_URL)
+                        .queryParamIfPresent("metadata", Optional.ofNullable(metadata))
+                        .build(datasetId, documentId))
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(DocumentInfo.class);
+    }
+
 
     @Override
     public DocumentIndexingStatusResponse indexingStatus(DocumentIndexingStatusRequest request) {

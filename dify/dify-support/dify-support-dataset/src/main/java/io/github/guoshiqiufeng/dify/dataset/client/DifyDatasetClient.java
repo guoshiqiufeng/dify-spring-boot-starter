@@ -115,6 +115,27 @@ public interface DifyDatasetClient {
     DifyPageResult<DocumentInfo> pageDocument(DatasetPageDocumentRequest request);
 
     /**
+     * Retrieves detailed information about a specific document
+     *
+     * @param datasetId  The ID of the dataset containing the document
+     * @param documentId The ID of the document to retrieve
+     * @param apiKey     The API key for authentication and authorization to the Dify API
+     * @return Detailed information about the document
+     */
+    DocumentInfo getDocument(String datasetId, String documentId, String apiKey);
+
+    /**
+     * Retrieves detailed information about a specific document with metadata filtering
+     *
+     * @param datasetId  The ID of the dataset containing the document
+     * @param documentId The ID of the document to retrieve
+     * @param metadata   Metadata filter option (all, only, without)
+     * @param apiKey     The API key for authentication and authorization to the Dify API
+     * @return Detailed information about the document
+     */
+    DocumentInfo getDocument(String datasetId, String documentId, String metadata, String apiKey);
+
+    /**
      * Checks the indexing status of a document
      *
      * @param request The request parameters for checking indexing status
