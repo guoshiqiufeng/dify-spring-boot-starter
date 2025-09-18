@@ -187,6 +187,17 @@ public interface DifyDatasetClient {
     SegmentUpdateResponse updateSegment(SegmentUpdateRequest request);
 
     /**
+     * Retrieves detailed information about a specific segment
+     *
+     * @param datasetId  The ID of the dataset containing the document
+     * @param documentId The ID of the document containing the segment
+     * @param segmentId  The ID of the segment to retrieve
+     * @param apiKey     The API key for authentication and authorization to the Dify API
+     * @return Detailed information about the segment
+     */
+    SegmentData getSegment(String datasetId, String documentId, String segmentId, String apiKey);
+
+    /**
      * Creates a child chunk within a segment
      *
      * @param request The segment child chunk creation request

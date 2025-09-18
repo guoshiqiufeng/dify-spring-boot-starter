@@ -321,6 +321,19 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
     }
 
     @Override
+    public SegmentData getSegment(String datasetId, String documentId, String segmentId, String apiKey) {
+        Assert.notNull(datasetId, "datasetId can not be null");
+        Assert.notNull(documentId, "documentId can not be null");
+        Assert.notNull(segmentId, "segmentId can not be null");
+        return restClient.get()
+                .uri(DatasetUriConstant.V1_DOCUMENTS_SEGMENT_URL, datasetId, documentId, segmentId)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(SegmentData.class);
+    }
+
+    @Override
     public SegmentChildChunkCreateResponse createSegmentChildChunk(SegmentChildChunkCreateRequest request) {
         Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
         Assert.notNull(request.getContent(), "content can not be null");

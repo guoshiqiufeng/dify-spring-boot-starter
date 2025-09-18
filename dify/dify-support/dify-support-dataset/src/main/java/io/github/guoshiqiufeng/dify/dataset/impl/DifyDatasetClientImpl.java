@@ -131,6 +131,11 @@ public class DifyDatasetClientImpl implements DifyDataset {
     }
 
     @Override
+    public SegmentData getSegment(String datasetId, String documentId, String segmentId, String apiKey) {
+        return difyDatasetClient.getSegment(datasetId, documentId, segmentId, apiKey);
+    }
+
+    @Override
     public SegmentChildChunkCreateResponse createSegmentChildChunk(SegmentChildChunkCreateRequest request) {
         return difyDatasetClient.createSegmentChildChunk(request);
     }

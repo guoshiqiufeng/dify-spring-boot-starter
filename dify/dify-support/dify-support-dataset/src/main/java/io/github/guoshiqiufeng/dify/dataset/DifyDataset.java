@@ -224,6 +224,17 @@ public interface DifyDataset {
     SegmentUpdateResponse updateSegment(SegmentUpdateRequest request);
 
     /**
+     * 获取分段详情
+     *
+     * @param datasetId  知识库的唯一标识符。
+     * @param documentId 文档的唯一标识符。
+     * @param segmentId  分段的唯一标识符。
+     * @param apiKey     apiKey
+     * @return 返回分段详情信息。
+     */
+    SegmentData getSegment(String datasetId, String documentId, String segmentId, String apiKey);
+
+    /**
      * 创建子分段
      *
      * @param request 子分段创建请求对象，包含创建分段所需的信息。
