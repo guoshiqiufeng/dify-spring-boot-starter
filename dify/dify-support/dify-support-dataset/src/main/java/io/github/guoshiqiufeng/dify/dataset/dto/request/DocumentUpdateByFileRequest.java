@@ -57,43 +57,67 @@ public class DocumentUpdateByFileRequest extends BaseDatasetRequest implements F
      */
     @JsonProperty("doc_type")
     @JsonAlias("docType")
+    @Deprecated
     private DocTypeEnum docType;
 
     /**
      * 文档元数据（如提供文档类型则必填）
+     *
+     * @deprecated 1.4.3
      */
     @JsonProperty("doc_metadata")
     @JsonAlias("docMetadata")
+    @Deprecated
     private List<MetaData> docMetadata;
 
     /**
      * 索引模式
+     *
+     * @deprecated 1.4.3
      */
     @JsonProperty("indexing_technique")
     @JsonAlias("indexingTechnique")
+    @Deprecated
     private IndexingTechniqueEnum indexingTechnique;
 
+    /**
+     * @deprecated 1.4.3
+     */
     @JsonProperty("doc_form")
     @JsonAlias("docForm")
+    @Deprecated
     private DocFormEnum docForm;
 
+    /**
+     * @deprecated 1.4.3
+     */
     @JsonProperty("doc_language")
     @JsonAlias("docLanguage")
+    @Deprecated
     private String docLanguage;
 
     @JsonProperty("process_rule")
     @JsonAlias("processRule")
     private ProcessRule processRule;
 
+    /**
+     * @deprecated 1.4.3
+     */
     @JsonProperty("retrieval_model")
     @JsonAlias("retrievalModel")
+    @Deprecated
     private RetrievalModel retrievalModel;
 
+    /**
+     * @deprecated 1.4.3
+     */
     @JsonProperty("embedding_model")
     @JsonAlias("embeddingModel")
+    @Deprecated
     private String embeddingModel;
 
     @JsonProperty("embedding_model_provider")
     @JsonAlias("embeddingModelProvider")
+    @Deprecated
     private String embeddingModelProvider;
 }

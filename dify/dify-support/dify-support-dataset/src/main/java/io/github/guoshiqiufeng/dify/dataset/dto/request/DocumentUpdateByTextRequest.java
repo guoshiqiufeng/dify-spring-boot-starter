@@ -50,31 +50,48 @@ public class DocumentUpdateByTextRequest extends BaseDatasetRequest implements S
 
     /**
      * 文档类型（选填）
+     *
+     * @deprecated 1.4.3
      */
     @JsonProperty("doc_type")
     @JsonAlias("docType")
+    @Deprecated
     private DocTypeEnum docType;
 
     /**
      * 文档元数据（如提供文档类型则必填）
+     *
+     * @deprecated 1.4.3
      */
     @JsonProperty("doc_metadata")
     @JsonAlias("docMetadata")
+    @Deprecated
     private List<MetaData> docMetadata;
 
     /**
      * 索引模式
+     *
+     * @deprecated 1.4.3
      */
     @JsonProperty("indexing_technique")
     @JsonAlias("indexingTechnique")
+    @Deprecated
     private IndexingTechniqueEnum indexingTechnique;
 
+    /**
+     * @deprecated 1.4.3
+     */
     @JsonProperty("doc_form")
     @JsonAlias("docForm")
+    @Deprecated
     private DocFormEnum docForm;
 
+    /**
+     * @deprecated 1.4.3
+     */
     @JsonProperty("doc_language")
     @JsonAlias("docLanguage")
+    @Deprecated
     private String docLanguage;
 
     @JsonProperty("process_rule")
