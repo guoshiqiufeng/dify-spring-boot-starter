@@ -91,6 +91,16 @@ public class DifyDatasetClientImpl implements DifyDataset {
     }
 
     @Override
+    public DocumentInfo getDocument(String datasetId, String documentId, String apiKey) {
+        return difyDatasetClient.getDocument(datasetId, documentId, apiKey);
+    }
+
+    @Override
+    public DocumentInfo getDocument(String datasetId, String documentId, String metadata, String apiKey) {
+        return difyDatasetClient.getDocument(datasetId, documentId, metadata, apiKey);
+    }
+
+    @Override
     public DocumentIndexingStatusResponse indexingStatus(DocumentIndexingStatusRequest request) {
         return difyDatasetClient.indexingStatus(request);
     }
@@ -118,6 +128,11 @@ public class DifyDatasetClientImpl implements DifyDataset {
     @Override
     public SegmentUpdateResponse updateSegment(SegmentUpdateRequest request) {
         return difyDatasetClient.updateSegment(request);
+    }
+
+    @Override
+    public SegmentData getSegment(String datasetId, String documentId, String segmentId, String apiKey) {
+        return difyDatasetClient.getSegment(datasetId, documentId, segmentId, apiKey);
     }
 
     @Override

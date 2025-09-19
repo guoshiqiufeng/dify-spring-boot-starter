@@ -83,7 +83,7 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
                                 .queryParam("limit", request.getLimit())
                                 .queryParamIfPresent("tag_ids", Optional.ofNullable(request.getTagIds()).filter(m -> !m.isEmpty()))
                                 .queryParamIfPresent("keyword", Optional.ofNullable(request.getKeyword()).filter(m -> !m.isEmpty()))
-                                .queryParamIfPresent("include_all", Optional.ofNullable(request.getIncludeAll()).filter(m -> !m))
+                                .queryParamIfPresent("include_all", Optional.ofNullable(request.getIncludeAll()))
                                 .build()
                 )
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request).accept(h))
@@ -207,6 +207,33 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
                 });
     }
 
+    @Override
+    public DocumentInfo getDocument(String datasetId, String documentId, String apiKey) {
+        Assert.notNull(datasetId, "datasetId can not be null");
+        Assert.notNull(documentId, "documentId can not be null");
+        return restClient.get()
+                .uri(DatasetUriConstant.V1_DOCUMENT_URL, datasetId, documentId)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(DocumentInfo.class);
+    }
+
+    @Override
+    public DocumentInfo getDocument(String datasetId, String documentId, String metadata, String apiKey) {
+        Assert.notNull(datasetId, "datasetId can not be null");
+        Assert.notNull(documentId, "documentId can not be null");
+        return restClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(DatasetUriConstant.V1_DOCUMENT_URL)
+                        .queryParamIfPresent("metadata", Optional.ofNullable(metadata))
+                        .build(datasetId, documentId))
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(DocumentInfo.class);
+    }
+
 
     @Override
     public DocumentIndexingStatusResponse indexingStatus(DocumentIndexingStatusRequest request) {
@@ -291,6 +318,19 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
                 .retrieve()
                 .onStatus(responseErrorHandler)
                 .body(SegmentUpdateResponse.class);
+    }
+
+    @Override
+    public SegmentData getSegment(String datasetId, String documentId, String segmentId, String apiKey) {
+        Assert.notNull(datasetId, "datasetId can not be null");
+        Assert.notNull(documentId, "documentId can not be null");
+        Assert.notNull(segmentId, "segmentId can not be null");
+        return restClient.get()
+                .uri(DatasetUriConstant.V1_DOCUMENTS_SEGMENT_URL, datasetId, documentId, segmentId)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(SegmentData.class);
     }
 
     @Override

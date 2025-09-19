@@ -66,6 +66,13 @@ public class ChatMessageVO implements Serializable {
 
     private List<ChatMessageFile> files;
 
+    /**
+     * 是否自动生成会话标题
+     */
+    @JsonProperty("auto_generate_name")
+    @JsonAlias("autoGenerateName")
+    private Boolean autoGenerateName = true;
+
     @Data
     public static class ChatMessageFile implements Serializable {
         private static final long serialVersionUID = 3796193415966750860L;

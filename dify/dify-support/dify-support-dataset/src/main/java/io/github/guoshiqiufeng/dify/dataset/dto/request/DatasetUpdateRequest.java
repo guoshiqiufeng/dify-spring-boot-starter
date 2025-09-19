@@ -40,6 +40,16 @@ public class DatasetUpdateRequest extends BaseDatasetRequest implements Serializ
     private String datasetId;
 
     /**
+     * 知识库名称
+     */
+    private String name;
+
+    /**
+     * 知识库描述
+     */
+    private String description;
+
+    /**
      * 索引模式
      */
     @JsonProperty("indexing_technique")

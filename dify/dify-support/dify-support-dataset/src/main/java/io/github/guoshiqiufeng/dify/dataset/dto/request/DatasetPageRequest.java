@@ -44,5 +44,8 @@ public class DatasetPageRequest extends BaseDatasetRequest implements Serializab
 
     private List<String> tagIds;
 
-    private Boolean includeAll;
+    /**
+     * 是否包含所有数据集，仅对工作区所有者有效
+     */
+    private Boolean includeAll = false;
 }

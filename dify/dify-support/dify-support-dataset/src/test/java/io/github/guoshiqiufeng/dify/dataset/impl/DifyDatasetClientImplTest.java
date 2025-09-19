@@ -1507,4 +1507,119 @@ public class DifyDatasetClientImplTest {
         assertNotNull(statusResponse.getResult());
         verify(difyDatasetClient, times(1)).changeDocumentStatus(datasetId, documentIds, DocActionEnum.enable, apiKey);
     }
+
+    @Test
+    void testGetDocument() {
+        // Arrange
+        String datasetId = "dataset_123";
+        String documentId = "doc_456";
+        String apiKey = "test_api_key";
+
+        DocumentInfo expectedDocument = new DocumentInfo();
+        expectedDocument.setId(documentId);
+        expectedDocument.setName("Test Document");
+        expectedDocument.setDataSourceType("text");
+        expectedDocument.setWordCount("1000");
+
+        when(difyDatasetClient.getDocument(anyString(), anyString(), anyString()))
+                .thenReturn(expectedDocument);
+
+        // Act
+        DocumentInfo actualDocument = difyDataset.getDocument(datasetId, documentId, apiKey);
+
+        // Assert
+        assertNotNull(actualDocument);
+        assertEquals(expectedDocument.getId(), actualDocument.getId());
+        assertEquals(expectedDocument.getName(), actualDocument.getName());
+        assertEquals(expectedDocument.getDataSourceType(), actualDocument.getDataSourceType());
+        assertEquals(expectedDocument.getWordCount(), actualDocument.getWordCount());
+        verify(difyDatasetClient, times(1)).getDocument(datasetId, documentId, apiKey);
+    }
+
+    @Test
+    void testGetDocumentNoApiKey() {
+        // Arrange
+        String datasetId = "dataset_123";
+        String documentId = "doc_456";
+
+        DocumentInfo expectedDocument = new DocumentInfo();
+        expectedDocument.setId(documentId);
+        expectedDocument.setName("Test Document");
+        expectedDocument.setDataSourceType("text");
+        expectedDocument.setWordCount("1000");
+
+        when(difyDatasetClient.getDocument(anyString(), anyString(), any()))
+                .thenReturn(expectedDocument);
+
+        // Act
+        DocumentInfo actualDocument = difyDataset.getDocument(datasetId, documentId);
+
+        // Assert
+        assertNotNull(actualDocument);
+        assertEquals(expectedDocument.getId(), actualDocument.getId());
+        assertEquals(expectedDocument.getName(), actualDocument.getName());
+        assertEquals(expectedDocument.getDataSourceType(), actualDocument.getDataSourceType());
+        assertEquals(expectedDocument.getWordCount(), actualDocument.getWordCount());
+        verify(difyDatasetClient, times(1)).getDocument(datasetId, documentId, null);
+    }
+
+    @Test
+    void testGetDocumentWithMetadata() {
+        // Arrange
+        String datasetId = "dataset_123";
+        String documentId = "doc_456";
+        String metadata = "only";
+        String apiKey = "test_api_key";
+
+        DocumentInfo expectedDocument = new DocumentInfo();
+        expectedDocument.setId(documentId);
+        expectedDocument.setName("Test Document");
+        expectedDocument.setDataSourceType("text");
+        expectedDocument.setWordCount("1000");
+
+        when(difyDatasetClient.getDocument(anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(expectedDocument);
+
+        // Act
+        DocumentInfo actualDocument = difyDataset.getDocument(datasetId, documentId, metadata, apiKey);
+
+        // Assert
+        assertNotNull(actualDocument);
+        assertEquals(expectedDocument.getId(), actualDocument.getId());
+        assertEquals(expectedDocument.getName(), actualDocument.getName());
+        assertEquals(expectedDocument.getDataSourceType(), actualDocument.getDataSourceType());
+        assertEquals(expectedDocument.getWordCount(), actualDocument.getWordCount());
+        verify(difyDatasetClient, times(1)).getDocument(datasetId, documentId, metadata, apiKey);
+    }
+
+    @Test
+    void testGetSegment() {
+        // Arrange
+        String datasetId = "dataset_123";
+        String documentId = "doc_456";
+        String segmentId = "seg_789";
+        String apiKey = "test_api_key";
+
+        SegmentData expectedSegment = new SegmentData();
+        expectedSegment.setId(segmentId);
+        expectedSegment.setDocumentId(documentId);
+        expectedSegment.setContent("Segment content");
+        expectedSegment.setWordCount(100);
+        expectedSegment.setKeywords(List.of("keyword1", "keyword2"));
+
+        when(difyDatasetClient.getSegment(anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(expectedSegment);
+
+        // Act
+        SegmentData actualSegment = difyDataset.getSegment(datasetId, documentId, segmentId, apiKey);
+
+        // Assert
+        assertNotNull(actualSegment);
+        assertEquals(expectedSegment.getId(), actualSegment.getId());
+        assertEquals(expectedSegment.getDocumentId(), actualSegment.getDocumentId());
+        assertEquals(expectedSegment.getContent(), actualSegment.getContent());
+        assertEquals(expectedSegment.getWordCount(), actualSegment.getWordCount());
+        assertEquals(expectedSegment.getKeywords(), actualSegment.getKeywords());
+        verify(difyDatasetClient, times(1)).getSegment(datasetId, documentId, segmentId, apiKey);
+    }
 }

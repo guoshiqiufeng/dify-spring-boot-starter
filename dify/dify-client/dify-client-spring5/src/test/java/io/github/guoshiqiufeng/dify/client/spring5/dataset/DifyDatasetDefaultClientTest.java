@@ -41,6 +41,7 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -1763,5 +1764,119 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
             return false;
         }));
         verify(responseSpecMock).bodyToMono(DatasetStatusResponse.class);
+    }
+
+    @Test
+    public void testGetDocument() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String datasetId = "dataset-123456";
+        String documentId = "document-123456";
+
+        // Create expected response
+        DocumentInfo expectedResponse = new DocumentInfo();
+        expectedResponse.setId(documentId);
+        expectedResponse.setName("Test Document");
+        expectedResponse.setDataSourceType("text");
+        expectedResponse.setWordCount("1000");
+
+        // Set up the response mock to return our expected response
+        when(responseSpecMock.bodyToMono(DocumentInfo.class)).thenReturn(Mono.just(expectedResponse));
+
+        // Execute the method
+        DocumentInfo actualResponse = client.getDocument(datasetId, documentId, apiKey);
+
+        // Verify the result
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getName(), actualResponse.getName());
+        assertEquals(expectedResponse.getDataSourceType(), actualResponse.getDataSourceType());
+        assertEquals(expectedResponse.getWordCount(), actualResponse.getWordCount());
+
+        // Verify WebClient interactions
+        verify(webClientMock).get();
+        verify(requestHeadersUriSpecMock).uri(eq(DatasetUriConstant.V1_DOCUMENT_URL), eq(datasetId), eq(documentId));
+        verify(requestHeadersSpecMock).headers(any(Consumer.class));
+        verify(responseSpecMock).bodyToMono(DocumentInfo.class);
+    }
+
+    @Test
+    public void testGetDocumentWithMetadata() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String datasetId = "dataset-123456";
+        String documentId = "document-123456";
+        String metadata = "only";
+
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("metadata"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build(anyString(), anyString())).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
+
+        // Create expected response
+        DocumentInfo expectedResponse = new DocumentInfo();
+        expectedResponse.setId(documentId);
+        expectedResponse.setName("Test Document");
+        expectedResponse.setDataSourceType("text");
+        expectedResponse.setWordCount("1000");
+
+        // Set up the response mock to return our expected response
+        when(responseSpecMock.bodyToMono(DocumentInfo.class)).thenReturn(Mono.just(expectedResponse));
+
+        // Execute the method
+        DocumentInfo actualResponse = client.getDocument(datasetId, documentId, metadata, apiKey);
+
+        // Verify the result
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getName(), actualResponse.getName());
+        assertEquals(expectedResponse.getDataSourceType(), actualResponse.getDataSourceType());
+        assertEquals(expectedResponse.getWordCount(), actualResponse.getWordCount());
+
+        // Verify WebClient interactions
+        verify(webClientMock).get();
+        verify(responseSpecMock).bodyToMono(DocumentInfo.class);
+    }
+
+    @Test
+    public void testGetSegment() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String datasetId = "dataset-123456";
+        String documentId = "document-123456";
+        String segmentId = "segment-123456";
+
+        // Create expected response
+        SegmentData expectedResponse = new SegmentData();
+        expectedResponse.setId(segmentId);
+        expectedResponse.setDocumentId(documentId);
+        expectedResponse.setContent("Segment content");
+        expectedResponse.setWordCount(100);
+        expectedResponse.setKeywords(List.of("keyword1", "keyword2"));
+
+        // Set up the response mock to return our expected response
+        when(responseSpecMock.bodyToMono(SegmentData.class)).thenReturn(Mono.just(expectedResponse));
+
+        // Execute the method
+        SegmentData actualResponse = client.getSegment(datasetId, documentId, segmentId, apiKey);
+
+        // Verify the result
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getDocumentId(), actualResponse.getDocumentId());
+        assertEquals(expectedResponse.getContent(), actualResponse.getContent());
+        assertEquals(expectedResponse.getWordCount(), actualResponse.getWordCount());
+        assertEquals(expectedResponse.getKeywords(), actualResponse.getKeywords());
+
+        // Verify WebClient interactions
+        verify(webClientMock).get();
+        verify(requestHeadersUriSpecMock).uri(eq(DatasetUriConstant.V1_DOCUMENTS_SEGMENT_URL), eq(datasetId), eq(documentId), eq(segmentId));
+        verify(requestHeadersSpecMock).headers(any(Consumer.class));
+        verify(responseSpecMock).bodyToMono(SegmentData.class);
     }
 }

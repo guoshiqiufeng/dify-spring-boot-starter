@@ -120,6 +120,38 @@ public interface DifyDataset {
     DifyPageResult<DocumentInfo> pageDocument(DatasetPageDocumentRequest request);
 
     /**
+     * 获取文档详情
+     *
+     * @param datasetId  知识库的唯一标识符。
+     * @param documentId 文档的唯一标识符。
+     * @return 返回文档详情信息。
+     */
+    default DocumentInfo getDocument(String datasetId, String documentId) {
+        return getDocument(datasetId, documentId, null);
+    }
+
+    /**
+     * 获取文档详情
+     *
+     * @param datasetId  知识库的唯一标识符。
+     * @param documentId 文档的唯一标识符。
+     * @param apiKey     apiKey
+     * @return 返回文档详情信息。
+     */
+    DocumentInfo getDocument(String datasetId, String documentId, String apiKey);
+
+    /**
+     * 获取文档详情（带元数据过滤）
+     *
+     * @param datasetId  知识库的唯一标识符。
+     * @param documentId 文档的唯一标识符。
+     * @param metadata   元数据过滤选项 (all, only, without)
+     * @param apiKey     apiKey
+     * @return 返回文档详情信息。
+     */
+    DocumentInfo getDocument(String datasetId, String documentId, String metadata, String apiKey);
+
+    /**
      * 查询文档索引状态。
      *
      * @param request 索引状态查询请求对象，包含查询所需的信息。
@@ -190,6 +222,17 @@ public interface DifyDataset {
      * @return 返回分段更新响应对象。
      */
     SegmentUpdateResponse updateSegment(SegmentUpdateRequest request);
+
+    /**
+     * 获取分段详情
+     *
+     * @param datasetId  知识库的唯一标识符。
+     * @param documentId 文档的唯一标识符。
+     * @param segmentId  分段的唯一标识符。
+     * @param apiKey     apiKey
+     * @return 返回分段详情信息。
+     */
+    SegmentData getSegment(String datasetId, String documentId, String segmentId, String apiKey);
 
     /**
      * 创建子分段
