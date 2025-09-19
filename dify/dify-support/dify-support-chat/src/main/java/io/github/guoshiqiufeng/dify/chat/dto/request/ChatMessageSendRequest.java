@@ -15,6 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.chat.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.guoshiqiufeng.dify.core.enums.message.MessageFileTransferMethodEnum;
 import io.github.guoshiqiufeng.dify.core.enums.message.MessageFileTypeEnum;
 import lombok.Data;
@@ -57,6 +59,12 @@ public class ChatMessageSendRequest extends BaseChatRequest implements Serializa
      */
     private Map<String, Object> inputs;
 
+    /**
+     * 是否自动生成会话标题
+     */
+    @JsonProperty("auto_generate_name")
+    @JsonAlias("autoGenerateName")
+    private Boolean autoGenerateName = true;
 
     @Data
     public static class ChatMessageFile {

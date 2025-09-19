@@ -519,6 +519,7 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
         chatMessage.setUser(sendRequest.getUserId());
         chatMessage.setQuery(sendRequest.getContent());
         chatMessage.setConversationId(sendRequest.getConversationId());
+        chatMessage.setAutoGenerateName(sendRequest.getAutoGenerateName());
         List<ChatMessageSendRequest.ChatMessageFile> files = sendRequest.getFiles();
         if (!CollectionUtils.isEmpty(files)) {
             files = files.stream().peek(f -> {
