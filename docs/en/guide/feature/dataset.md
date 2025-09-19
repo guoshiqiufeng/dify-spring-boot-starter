@@ -91,24 +91,61 @@ DifyPageResult<DatasetResponse> page(DatasetPageRequest request);
 
 DatasetPageRequest
 
-| Parameter | Type    | Required | Description                  |
-|-----------|---------|----------|------------------------------|
-| page      | Integer | No       | Page number, default 1       |
-| limit     | Integer | No       | Records per page, default 20 |
+| Parameter  | Type           | Required | Description                                                               |
+|------------|----------------|----------|---------------------------------------------------------------------------|
+| page       | Integer        | No       | Page number, default 1                                                    |
+| limit      | Integer        | No       | Records per page, default 20, range 1-100                                 |
+| keyword    | String         | No       | Search keyword                                                            |
+| tagIds     | `List<String>` | No       | List of tag IDs                                                           |
+| includeAll | Boolean        | No       | Whether to include all datasets, only for workspace owners, default false |
 
 #### Response Parameters
 
 `DifyPageResult<DatasetResponse>`
 
-| Parameter | Type                    | Description         |
-|-----------|-------------------------|---------------------|
-| list      | `List<DatasetResponse>` | Knowledge base list |
-| total     | Long                    | Total records       |
-| page      | Integer                 | Current page        |
-| limit     | Integer                 | Records per page    |
-| pages     | Integer                 | Total pages         |
+| Parameter | Type                    | Description      |
+|-----------|-------------------------|------------------|
+| data      | `List<DatasetResponse>` | Dataset list     |
+| total     | Long                    | Total records    |
+| page      | Integer                 | Current page     |
+| limit     | Integer                 | Records per page |
+| pages     | Integer                 | Total pages      |
 
-DatasetResponse See 1.1
+**DatasetResponse Object Structure**
+
+| Parameter              | Type                  | Description                    |
+|------------------------|-----------------------|--------------------------------|
+| id                     | String                | Dataset ID                     |
+| name                   | String                | Dataset name                   |
+| description            | String                | Dataset description            |
+| permission             | PermissionEnum        | Permission                     |
+| dataSourceType         | String                | Data source type               |
+| indexingTechnique      | IndexingTechniqueEnum | Indexing technique             |
+| appCount               | Integer               | Application count              |
+| documentCount          | Integer               | Document count                 |
+| wordCount              | Integer               | Word count                     |
+| createdBy              | String                | Created by                     |
+| createdAt              | Long                  | Creation timestamp             |
+| updatedBy              | String                | Updated by                     |
+| updatedAt              | Long                  | Update timestamp               |
+| embeddingModel         | String                | Embedding model                |
+| embeddingModelProvider | String                | Embedding model provider       |
+| embeddingAvailable     | Boolean               | Whether embedding is available |
+
+**PermissionEnum Values**
+
+| Enum Value       | Code Value       | Description          |
+|------------------|------------------|----------------------|
+| ONLY_ME          | only_me          | Only self            |
+| ALL_TEAM_MEMBERS | all_team_members | All team members     |
+| PARTIAL_MEMBERS  | partial_members  | Partial team members |
+
+**IndexingTechniqueEnum Values**
+
+| Enum Value   | Code Value   | Description  |
+|--------------|--------------|--------------|
+| HIGH_QUALITY | high_quality | High quality |
+| ECONOMY      | economy      | Economy      |
 
 ### 1.3 Knowledge Base Details
 
@@ -698,6 +735,118 @@ DatasetStatusResponse
 |-----------|--------|------------------------------------------------|
 | result    | String | Operation result, returns "success" on success |
 
+### 2.10 Get Document Details
+
+#### Method
+
+```java
+DocumentInfo getDocument(String datasetId, String documentId);
+
+DocumentInfo getDocument(String datasetId, String documentId, String apiKey);
+```
+
+#### Request Parameters
+
+| Parameter  | Type   | Required | Description        |
+|------------|--------|----------|--------------------|
+| datasetId  | String | Yes      | Dataset ID         |
+| documentId | String | Yes      | Document ID        |
+| apiKey     | String | No       | API key (optional) |
+
+#### Response Parameters
+
+DocumentInfo
+
+| Parameter            | Type                  | Description             |
+|----------------------|-----------------------|-------------------------|
+| id                   | String                | Document ID             |
+| position             | Integer               | Position                |
+| dataSourceType       | String                | Data source type        |
+| dataSourceInfo       | `Map<String, Object>` | Data source information |
+| datasetProcessRuleId | String                | Dataset process rule ID |
+| name                 | String                | Document name           |
+| createdFrom          | String                | Creation source         |
+| createdBy            | String                | Created by              |
+| createdAt            | Long                  | Creation timestamp      |
+| tokens               | Integer               | Token count             |
+| indexingStatus       | String                | Indexing status         |
+| error                | String                | Error message           |
+| enabled              | String                | Whether enabled         |
+| disabledAt           | Long                  | Disabled timestamp      |
+| disabledBy           | String                | Disabled by             |
+| archived             | String                | Whether archived        |
+| displayStatus        | String                | Display status          |
+| wordCount            | String                | Word count              |
+| hitCount             | String                | Hit count               |
+| docForm              | String                | Document form           |
+
+### 2.11 Get Document Details (with Metadata Filtering)
+
+#### Method
+
+```java
+DocumentInfo getDocument(String datasetId, String documentId, String metadata, String apiKey);
+```
+
+#### Request Parameters
+
+| Parameter  | Type   | Required | Description                                              |
+|------------|--------|----------|----------------------------------------------------------|
+| datasetId  | String | Yes      | Dataset ID                                               |
+| documentId | String | Yes      | Document ID                                              |
+| metadata   | String | No       | Metadata filter option (all, only, without), default all |
+| apiKey     | String | No       | API key (optional)                                       |
+
+#### Response Parameters
+
+Same as 2.10
+
+### 2.12 Get Segment Details
+
+#### Method
+
+```java
+SegmentData getSegment(String datasetId, String documentId, String segmentId, String apiKey);
+```
+
+#### Request Parameters
+
+| Parameter  | Type   | Required | Description        |
+|------------|--------|----------|--------------------|
+| datasetId  | String | Yes      | Dataset ID         |
+| documentId | String | Yes      | Document ID        |
+| segmentId  | String | Yes      | Segment ID         |
+| apiKey     | String | No       | API key (optional) |
+
+#### Response Parameters
+
+SegmentData
+
+| Parameter      | Type           | Description          |
+|----------------|----------------|----------------------|
+| id             | String         | Segment ID           |
+| position       | Integer        | Position             |
+| documentId     | String         | Document ID          |
+| content        | String         | Segment content      |
+| answer         | String         | Answer               |
+| wordCount      | Integer        | Word count           |
+| tokens         | Integer        | Token count          |
+| keywords       | `List<String>` | Keywords list        |
+| indexNodeId    | String         | Index node ID        |
+| indexNodeHash  | String         | Index node hash      |
+| hitCount       | Integer        | Hit count            |
+| indexingStatus | String         | Indexing status      |
+| error          | String         | Error message        |
+| enabled        | String         | Whether enabled      |
+| disabledAt     | Long           | Disabled timestamp   |
+| disabledBy     | String         | Disabled by          |
+| status         | String         | Status               |
+| archived       | Boolean        | Whether archived     |
+| createdAt      | Long           | Creation timestamp   |
+| indexingAt     | Long           | Indexing timestamp   |
+| completedAt    | Long           | Completion timestamp |
+| stoppedAt      | Long           | Stopped timestamp    |
+
 ## 3. Segment Management
 
 ### 3.1 Create Segment
@@ -921,7 +1070,7 @@ SegmentChildChunkCreateResponse
 | indexingAt    | Long    | Indexing timestamp   |
 | completedAt   | Long    | Completion timestamp |
 | error         | String  | Error message        |
-| stoppedAt     | Long    | Stop timestamp       |
+| stoppedAt     | Long    | Stopped timestamp    |
 
 ### 4.2 Paginated Query of Child Chunk List
 
@@ -1021,20 +1170,65 @@ RetrieveResponse retrieve(RetrieveRequest request);
 
 RetrieveRequest
 
-| Parameter      | Type           | Required | Description             |
-|----------------|----------------|----------|-------------------------|
-| datasetId      | String         | Yes      | Knowledge base ID       |
-| query          | String         | Yes      | Retrieval query content |
+| Parameter      | Type                   | Required | Description             |
+|----------------|------------------------|----------|-------------------------|
+| datasetId      | String                 | Yes      | Dataset ID              |
+| query          | String                 | Yes      | Retrieval query content |
 | retrievalModel | RetrieveRetrievalModel | No       | Retrieval model         |
-> 1.4.2 之前的版本 retrievalModel 为 RetrievalModel类型
+
+> In versions prior to 1.4.2, retrievalModel was of type RetrievalModel
+
+**RetrieveRetrievalModel Object Structure**
+
+| Parameter                   | Type                               | Required | Description                       |
+|-----------------------------|------------------------------------|----------|-----------------------------------|
+| searchMethod                | SearchMethodEnum                   | No       | Search method                     |
+| rerankingMode               | RetrievalModel.RerankingModel      | No       | Reranking mode                    |
+| rerankingEnable             | Boolean                            | No       | Whether to enable reranking       |
+| weights                     | Float                              | No       | Weights                           |
+| topK                        | Integer                            | No       | Number of results to return       |
+| scoreThresholdEnabled       | Boolean                            | No       | Whether to enable score threshold |
+| scoreThreshold              | Float                              | No       | Score threshold                   |
+| metadataFilteringConditions | RetrievalModel.FilteringConditions | No       | Metadata filtering conditions     |
+
+**SearchMethodEnum Values**
+
+| Enum Value       | Description      |
+|------------------|------------------|
+| keyword_search   | Keyword search   |
+| hybrid_search    | Hybrid search    |
+| semantic_search  | Semantic search  |
+| full_text_search | Full text search |
+
+**RetrievalModel.RerankingModel Object Structure**
+
+| Parameter             | Type   | Description             |
+|-----------------------|--------|-------------------------|
+| rerankingProviderName | String | Reranking provider name |
+| rerankingModelName    | String | Reranking model name    |
+
+**RetrievalModel.FilteringConditions Object Structure**
+
+| Parameter       | Type              | Description        |
+|-----------------|-------------------|--------------------|
+| logicalOperator | String            | Logical operator   |
+| conditions      | `List<Condition>` | List of conditions |
+
+**Condition Object Structure**
+
+| Parameter          | Type   | Description         |
+|--------------------|--------|---------------------|
+| name               | String | Condition name      |
+| comparisonOperator | String | Comparison operator |
+
 #### Response Parameters
 
 RetrieveResponse
 
-| Parameter | Type                   | Description           |
-|-----------|------------------------|-----------------------|
-| query     | RetrieveQuery          | Query information     |
-| records   | `List<RetrieveRecord>` | Retrieval record list |
+| Parameter | Type                   | Description       |
+|-----------|------------------------|-------------------|
+| query     | RetrieveQuery          | Query information |
+| records   | `List<RetrieveRecord>` | Retrieval records |
 
 **RetrieveQuery Object Structure**
 
@@ -1044,11 +1238,11 @@ RetrieveResponse
 
 **RetrieveRecord Object Structure**
 
-| Parameter    | Type         | Description               |
-|--------------|--------------|---------------------------|
-| segment      | Segment      | Segment information       |
-| score        | Float        | Relevance score           |
-| tsnePosition | TsnePosition | TSNE position information |
+| Parameter    | Type         | Description         |
+|--------------|--------------|---------------------|
+| segment      | Segment      | Segment information |
+| score        | Float        | Relevance score     |
+| tsnePosition | TsnePosition | TSNE position info  |
 
 **TsnePosition Object Structure**
 
@@ -1059,30 +1253,30 @@ RetrieveResponse
 
 **Segment Object Structure**
 
-| Parameter     | Type            | Description          |
-|---------------|-----------------|----------------------|
-| id            | String          | Segment ID           |
-| position      | Integer         | Position             |
-| documentId    | String          | Document ID          |
-| content       | String          | Segment content      |
-| answer        | String          | Answer               |
-| wordCount     | Integer         | Word count           |
-| tokens        | Integer         | Token count          |
-| keywords      | ` List<String>` | Keyword list         |
-| indexNodeId   | String          | Index node ID        |
-| indexNodeHash | String          | Index node hash      |
-| hitCount      | Integer         | Hit count            |
-| enabled       | String          | Whether enabled      |
-| disabledAt    | Long            | Disabled timestamp   |
-| disabledBy    | String          | Disabled by          |
-| status        | String          | Status               |
-| createdAt     | Long            | Creation timestamp   |
-| createdBy     | String          | Created by           |
-| indexingAt    | Long            | Indexing timestamp   |
-| completedAt   | Long            | Completion timestamp |
-| error         | String          | Error message        |
-| stoppedAt     | Long            | Stop timestamp       |
-| document      | Document        | Document information |
+| Parameter     | Type           | Description          |
+|---------------|----------------|----------------------|
+| id            | String         | Segment ID           |
+| position      | Integer        | Position             |
+| documentId    | String         | Document ID          |
+| content       | String         | Segment content      |
+| answer        | String         | Answer               |
+| wordCount     | Integer        | Word count           |
+| tokens        | Integer        | Token count          |
+| keywords      | `List<String>` | Keywords list        |
+| indexNodeId   | String         | Index node ID        |
+| indexNodeHash | String         | Index node hash      |
+| hitCount      | Integer        | Hit count            |
+| enabled       | String         | Whether enabled      |
+| disabledAt    | Long           | Disabled timestamp   |
+| disabledBy    | String         | Disabled by          |
+| status        | String         | Status               |
+| createdAt     | Long           | Creation timestamp   |
+| createdBy     | String         | Created by           |
+| indexingAt    | Long           | Indexing timestamp   |
+| completedAt   | Long           | Completion timestamp |
+| error         | String         | Error message        |
+| stoppedAt     | Long           | Stopped timestamp    |
+| document      | Document       | Document info        |
 
 **Document Object Structure**
 
@@ -1251,10 +1445,10 @@ MetaDataListResponse listMetaData(String datasetId, String apiKey);
 
 MetaDataListResponse
 
-| Parameter           | Type                | Description                       |
-|---------------------|---------------------|-----------------------------------|
-| builtInFieldEnabled | Boolean             | Whether built-in field is enabled |
-| docMetadata         | `List<DocMetadata>` | Document metadata list            |
+| Parameter           | Type                 | Description                       |
+|---------------------|----------------------|-----------------------------------|
+| builtInFieldEnabled | Boolean              | Whether built-in field is enabled |
+| docMetadata         | `List<DocMetadata> ` | Document metadata list            |
 
 **DocMetadata Object Structure**
 
@@ -1263,7 +1457,7 @@ MetaDataListResponse
 | id        | String  | Metadata ID   |
 | type      | String  | Metadata type |
 | name      | String  | Metadata name |
-| userCount | Integer | Usage count   |
+| userCount | Integer | User count    |
 
 ## 7. Embedding Models
 
@@ -1451,37 +1645,6 @@ TextEmbeddingListResponse
 
 ---
 
-## 8. Tag Management
-
-### 8.1 Create Tag
-
-#### Method
-
-```java
-TagInfoResponse createTag(TagCreateRequest request);
-```
-
-#### Request Parameters
-
-TagCreateRequest
-
-| Parameter | Type   | Required | Description             |
-|-----------|--------|----------|-------------------------|
-| name      | String | Yes      | Tag name, max length 50 |
-
-#### Response Parameters
-
-TagInfoResponse
-
-| Parameter    | Type    | Description        |
-|--------------|---------|--------------------|
-| id           | String  | Tag ID             |
-| name         | String  | Tag name           |
-| type         | String  | Tag type           |
-| bindingCount | Integer | Number of bindings |
-
----
-
 ### 8.2 List Tags
 
 #### Method
@@ -1500,7 +1663,16 @@ List<TagInfoResponse> listTag(String apiKey);
 
 #### Response Parameters
 
-Same as 8.1 TagInfoResponse list
+List of TagInfoResponse
+
+**TagInfoResponse Object Structure**
+
+| Parameter    | Type    | Description        |
+|--------------|---------|--------------------|
+| id           | String  | Tag ID             |
+| name         | String  | Tag name           |
+| type         | String  | Tag type           |
+| bindingCount | Integer | Number of bindings |
 
 ---
 
@@ -1523,76 +1695,14 @@ TagUpdateRequest
 
 #### Response Parameters
 
-Same as 8.1 TagInfoResponse
+**TagInfoResponse Object Structure**
 
----
-
-### 8.4 Delete Tag
-
-#### Method
-
-```java
-void deleteTag(String tagId);
-
-void deleteTag(String tagId, String apiKey);
-```
-
-#### Request Parameters
-
-| Parameter | Type   | Required | Description        |
-|-----------|--------|----------|--------------------|
-| tagId     | String | Yes      | Tag ID             |
-| apiKey    | String | No       | API key (optional) |
-
-#### Response Parameters
-
-None
-
----
-
-### 8.5 Bind Tags to Resource
-
-#### Method
-
-```java
-void bindingTag(TagBindingRequest request);
-```
-
-#### Request Parameters
-
-TagBindingRequest
-
-| Parameter | Type           | Required | Description               |
-|-----------|----------------|----------|---------------------------|
-| tagIds    | `List<String>` | Yes      | List of tag IDs           |
-| targetId  | String         | Yes      | Target ID (e.g., dataset) |
-
-#### Response Parameters
-
-None
-
----
-
-### 8.6 Unbind Tag
-
-#### Method
-
-```java
-void unbindingTag(TagUnbindingRequest request);
-```
-
-#### Request Parameters
-
-TagUnbindingRequest
-
-| Parameter | Type   | Required | Description               |
-|-----------|--------|----------|---------------------------|
-| tagId     | String | Yes      | Tag ID                    |
-| targetId  | String | Yes      | Target ID (e.g., dataset) |
-
-#### Response Parameters
-
-None
+| Parameter    | Type    | Description        |
+|--------------|---------|--------------------|
+| id           | String  | Tag ID             |
+| name         | String  | Tag name           |
+| type         | String  | Tag type           |
+| bindingCount | Integer | Number of bindings |
 
 ---
 
@@ -1622,7 +1732,12 @@ DataSetTagsResponse
 | data      | `List<DataSetTagInfo>` | List of tag info     |
 | total     | Integer                | Total number of tags |
 
-See DataSetTagInfo structure in implementation for details.
+**DataSetTagInfo Object Structure**
+
+| Parameter | Type   | Description |
+|-----------|--------|-------------|
+| id        | String | Tag ID      |
+| name      | String | Tag name    |
 
 ---
 
