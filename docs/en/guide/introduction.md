@@ -6,102 +6,121 @@ description: en-US
 
 # Guide
 
-[dify-spring-boot-starter](https://github.com/guoshiqiufeng/dify-spring-boot-starter) It is based on
-spring-cloud-stream
-Implementation of the Redis messaging framework.
+[dify-spring-boot-starter](https://github.com/guoshiqiufeng/dify-spring-boot-starter) is a Spring Boot starter
+implementation of the Dify API calling framework.
 
-## Characterization
+## Characteristics
 
-- **Non-intrusive**: Non-intrusive integration calls by way of spring-boot-starter.
-- **Standardize**： Based on the Dify interface specification.
+- **Non-intrusive**: Non-intrusive integration calls through spring-boot-starter approach.
+- **Standardized**: Based on Dify interface specifications.
 
-## Supported
+## Supported Services
 
 - Chat (Chat Related)
 - Workflow (Workflow Related)
 - Dataset (Knowledge Base)
-- Server (Doesn't provide open interface functionality)
+- Server (Features without open interfaces)
 
 ## Features
 
-- Available - ✅
-- In progress - 🚧
+Legend:
 
-| Feature                                                     | status |
-|-------------------------------------------------------------|--------|
-| 【CHAT】Send Message                                          | ✅      |
-| 【CHAT】Send Message Stream                                   | ✅      |
-| 【CHAT】Stop Message Stream                                   | ✅      |
-| 【CHAT】Message Feedback (Likes)                              | ✅      |
-| 【CHAT】Message Feedbacks                                     | ✅      |
-| 【CHAT】Get session list                                      | ✅      |
-| 【CHAT】Getting a list of messages                            | ✅      |
-| 【CHAT】Get a list of suggested messages                      | ✅      |
-| 【CHAT】Deleting a session                                    | ✅      |
-| 【CHAT】Session rename                                        | ✅      |
-| 【CHAT】Getting Application Parameters                        | ✅      |
-| 【CHAT】text-to-speech                                        | ✅      |
-| 【CHAT】speech-to-text                                        | ✅      |
-| 【CHAT】File Upload                                           | ✅      |
-| 【CHAT】File Preview                                          | ✅      |  
-| 【CHAT】Get Application Basic Information                     | ✅      |
-| 【CHAT】Get Application Meta Information                      | ✅      |
-| 【CHAT】Get Application WebApp Settings                       | ✅      |
-| 【CHAT】Get Annotation List                                   | ✅      |
-| 【CHAT】Create Annotation                                     | ✅      |
-| 【CHAT】Update Annotation                                     | ✅      |
-| 【CHAT】Delete Annotation                                     | ✅      |
-| 【CHAT】Initial Annotation Reply Settings                     | ✅      |
-| 【CHAT】Query Initial Annotation Reply Settings Task Status   | ✅      |
-| 【WORKFLOW】 Run Workflow                                     | ✅      |
-| 【WORKFLOW】 Run Workflow Stream                              | ✅      |
-| 【WORKFLOW】 Stop Workflow Stream                             | ✅      |
-| 【WORKFLOW】 Workflow Logs                                    | ✅      |
-| 【KNOWLEDGE】 Create a Document from Text                     | ✅      |
-| 【KNOWLEDGE】 Create a Document from a File                   | ✅      |
-| 【KNOWLEDGE】 Create an Empty Knowledge Base                  | ✅      |
-| 【KNOWLEDGE】 Get knowledge base details by knowledge base ID | ✅      |
-| 【KNOWLEDGE】 Update knowledge base                           | ✅      |
-| 【KNOWLEDGE】 Get Knowledge Base List                         | ✅      |
-| 【KNOWLEDGE】 Delete a Knowledge Base                         | ✅      |
-| 【KNOWLEDGE】 Update a Document with Text                     | ✅      |
-| 【KNOWLEDGE】 Update a Document with a File                   | ✅      |
-| 【KNOWLEDGE】 Get Document Embedding Status (Progress)        | ✅      |
-| 【KNOWLEDGE】 Delete a Document                               | ✅      |
-| 【KNOWLEDGE】 Get the Document List of a Knowledge Base       | ✅      |
-| 【KNOWLEDGE】 Add Chunks to a Document                        | ✅      |
-| 【KNOWLEDGE】 Get Chunks from a Document                      | ✅      |
-| 【KNOWLEDGE】 Delete a Chunk in a Document                    | ✅      |
-| 【KNOWLEDGE】 Update a Chunk in a Document                    | ✅      |
-| 【KNOWLEDGE】 Create Child Chunk                              | ✅      |
-| 【KNOWLEDGE】Get Child Chunks                                 | ✅      |
-| 【KNOWLEDGE】 Delete Child Chunk                              | ✅      |
-| 【KNOWLEDGE】 Update Child Chunk                              | ✅      |
-| 【KNOWLEDGE】 Get Upload File                                 | ✅      |
-| 【KNOWLEDGE】 Retrieve Chunks from a Knowledge Base           | ✅      |
-| 【KNOWLEDGE】 Create a Knowledge Metadata                     | ✅      |
-| 【KNOWLEDGE】 Update a Knowledge Metadata                     | ✅      |
-| 【KNOWLEDGE】 Delete a Knowledge Metadata                     | ✅      |
-| 【KNOWLEDGE】 Disable Or Enable Built-in Metadata             | ✅      |
-| 【KNOWLEDGE】 Update Documents Metadata                       | ✅      |
-| 【KNOWLEDGE】 Get Knowledge Metadata List                     | ✅      |
-| 【KNOWLEDGE】 Get available embedding models                  | ✅      |
-| 【KNOWLEDGE】 Get rerank models                               | ✅      |
-| 【KNOWLEDGE】 Create New Knowledge Base Type Tag              | ✅      |
-| 【KNOWLEDGE】 Modify Knowledge Base Type Tag Name             | ✅      |
-| 【KNOWLEDGE】 Delete Knowledge Base Type Tag                  | ✅      |
-| 【KNOWLEDGE】 Bind Dataset to Knowledge Base Type Tag         | ✅      |
-| 【KNOWLEDGE】 Unbind Dataset and Knowledge Base Type Tag      | ✅      |
-| 【KNOWLEDGE】 Query Tags Bound to a Dataset                   | ✅      |
-| 【SERVER】Get Applications List                               | ✅      |
-| 【SERVER】Get Application Information                         | ✅      |
-| 【SERVER】Get Application API Keys                            | ✅      |
-| 【SERVER】Initialize Application API Key                      | ✅      |
-| 【SERVER】Get Knowledge Base API Keys                         | ✅      |
-| 【SERVER】Initialize Knowledge Base API Key                   | ✅      |
+- ✅ Available
+- 🚧 In Progress
 
-Tips：
+### Chat Features
 
-## Code hosting
+| Feature                                             | Status |
+|-----------------------------------------------------|--------|
+| Send Message                                        | ✅      |
+| Send Message Stream                                 | ✅      |
+| Stop Message Stream                                 | ✅      |
+| Message Feedback (Likes)                            | ✅      |
+| Message Feedbacks                                   | ✅      |
+| Get Session List                                    | ✅      |
+| Get Message List                                    | ✅      |
+| Get Suggested Messages List                         | ✅      |
+| Delete Session                                      | ✅      |
+| Rename Session                                      | ✅      |
+| Get Application Parameters                          | ✅      |
+| Text-to-Speech                                      | ✅      |
+| Speech-to-Text                                      | ✅      |
+| File Upload                                         | ✅      |
+| File Preview                                        | ✅      |
+| Get Application Basic Information                   | ✅      |
+| Get Application Meta Information                    | ✅      |
+| Get Application WebApp Settings                     | ✅      |
+| Get Annotation List                                 | ✅      |
+| Create Annotation                                   | ✅      |
+| Update Annotation                                   | ✅      |
+| Delete Annotation                                   | ✅      |
+| Initial Annotation Reply Settings                   | ✅      |
+| Query Initial Annotation Reply Settings Task Status | ✅      |
+
+### Workflow Features
+
+| Feature              | Status |
+|----------------------|--------|
+| Run Workflow         | ✅      |
+| Run Workflow Stream  | ✅      |
+| Stop Workflow Stream | ✅      |
+| Workflow Logs        | ✅      |
+
+### Dataset (Knowledge Base) Features
+
+| Feature                                      | Status |
+|----------------------------------------------|--------|
+| Create Document from Text                    | ✅      |
+| Create Document from File                    | ✅      |
+| Create Empty Knowledge Base                  | ✅      |
+| Get Knowledge Base Details by ID             | ✅      |
+| Update Knowledge Base                        | ✅      |
+| Get Knowledge Base List                      | ✅      |
+| Delete Knowledge Base                        | ✅      |
+| Update Document with Text                    | ✅      |
+| Update Document with File                    | ✅      |
+| Get Document Embedding Status (Progress)     | ✅      |
+| Delete Document                              | ✅      |
+| Get Document List of Knowledge Base          | ✅      |
+| Get Document Details                         | ✅      |
+| Get Document Details with Metadata Filtering | ✅      |
+| Get Segment Details                          | ✅      |
+| Add Chunks to Document                       | ✅      |
+| Get Chunks from Document                     | ✅      |
+| Delete Chunk in Document                     | ✅      |
+| Update Chunk in Document                     | ✅      |
+| Create Child Chunk                           | ✅      |
+| Get Child Chunks                             | ✅      |
+| Delete Child Chunk                           | ✅      |
+| Update Child Chunk                           | ✅      |
+| Get Upload File                              | ✅      |
+| Retrieve Chunks from Knowledge Base          | ✅      |
+| Create Knowledge Metadata                    | ✅      |
+| Update Knowledge Metadata                    | ✅      |
+| Delete Knowledge Metadata                    | ✅      |
+| Disable/Enable Built-in Metadata             | ✅      |
+| Update Documents Metadata                    | ✅      |
+| Get Knowledge Metadata List                  | ✅      |
+| Get Available Embedding Models               | ✅      |
+| Get Rerank Models                            | ✅      |
+| Create Knowledge Base Type Tag               | ✅      |
+| Modify Knowledge Base Type Tag Name          | ✅      |
+| Delete Knowledge Base Type Tag               | ✅      |
+| Bind Dataset to Knowledge Base Type Tag      | ✅      |
+| Unbind Dataset and Knowledge Base Type Tag   | ✅      |
+| Query Tags Bound to Dataset                  | ✅      |
+
+### Server Features
+
+| Feature                           | Status |
+|-----------------------------------|--------|
+| Get Applications List             | ✅      |
+| Get Application Information       | ✅      |
+| Get Application API Keys          | ✅      |
+| Initialize Application API Key    | ✅      |
+| Get Knowledge Base API Keys       | ✅      |
+| Initialize Knowledge Base API Key | ✅      |
+
+## Code Hosting
 
 > **[GitHub](https://github.com/guoshiqiufeng/dify-spring-boot-starter)**

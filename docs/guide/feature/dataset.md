@@ -88,10 +88,13 @@ DifyPageResult<DatasetResponse> page(DatasetPageRequest request);
 
 DatasetPageRequest
 
-| 参数名   | 类型      | 是否必须 | 描述          |
-|-------|---------|------|-------------|
-| page  | Integer | 否    | 页码，默认1      |
-| limit | Integer | 否    | 每页记录数，默认20条 |
+| 参数名        | 类型             | 是否必须 | 描述                           |
+|------------|----------------|------|------------------------------|
+| page       | Integer        | 否    | 页码，默认1                       |
+| limit      | Integer        | 否    | 每页记录数，默认20，范围1-100           |
+| keyword    | String         | 否    | 搜索关键字                        |
+| tagIds     | `List<String>` | 否    | 标签ID列表                       |
+| includeAll | Boolean        | 否    | 是否包含所有数据集，仅对工作区所有者有效，默认false |
 
 #### 响应参数
 
@@ -99,13 +102,47 @@ DatasetPageRequest
 
 | 参数名   | 类型                      | 描述    |
 |-------|-------------------------|-------|
-| list  | `List<DatasetResponse>` | 知识库列表 |
+| data  | `List<DatasetResponse>` | 知识库列表 |
 | total | Long                    | 总记录数  |
 | page  | Integer                 | 当前页码  |
 | limit | Integer                 | 每页记录数 |
 | pages | Integer                 | 总页数   |
 
-DatasetResponse 查看 1.1
+**DatasetResponse 对象结构**
+
+| 参数名                    | 类型                    | 描述      |
+|------------------------|-----------------------|---------|
+| id                     | String                | 知识库 id  |
+| name                   | String                | 知识库名称   |
+| description            | String                | 知识库描述   |
+| permission             | PermissionEnum        | 权限      |
+| dataSourceType         | String                | 数据源类型   |
+| indexingTechnique      | IndexingTechniqueEnum | 索引技术    |
+| appCount               | Integer               | 应用数量    |
+| documentCount          | Integer               | 文档数量    |
+| wordCount              | Integer               | 单词数量    |
+| createdBy              | String                | 创建人     |
+| createdAt              | Long                  | 创建时间戳   |
+| updatedBy              | String                | 更新人     |
+| updatedAt              | Long                  | 更新时间戳   |
+| embeddingModel         | String                | 嵌入模型    |
+| embeddingModelProvider | String                | 嵌入模型提供商 |
+| embeddingAvailable     | Boolean               | 嵌入是否可用  |
+
+**PermissionEnum 枚举值**
+
+| 枚举值              | 代码值              | 描述     |
+|------------------|------------------|--------|
+| ONLY_ME          | only_me          | 仅自己    |
+| ALL_TEAM_MEMBERS | all_team_members | 所有团队成员 |
+| PARTIAL_MEMBERS  | partial_members  | 部分团队成员 |
+
+**IndexingTechniqueEnum 枚举值**
+
+| 枚举值          | 代码值          | 描述  |
+|--------------|--------------|-----|
+| HIGH_QUALITY | high_quality | 高质量 |
+| ECONOMY      | economy      | 经济型 |
 
 ### 1.3 知识库详情
 
@@ -695,6 +732,118 @@ DatasetStatusResponse
 |--------|--------|----------------------|
 | result | String | 操作结果，成功时返回 "success" |
 
+### 2.10 获取文档详情
+
+#### 方法
+
+```java
+DocumentInfo getDocument(String datasetId, String documentId);
+
+DocumentInfo getDocument(String datasetId, String documentId, String apiKey);
+```
+
+#### 请求参数
+
+| 参数名        | 类型     | 是否必须 | 描述        |
+|------------|--------|------|-----------|
+| datasetId  | String | 是    | 知识库 id    |
+| documentId | String | 是    | 文档 id     |
+| apiKey     | String | 否    | API密钥（可选） |
+
+#### 响应参数
+
+DocumentInfo
+
+| 参数名                  | 类型                    | 描述        |
+|----------------------|-----------------------|-----------|
+| id                   | String                | 文档 id     |
+| position             | Integer               | 位置        |
+| dataSourceType       | String                | 数据源类型     |
+| dataSourceInfo       | `Map<String, Object>` | 数据源信息     |
+| datasetProcessRuleId | String                | 知识库处理规则ID |
+| name                 | String                | 文档名称      |
+| createdFrom          | String                | 创建来源      |
+| createdBy            | String                | 创建人       |
+| createdAt            | Long                  | 创建时间戳     |
+| tokens               | Integer               | 令牌数量      |
+| indexingStatus       | String                | 索引状态      |
+| error                | String                | 错误信息      |
+| enabled              | String                | 是否启用      |
+| disabledAt           | Long                  | 禁用时间      |
+| disabledBy           | String                | 禁用人       |
+| archived             | String                | 是否归档      |
+| displayStatus        | String                | 显示状态      |
+| wordCount            | String                | 单词数量      |
+| hitCount             | String                | 命中次数      |
+| docForm              | String                | 文档形式      |
+
+### 2.11 获取文档详情（带元数据过滤）
+
+#### 方法
+
+```java
+DocumentInfo getDocument(String datasetId, String documentId, String metadata, String apiKey);
+```
+
+#### 请求参数
+
+| 参数名        | 类型     | 是否必须 | 描述                                   |
+|------------|--------|------|--------------------------------------|
+| datasetId  | String | 是    | 知识库 id                               |
+| documentId | String | 是    | 文档 id                                |
+| metadata   | String | 否    | 元数据过滤选项 (all, only, without)，默认为 all |
+| apiKey     | String | 否    | API密钥（可选）                            |
+
+#### 响应参数
+
+同 2.10
+
+### 2.12 获取分段详情
+
+#### 方法
+
+```java
+SegmentData getSegment(String datasetId, String documentId, String segmentId, String apiKey);
+```
+
+#### 请求参数
+
+| 参数名        | 类型     | 是否必须 | 描述        |
+|------------|--------|------|-----------|
+| datasetId  | String | 是    | 知识库 id    |
+| documentId | String | 是    | 文档 id     |
+| segmentId  | String | 是    | 分段 id     |
+| apiKey     | String | 否    | API密钥（可选） |
+
+#### 响应参数
+
+SegmentData
+
+| 参数名            | 类型             | 描述      |
+|----------------|----------------|---------|
+| id             | String         | 分段 id   |
+| position       | Integer        | 位置      |
+| documentId     | String         | 文档 id   |
+| content        | String         | 分段内容    |
+| answer         | String         | 答案      |
+| wordCount      | Integer        | 单词数量    |
+| tokens         | Integer        | 令牌数量    |
+| keywords       | `List<String>` | 关键词列表   |
+| indexNodeId    | String         | 索引节点ID  |
+| indexNodeHash  | String         | 索引节点哈希值 |
+| hitCount       | Integer        | 命中次数    |
+| indexingStatus | String         | 索引状态    |
+| error          | String         | 错误信息    |
+| enabled        | String         | 是否启用    |
+| disabledAt     | Long           | 禁用时间    |
+| disabledBy     | String         | 禁用人     |
+| status         | String         | 状态      |
+| archived       | Boolean        | 是否归档    |
+| createdAt      | Long           | 创建时间戳   |
+| indexingAt     | Long           | 索引时间    |
+| completedAt    | Long           | 完成时间戳   |
+| stoppedAt      | Long           | 停止时间戳   |
+
 ## 3. 分段管理
 
 ### 3.1 创建分段
@@ -918,6 +1067,18 @@ SegmentChildChunkCreateResponse
 | completedAt   | Long    | 完成时间戳   |
 | error         | String  | 错误信息    |
 | stoppedAt     | Long    | 停止时间戳   |
+| content       | String  | 子分段内容   |
+| wordCount     | Integer | 单词数量    |
+| tokens        | Integer | 令牌数量    |
+| indexNodeId   | String  | 索引节点ID  |
+| indexNodeHash | String  | 索引节点哈希  |
+| status        | String  | 状态      |
+| createdBy     | String  | 创建人     |
+| createdAt     | Long    | 创建时间戳   |
+| indexingAt    | Long    | 索引时间戳   |
+| completedAt   | Long    | 完成时间戳   |
+| error         | String  | 错误信息    |
+| stoppedAt     | Long    | 停止时间戳   |
 
 ### 4.2 分页查询子分段列表
 
@@ -1017,13 +1178,56 @@ RetrieveResponse retrieve(RetrieveRequest request);
 
 RetrieveRequest
 
-| 参数名            | 类型             | 是否必须 | 描述     |
-|----------------|----------------|------|--------|
-| datasetId      | String         | 是    | 知识库 id |
-| query          | String         | 是    | 检索查询内容 |
+| 参数名            | 类型                     | 是否必须 | 描述     |
+|----------------|------------------------|------|--------|
+| datasetId      | String                 | 是    | 知识库 id |
+| query          | String                 | 是    | 检索查询内容 |
 | retrievalModel | RetrieveRetrievalModel | 否    | 检索模型   |
 
 > 1.4.2 之前的版本 retrievalModel 为 RetrievalModel类型
+
+**RetrieveRetrievalModel 对象结构**
+
+| 参数名                         | 类型                                 | 是否必须 | 描述       |
+|-----------------------------|------------------------------------|------|----------|
+| searchMethod                | SearchMethodEnum                   | 否    | 搜索方法     |
+| rerankingMode               | RetrievalModel.RerankingModel      | 否    | 重排序模式    |
+| rerankingEnable             | Boolean                            | 否    | 是否启用重排序  |
+| weights                     | Float                              | 否    | 权重       |
+| topK                        | Integer                            | 否    | 返回结果数量   |
+| scoreThresholdEnabled       | Boolean                            | 否    | 是否启用分数阈值 |
+| scoreThreshold              | Float                              | 否    | 分数阈值     |
+| metadataFilteringConditions | RetrievalModel.FilteringConditions | 否    | 元数据过滤条件  |
+
+**SearchMethodEnum 枚举值**
+
+| 枚举值              | 描述    |
+|------------------|-------|
+| keyword_search   | 关键字检索 |
+| hybrid_search    | 混合检索  |
+| semantic_search  | 语义检索  |
+| full_text_search | 全文检索  |
+
+**RetrievalModel.RerankingModel 对象结构**
+
+| 参数名                   | 类型     | 描述       |
+|-----------------------|--------|----------|
+| rerankingProviderName | String | 重排序提供商名称 |
+| rerankingModelName    | String | 重排序模型名称  |
+
+**RetrievalModel.FilteringConditions 对象结构**
+
+| 参数名             | 类型                | 描述     |
+|-----------------|-------------------|--------|
+| logicalOperator | String            | 逻辑运算符  |
+| conditions      | `List<Condition>` | 过滤条件列表 |
+
+**Condition 对象结构**
+
+| 参数名                | 类型     | 描述    |
+|--------------------|--------|-------|
+| name               | String | 条件名称  |
+| comparisonOperator | String | 比较运算符 |
 
 #### 响应参数
 
@@ -1261,7 +1465,7 @@ MetaDataListResponse
 | id        | String  | 元数据ID |
 | type      | String  | 元数据类型 |
 | name      | String  | 元数据名称 |
-| userCount | Integer | 使用次数  |
+| userCount | Integer | 用户计数  |
 
 ## 7. 嵌入模型
 
@@ -1498,7 +1702,16 @@ List<TagInfoResponse> listTag(String apiKey);
 
 #### 响应参数
 
-同 8.1 TagInfoResponse 列表
+TagInfoResponse 列表
+
+**TagInfoResponse 对象结构**
+
+| 参数名          | 类型      | 描述   |
+|--------------|---------|------|
+| id           | String  | 标签ID |
+| name         | String  | 标签名称 |
+| type         | String  | 标签类型 |
+| bindingCount | Integer | 绑定数量 |
 
 ---
 
@@ -1521,7 +1734,14 @@ TagUpdateRequest
 
 #### 响应参数
 
-同 8.1 TagInfoResponse
+**TagInfoResponse 对象结构**
+
+| 参数名          | 类型      | 描述   |
+|--------------|---------|------|
+| id           | String  | 标签ID |
+| name         | String  | 标签名称 |
+| type         | String  | 标签类型 |
+| bindingCount | Integer | 绑定数量 |
 
 ---
 
@@ -1620,7 +1840,12 @@ DataSetTagsResponse
 | data  | `List<DataSetTagInfo>` | 标签信息列表 |
 | total | Integer                | 标签总数   |
 
-DataSetTagInfo 结构请参考实际实现。
+**DataSetTagInfo 对象结构**
+
+| 参数名  | 类型     | 描述   |
+|------|--------|------|
+| id   | String | 标签ID |
+| name | String | 标签名称 |
 
 ---
 
