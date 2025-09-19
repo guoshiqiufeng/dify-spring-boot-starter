@@ -1,4 +1,4 @@
-name: Docs build test
+name: Docs publish SNAPSHOT
 permissions:
   contents: write
   pull-requests: write
