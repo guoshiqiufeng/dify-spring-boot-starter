@@ -149,5 +149,7 @@ public class RetrievalModel implements Serializable {
         @JsonAlias("comparisonOperator")
         @JsonProperty("comparison_operator")
         private String comparisonOperator;
+
+        private String value;
     }
 }
