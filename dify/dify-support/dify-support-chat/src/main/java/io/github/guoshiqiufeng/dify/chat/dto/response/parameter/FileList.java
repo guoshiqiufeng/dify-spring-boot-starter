@@ -1,0 +1,36 @@
+package io.github.guoshiqiufeng.dify.chat.dto.response.parameter;
+
+import com.fasterxml.jackson.annotation.JsonAlias;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+import java.util.List;
+
+/**
+ * @author yanghq
+ * @version 1.4.4
+ * @since 2025/9/25 14:32
+ */
+@Data
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class FileList extends TextInput {
+
+    private String type;
+
+    private List<String> options;
+
+    private String placeholder;
+
+    private String hint;
+
+    @JsonAlias("allowed_file_types")
+    private List<String> allowedFileTypes;
+
+    @JsonAlias("allowed_file_extensions")
+    private List<String> allowedFileExtensions;
+
+    @JsonAlias("allowed_file_upload_methods")
+    private List<String> allowedFileUploadMethods;
+}
