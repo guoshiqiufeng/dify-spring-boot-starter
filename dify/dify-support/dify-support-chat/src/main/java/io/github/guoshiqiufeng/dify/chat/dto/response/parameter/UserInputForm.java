@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author yanghq
@@ -33,6 +34,12 @@ public class UserInputForm implements Serializable {
     @JsonAlias("text-input")
     private TextInput textInput;
 
+    @JsonAlias("number")
+    private Number number;
+
+    @JsonAlias("checkbox")
+    private Checkbox checkbox;
+
     /**
      * paragraph(object) 段落文本输入控件
      */
@@ -44,4 +51,17 @@ public class UserInputForm implements Serializable {
      */
     @JsonAlias("select")
     private Select select;
+
+    /**
+     * file-list (object) 文件列表上传控件
+     */
+    @JsonAlias("file-list")
+    private FileList fileList;
+
+    /**
+     * file (object) 文件上传控件
+     */
+    @JsonAlias("file")
+    private File file;
+
 }
