@@ -54,7 +54,7 @@
         <dependency>
             <groupId>io.github.guoshiqiufeng.dify</groupId>
             <artifactId>dify-bom</artifactId>
-            <version>1.4.3</version>
+            <version>1.4.4</version>
             <type>import</type>
         </dependency>
     </dependencies>
@@ -63,7 +63,7 @@
 
 #### 引入starter依赖
 
-- springboot3
+- springboot3.1 及以上
 
 ```xml
 
@@ -73,7 +73,7 @@
 </dependency>
 ```
 
-- springboot2
+- springboot2、springboot3.0.x
 
 > dify-spring-boot-starter v0.9.0 以上版本可用
 

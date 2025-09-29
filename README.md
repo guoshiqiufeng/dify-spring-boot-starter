@@ -54,7 +54,7 @@ Provide springboot starter for dify to simplify development.
         <dependency>
             <groupId>io.github.guoshiqiufeng.dify</groupId>
             <artifactId>dify-bom</artifactId>
-            <version>1.4.3</version>
+            <version>1.4.4</version>
             <type>import</type>
         </dependency>
     </dependencies>
@@ -63,7 +63,7 @@ Provide springboot starter for dify to simplify development.
 
 #### Introducing starter dependencies
 
-- springboot3
+- springboot3.1 及以上
 
 ```xml
 
@@ -73,7 +73,7 @@ Provide springboot starter for dify to simplify development.
 </dependency>
 ```
 
-- springboot2
+- springboot2、springboot3.0.x
 
 > dify-spring-boot-starter v0.9.0 or above is available.
 

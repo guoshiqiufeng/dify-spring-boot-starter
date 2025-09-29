@@ -12,7 +12,7 @@ const version = inject('version');
 
 [dify-spring-boot-starter](https://github.com/guoshiqiufeng/dify-spring-boot-starter) 基于JDK21, 支持SpringBoot 3.x、2.x.
 
-## SpringBoot 3.x
+## SpringBoot 3.1 及以上
 
 ### 全依赖安装
 
@@ -174,7 +174,7 @@ implementation group: 'io.github.guoshiqiufeng.dify', name: 'dify-spring-boot-st
   </CodeGroupItem>
 </CodeGroup>
 
-## SpringBoot 2.x
+## SpringBoot 2.x、SpringBoot3.0.x
 
 ### 全依赖安装
 
