@@ -47,8 +47,8 @@
 
 #### maven 镜像仓库
 
-国内用户建议使用腾讯镜像仓库，腾讯会自动同步。`https://mirrors.cloud.tencent.com/nexus/repository/maven-public`
-不建议使用阿里云maven 镜像仓库，同步比较慢。
+- 国内用户建议使用腾讯镜像仓库，腾讯会自动同步。`https://mirrors.cloud.tencent.com/nexus/repository/maven-public`
+- 不建议使用阿里云maven 镜像仓库，同步比较慢。
 
 #### 引入统一版本依赖，不用再使用时指定版本号
 
