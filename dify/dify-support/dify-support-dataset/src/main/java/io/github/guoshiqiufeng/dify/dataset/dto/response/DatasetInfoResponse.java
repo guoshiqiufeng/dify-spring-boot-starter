@@ -37,7 +37,7 @@ public class DatasetInfoResponse extends DatasetResponse {
     @JsonProperty("retrieval_model_dict")
     private RetrievalModel retrievalModelDict;
 
-    private List<String> tags;
+    private List<Tag> tags;
 
     @JsonAlias("docForm")
     @JsonProperty("doc_form")
