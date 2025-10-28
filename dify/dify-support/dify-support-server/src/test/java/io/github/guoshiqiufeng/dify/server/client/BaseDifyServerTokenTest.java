@@ -22,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
+import org.springframework.util.MultiValueMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -125,6 +126,11 @@ class BaseDifyServerTokenTest {
         @Override
         public void addAuthorizationHeader(HttpHeaders headers, DifyServerClient difyServerClient) {
             // No-op for testing
+        }
+
+        @Override
+        public void addAuthorizationCookies(MultiValueMap<String, String> cookies, DifyServerClient difyServerClient) {
+
         }
 
         @Override
