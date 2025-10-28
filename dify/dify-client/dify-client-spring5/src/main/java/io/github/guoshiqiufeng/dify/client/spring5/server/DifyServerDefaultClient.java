@@ -29,7 +29,9 @@ import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.*;
@@ -81,6 +83,7 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                 () -> webClient.get()
                         .uri(ServerUriConstant.APPS + "/{appId}", appId)
                         .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
                         .retrieve()
                         .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
                         .bodyToMono(AppsResponse.class)
@@ -94,6 +97,7 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                 () -> webClient.get()
                         .uri(ServerUriConstant.APPS + "/{appId}/api-keys", appId)
                         .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
                         .retrieve()
                         .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
                         .bodyToMono(ApiKeyResultResponse.class)
@@ -111,6 +115,7 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                 () -> webClient.post()
                         .uri(ServerUriConstant.APPS + "/{appId}/api-keys", appId)
                         .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
                         .retrieve()
                         .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
                         .bodyToMono(ApiKeyResponse.class)
@@ -127,6 +132,7 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                 () -> webClient.get()
                         .uri(ServerUriConstant.DATASETS + "/api-keys")
                         .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
                         .retrieve()
                         .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
                         .bodyToMono(DatasetApiKeyResult.class)
@@ -141,6 +147,7 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                 () -> webClient.post()
                         .uri(ServerUriConstant.DATASETS + "/api-keys")
                         .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
                         .retrieve()
                         .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
                         .bodyToMono(DatasetApiKeyResponse.class)
@@ -162,6 +169,7 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                                 .queryParamIfPresent("name", Optional.ofNullable(name).filter(m -> !m.isEmpty()))
                                 .build())
                         .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
                         .retrieve()
                         .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
                         .bodyToMono(AppsResponseResult.class)
@@ -185,6 +193,10 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
         difyServerToken.addAuthorizationHeader(headers, this);
     }
 
+    private void addAuthorizationCookies(MultiValueMap<String, String> cookies) {
+        difyServerToken.addAuthorizationCookies(cookies, this);
+    }
+
     private <T> T executeWithRetry(RequestSupplier<T> supplier) {
         return difyServerToken.executeWithRetry(supplier, this);
     }
@@ -192,41 +204,103 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
     @Override
     public LoginResponse login() {
         Assert.notNull(difyServerProperties, "The difyServerProperties can not be null.");
-        DifyLoginRequest requestVO = DifyLoginRequest.build(difyServerProperties.getEmail(), difyServerProperties.getPassword());
-        LoginResultResponse result = webClient.post()
+
+        DifyLoginRequest requestVO = DifyLoginRequest.build(
+                difyServerProperties.getEmail(),
+                difyServerProperties.getPassword()
+        );
+        ResponseEntity<LoginResultResponse> responseEntity = webClient.post()
                 .uri(ServerUriConstant.LOGIN)
                 .bodyValue(requestVO)
                 .retrieve()
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
-                .bodyToMono(LoginResultResponse.class)
+                .toEntity(LoginResultResponse.class)
                 .block();
-        return processLoginResult(result);
+        if (responseEntity == null) {
+            throw new IllegalStateException("Login request failed: no response received from server.");
+        }
+        // 安全获取 Set-Cookie
+        List<String> setCookies = Optional.ofNullable(responseEntity.getHeaders().get("Set-Cookie"))
+                .orElse(Collections.emptyList());
+        // 处理登录结果
+        LoginResultResponse result = responseEntity.getBody();
+        return processLoginResult(result, setCookies);
     }
 
     @Override
     public LoginResponse refreshToken(String refreshToken) {
         Map<String, String> requestVO = new HashMap<>(1);
         requestVO.put("refresh_token", refreshToken);
-        LoginResultResponse result = webClient.post()
+        ResponseEntity<LoginResultResponse> responseEntity = webClient.post()
                 .uri(ServerUriConstant.REFRESH_TOKEN)
+                .cookie("refresh_token", refreshToken)
                 .bodyValue(requestVO)
                 .retrieve()
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
-                .bodyToMono(LoginResultResponse.class)
+                .toEntity(LoginResultResponse.class)
                 .block();
-        return processLoginResult(result);
+
+        if (responseEntity == null) {
+            throw new IllegalStateException("Login request failed: no response received from server.");
+        }
+        // 安全获取 Set-Cookie
+        List<String> setCookies = Optional.ofNullable(responseEntity.getHeaders().get("Set-Cookie"))
+                .orElse(Collections.emptyList());
+        // 处理登录结果
+        LoginResultResponse result = responseEntity.getBody();
+        return processLoginResult(result, setCookies);
+    }
+
+    @Deprecated
+    private LoginResponse processLoginResult(LoginResultResponse result) {
+        return processLoginResult(result, null);
     }
 
     /**
      * Processes login/refresh response and extracts data
      *
-     * @param result the login result
-     * @return the login response data or null
+     * @param result           the login result
+     * @param setCookieHeaders the Set-Cookie headers from the response
+     * @return the login response data with cookies or null
      */
-    private LoginResponse processLoginResult(LoginResultResponse result) {
-        return Optional.ofNullable(result)
+    private LoginResponse processLoginResult(LoginResultResponse result, List<String> setCookieHeaders) {
+        LoginResponse loginResponse = Optional.ofNullable(result)
                 .filter(r -> DifyResult.SUCCESS.equals(r.getResult()))
                 .map(LoginResultResponse::getData)
                 .orElse(null);
+
+        if (loginResponse == null && setCookieHeaders != null) {
+            loginResponse = new LoginResponse();
+            for (String cookieHeader : setCookieHeaders) {
+                if (cookieHeader.startsWith("access_token=") && !cookieHeader.contains("access_token=;")) {
+                    String accessToken = extractTokenValue(cookieHeader, "access_token=");
+                    loginResponse.setAccessToken(accessToken);
+                } else if (cookieHeader.startsWith("refresh_token=") && !cookieHeader.contains("refresh_token=;")) {
+                    String refreshToken = extractTokenValue(cookieHeader, "refresh_token=");
+                    loginResponse.setRefreshToken(refreshToken);
+                } else if (cookieHeader.startsWith("csrf_token=") && !cookieHeader.contains("csrf_token=;")) {
+                    String csrfToken = extractTokenValue(cookieHeader, "csrf_token=");
+                    loginResponse.setCsrfToken(csrfToken);
+                }
+            }
+        }
+
+        return loginResponse;
+    }
+
+    /**
+     * Extracts the token value from a cookie header string
+     *
+     * @param cookieHeader the cookie header string
+     * @param prefix       the token prefix (e.g. "access_token=")
+     * @return the extracted token value
+     */
+    private String extractTokenValue(String cookieHeader, String prefix) {
+        int startIndex = cookieHeader.indexOf(prefix) + prefix.length();
+        int endIndex = cookieHeader.indexOf(";", startIndex);
+        if (endIndex == -1) {
+            endIndex = cookieHeader.length();
+        }
+        return cookieHeader.substring(startIndex, endIndex);
     }
 }

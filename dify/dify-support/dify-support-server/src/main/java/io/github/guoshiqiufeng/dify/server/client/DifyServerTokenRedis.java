@@ -21,6 +21,7 @@ import io.github.guoshiqiufeng.dify.server.dto.response.LoginResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
+import org.springframework.util.MultiValueMap;
 
 import java.util.concurrent.TimeUnit;
 
@@ -47,6 +48,19 @@ public class DifyServerTokenRedis extends BaseDifyServerToken {
             accessToken = obtainToken(difyServerClient);
         }
         headers.setBearerAuth(accessToken);
+        String csrfToken = redisTemplate.opsForValue().get(DifyRedisKey.CSRF_TOKEN);
+        headers.add("x-csrf-token", csrfToken);
+    }
+
+    @Override
+    public void addAuthorizationCookies(MultiValueMap<String, String> cookies, DifyServerClient difyServerClient) {
+        String accessToken = redisTemplate.opsForValue().get(DifyRedisKey.ACCESS_TOKEN);
+        if (StrUtil.isEmpty(accessToken)) {
+            accessToken = obtainToken(difyServerClient);
+        }
+        String csrfToken = redisTemplate.opsForValue().get(DifyRedisKey.CSRF_TOKEN);
+        cookies.add("access_token", accessToken);
+        cookies.add("csrf_token", csrfToken);
     }
 
     private String obtainToken(DifyServerClient difyServerClient) {
@@ -56,6 +70,10 @@ public class DifyServerTokenRedis extends BaseDifyServerToken {
             redisTemplate.opsForValue().set(DifyRedisKey.ACCESS_TOKEN, accessToken);
             redisTemplate.expire(DifyRedisKey.ACCESS_TOKEN, TOKEN_EXPIRE_MINUTES, TimeUnit.MINUTES);
             redisTemplate.opsForValue().set(DifyRedisKey.REFRESH_TOKEN, loginResponse.getRefreshToken());
+            if(StrUtil.isNotEmpty(loginResponse.getCsrfToken())) {
+                redisTemplate.opsForValue().set(DifyRedisKey.CSRF_TOKEN, loginResponse.getCsrfToken());
+            }
+
             return accessToken;
         }
         return null;
@@ -74,6 +92,9 @@ public class DifyServerTokenRedis extends BaseDifyServerToken {
                 redisTemplate.opsForValue().set(DifyRedisKey.ACCESS_TOKEN, accessToken);
                 redisTemplate.expire(DifyRedisKey.ACCESS_TOKEN, TOKEN_EXPIRE_MINUTES, TimeUnit.MINUTES);
                 redisTemplate.opsForValue().set(DifyRedisKey.REFRESH_TOKEN, response.getRefreshToken());
+                if(StrUtil.isNotEmpty(response.getCsrfToken())) {
+                    redisTemplate.opsForValue().set(DifyRedisKey.CSRF_TOKEN, response.getCsrfToken());
+                }
                 return;
             }
         }
@@ -84,6 +105,9 @@ public class DifyServerTokenRedis extends BaseDifyServerToken {
             redisTemplate.opsForValue().set(DifyRedisKey.ACCESS_TOKEN, accessToken);
             redisTemplate.expire(DifyRedisKey.ACCESS_TOKEN, TOKEN_EXPIRE_MINUTES, TimeUnit.MINUTES);
             redisTemplate.opsForValue().set(DifyRedisKey.REFRESH_TOKEN, loginResponse.getRefreshToken());
+            if(StrUtil.isNotEmpty(loginResponse.getCsrfToken())) {
+                redisTemplate.opsForValue().set(DifyRedisKey.CSRF_TOKEN, loginResponse.getCsrfToken());
+            }
         }
 
     }

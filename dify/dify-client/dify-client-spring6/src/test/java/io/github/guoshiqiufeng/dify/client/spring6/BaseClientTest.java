@@ -17,6 +17,8 @@ package io.github.guoshiqiufeng.dify.client.spring6;
 
 import lombok.Getter;
 import org.mockito.Mockito;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -62,6 +64,8 @@ public abstract class BaseClientTest {
 
         protected RestClient.RequestHeadersUriSpec requestHeadersUriSpec;
 
+        protected ResponseEntity<String> responseEntity;
+
         public RestClientMock() {
             // Create fresh mocks
             restClient = Mockito.mock(RestClient.class);
@@ -71,6 +75,7 @@ public abstract class BaseClientTest {
             requestBodySpec = Mockito.mock(RestClient.RequestBodySpec.class);
             responseSpec = Mockito.mock(RestClient.ResponseSpec.class);
             requestHeadersUriSpec = Mockito.mock(RestClient.RequestHeadersUriSpec.class);
+            responseEntity = Mockito.mock(ResponseEntity.class);
         }
 
         public void init() {
@@ -97,6 +102,9 @@ public abstract class BaseClientTest {
             when(requestBodySpec.header(anyString(), anyString())).thenReturn(requestBodySpec);
             // Fix for headers(Consumer) method
             doReturn(requestBodySpec).when(requestBodySpec).headers(any(Consumer.class));
+            doReturn(requestBodySpec).when(requestBodySpec).cookies(any(Consumer.class));
+            // Add mocking for individual cookie(String, String) method
+            when(requestBodySpec.cookie(anyString(), anyString())).thenReturn(requestBodySpec);
             when(requestBodySpec.contentType(any())).thenReturn(requestBodySpec);
 
             // Critical fix for the body method - try multiple approaches
@@ -123,6 +131,9 @@ public abstract class BaseClientTest {
             when(requestHeadersSpec.header(anyString(), anyString())).thenReturn(requestHeadersSpec);
             // Critical fix: Add proper mocking for headers method on RequestHeadersSpec
             doReturn(requestHeadersSpec).when(requestHeadersSpec).headers(any(Consumer.class));
+            doReturn(requestHeadersSpec).when(requestHeadersSpec).cookies(any(Consumer.class));
+            // Add mocking for individual cookie(String, String) method on RequestHeadersSpec
+            when(requestHeadersSpec.cookie(anyString(), anyString())).thenReturn(requestHeadersSpec);
             when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
 
             // Setup RestClient behavior chain for DELETE
@@ -136,6 +147,10 @@ public abstract class BaseClientTest {
             // Ensure response handling works
             when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
             when(responseSpec.onStatus(any())).thenReturn(responseSpec);
+            // Mock response entity methods for Spring 6 RestClient
+            // These will be overridden in specific tests as needed with actual ResponseEntity objects
+            when(responseSpec.toEntity(any(Class.class))).thenAnswer(invocation -> null);
+            when(responseSpec.toEntity(any(ParameterizedTypeReference.class))).thenAnswer(invocation -> null); // For generic types
         }
     }
 

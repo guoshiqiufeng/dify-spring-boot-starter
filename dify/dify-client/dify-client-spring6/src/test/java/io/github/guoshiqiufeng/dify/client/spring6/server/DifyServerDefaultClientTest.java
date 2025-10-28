@@ -26,6 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriBuilder;
 
@@ -91,7 +92,12 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         mockLoginData.setAccessToken("test-access-token");
         mockLoginData.setRefreshToken("test-refresh-token");
         mockLoginResult.setData(mockLoginData);
-        when(responseSpec.body(LoginResultResponse.class)).thenReturn(mockLoginResult);
+
+        // Create a ResponseEntity with the mock result
+        ResponseEntity<LoginResultResponse> responseEntity = ResponseEntity.ok(mockLoginResult);
+
+        // Mock the toEntity method to return the response entity
+        when(responseSpec.toEntity(LoginResultResponse.class)).thenReturn(responseEntity);
 
         // Create server properties
         DifyProperties.Server serverProperties = new DifyProperties.Server();
@@ -134,7 +140,12 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         mockRefreshData.setRefreshToken("new-refresh-token");
 
         mockRefreshResult.setData(mockRefreshData);
-        when(responseSpec.body(LoginResultResponse.class)).thenReturn(mockRefreshResult);
+
+        // Create a ResponseEntity with the mock result
+        ResponseEntity<LoginResultResponse> responseEntity = ResponseEntity.ok(mockRefreshResult);
+
+        // Mock the toEntity method to return the response entity
+        when(responseSpec.toEntity(LoginResultResponse.class)).thenReturn(responseEntity);
 
         // Call the method to test
         String refreshToken = "old-refresh-token";
