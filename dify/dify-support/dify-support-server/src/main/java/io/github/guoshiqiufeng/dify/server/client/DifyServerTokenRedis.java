@@ -70,7 +70,10 @@ public class DifyServerTokenRedis extends BaseDifyServerToken {
             redisTemplate.opsForValue().set(DifyRedisKey.ACCESS_TOKEN, accessToken);
             redisTemplate.expire(DifyRedisKey.ACCESS_TOKEN, TOKEN_EXPIRE_MINUTES, TimeUnit.MINUTES);
             redisTemplate.opsForValue().set(DifyRedisKey.REFRESH_TOKEN, loginResponse.getRefreshToken());
-            redisTemplate.opsForValue().set(DifyRedisKey.CSRF_TOKEN, loginResponse.getCsrfToken());
+            if(StrUtil.isNotEmpty(loginResponse.getCsrfToken())) {
+                redisTemplate.opsForValue().set(DifyRedisKey.CSRF_TOKEN, loginResponse.getCsrfToken());
+            }
+
             return accessToken;
         }
         return null;
@@ -89,7 +92,9 @@ public class DifyServerTokenRedis extends BaseDifyServerToken {
                 redisTemplate.opsForValue().set(DifyRedisKey.ACCESS_TOKEN, accessToken);
                 redisTemplate.expire(DifyRedisKey.ACCESS_TOKEN, TOKEN_EXPIRE_MINUTES, TimeUnit.MINUTES);
                 redisTemplate.opsForValue().set(DifyRedisKey.REFRESH_TOKEN, response.getRefreshToken());
-                redisTemplate.opsForValue().set(DifyRedisKey.CSRF_TOKEN, response.getCsrfToken());
+                if(StrUtil.isNotEmpty(response.getCsrfToken())) {
+                    redisTemplate.opsForValue().set(DifyRedisKey.CSRF_TOKEN, response.getCsrfToken());
+                }
                 return;
             }
         }
@@ -100,7 +105,9 @@ public class DifyServerTokenRedis extends BaseDifyServerToken {
             redisTemplate.opsForValue().set(DifyRedisKey.ACCESS_TOKEN, accessToken);
             redisTemplate.expire(DifyRedisKey.ACCESS_TOKEN, TOKEN_EXPIRE_MINUTES, TimeUnit.MINUTES);
             redisTemplate.opsForValue().set(DifyRedisKey.REFRESH_TOKEN, loginResponse.getRefreshToken());
-            redisTemplate.opsForValue().set(DifyRedisKey.CSRF_TOKEN, loginResponse.getCsrfToken());
+            if(StrUtil.isNotEmpty(loginResponse.getCsrfToken())) {
+                redisTemplate.opsForValue().set(DifyRedisKey.CSRF_TOKEN, loginResponse.getCsrfToken());
+            }
         }
 
     }
