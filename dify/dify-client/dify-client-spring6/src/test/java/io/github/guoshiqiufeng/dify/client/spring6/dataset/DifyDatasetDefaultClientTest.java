@@ -19,7 +19,6 @@ import io.github.guoshiqiufeng.dify.client.spring6.BaseClientTest;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.dataset.constant.DatasetUriConstant;
-import io.github.guoshiqiufeng.dify.dataset.dto.RetrievalModel;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.*;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.*;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.textembedding.TextEmbedding;

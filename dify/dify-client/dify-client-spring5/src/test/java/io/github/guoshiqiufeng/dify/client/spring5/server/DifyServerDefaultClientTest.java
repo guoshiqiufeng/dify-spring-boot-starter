@@ -25,6 +25,7 @@ import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
 
@@ -77,8 +78,11 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         responseVO.setRefreshToken("test-refresh-token");
         resultResponseVO.setData(responseVO);
 
+        // Create a ResponseEntity with the expected result
+        ResponseEntity<LoginResultResponse> responseEntity = ResponseEntity.ok(resultResponseVO);
+
         // Set up the response mock to return our expected response
-        when(responseSpecMock.bodyToMono(LoginResultResponse.class)).thenReturn(Mono.just(resultResponseVO));
+        when(responseSpecMock.toEntity(LoginResultResponse.class)).thenReturn(Mono.just(responseEntity));
 
         // Execute the method
         LoginResponse actualResponse = client.login();
@@ -92,7 +96,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(webClientMock).post();
         verify(requestBodyUriSpecMock).uri(ServerUriConstant.LOGIN);
         verify(requestBodySpecMock).bodyValue(any(DifyLoginRequest.class));
-        verify(responseSpecMock).bodyToMono(LoginResultResponse.class);
+        verify(responseSpecMock).toEntity(LoginResultResponse.class);
     }
 
     @Test
@@ -109,8 +113,11 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         responseVO.setRefreshToken("new-refresh-token");
         resultResponseVO.setData(responseVO);
 
-        // Set up the response mock to return our expected response
-        when(responseSpecMock.bodyToMono(LoginResultResponse.class)).thenReturn(Mono.just(resultResponseVO));
+        // Create a ResponseEntity with the expected result
+        ResponseEntity<LoginResultResponse> responseEntity = ResponseEntity.ok(resultResponseVO);
+
+        // Set up the response mock to return our expected response - toEntity returns Mono<ResponseEntity<T>>
+        when(responseSpecMock.toEntity(LoginResultResponse.class)).thenReturn(Mono.just(responseEntity));
 
         // Execute the method
         LoginResponse actualResponse = client.refreshToken(refreshToken);
@@ -124,7 +131,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(webClientMock).post();
         verify(requestBodyUriSpecMock).uri(ServerUriConstant.REFRESH_TOKEN);
         verify(requestBodySpecMock).bodyValue(anyMap());
-        verify(responseSpecMock).bodyToMono(LoginResultResponse.class);
+        verify(responseSpecMock).toEntity(LoginResultResponse.class);
     }
 
     @Test

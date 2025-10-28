@@ -41,6 +41,7 @@ public abstract class BaseDifyServerToken {
     public abstract void addAuthorizationHeader(HttpHeaders headers, DifyServerClient difyServerClient);
 
     public abstract void addAuthorizationCookies(MultiValueMap<String, String> cookies, DifyServerClient difyServerClient);
+
     /**
      * Executes the given request supplier with automatic retry mechanism.
      * Will retry when encountering 401 Unauthorized errors, up to MAX_RETRY_ATTEMPTS times.

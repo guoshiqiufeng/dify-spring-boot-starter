@@ -16,7 +16,6 @@
 package io.github.guoshiqiufeng.dify.client.spring6.server;
 
 import io.github.guoshiqiufeng.dify.client.spring6.base.BaseDifyDefaultClient;
-import io.github.guoshiqiufeng.dify.client.spring6.utils.WebClientUtil;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
 import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
@@ -31,10 +30,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -251,7 +248,7 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
     /**
      * Processes login/refresh response and extracts data
      *
-     * @param result the login result
+     * @param result           the login result
      * @param setCookieHeaders the Set-Cookie headers from the response
      * @return the login response data with cookies or null
      */
@@ -284,7 +281,7 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
      * Extracts the token value from a cookie header string
      *
      * @param cookieHeader the cookie header string
-     * @param prefix the token prefix (e.g. "access_token=")
+     * @param prefix       the token prefix (e.g. "access_token=")
      * @return the extracted token value
      */
     private String extractTokenValue(String cookieHeader, String prefix) {

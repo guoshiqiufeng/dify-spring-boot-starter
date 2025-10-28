@@ -16,13 +16,11 @@
 package io.github.guoshiqiufeng.dify.dataset.client;
 
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
-import io.github.guoshiqiufeng.dify.dataset.dto.RetrievalModel;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.*;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.*;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.textembedding.TextEmbedding;
 import io.github.guoshiqiufeng.dify.dataset.enums.IndexingTechniqueEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.MetaDataActionEnum;
-import io.github.guoshiqiufeng.dify.dataset.enums.RerankingModeEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.SearchMethodEnum;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

@@ -209,8 +209,6 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                 difyServerProperties.getEmail(),
                 difyServerProperties.getPassword()
         );
-
-        // 发送请求并同步获取完整响应
         ResponseEntity<LoginResultResponse> responseEntity = webClient.post()
                 .uri(ServerUriConstant.LOGIN)
                 .bodyValue(requestVO)
@@ -218,15 +216,12 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
                 .toEntity(LoginResultResponse.class)
                 .block();
-
         if (responseEntity == null) {
             throw new IllegalStateException("Login request failed: no response received from server.");
         }
-
         // 安全获取 Set-Cookie
         List<String> setCookies = Optional.ofNullable(responseEntity.getHeaders().get("Set-Cookie"))
                 .orElse(Collections.emptyList());
-
         // 处理登录结果
         LoginResultResponse result = responseEntity.getBody();
         return processLoginResult(result, setCookies);
@@ -236,16 +231,27 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
     public LoginResponse refreshToken(String refreshToken) {
         Map<String, String> requestVO = new HashMap<>(1);
         requestVO.put("refresh_token", refreshToken);
-        LoginResultResponse result = webClient.post()
+        ResponseEntity<LoginResultResponse> responseEntity = webClient.post()
                 .uri(ServerUriConstant.REFRESH_TOKEN)
+                .cookie("refresh_token", refreshToken)
                 .bodyValue(requestVO)
                 .retrieve()
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
-                .bodyToMono(LoginResultResponse.class)
+                .toEntity(LoginResultResponse.class)
                 .block();
-        return processLoginResult(result);
+
+        if (responseEntity == null) {
+            throw new IllegalStateException("Login request failed: no response received from server.");
+        }
+        // 安全获取 Set-Cookie
+        List<String> setCookies = Optional.ofNullable(responseEntity.getHeaders().get("Set-Cookie"))
+                .orElse(Collections.emptyList());
+        // 处理登录结果
+        LoginResultResponse result = responseEntity.getBody();
+        return processLoginResult(result, setCookies);
     }
 
+    @Deprecated
     private LoginResponse processLoginResult(LoginResultResponse result) {
         return processLoginResult(result, null);
     }

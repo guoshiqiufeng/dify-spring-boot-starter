@@ -15,7 +15,9 @@
  */
 package io.github.guoshiqiufeng.dify.client.spring5;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -48,6 +50,8 @@ public abstract class BaseClientTest {
 
     protected WebClient.RequestHeadersUriSpec requestHeadersUriSpecMock;
 
+    protected Mono<ResponseEntity<String>> responseEntityMonoMock;
+
     public void setup() {
         webClientMock = mock(WebClient.class);
         webClientBuilderMock = mock(WebClient.Builder.class);
@@ -56,6 +60,7 @@ public abstract class BaseClientTest {
         requestBodySpecMock = mock(WebClient.RequestBodySpec.class);
         responseSpecMock = mock(WebClient.ResponseSpec.class);
         requestHeadersUriSpecMock = mock(WebClient.RequestHeadersUriSpec.class);
+        responseEntityMonoMock = mock(Mono.class);
 
         // Setup WebClient.Builder behavior for proper chaining
         when(webClientBuilderMock.baseUrl(anyString())).thenReturn(webClientBuilderMock);
@@ -74,6 +79,8 @@ public abstract class BaseClientTest {
         when(requestBodySpecMock.header(anyString(), any(String[].class))).thenReturn(requestBodySpecMock);
         when(requestBodySpecMock.header(anyString(), anyString())).thenReturn(requestBodySpecMock);
         doReturn(requestBodySpecMock).when(requestBodySpecMock).headers(any(Consumer.class));
+        doReturn(requestBodySpecMock).when(requestBodySpecMock).cookies(any(Consumer.class));
+        when(requestBodySpecMock.cookie(anyString(), anyString())).thenReturn(requestBodySpecMock);
         when(requestBodySpecMock.contentType(any())).thenReturn(requestBodySpecMock);
         when(requestBodySpecMock.bodyValue(any())).thenReturn(requestHeadersSpecMock);
         // Add proper mocking for body() method that takes a Publisher and Class arguments
@@ -92,6 +99,8 @@ public abstract class BaseClientTest {
         when(requestHeadersSpecMock.header(anyString(), any(String[].class))).thenReturn(requestHeadersSpecMock);
         when(requestHeadersSpecMock.header(anyString(), anyString())).thenReturn(requestHeadersSpecMock);
         doReturn(requestHeadersSpecMock).when(requestHeadersSpecMock).headers(any(Consumer.class));
+        doReturn(requestHeadersSpecMock).when(requestHeadersSpecMock).cookies(any(Consumer.class));
+        when(requestHeadersSpecMock.cookie(anyString(), anyString())).thenReturn(requestHeadersSpecMock);
         when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
 
         // Setup WebClient mock behavior chain for DELETE
@@ -108,5 +117,12 @@ public abstract class BaseClientTest {
 
         // Ensure response handling works
         when(responseSpecMock.onStatus(any(), any())).thenReturn(responseSpecMock);
+        // Mock response entity methods - these will be overridden in specific tests as needed
+        when(responseSpecMock.toEntity(any(Class.class))).thenReturn(responseEntityMonoMock);
+        // Also mock bodyToMono for completeness (though specific tests should override as needed)
+        when(responseSpecMock.bodyToMono(any(Class.class))).thenReturn(null); // Will be overridden by specific tests
+        // Mock common Mono operations that might be called on the response
+        when(responseEntityMonoMock.block()).thenReturn(null); // This will be overridden in specific tests as needed
+        when(responseEntityMonoMock.block(any())).thenReturn(null); // with timeout
     }
 }
