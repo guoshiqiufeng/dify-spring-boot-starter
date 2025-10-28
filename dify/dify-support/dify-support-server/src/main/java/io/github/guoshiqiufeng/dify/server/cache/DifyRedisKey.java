@@ -26,4 +26,6 @@ public interface DifyRedisKey {
 
     String REFRESH_TOKEN = "dify:refresh_token";
 
+    String CSRF_TOKEN = "dify:csrf_token";
+
 }

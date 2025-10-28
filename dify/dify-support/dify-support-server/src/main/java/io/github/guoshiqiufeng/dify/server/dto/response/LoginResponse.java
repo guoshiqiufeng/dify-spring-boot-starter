@@ -37,4 +37,7 @@ public class LoginResponse implements Serializable {
     @JsonAlias("refresh_token")
     private String refreshToken;
 
+    @JsonAlias("csrf_token")
+    private String csrfToken;
+
 }

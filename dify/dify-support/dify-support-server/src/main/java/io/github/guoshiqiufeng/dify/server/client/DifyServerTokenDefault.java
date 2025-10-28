@@ -18,6 +18,7 @@ package io.github.guoshiqiufeng.dify.server.client;
 import io.github.guoshiqiufeng.dify.server.dto.response.LoginResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.util.MultiValueMap;
 
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -33,6 +34,8 @@ public class DifyServerTokenDefault extends BaseDifyServerToken {
 
     private String refreshToken;
 
+    private String csrfToken;
+
     private final ReentrantLock tokenLock = new ReentrantLock();
 
     @Override
@@ -41,6 +44,16 @@ public class DifyServerTokenDefault extends BaseDifyServerToken {
             obtainToken(difyServerClient);
         }
         headers.setBearerAuth(accessToken);
+        headers.add("x-csrf-token", csrfToken);
+    }
+
+    @Override
+    public void addAuthorizationCookies(MultiValueMap<String, String> cookies, DifyServerClient difyServerClient) {
+        if (accessToken == null) {
+            obtainToken(difyServerClient);
+        }
+        cookies.add("access_token", accessToken);
+        cookies.add("csrf_token", csrfToken);
     }
 
     private void obtainToken(DifyServerClient difyServerClient) {
@@ -51,6 +64,7 @@ public class DifyServerTokenDefault extends BaseDifyServerToken {
                 if (loginResponse != null) {
                     this.accessToken = loginResponse.getAccessToken();
                     this.refreshToken = loginResponse.getRefreshToken();
+                    this.csrfToken = loginResponse.getCsrfToken();
                 }
             }
         } finally {
@@ -70,6 +84,7 @@ public class DifyServerTokenDefault extends BaseDifyServerToken {
                 if (response != null) {
                     this.accessToken = response.getAccessToken();
                     this.refreshToken = response.getRefreshToken();
+                    this.csrfToken = response.getCsrfToken();
                     return;
                 }
             }
@@ -78,6 +93,7 @@ public class DifyServerTokenDefault extends BaseDifyServerToken {
             if (loginResponse != null) {
                 this.accessToken = loginResponse.getAccessToken();
                 this.refreshToken = loginResponse.getRefreshToken();
+                this.csrfToken = loginResponse.getCsrfToken();
             }
         } finally {
             tokenLock.unlock();

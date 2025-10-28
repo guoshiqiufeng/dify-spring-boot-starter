@@ -17,6 +17,7 @@ package io.github.guoshiqiufeng.dify.server.client;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.util.MultiValueMap;
 
 /**
  * @author yanghq
@@ -39,6 +40,7 @@ public abstract class BaseDifyServerToken {
      */
     public abstract void addAuthorizationHeader(HttpHeaders headers, DifyServerClient difyServerClient);
 
+    public abstract void addAuthorizationCookies(MultiValueMap<String, String> cookies, DifyServerClient difyServerClient);
     /**
      * Executes the given request supplier with automatic retry mechanism.
      * Will retry when encountering 401 Unauthorized errors, up to MAX_RETRY_ATTEMPTS times.
@@ -74,5 +76,6 @@ public abstract class BaseDifyServerToken {
      * @param difyServerClient client instance containing authentication information
      */
     abstract void refreshOrObtainNewToken(DifyServerClient difyServerClient);
+
 
 }

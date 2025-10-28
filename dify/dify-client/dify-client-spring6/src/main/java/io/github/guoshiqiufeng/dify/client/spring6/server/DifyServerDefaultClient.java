@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.client.spring6.server;
 
 import io.github.guoshiqiufeng.dify.client.spring6.base.BaseDifyDefaultClient;
+import io.github.guoshiqiufeng.dify.client.spring6.utils.WebClientUtil;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
 import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
@@ -27,9 +28,13 @@ import io.github.guoshiqiufeng.dify.server.dto.request.DifyLoginRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,6 +88,7 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                 () -> restClient.get()
                         .uri(ServerUriConstant.APPS + "/{appId}", appId)
                         .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
                         .retrieve()
                         .onStatus(responseErrorHandler)
                         .body(AppsResponse.class)
@@ -95,6 +101,7 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                 () -> restClient.get()
                         .uri(ServerUriConstant.APPS + "/{appId}/api-keys", appId)
                         .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
                         .retrieve()
                         .onStatus(responseErrorHandler)
                         .body(ApiKeyResultResponse.class)
@@ -111,6 +118,7 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                 () -> restClient.post()
                         .uri(ServerUriConstant.APPS + "/{appId}/api-keys", appId)
                         .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
                         .retrieve()
                         .onStatus(responseErrorHandler)
                         .body(ApiKeyResponse.class)
@@ -124,6 +132,7 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                 () -> restClient.get()
                         .uri(ServerUriConstant.DATASETS + "/api-keys")
                         .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
                         .retrieve()
                         .onStatus(responseErrorHandler)
                         .body(DatasetApiKeyResult.class)
@@ -137,6 +146,7 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                 () -> restClient.post()
                         .uri(ServerUriConstant.DATASETS + "/api-keys")
                         .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
                         .retrieve()
                         .onStatus(responseErrorHandler)
                         .body(DatasetApiKeyResponse.class)
@@ -155,6 +165,7 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                                 .queryParamIfPresent("name", Optional.ofNullable(name).filter(m -> !m.isEmpty()))
                                 .build())
                         .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
                         .retrieve()
                         .onStatus(responseErrorHandler)
                         .body(AppsResponseResult.class)
@@ -177,6 +188,10 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
         difyServerToken.addAuthorizationHeader(headers, this);
     }
 
+    private void addAuthorizationCookies(MultiValueMap<String, String> cookies) {
+        difyServerToken.addAuthorizationCookies(cookies, this);
+    }
+
     private <T> T executeWithRetry(RequestSupplier<T> supplier) {
         return difyServerToken.executeWithRetry(supplier, this);
     }
@@ -184,26 +199,39 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
     @Override
     public LoginResponse login() {
         Assert.notNull(difyServerProperties, "The difyServerProperties can not be null.");
-        DifyLoginRequest requestVO = DifyLoginRequest.build(difyServerProperties.getEmail(), difyServerProperties.getPassword());
-        LoginResultResponse result = restClient.post()
+        DifyLoginRequest requestVO = DifyLoginRequest.build(
+                difyServerProperties.getEmail(),
+                difyServerProperties.getPassword()
+        );
+        // 发送请求并获取完整 ResponseEntity
+        ResponseEntity<LoginResultResponse> responseEntity = restClient.post()
                 .uri(ServerUriConstant.LOGIN)
                 .body(requestVO)
                 .retrieve()
                 .onStatus(responseErrorHandler)
-                .body(LoginResultResponse.class);
-        return processLoginResult(result);
+                .toEntity(LoginResultResponse.class);
+        // 获取 Set-Cookie 头
+        List<String> setCookies = responseEntity.getHeaders().getOrEmpty("Set-Cookie");
+        // 处理结果
+        LoginResultResponse result = responseEntity.getBody();
+        return processLoginResult(result, setCookies);
     }
 
     @Override
     public LoginResponse refreshToken(String refreshToken) {
         Map<String, String> requestVO = Map.of("refresh_token", refreshToken);
-        LoginResultResponse result = restClient.post()
+        ResponseEntity<LoginResultResponse> responseEntity = restClient.post()
                 .uri(ServerUriConstant.REFRESH_TOKEN)
+                .cookie("refresh_token", refreshToken)
                 .body(requestVO)
                 .retrieve()
                 .onStatus(responseErrorHandler)
-                .body(LoginResultResponse.class);
-        return processLoginResult(result);
+                .toEntity(LoginResultResponse.class);
+        // 获取 Set-Cookie 头
+        List<String> setCookies = responseEntity.getHeaders().getOrEmpty("Set-Cookie");
+        // 处理结果
+        LoginResultResponse result = responseEntity.getBody();
+        return processLoginResult(result, setCookies);
     }
 
     /**
@@ -212,10 +240,59 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
      * @param result the login result
      * @return the login response data or null
      */
+    @Deprecated
     private LoginResponse processLoginResult(LoginResultResponse result) {
         return Optional.ofNullable(result)
                 .filter(r -> DifyResult.SUCCESS.equals(r.getResult()))
                 .map(LoginResultResponse::getData)
                 .orElse(null);
+    }
+
+    /**
+     * Processes login/refresh response and extracts data
+     *
+     * @param result the login result
+     * @param setCookieHeaders the Set-Cookie headers from the response
+     * @return the login response data with cookies or null
+     */
+    private LoginResponse processLoginResult(LoginResultResponse result, List<String> setCookieHeaders) {
+        LoginResponse loginResponse = Optional.ofNullable(result)
+                .filter(r -> DifyResult.SUCCESS.equals(r.getResult()))
+                .map(LoginResultResponse::getData)
+                .orElse(null);
+
+        if (loginResponse == null && setCookieHeaders != null) {
+            loginResponse = new LoginResponse();
+            for (String cookieHeader : setCookieHeaders) {
+                if (cookieHeader.startsWith("access_token=") && !cookieHeader.contains("access_token=;")) {
+                    String accessToken = extractTokenValue(cookieHeader, "access_token=");
+                    loginResponse.setAccessToken(accessToken);
+                } else if (cookieHeader.startsWith("refresh_token=") && !cookieHeader.contains("refresh_token=;")) {
+                    String refreshToken = extractTokenValue(cookieHeader, "refresh_token=");
+                    loginResponse.setRefreshToken(refreshToken);
+                } else if (cookieHeader.startsWith("csrf_token=") && !cookieHeader.contains("csrf_token=;")) {
+                    String csrfToken = extractTokenValue(cookieHeader, "csrf_token=");
+                    loginResponse.setCsrfToken(csrfToken);
+                }
+            }
+        }
+
+        return loginResponse;
+    }
+
+    /**
+     * Extracts the token value from a cookie header string
+     *
+     * @param cookieHeader the cookie header string
+     * @param prefix the token prefix (e.g. "access_token=")
+     * @return the extracted token value
+     */
+    private String extractTokenValue(String cookieHeader, String prefix) {
+        int startIndex = cookieHeader.indexOf(prefix) + prefix.length();
+        int endIndex = cookieHeader.indexOf(";", startIndex);
+        if (endIndex == -1) {
+            endIndex = cookieHeader.length();
+        }
+        return cookieHeader.substring(startIndex, endIndex);
     }
 }
