@@ -15,8 +15,10 @@
  */
 package io.github.guoshiqiufeng.dify.server;
 
+import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponse;
 import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponse;
+import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponseResult;
 import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponse;
 
 import java.util.List;
@@ -39,6 +41,17 @@ public interface DifyServer {
      * @throws IllegalArgumentException 如果传入的参数不符合预期格式或范围
      */
     List<AppsResponse> apps(String mode, String name);
+
+    /**
+     * Retrieves paginated list of applications based on request parameters
+     *
+     * @param appsRequest Application query request containing pagination parameters and filter conditions
+     *                    Should include mode, name, isCreatedByMe and other filtering conditions, as well as page, limit for pagination
+     * @return Paginated application list result encapsulated in {@link AppsResponseResult} object
+     *         Contains current page data, total count, page number, page limit and other pagination information
+     * @since 1.5.0
+     */
+    AppsResponseResult apps(AppsRequest appsRequest);
 
     /**
      * 根据应用ID获取单个应用的详细信息

@@ -23,6 +23,7 @@ import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
 import io.github.guoshiqiufeng.dify.server.client.RequestSupplier;
 import io.github.guoshiqiufeng.dify.server.constant.ServerUriConstant;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DifyLoginRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import lombok.extern.slf4j.Slf4j;
@@ -77,6 +78,26 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
         List<AppsResponse> result = new ArrayList<>();
         appPages(mode, name, 1, result);
         return result;
+    }
+
+    @Override
+    public AppsResponseResult apps(AppsRequest appsRequest) {
+        return executeWithRetry(
+                () -> restClient.get()
+                        .uri(uriBuilder -> uriBuilder
+                                .path(ServerUriConstant.APPS)
+                                .queryParam("page", appsRequest.getPage())
+                                .queryParam("limit", appsRequest.getLimit())
+                                .queryParamIfPresent("mode", Optional.ofNullable(appsRequest.getMode()).filter(m -> !m.isEmpty()))
+                                .queryParamIfPresent("name", Optional.ofNullable(appsRequest.getName()).filter(m -> !m.isEmpty()))
+                                .queryParamIfPresent("is_created_by_me", Optional.ofNullable(appsRequest.getIsCreatedByMe()))
+                                .build())
+                        .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
+                        .retrieve()
+                        .onStatus(responseErrorHandler)
+                        .body(AppsResponseResult.class)
+        );
     }
 
     @Override
