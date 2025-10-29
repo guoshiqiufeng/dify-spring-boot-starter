@@ -121,7 +121,7 @@ AppsRequest
 
 #### Response Parameters
 
-AppsResponseResult (extends DifyPageResult<AppsResponse>)
+AppsResponseResult
 
 | Parameter name | Type                | Description                             |
 |----------------|---------------------|-----------------------------------------|

@@ -119,7 +119,7 @@ AppsRequest
 
 #### 响应参数
 
-AppsResponseResult (继承自 DifyPageResult<AppsResponse>)
+AppsResponseResult
 
 | 参数名      | 类型                | 描述          |
 |----------|---------------------|-------------|
