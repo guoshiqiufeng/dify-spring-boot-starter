@@ -15,7 +15,7 @@ API 密钥进行身份验证。
 
 ## 1. 应用管理
 
-### 1.1 获取所有应用
+### 1.1 获取所有应用 (非分页)
 
 #### 方法
 
@@ -97,7 +97,69 @@ public void testGetApps() {
 }
 ```
 
-### 1.2 根据ID获取应用
+### 1.2 分页获取应用
+
+#### 方法
+
+```java
+AppsResponseResult apps(AppsRequest appsRequest);
+```
+
+#### 请求参数
+
+AppsRequest
+
+| 参数名        | 类型     | 是否必须 | 描述                                    |
+|------------|--------|------|---------------------------------------|
+| page       | Integer| 否    | 页码（默认：1）                            |
+| limit      | Integer| 否    | 每页数量（默认：20，范围：1-100）                |
+| mode       | String | 否    | 应用模式过滤：chat\agent-chat\completion\advanced-chat\workflow |
+| name       | String | 否    | 应用名称过滤                               |
+| isCreatedByMe | Boolean| 否    | 是否为当前用户创建的应用                        |
+
+#### 响应参数
+
+AppsResponseResult
+
+| 参数名      | 类型                | 描述          |
+|----------|---------------------|-------------|
+| data     | `List<AppsResponse>`| 当前页数据列表      |
+| hasMore  | Boolean             | 是否有更多页      |
+| limit    | Integer             | 每页数量        |
+| page     | Integer             | 当前页码        |
+| total    | Integer             | 总数据数量       |
+
+AppsResponse 的结构与 1.1 节中定义的相同。
+
+#### 请求示例
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testGetAppsPaginated() {
+    // 创建分页请求
+    AppsRequest request = new AppsRequest();
+    request.setPage(1);
+    request.setLimit(10);
+    request.setMode("chat");
+    request.setName("myApp");
+    request.setIsCreatedByMe(true);
+
+    // 获取分页应用列表
+    AppsResponseResult result = difyServer.apps(request);
+    
+    System.out.println("当前页: " + result.getPage());
+    System.out.println("每页数量: " + result.getLimit());
+    System.out.println("总数: " + result.getTotal());
+    System.out.println("是否有更多: " + result.getHasMore());
+    System.out.println("数据大小: " + result.getData().size());
+}
+```
+
+### 1.3 根据ID获取应用
 
 #### 方法
 
@@ -128,7 +190,7 @@ public void testGetApp() {
 }
 ```
 
-### 1.3 获取应用API密钥
+### 1.4 获取应用API密钥
 
 #### 方法
 
@@ -164,7 +226,7 @@ public void testGetAppApiKeys() {
 }
 ```
 
-### 1.4 初始化应用API密钥
+### 1.5 初始化应用API密钥
 
 #### 方法
 

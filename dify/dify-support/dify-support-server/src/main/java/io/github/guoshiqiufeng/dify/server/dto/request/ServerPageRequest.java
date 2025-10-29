@@ -13,39 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.chat.dto.response.parameter;
+package io.github.guoshiqiufeng.dify.server.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author yanghq
- * @version 1.4.4
- * @since 2025/9/25 14:32
+ * @version 1.5.0
+ * @since 2025/10/29 13:12
  */
 @Data
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public class FileList extends TextInput {
+public class ServerPageRequest implements Serializable {
 
-    private String type;
+    /**
+     * 页码
+     */
+    private Integer page = 1;
 
-    private List<String> options;
+    /**
+     * 返回条数，默认 20，范围 1-100
+     */
+    private Integer limit = 20;
 
-    private String placeholder;
-
-    private String hint;
-
-    @JsonAlias("allowed_file_types")
-    private List<String> allowedFileTypes;
-
-    @JsonAlias("allowed_file_extensions")
-    private List<String> allowedFileExtensions;
-
-    @JsonAlias("allowed_file_upload_methods")
-    private List<String> allowedFileUploadMethods;
 }

@@ -13,39 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.chat.dto.response.parameter;
+package io.github.guoshiqiufeng.dify.server.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
-import java.util.List;
+import java.io.Serializable;
 
 /**
  * @author yanghq
- * @version 1.4.4
- * @since 2025/9/25 14:32
+ * @version 1.5.0
+ * @since 2025/10/29 16:35
  */
 @Data
-@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class FileList extends TextInput {
+public class AppsRequest extends ServerPageRequest implements Serializable {
+    private static final long serialVersionUID = 5565437185630052876L;
 
-    private String type;
+    /**
+     * 不传为所有，可选值： workflow、advanced-chat、chat、agent-chat、completion
+     */
+    private String mode;
 
-    private List<String> options;
+    private String name;
 
-    private String placeholder;
+    @JsonAlias("isCreatedByMe")
+    @JsonProperty("is_created_by_me")
+    private Boolean isCreatedByMe;
 
-    private String hint;
 
-    @JsonAlias("allowed_file_types")
-    private List<String> allowedFileTypes;
 
-    @JsonAlias("allowed_file_extensions")
-    private List<String> allowedFileExtensions;
-
-    @JsonAlias("allowed_file_upload_methods")
-    private List<String> allowedFileUploadMethods;
 }

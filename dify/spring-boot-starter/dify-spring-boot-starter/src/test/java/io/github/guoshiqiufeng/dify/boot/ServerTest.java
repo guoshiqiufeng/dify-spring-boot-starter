@@ -18,8 +18,10 @@ package io.github.guoshiqiufeng.dify.boot;
 import cn.hutool.json.JSONUtil;
 import io.github.guoshiqiufeng.dify.boot.base.BaseServerContainerTest;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponse;
 import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponse;
+import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponseResult;
 import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponse;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -72,6 +74,51 @@ public class ServerTest extends BaseServerContainerTest {
 
     @Test
     @Order(2)
+    @DisplayName("Test retrieving paginated application list with AppsRequest")
+    public void appsWithRequestTest() {
+        // Create AppsRequest with default parameters
+        AppsRequest request = new AppsRequest();
+        request.setPage(1);
+        request.setLimit(10);
+
+        AppsResponseResult paginatedApps = difyServer.apps(request);
+        log.debug("Paginated applications: {}", JSONUtil.toJsonStr(paginatedApps));
+        assertNotNull(paginatedApps, "Paginated application result should not be null");
+        assertNotNull(paginatedApps.getData(), "Paginated application data should not be null");
+        assertEquals(Integer.valueOf(1), paginatedApps.getPage(), "Returned page should match requested page");
+        assertEquals(Integer.valueOf(10), paginatedApps.getLimit(), "Returned limit should match requested limit");
+
+        // Test with mode filter
+        request.setMode("chat");
+        AppsResponseResult chatApps = difyServer.apps(request);
+        log.debug("Chat applications: {}", JSONUtil.toJsonStr(chatApps));
+        assertNotNull(chatApps, "Chat application result should not be null");
+        if (chatApps.getData() != null) {
+            // Verify that returned apps match the mode filter
+            chatApps.getData().forEach(app -> {
+                if (app.getMode() != null) {
+                    assertEquals("chat", app.getMode(), "Application mode should match filter");
+                }
+            });
+        }
+
+        // Test with name filter
+        request.setMode(null); // Reset mode filter
+        if (testAppId != null) {
+            // Get app name to use for filter test
+            AppsResponse app = difyServer.app(testAppId);
+            if (app != null && app.getName() != null && app.getName().length() > 0) {
+                String namePrefix = app.getName().substring(0, Math.min(1, app.getName().length()));
+                request.setName(namePrefix);
+                AppsResponseResult nameFilteredApps = difyServer.apps(request);
+                log.debug("Applications filtered by name '{}': {}", namePrefix, JSONUtil.toJsonStr(nameFilteredApps));
+                assertNotNull(nameFilteredApps, "Name-filtered application result should not be null");
+            }
+        }
+    }
+
+    @Test
+    @Order(3)
     @DisplayName("Test retrieving single application details")
     public void appTest() {
         // Check if test application ID is available
@@ -93,7 +140,7 @@ public class ServerTest extends BaseServerContainerTest {
     }
 
     @Test
-    @Order(3)
+    @Order(10)
     @DisplayName("Test retrieving and initializing application API Keys")
     public void appApiKeyTest() {
         // Check if test application ID is available
@@ -119,7 +166,7 @@ public class ServerTest extends BaseServerContainerTest {
     }
 
     @Test
-    @Order(4)
+    @Order(14)
     @DisplayName("Test dataset API Keys")
     public void datasetApiKeyTest() {
         // Get dataset API Keys
@@ -133,7 +180,7 @@ public class ServerTest extends BaseServerContainerTest {
     }
 
     @Test
-    @Order(5)
+    @Order(15)
     @DisplayName("Test error handling")
     public void errorHandlingTest() {
         // Test with invalid application ID

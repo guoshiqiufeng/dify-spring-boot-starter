@@ -15,8 +15,10 @@
  */
 package io.github.guoshiqiufeng.dify.server.client;
 
+import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponse;
 import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponse;
+import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponseResult;
 import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponse;
 import io.github.guoshiqiufeng.dify.server.dto.response.LoginResponse;
 
@@ -41,6 +43,17 @@ public interface DifyServerClient {
      * @return List of application responses matching the criteria
      */
     List<AppsResponse> apps(String mode, String name);
+
+    /**
+     * Retrieves paginated list of applications based on request parameters
+     *
+     * @param appsRequest Application query request containing pagination parameters and filter conditions
+     *                    Should include mode, name, isCreatedByMe and other filtering conditions, as well as page, limit for pagination
+     * @return Paginated application list result encapsulated in {@link AppsResponseResult} object
+     *         Contains current page data, total count, page number, page limit and other pagination information
+     * @since 1.5.0
+     */
+    AppsResponseResult apps(AppsRequest appsRequest);
 
     /**
      * Retrieves detailed information about a specific application

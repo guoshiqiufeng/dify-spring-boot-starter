@@ -17,8 +17,10 @@ package io.github.guoshiqiufeng.dify.server.impl;
 
 import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponse;
 import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponse;
+import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponseResult;
 import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponse;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,6 +43,11 @@ public class DifyServerClientImpl implements DifyServer {
     @Override
     public List<AppsResponse> apps(String mode, String name) {
         return difyServerClient.apps(mode, name);
+    }
+
+    @Override
+    public AppsResponseResult apps(AppsRequest appsRequest) {
+        return difyServerClient.apps(appsRequest);
     }
 
     @Override

@@ -17,7 +17,7 @@ Use the `DifyServer` interface instance.
 
 ## 1. Application Management
 
-### 1.1 Get All Applications
+### 1.1 Get All Applications (Non-Paginated)
 
 #### Method
 
@@ -99,7 +99,69 @@ public void testGetApps() {
 }
 ```
 
-### 1.2 Get Application by ID
+### 1.2 Get Applications with Pagination
+
+#### Method
+
+```java
+AppsResponseResult apps(AppsRequest appsRequest);
+```
+
+#### Request Parameters
+
+AppsRequest
+
+| Parameter name   | Type    | Required | Description                                                                 |
+|------------------|---------|----------|-----------------------------------------------------------------------------|
+| page             | Integer | No       | Page number (default: 1)                                                    |
+| limit            | Integer | No       | Number of items per page (default: 20, range: 1-100)                        |
+| mode             | String  | No       | Application mode filter: chat\agent-chat\completion\advanced-chat\workflow  |
+| name             | String  | No       | Application name filter                                                     |
+| isCreatedByMe    | Boolean | No       | Whether the application is created by the current user                      |
+
+#### Response Parameters
+
+AppsResponseResult
+
+| Parameter name | Type                | Description                             |
+|----------------|---------------------|-----------------------------------------|
+| data           | `List<AppsResponse>`| Current page data list                  |
+| hasMore        | Boolean             | Whether there are more pages            |
+| limit          | Integer             | Items per page                          |
+| page           | Integer             | Current page number                     |
+| total          | Integer             | Total number of items                   |
+
+The structure of AppsResponse is the same as defined above in section 1.1.
+
+#### Request Example
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testGetAppsPaginated() {
+    // Create paginated request
+    AppsRequest request = new AppsRequest();
+    request.setPage(1);
+    request.setLimit(10);
+    request.setMode("chat");
+    request.setName("myApp");
+    request.setIsCreatedByMe(true);
+
+    // Get paginated applications
+    AppsResponseResult result = difyServer.apps(request);
+    
+    System.out.println("Current page: " + result.getPage());
+    System.out.println("Items per page: " + result.getLimit());
+    System.out.println("Total items: " + result.getTotal());
+    System.out.println("Has more: " + result.getHasMore());
+    System.out.println("Data size: " + result.getData().size());
+}
+```
+
+### 1.3 Get Application by ID
 
 #### Method
 
@@ -130,7 +192,7 @@ public void testGetApp() {
 }
 ```
 
-### 1.3 Get Application API Keys
+### 1.4 Get Application API Keys
 
 #### Method
 
@@ -166,7 +228,7 @@ public void testGetAppApiKeys() {
 }
 ```
 
-### 1.4 Initialize Application API Key
+### 1.5 Initialize Application API Key
 
 #### Method
 
