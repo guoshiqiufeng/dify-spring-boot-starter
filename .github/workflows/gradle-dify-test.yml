@@ -261,3 +261,9 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: v${{ env.APP_VERSION }}
           name: GitHub-Actions-${{ github.job }}
+
+      - name: Upload test results to Codecov
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./**/build/test-results/test/TEST-*.xml  # All modules Gradle test results path
