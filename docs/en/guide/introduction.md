@@ -112,14 +112,16 @@ Legend:
 
 ### Server Features
 
-| Feature                           | Status |
-|-----------------------------------|--------|
-| Get Applications List             | ✅      |
-| Get Application Information       | ✅      |
-| Get Application API Keys          | ✅      |
-| Initialize Application API Key    | ✅      |
-| Get Knowledge Base API Keys       | ✅      |
-| Initialize Knowledge Base API Key | ✅      |
+| Feature                                | Status |
+|----------------------------------------|--------|
+| Get All Applications List              | ✅      |
+| Get Applications Page List             | ✅      |
+| Get Application Information            | ✅      |
+| Get Application API Keys               | ✅      |
+| Initialize Application API Key         | ✅      |
+| Get Knowledge Base API Keys            | ✅      |
+| Initialize Knowledge Base API Key      | ✅      |
+| Get Application Chat Conversation List | ✅      |
 
 ## Code Hosting
 

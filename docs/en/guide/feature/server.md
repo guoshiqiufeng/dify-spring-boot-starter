@@ -345,7 +345,7 @@ ChatConversationsRequest
 
 #### Response Parameters
 
-DifyPageResult<ChatConversationResponse>
+`DifyPageResult<ChatConversationResponse>`
 
 | Parameter name | Type                             | Description                  |
 |----------------|----------------------------------|------------------------------|

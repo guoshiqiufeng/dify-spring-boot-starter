@@ -343,7 +343,7 @@ ChatConversationsRequest
 
 #### 响应参数
 
-DifyPageResult<ChatConversationResponse>
+`DifyPageResult<ChatConversationResponse>`
 
 | 参数名     | 类型                               | 描述      |
 |---------|----------------------------------|---------|
