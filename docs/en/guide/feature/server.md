@@ -430,7 +430,7 @@ public void testGetChatConversations() {
 
 ```
 
-## 4. Daily Conversation Statistics
+## 4. Application Statistics
 
 ### 4.1 Get Application Daily Conversation Statistics
 
@@ -477,6 +477,56 @@ public void testGetDailyConversations() {
         for (DailyConversationsResponse dailyStat : dailyStats) {
             System.out.println("Date: " + dailyStat.getDate());
             System.out.println("Conversation count: " + dailyStat.getConversationCount());
+        }
+    }
+}
+```
+
+### 4.2 Get Application Daily End Users Statistics
+
+#### Method
+
+```java
+List<DailyEndUsersResponse> dailyEndUsers(String appId, LocalDateTime start, LocalDateTime end);
+```
+
+#### Request Parameters
+
+| Parameter name | Type          | Required | Description                          |
+|----------------|---------------|----------|--------------------------------------|
+| appId          | String        | Yes      | Application ID                       |
+| start          | LocalDateTime | Yes      | Start time, format: yyyy-MM-dd HH:mm |
+| end            | LocalDateTime | Yes      | End time, format: yyyy-MM-dd HH:mm   |
+
+#### Response Parameters
+
+DailyEndUsersResponse
+
+| Parameter name   | Type    | Description                       |
+|------------------|---------|-----------------------------------|
+| date             | String  | Date, format: yyyy-MM-dd          |
+| terminalCount    | Integer | Number of end users on that day   |
+
+#### Request Example
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testGetDailyEndUsers() {
+    String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
+    LocalDateTime start = LocalDateTime.of(2025, 10, 23, 0, 0);
+    LocalDateTime end = LocalDateTime.of(2025, 10, 30, 23, 59);
+
+    // Get daily end users statistics
+    List<DailyEndUsersResponse> dailyEndUsersStats = difyServer.dailyEndUsers(appId, start, end);
+
+    if (dailyEndUsersStats != null) {
+        for (DailyEndUsersResponse dailyStat : dailyEndUsersStats) {
+            System.out.println("Date: " + dailyStat.getDate());
+            System.out.println("End users count: " + dailyStat.getTerminalCount());
         }
     }
 }

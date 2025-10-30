@@ -256,6 +256,40 @@ public class ServerTest extends BaseServerContainerTest {
 
     @Test
     @Order(17)
+    @DisplayName("Test retrieving daily end users statistics")
+    public void dailyEndUsersTest() {
+        // Check if test application ID is available
+        if (testAppId == null) {
+            List<AppsResponse> apps = difyServer.apps("", "");
+            if (!apps.isEmpty()) {
+                testAppId = apps.getFirst().getId();
+            } else {
+                log.warn("No applications available, skipping daily end users test");
+                return;
+            }
+        }
+
+        // Create date range for daily end users
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
+        java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        // Get daily end users statistics
+        List<io.github.guoshiqiufeng.dify.server.dto.response.DailyEndUsersResponse> dailyEndUsersStats =
+                difyServer.dailyEndUsers(testAppId, start, end);
+        log.debug("Daily end users statistics: {}", JSONUtil.toJsonStr(dailyEndUsersStats));
+        assertNotNull(dailyEndUsersStats, "Daily end users statistics should not be null");
+
+        // If statistics exist, verify the data structure
+        if (dailyEndUsersStats != null && !dailyEndUsersStats.isEmpty()) {
+            io.github.guoshiqiufeng.dify.server.dto.response.DailyEndUsersResponse firstStat = dailyEndUsersStats.get(0);
+            log.debug("First daily end users statistic: {}", JSONUtil.toJsonStr(firstStat));
+            assertNotNull(firstStat.getDate(), "Daily end users statistic date should not be null");
+            assertNotNull(firstStat.getTerminalCount(), "Daily end users statistic terminal count should not be null");
+        }
+    }
+
+    @Test
+    @Order(18)
     @DisplayName("Test error handling")
     public void errorHandlingTest() {
         // Test with invalid application ID

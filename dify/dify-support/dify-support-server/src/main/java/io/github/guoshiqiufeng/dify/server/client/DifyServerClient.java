@@ -126,4 +126,14 @@ public interface DifyServerClient {
      * @return List of daily conversation statistics, each encapsulated in {@link DailyConversationsResponse} object
      */
     List<DailyConversationsResponse> dailyConversations(String appId, LocalDateTime start, LocalDateTime end);
+
+    /**
+     * Retrieves daily end users statistics for a specific application
+     *
+     * @param appId The ID of the application to get statistics for
+     * @param start Start time in format "yyyy-MM-dd HH:mm"
+     * @param end   End time in format "yyyy-MM-dd HH:mm"
+     * @return List of daily end users statistics, each encapsulated in {@link DailyEndUsersResponse} object
+     */
+    List<DailyEndUsersResponse> dailyEndUsers(String appId, LocalDateTime start, LocalDateTime end);
 }

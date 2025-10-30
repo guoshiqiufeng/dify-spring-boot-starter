@@ -519,4 +519,40 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(requestHeadersUriSpecMock).uri(any(Function.class));
         verify(responseSpecMock).bodyToMono(any(org.springframework.core.ParameterizedTypeReference.class));
     }
+
+    @Test
+    @DisplayName("Test dailyEndUsers method")
+    public void testDailyEndUsers() {
+        // Prepare test data
+        String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
+        java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        // Create mock daily end users data
+        DailyEndUsersResponse dailyStat = new DailyEndUsersResponse();
+        dailyStat.setDate("2025-09-02");
+        dailyStat.setTerminalCount(1);
+
+        // Create mock response
+        List<DailyEndUsersResponse> mockResponse = List.of(dailyStat);
+        DailyEndUsersResultResponse response = new DailyEndUsersResultResponse();
+        response.setData(mockResponse);
+
+        // Set up the response mock to return our expected response
+        when(responseSpecMock.bodyToMono(any(org.springframework.core.ParameterizedTypeReference.class))).thenReturn(Mono.just(response));
+
+        // Execute the method
+        List<DailyEndUsersResponse> actualResponse = client.dailyEndUsers(appId, start, end);
+
+        // Verify the result
+        assertNotNull(actualResponse);
+        assertEquals(1, actualResponse.size());
+        assertEquals("2025-09-02", actualResponse.get(0).getDate());
+        assertEquals(1, actualResponse.get(0).getTerminalCount());
+
+        // Verify WebClient interactions
+        verify(webClientMock).get();
+        verify(requestHeadersUriSpecMock).uri(any(Function.class));
+        verify(responseSpecMock).bodyToMono(any(org.springframework.core.ParameterizedTypeReference.class));
+    }
 }
