@@ -18,10 +18,13 @@ package io.github.guoshiqiufeng.dify.boot;
 import cn.hutool.json.JSONUtil;
 import io.github.guoshiqiufeng.dify.boot.base.BaseServerContainerTest;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
+import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponse;
 import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponse;
 import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponseResult;
+import io.github.guoshiqiufeng.dify.server.dto.response.ChatConversationResponse;
 import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponse;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -181,6 +184,48 @@ public class ServerTest extends BaseServerContainerTest {
 
     @Test
     @Order(15)
+    @DisplayName("Test retrieving chat conversations")
+    public void chatConversationsTest() {
+        // Check if test application ID is available
+        if (testAppId == null) {
+            List<AppsResponse> apps = difyServer.apps("", "");
+            if (!apps.isEmpty()) {
+                testAppId = apps.getFirst().getId();
+            } else {
+                log.warn("No applications available, skipping chat conversations test");
+                return;
+            }
+        }
+
+        // Create a ChatConversationsRequest
+        ChatConversationsRequest request = new ChatConversationsRequest();
+        request.setAppId(testAppId);
+        request.setPage(1);
+        request.setLimit(10);
+        request.setAnnotationStatus("all");
+        request.setStart("2024-01-01 00:00");
+        request.setEnd("2025-12-31 23:59");
+        request.setSortBy("-created_at");
+
+        // Get chat conversations
+        DifyPageResult<ChatConversationResponse> conversations = difyServer.chatConversations(request);
+        log.debug("Chat conversations: {}", JSONUtil.toJsonStr(conversations));
+        assertNotNull(conversations, "Chat conversations result should not be null");
+        assertNotNull(conversations.getData(), "Chat conversations data should not be null");
+        assertEquals(Integer.valueOf(1), conversations.getPage(), "Returned page should match requested page");
+        assertEquals(Integer.valueOf(10), conversations.getLimit(), "Returned limit should match requested limit");
+
+        // Verify the data structure if conversations exist
+        if (conversations.getData() != null && !conversations.getData().isEmpty()) {
+            ChatConversationResponse firstConversation = conversations.getData().getFirst();
+            log.debug("First conversation: {}", JSONUtil.toJsonStr(firstConversation));
+            assertNotNull(firstConversation.getId(), "Conversation ID should not be null");
+            assertNotNull(firstConversation.getName(), "Conversation name should not be null");
+        }
+    }
+
+    @Test
+    @Order(16)
     @DisplayName("Test error handling")
     public void errorHandlingTest() {
         // Test with invalid application ID

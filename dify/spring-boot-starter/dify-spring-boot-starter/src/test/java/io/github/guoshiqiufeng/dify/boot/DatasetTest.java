@@ -273,7 +273,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
         assertNotNull(response);
         log.info("Indexing status: {}", JSONUtil.toJsonStr(response));
         int attempts = 0;
-        while (response.getData().getFirst().getIndexingStatus().equals("indexing") && attempts < 5) {
+        while (!response.getData().getFirst().getIndexingStatus().equals("completed") && attempts < 30) {
             attempts++;
             Thread.sleep(500);
             response = difyDataset.indexingStatus(request);
@@ -287,9 +287,6 @@ public class DatasetTest extends BaseDatasetContainerTest {
     public void testSegmentOperations() throws InterruptedException {
         assertNotNull(datasetId, "Dataset ID should be available from previous test");
         assertNotNull(documentTextId, "Document ID should be available from previous test");
-
-        // Wait for indexing to complete
-        Thread.sleep(1500);
 
         // Test listing segments
         SegmentPageRequest pageRequest = new SegmentPageRequest();
@@ -373,8 +370,20 @@ public class DatasetTest extends BaseDatasetContainerTest {
         DocumentCreateResponse response = difyDataset.createDocumentByText(request);
         assertNotNull(response);
         String documentId = response.getDocument().getId();
-        // Wait for indexing to complete
-        Thread.sleep(1500);
+
+        DocumentIndexingStatusRequest statusRequest = new DocumentIndexingStatusRequest();
+        statusRequest.setDatasetId(datasetId);
+        statusRequest.setBatch(response.getBatch());
+
+        DocumentIndexingStatusResponse statusResponse = difyDataset.indexingStatus(statusRequest);
+        assertNotNull(response);
+        log.info("Indexing status: {}", JSONUtil.toJsonStr(statusResponse));
+        int attempts = 0;
+        while (!statusResponse.getData().getFirst().getIndexingStatus().equals("completed") && attempts < 30) {
+            attempts++;
+            Thread.sleep(500);
+            statusResponse = difyDataset.indexingStatus(statusRequest);
+        }
 
         SegmentCreateRequest segmentCreateRequest = new SegmentCreateRequest();
         segmentCreateRequest.setDatasetId(datasetId);

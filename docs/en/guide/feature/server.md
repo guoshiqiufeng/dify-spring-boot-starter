@@ -111,25 +111,25 @@ AppsResponseResult apps(AppsRequest appsRequest);
 
 AppsRequest
 
-| Parameter name   | Type    | Required | Description                                                                 |
-|------------------|---------|----------|-----------------------------------------------------------------------------|
-| page             | Integer | No       | Page number (default: 1)                                                    |
-| limit            | Integer | No       | Number of items per page (default: 20, range: 1-100)                        |
-| mode             | String  | No       | Application mode filter: chat\agent-chat\completion\advanced-chat\workflow  |
-| name             | String  | No       | Application name filter                                                     |
-| isCreatedByMe    | Boolean | No       | Whether the application is created by the current user                      |
+| Parameter name | Type    | Required | Description                                                                |
+|----------------|---------|----------|----------------------------------------------------------------------------|
+| page           | Integer | No       | Page number (default: 1)                                                   |
+| limit          | Integer | No       | Number of items per page (default: 20, range: 1-100)                       |
+| mode           | String  | No       | Application mode filter: chat\agent-chat\completion\advanced-chat\workflow |
+| name           | String  | No       | Application name filter                                                    |
+| isCreatedByMe  | Boolean | No       | Whether the application is created by the current user                     |
 
 #### Response Parameters
 
 AppsResponseResult
 
-| Parameter name | Type                | Description                             |
-|----------------|---------------------|-----------------------------------------|
-| data           | `List<AppsResponse>`| Current page data list                  |
-| hasMore        | Boolean             | Whether there are more pages            |
-| limit          | Integer             | Items per page                          |
-| page           | Integer             | Current page number                     |
-| total          | Integer             | Total number of items                   |
+| Parameter name | Type                 | Description                  |
+|----------------|----------------------|------------------------------|
+| data           | `List<AppsResponse>` | Current page data list       |
+| hasMore        | Boolean              | Whether there are more pages |
+| limit          | Integer              | Items per page               |
+| page           | Integer              | Current page number          |
+| total          | Integer              | Total number of items        |
 
 The structure of AppsResponse is the same as defined above in section 1.1.
 
@@ -316,5 +316,115 @@ private DifyServer difyServer;
 @Test
 public void testInitDatasetApiKey() {
     List<DatasetApiKeyResponseVO> datasetApiKeys = difyServer.initDatasetApiKey();
+}
+```
+
+## 3. Chat Conversation Management
+
+### 3.1 Get Application Chat Conversation List
+
+#### Method
+
+```java
+DifyPageResult<ChatConversationResponse> chatConversations(ChatConversationsRequest request);
+```
+
+#### Request Parameters
+
+ChatConversationsRequest
+
+| Parameter name   | Type    | Required | Description                                                      |
+|------------------|---------|----------|------------------------------------------------------------------|
+| appId            | String  | Yes      | Application ID                                                   |
+| page             | Integer | No       | Page number (default: 1)                                         |
+| limit            | Integer | No       | Number of items per page (default: 10, range: 1-100)             |
+| start            | String  | No       | Start time, format: yyyy-MM-dd HH:mm                             |
+| end              | String  | No       | End time, format: yyyy-MM-dd HH:mm                               |
+| sortBy           | String  | No       | Sort field, e.g., -created_at (sort by creation time descending) |
+| annotationStatus | String  | No       | Annotation status: all, not_annotated, annotated                 |
+
+#### Response Parameters
+
+`DifyPageResult<ChatConversationResponse>`
+
+| Parameter name | Type                             | Description                  |
+|----------------|----------------------------------|------------------------------|
+| data           | `List<ChatConversationResponse>` | Current page data list       |
+| hasMore        | Boolean                          | Whether there are more pages |
+| limit          | Integer                          | Items per page               |
+| page           | Integer                          | Current page number          |
+| total          | Integer                          | Total number of items        |
+
+ChatConversationResponse
+
+| Parameter name       | Type                  | Description               |
+|----------------------|-----------------------|---------------------------|
+| id                   | String                | Conversation ID           |
+| status               | String                | Conversation status       |
+| fromSource           | String                | Source                    |
+| fromEndUserId        | String                | End user ID               |
+| fromEndUserSessionId | String                | End user session ID       |
+| fromAccountId        | String                | Account ID                |
+| fromAccountName      | String                | Account name              |
+| name                 | String                | Conversation name         |
+| summary              | String                | Conversation summary      |
+| readAt               | Long                  | Read time (timestamp)     |
+| createdAt            | Long                  | Creation time (timestamp) |
+| updatedAt            | Long                  | Update time (timestamp)   |
+| annotated            | Boolean               | Whether annotated         |
+| modelConfig          | `Map<String, Object>` | Model configuration       |
+| messageCount         | Integer               | Message count             |
+| userFeedbackStats    | FeedbackStats         | User feedback statistics  |
+| adminFeedbackStats   | FeedbackStats         | Admin feedback statistics |
+| statusCount          | StatusCount           | Status count              |
+
+FeedbackStats
+
+| Parameter name | Type    | Description   |
+|----------------|---------|---------------|
+| like           | Integer | Like count    |
+| dislike        | Integer | Dislike count |
+
+StatusCount
+
+| Parameter name | Type    | Description           |
+|----------------|---------|-----------------------|
+| success        | Integer | Success count         |
+| failed         | Integer | Failed count          |
+| partialSuccess | Integer | Partial success count |
+
+#### Request Example
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testGetChatConversations() {
+    // Create request object
+    ChatConversationsRequest request = new ChatConversationsRequest();
+    request.setAppId("app-123456789");
+    request.setPage(1);
+    request.setLimit(10);
+    request.setStart("2025-10-23 00:00");
+    request.setEnd("2025-10-30 23:59");
+    request.setAnnotationStatus("all");
+    request.setSortBy("-created_at");
+
+    // Get chat conversation list
+    DifyPageResult<ChatConversationResponse> result = difyServer.chatConversations(request);
+    
+    System.out.println("Current page: " + result.getPage());
+    System.out.println("Items per page: " + result.getLimit());
+    System.out.println("Total items: " + result.getTotal());
+    System.out.println("Has more: " + result.getHasMore());
+    System.out.println("Data size: " + result.getData().size());
+    
+    for (ChatConversationResponse conversation : result.getData()) {
+        System.out.println("Conversation ID: " + conversation.getId());
+        System.out.println("Conversation name: " + conversation.getName());
+        System.out.println("Is annotated: " + conversation.isAnnotated());
+    }
 }
 ```

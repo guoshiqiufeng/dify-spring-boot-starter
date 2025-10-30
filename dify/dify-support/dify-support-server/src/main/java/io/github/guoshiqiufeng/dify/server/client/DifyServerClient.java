@@ -15,12 +15,10 @@
  */
 package io.github.guoshiqiufeng.dify.server.client;
 
+import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
-import io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponse;
-import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponse;
-import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponseResult;
-import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponse;
-import io.github.guoshiqiufeng.dify.server.dto.response.LoginResponse;
+import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
+import io.github.guoshiqiufeng.dify.server.dto.response.*;
 
 import java.util.List;
 
@@ -50,7 +48,7 @@ public interface DifyServerClient {
      * @param appsRequest Application query request containing pagination parameters and filter conditions
      *                    Should include mode, name, isCreatedByMe and other filtering conditions, as well as page, limit for pagination
      * @return Paginated application list result encapsulated in {@link AppsResponseResult} object
-     *         Contains current page data, total count, page number, page limit and other pagination information
+     * Contains current page data, total count, page number, page limit and other pagination information
      * @since 1.5.0
      */
     AppsResponseResult apps(AppsRequest appsRequest);
@@ -107,4 +105,14 @@ public interface DifyServerClient {
      * @return Login response containing new access token and refresh token
      */
     LoginResponse refreshToken(String refreshToken);
+
+    /**
+     * Retrieves paginated chat conversations for a specific application
+     *
+     * @param request Chat conversations query request containing pagination parameters and filter conditions
+     *                Should include appId, date range, annotation status, and other filtering conditions, as well as page, limit for pagination
+     * @return Paginated chat conversations result encapsulated in {@link DifyPageResult} object
+     * Contains current page data, total count, page number, page limit and other pagination information
+     */
+    DifyPageResult<ChatConversationResponse> chatConversations(ChatConversationsRequest request);
 }

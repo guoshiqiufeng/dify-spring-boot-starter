@@ -15,11 +15,10 @@
  */
 package io.github.guoshiqiufeng.dify.server;
 
+import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
-import io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponse;
-import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponse;
-import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponseResult;
-import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponse;
+import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
+import io.github.guoshiqiufeng.dify.server.dto.response.*;
 
 import java.util.List;
 
@@ -48,7 +47,7 @@ public interface DifyServer {
      * @param appsRequest Application query request containing pagination parameters and filter conditions
      *                    Should include mode, name, isCreatedByMe and other filtering conditions, as well as page, limit for pagination
      * @return Paginated application list result encapsulated in {@link AppsResponseResult} object
-     *         Contains current page data, total count, page number, page limit and other pagination information
+     * Contains current page data, total count, page number, page limit and other pagination information
      * @since 1.5.0
      */
     AppsResponseResult apps(AppsRequest appsRequest);
@@ -98,4 +97,12 @@ public interface DifyServer {
      * 如果初始化失败则返回空列表
      */
     List<DatasetApiKeyResponse> initDatasetApiKey();
+
+    /**
+     * 获取应用的聊天会话列表
+     *
+     * @param request 聊天会话查询请求，包含分页参数和过滤条件
+     * @return 分页结果，包含会话列表信息
+     */
+    DifyPageResult<ChatConversationResponse> chatConversations(ChatConversationsRequest request);
 }

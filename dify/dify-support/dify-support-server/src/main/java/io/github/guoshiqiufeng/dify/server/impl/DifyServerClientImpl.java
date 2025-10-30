@@ -15,13 +15,12 @@
  */
 package io.github.guoshiqiufeng.dify.server.impl;
 
+import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
-import io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponse;
-import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponse;
-import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponseResult;
-import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponse;
+import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
+import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -73,5 +72,10 @@ public class DifyServerClientImpl implements DifyServer {
     @Override
     public List<DatasetApiKeyResponse> initDatasetApiKey() {
         return difyServerClient.initDatasetApiKey();
+    }
+
+    @Override
+    public DifyPageResult<ChatConversationResponse> chatConversations(ChatConversationsRequest request) {
+        return difyServerClient.chatConversations(request);
     }
 }
