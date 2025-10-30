@@ -291,6 +291,40 @@ public class ServerTest extends BaseServerContainerTest {
 
     @Test
     @Order(18)
+    @DisplayName("Test retrieving average session interactions statistics")
+    public void averageSessionInteractionsTest() {
+        // Check if test application ID is available
+        if (testAppId == null) {
+            List<AppsResponse> apps = difyServer.apps("", "");
+            if (!apps.isEmpty()) {
+                testAppId = apps.get(0).getId(); // Use get(0) instead of getFirst() for Java 8 compatibility
+            } else {
+                log.warn("No applications available, skipping average session interactions test");
+                return;
+            }
+        }
+
+        // Create date range for average session interactions
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
+        java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        // Get average session interactions statistics
+        List<io.github.guoshiqiufeng.dify.server.dto.response.AverageSessionInteractionsResponse> averageSessionInteractionsStats =
+                difyServer.averageSessionInteractions(testAppId, start, end);
+        log.debug("Average session interactions statistics: {}", JSONUtil.toJsonStr(averageSessionInteractionsStats));
+        assertNotNull(averageSessionInteractionsStats, "Average session interactions statistics should not be null");
+
+        // If statistics exist, verify the data structure
+        if (averageSessionInteractionsStats != null && !averageSessionInteractionsStats.isEmpty()) {
+            io.github.guoshiqiufeng.dify.server.dto.response.AverageSessionInteractionsResponse firstStat = averageSessionInteractionsStats.get(0);
+            log.debug("First average session interactions statistic: {}", JSONUtil.toJsonStr(firstStat));
+            assertNotNull(firstStat.getDate(), "Average session interactions statistic date should not be null");
+            assertNotNull(firstStat.getInteractions(), "Average session interactions statistic should not be null");
+        }
+    }
+
+    @Test
+    @Order(18)
     @DisplayName("Test error handling")
     public void errorHandlingTest() {
         // Test with invalid application ID

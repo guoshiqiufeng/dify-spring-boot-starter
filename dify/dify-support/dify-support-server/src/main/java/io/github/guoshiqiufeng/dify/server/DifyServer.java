@@ -128,4 +128,15 @@ public interface DifyServer {
      * @throws IllegalArgumentException 如果传入的参数不符合预期格式或范围
      */
     List<DailyEndUsersResponse> dailyEndUsers(String appId, LocalDateTime start, LocalDateTime end);
+
+    /**
+     * 获取应用的平均会话交互统计
+     *
+     * @param appId 应用的唯一标识符，不能为空
+     * @param start 开始时间，格式为 "yyyy-MM-dd HH:mm"
+     * @param end   结束时间，格式为 "yyyy-MM-dd HH:mm"
+     * @return 返回平均会话交互统计列表，每个统计封装为 {@link AverageSessionInteractionsResponse} 对象
+     * @throws IllegalArgumentException 如果传入的参数不符合预期格式或范围
+     */
+    List<AverageSessionInteractionsResponse> averageSessionInteractions(String appId, LocalDateTime start, LocalDateTime end);
 }

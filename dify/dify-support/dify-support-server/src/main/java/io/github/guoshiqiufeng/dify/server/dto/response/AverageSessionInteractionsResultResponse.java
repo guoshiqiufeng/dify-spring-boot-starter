@@ -13,28 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.server.constant;
+
+package io.github.guoshiqiufeng.dify.server.dto.response;
+
+import lombok.Data;
+
+import java.util.List;
 
 /**
+ * Average session interactions statistics result response DTO
+ *
  * @author yanghq
- * @version 1.0
- * @since 2025/3/4 15:11
+ * @version 1.5.0
+ * @since 2025/10/30
  */
-public interface ServerUriConstant {
+@Data
+public class AverageSessionInteractionsResultResponse {
 
-    String API = "/console/api";
-
-    String LOGIN = API + "/login";
-
-    String REFRESH_TOKEN = API + "/refresh-token";
-
-    String APPS = API + "/apps";
-
-    String DATASETS = API + "/datasets";
-
-    String DAILY_CONVERSATIONS = APPS + "/{appId}/statistics/daily-conversations";
-
-    String DAILY_END_USERS = APPS + "/{appId}/statistics/daily-end-users";
-
-    String AVERAGE_SESSION_INTERACTIONS = APPS + "/{appId}/statistics/average-session-interactions";
+    /**
+     * List of average session interactions statistics
+     */
+    private List<AverageSessionInteractionsResponse> data;
 }
