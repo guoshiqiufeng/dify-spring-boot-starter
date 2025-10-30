@@ -500,9 +500,10 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
 
         // Create mock response
         List<DailyConversationsResponse> mockResponse = List.of(dailyStat);
-
+        DailyConversationsResultResponse response = new DailyConversationsResultResponse();
+        response.setData(mockResponse);
         // Set up the response mock to return our expected response
-        when(responseSpecMock.bodyToMono(any(org.springframework.core.ParameterizedTypeReference.class))).thenReturn(Mono.just(mockResponse));
+        when(responseSpecMock.bodyToMono(any(org.springframework.core.ParameterizedTypeReference.class))).thenReturn(Mono.just(response));
 
         // Execute the method
         List<DailyConversationsResponse> actualResponse = client.dailyConversations(appId, start, end);

@@ -540,18 +540,19 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
 
         // Create mock response
         List<DailyConversationsResponse> mockResponse = List.of(dailyStat);
-
+        DailyConversationsResultResponse response = new DailyConversationsResultResponse();
+        response.setData(mockResponse);
         // Mock the response
-        when(responseSpec.body(any(org.springframework.core.ParameterizedTypeReference.class))).thenReturn(mockResponse);
+        when(responseSpec.body(any(org.springframework.core.ParameterizedTypeReference.class))).thenReturn(response);
 
         // Call the method to test
-        List<DailyConversationsResponse> response = client.dailyConversations(appId, start, end);
+        List<DailyConversationsResponse> actualResponse = client.dailyConversations(appId, start, end);
 
         // Verify the response
-        assertNotNull(response);
-        assertEquals(1, response.size());
-        assertEquals("2025-09-02", response.get(0).getDate());
-        assertEquals(1, response.get(0).getConversationCount().intValue());
+        assertNotNull(actualResponse);
+        assertEquals(1, actualResponse.size());
+        assertEquals("2025-09-02", actualResponse.get(0).getDate());
+        assertEquals(1, actualResponse.get(0).getConversationCount().intValue());
 
         // Verify interactions with mocks
         verify(requestHeadersUriSpec).uri(any(Function.class));
