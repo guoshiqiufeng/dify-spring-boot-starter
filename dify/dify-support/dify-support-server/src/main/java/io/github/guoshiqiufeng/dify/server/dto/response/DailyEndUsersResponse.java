@@ -13,26 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.server.constant;
+
+package io.github.guoshiqiufeng.dify.server.dto.response;
+
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
 /**
+ * Daily end users statistics response DTO
+ *
  * @author yanghq
- * @version 1.0
- * @since 2025/3/4 15:11
+ * @version 1.5.0
+ * @since 2025/10/30
  */
-public interface ServerUriConstant {
+@Data
+public class DailyEndUsersResponse {
 
-    String API = "/console/api";
+    /**
+     * Date in format "yyyy-MM-dd"
+     */
+    private String date;
 
-    String LOGIN = API + "/login";
-
-    String REFRESH_TOKEN = API + "/refresh-token";
-
-    String APPS = API + "/apps";
-
-    String DATASETS = API + "/datasets";
-
-    String DAILY_CONVERSATIONS = APPS + "/{appId}/statistics/daily-conversations";
-
-    String DAILY_END_USERS = APPS + "/{appId}/statistics/daily-end-users";
+    /**
+     * Number of end users on this date
+     */
+    @JsonAlias("terminalCount")
+    @JsonProperty("terminal_count")
+    private Integer terminalCount;
 }

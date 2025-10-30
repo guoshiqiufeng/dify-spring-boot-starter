@@ -427,7 +427,7 @@ public void testGetChatConversations() {
 }
 ```
 
-## 4. 每日对话统计
+## 4. 应用统计
 
 ### 4.1 获取应用的每日对话统计
 
@@ -474,6 +474,56 @@ public void testGetDailyConversations() {
         for (DailyConversationsResponse dailyStat : dailyStats) {
             System.out.println("日期: " + dailyStat.getDate());
             System.out.println("对话数量: " + dailyStat.getConversationCount());
+        }
+    }
+}
+```
+
+### 4.2 获取应用的每日终端用户统计
+
+#### 方法
+
+```java
+List<DailyEndUsersResponse> dailyEndUsers(String appId, LocalDateTime start, LocalDateTime end);
+```
+
+#### 请求参数
+
+| 参数名   | 类型            | 是否必须 | 描述                       |
+|-------|---------------|------|--------------------------|
+| appId | String        | 是    | 应用 ID                    |
+| start | LocalDateTime | 是    | 开始时间，格式：yyyy-MM-dd HH:mm |
+| end   | LocalDateTime | 是    | 结束时间，格式：yyyy-MM-dd HH:mm |
+
+#### 响应参数
+
+DailyEndUsersResponse
+
+| 参数名            | 类型      | 描述               |
+|----------------|---------|------------------|
+| date           | String  | 日期，格式：yyyy-MM-dd |
+| terminalCount  | Integer | 当日终端用户数量        |
+
+#### 请求示例
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testGetDailyEndUsers() {
+    String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
+    LocalDateTime start = LocalDateTime.of(2025, 10, 23, 0, 0);
+    LocalDateTime end = LocalDateTime.of(2025, 10, 30, 23, 59);
+
+    // 获取每日终端用户统计
+    List<DailyEndUsersResponse> dailyEndUsersStats = difyServer.dailyEndUsers(appId, start, end);
+
+    if (dailyEndUsersStats != null) {
+        for (DailyEndUsersResponse dailyStat : dailyEndUsersStats) {
+            System.out.println("日期: " + dailyStat.getDate());
+            System.out.println("终端用户数量: " + dailyStat.getTerminalCount());
         }
     }
 }

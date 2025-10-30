@@ -558,4 +558,43 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(requestHeadersUriSpec).uri(any(Function.class));
         verify(requestHeadersSpec).headers(any());
     }
+
+    @Test
+    @DisplayName("Test dailyEndUsers method")
+    public void testDailyEndUsers() {
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
+
+        // Prepare test data
+        String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
+        java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        // Create mock daily end users data
+        DailyEndUsersResponse dailyStat = new DailyEndUsersResponse();
+        dailyStat.setDate("2025-09-02");
+        dailyStat.setTerminalCount(1);
+
+        // Create mock response
+        List<DailyEndUsersResponse> mockResponse = List.of(dailyStat);
+        DailyEndUsersResultResponse response = new DailyEndUsersResultResponse();
+        response.setData(mockResponse);
+
+        // Mock the response
+        when(responseSpec.body(any(org.springframework.core.ParameterizedTypeReference.class))).thenReturn(response);
+
+        // Call the method to test
+        List<DailyEndUsersResponse> actualResponse = client.dailyEndUsers(appId, start, end);
+
+        // Verify the response
+        assertNotNull(actualResponse);
+        assertEquals(1, actualResponse.size());
+        assertEquals("2025-09-02", actualResponse.get(0).getDate());
+        assertEquals(1, actualResponse.get(0).getTerminalCount().intValue());
+
+        // Verify interactions with mocks
+        verify(requestHeadersUriSpec).uri(any(Function.class));
+        verify(requestHeadersSpec).headers(any());
+    }
 }

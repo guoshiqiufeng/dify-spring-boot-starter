@@ -84,4 +84,9 @@ public class DifyServerClientImpl implements DifyServer {
     public List<DailyConversationsResponse> dailyConversations(String appId, LocalDateTime start, LocalDateTime end) {
         return difyServerClient.dailyConversations(appId, start, end);
     }
+
+    @Override
+    public List<DailyEndUsersResponse> dailyEndUsers(String appId, LocalDateTime start, LocalDateTime end) {
+        return difyServerClient.dailyEndUsers(appId, start, end);
+    }
 }
