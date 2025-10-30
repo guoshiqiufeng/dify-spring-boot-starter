@@ -218,8 +218,9 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                         .cookies(this::addAuthorizationCookies)
                         .retrieve()
                         .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
-                        .bodyToMono(new org.springframework.core.ParameterizedTypeReference<List<DailyConversationsResponse>>() {
+                        .bodyToMono(new org.springframework.core.ParameterizedTypeReference<DailyConversationsResultResponse>() {
                         })
+                        .map(DailyConversationsResultResponse::getData)
                         .block()
         );
     }

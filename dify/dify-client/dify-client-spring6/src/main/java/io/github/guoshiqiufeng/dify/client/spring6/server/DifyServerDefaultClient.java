@@ -36,10 +36,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author yanghq
@@ -199,18 +196,21 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
     @Override
     public List<DailyConversationsResponse> dailyConversations(String appId, java.time.LocalDateTime start, java.time.LocalDateTime end) {
         return executeWithRetry(
-                () -> restClient.get()
-                        .uri(uriBuilder -> uriBuilder
-                                .path(ServerUriConstant.DAILY_CONVERSATIONS)
-                                .queryParam("start", start.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
-                                .queryParam("end", end.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
-                                .build(appId))
-                        .headers(this::addAuthorizationHeader)
-                        .cookies(this::addAuthorizationCookies)
-                        .retrieve()
-                        .onStatus(responseErrorHandler)
-                        .body(new org.springframework.core.ParameterizedTypeReference<List<DailyConversationsResponse>>() {
-                        })
+                () -> {
+                    DailyConversationsResultResponse response = restClient.get()
+                            .uri(uriBuilder -> uriBuilder
+                                    .path(ServerUriConstant.DAILY_CONVERSATIONS)
+                                    .queryParam("start", start.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
+                                    .queryParam("end", end.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
+                                    .build(appId))
+                            .headers(this::addAuthorizationHeader)
+                            .cookies(this::addAuthorizationCookies)
+                            .retrieve()
+                            .onStatus(responseErrorHandler)
+                            .body(new org.springframework.core.ParameterizedTypeReference<DailyConversationsResultResponse>() {
+                            });
+                    return response != null ? response.getData() : Collections.emptyList();
+                }
         );
     }
 
