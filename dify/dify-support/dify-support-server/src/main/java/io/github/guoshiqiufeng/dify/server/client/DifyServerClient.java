@@ -20,6 +20,7 @@ import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -115,4 +116,14 @@ public interface DifyServerClient {
      * Contains current page data, total count, page number, page limit and other pagination information
      */
     DifyPageResult<ChatConversationResponse> chatConversations(ChatConversationsRequest request);
+
+    /**
+     * Retrieves daily conversation statistics for a specific application
+     *
+     * @param appId The ID of the application to get statistics for
+     * @param start Start time in format "yyyy-MM-dd HH:mm"
+     * @param end   End time in format "yyyy-MM-dd HH:mm"
+     * @return List of daily conversation statistics, each encapsulated in {@link DailyConversationsResponse} object
+     */
+    List<DailyConversationsResponse> dailyConversations(String appId, LocalDateTime start, LocalDateTime end);
 }

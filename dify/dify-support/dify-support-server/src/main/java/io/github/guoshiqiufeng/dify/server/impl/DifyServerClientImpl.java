@@ -23,6 +23,7 @@ import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -77,5 +78,10 @@ public class DifyServerClientImpl implements DifyServer {
     @Override
     public DifyPageResult<ChatConversationResponse> chatConversations(ChatConversationsRequest request) {
         return difyServerClient.chatConversations(request);
+    }
+
+    @Override
+    public List<DailyConversationsResponse> dailyConversations(String appId, LocalDateTime start, LocalDateTime end) {
+        return difyServerClient.dailyConversations(appId, start, end);
     }
 }

@@ -17,15 +17,11 @@ package io.github.guoshiqiufeng.dify.boot;
 
 import cn.hutool.json.JSONUtil;
 import io.github.guoshiqiufeng.dify.boot.base.BaseServerContainerTest;
-import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
+import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
-import io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponse;
-import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponse;
-import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponseResult;
-import io.github.guoshiqiufeng.dify.server.dto.response.ChatConversationResponse;
-import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponse;
+import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
@@ -226,6 +222,40 @@ public class ServerTest extends BaseServerContainerTest {
 
     @Test
     @Order(16)
+    @DisplayName("Test retrieving daily conversations statistics")
+    public void dailyConversationsTest() {
+        // Check if test application ID is available
+        if (testAppId == null) {
+            List<AppsResponse> apps = difyServer.apps("", "");
+            if (!apps.isEmpty()) {
+                testAppId = apps.getFirst().getId();
+            } else {
+                log.warn("No applications available, skipping daily conversations test");
+                return;
+            }
+        }
+
+        // Create date range for daily conversations
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
+        java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        // Get daily conversation statistics
+        List<io.github.guoshiqiufeng.dify.server.dto.response.DailyConversationsResponse> dailyStats =
+                difyServer.dailyConversations(testAppId, start, end);
+        log.debug("Daily conversations statistics: {}", JSONUtil.toJsonStr(dailyStats));
+        assertNotNull(dailyStats, "Daily conversations statistics should not be null");
+
+        // If statistics exist, verify the data structure
+        if (dailyStats != null && !dailyStats.isEmpty()) {
+            io.github.guoshiqiufeng.dify.server.dto.response.DailyConversationsResponse firstStat = dailyStats.get(0);
+            log.debug("First daily statistic: {}", JSONUtil.toJsonStr(firstStat));
+            assertNotNull(firstStat.getDate(), "Daily statistic date should not be null");
+            assertNotNull(firstStat.getConversationCount(), "Daily statistic conversation count should not be null");
+        }
+    }
+
+    @Test
+    @Order(17)
     @DisplayName("Test error handling")
     public void errorHandlingTest() {
         // Test with invalid application ID

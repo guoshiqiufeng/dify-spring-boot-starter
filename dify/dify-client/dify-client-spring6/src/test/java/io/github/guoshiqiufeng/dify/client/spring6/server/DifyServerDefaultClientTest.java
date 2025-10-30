@@ -520,4 +520,41 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(requestHeadersUriSpec).uri(any(Function.class));
         verify(requestHeadersSpec).headers(any());
     }
+
+    @Test
+    @DisplayName("Test dailyConversations method")
+    public void testDailyConversations() {
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
+
+        // Prepare test data
+        String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
+        java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        // Create mock daily conversation data
+        DailyConversationsResponse dailyStat = new DailyConversationsResponse();
+        dailyStat.setDate("2025-09-02");
+        dailyStat.setConversationCount(1);
+
+        // Create mock response
+        List<DailyConversationsResponse> mockResponse = List.of(dailyStat);
+
+        // Mock the response
+        when(responseSpec.body(any(org.springframework.core.ParameterizedTypeReference.class))).thenReturn(mockResponse);
+
+        // Call the method to test
+        List<DailyConversationsResponse> response = client.dailyConversations(appId, start, end);
+
+        // Verify the response
+        assertNotNull(response);
+        assertEquals(1, response.size());
+        assertEquals("2025-09-02", response.get(0).getDate());
+        assertEquals(1, response.get(0).getConversationCount().intValue());
+
+        // Verify interactions with mocks
+        verify(requestHeadersUriSpec).uri(any(Function.class));
+        verify(requestHeadersSpec).headers(any());
+    }
 }

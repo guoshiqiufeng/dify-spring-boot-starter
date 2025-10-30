@@ -425,4 +425,57 @@ public void testGetChatConversations() {
         System.out.println("是否标注: " + conversation.isAnnotated());
     }
 }
+
+## 4. 每日对话统计
+
+### 4.1 获取应用的每日对话统计
+
+#### 方法
+
+```java
+List<DailyConversationsResponse> dailyConversations(String appId, LocalDateTime start, LocalDateTime end);
+```
+
+#### 请求参数
+
+| 参数名   | 类型            | 是否必须 | 描述                       |
+|-------|---------------|------|--------------------------|
+| appId | String        | 是    | 应用 ID                    |
+| start | LocalDateTime | 是    | 开始时间，格式：yyyy-MM-dd HH:mm |
+| end   | LocalDateTime | 是    | 结束时间，格式：yyyy-MM-dd HH:mm |
+
+#### 响应参数
+
+DailyConversationsResponse
+
+| 参数名               | 类型      | 描述               |
+|-------------------|---------|------------------|
+| date              | String  | 日期，格式：yyyy-MM-dd |
+| conversationCount | Integer | 当日对话数量           |
+
+#### 请求示例
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testGetDailyConversations() {
+    String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
+    LocalDateTime start = LocalDateTime.of(2025, 10, 23, 0, 0);
+    LocalDateTime end = LocalDateTime.of(2025, 10, 30, 23, 59);
+
+    // 获取每日对话统计
+    List<DailyConversationsResponse> dailyStats = difyServer.dailyConversations(appId, start, end);
+
+    if (dailyStats != null) {
+        for (DailyConversationsResponse dailyStat : dailyStats) {
+            System.out.println("日期: " + dailyStat.getDate());
+            System.out.println("对话数量: " + dailyStat.getConversationCount());
+        }
+    }
+}
+```
+
 ```
