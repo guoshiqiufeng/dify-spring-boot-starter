@@ -16,6 +16,8 @@
 
 package io.github.guoshiqiufeng.dify.server.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 /**
@@ -36,5 +38,7 @@ public class DailyConversationsResponse {
     /**
      * Number of conversations on this date
      */
+    @JsonAlias("conversationCount")
+    @JsonProperty("conversation_count")
     private Integer conversationCount;
 }
