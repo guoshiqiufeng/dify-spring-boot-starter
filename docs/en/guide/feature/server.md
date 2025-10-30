@@ -583,3 +583,55 @@ public void testGetAverageSessionInteractions() {
     }
 }
 ```
+
+## 7. Tokens Per Second Statistics
+
+### 7.1 Get Application Tokens Per Second Statistics
+
+#### Method
+
+```java
+List<TokensPerSecondResponse> tokensPerSecond(String appId, LocalDateTime start, LocalDateTime end);
+```
+
+#### Request Parameters
+
+| Parameter name | Type          | Required | Description                          |
+|----------------|---------------|----------|--------------------------------------|
+| appId          | String        | Yes      | Application ID                       |
+| start          | LocalDateTime | Yes      | Start time, format: yyyy-MM-dd HH:mm |
+| end            | LocalDateTime | Yes      | End time, format: yyyy-MM-dd HH:mm   |
+
+#### Response Parameters
+
+TokensPerSecondResponse
+
+| Parameter name | Type   | Description                            |
+|----------------|--------|----------------------------------------|
+| date           | String | Date, format: yyyy-MM-dd               |
+| tps            | Double | Tokens per second on that day          |
+
+#### Request Example
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testGetTokensPerSecond() {
+    String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
+    LocalDateTime start = LocalDateTime.of(2025, 10, 23, 0, 0);
+    LocalDateTime end = LocalDateTime.of(2025, 10, 30, 23, 59);
+
+    // Get tokens per second statistics
+    List<TokensPerSecondResponse> tokensPerSecondStats = difyServer.tokensPerSecond(appId, start, end);
+
+    if (tokensPerSecondStats != null) {
+        for (TokensPerSecondResponse dailyStat : tokensPerSecondStats) {
+            System.out.println("Date: " + dailyStat.getDate());
+            System.out.println("Tokens per second: " + dailyStat.getTps());
+        }
+    }
+}
+```

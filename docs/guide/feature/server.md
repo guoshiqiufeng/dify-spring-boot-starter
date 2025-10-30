@@ -580,3 +580,55 @@ public void testGetAverageSessionInteractions() {
     }
 }
 ```
+
+### 7. 每秒令牌统计
+
+### 7.1 获取应用的每秒令牌统计
+
+#### 方法
+
+```java
+List<TokensPerSecondResponse> tokensPerSecond(String appId, LocalDateTime start, LocalDateTime end);
+```
+
+#### 请求参数
+
+| 参数名   | 类型            | 是否必须 | 描述                       |
+|-------|---------------|------|--------------------------|
+| appId | String        | 是    | 应用 ID                    |
+| start | LocalDateTime | 是    | 开始时间，格式：yyyy-MM-dd HH:mm |
+| end   | LocalDateTime | 是    | 结束时间，格式：yyyy-MM-dd HH:mm |
+
+#### 响应参数
+
+TokensPerSecondResponse
+
+| 参数名        | 类型   | 描述               |
+|-------------|------|------------------|
+| date        | String  | 日期，格式：yyyy-MM-dd |
+| tps         | Double | 当日每秒令牌数        |
+
+#### 请求示例
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testGetTokensPerSecond() {
+    String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
+    LocalDateTime start = LocalDateTime.of(2025, 10, 23, 0, 0);
+    LocalDateTime end = LocalDateTime.of(2025, 10, 30, 23, 59);
+
+    // 获取每秒令牌统计
+    List<TokensPerSecondResponse> tokensPerSecondStats = difyServer.tokensPerSecond(appId, start, end);
+
+    if (tokensPerSecondStats != null) {
+        for (TokensPerSecondResponse dailyStat : tokensPerSecondStats) {
+            System.out.println("日期: " + dailyStat.getDate());
+            System.out.println("每秒令牌数: " + dailyStat.getTps());
+        }
+    }
+}
+```

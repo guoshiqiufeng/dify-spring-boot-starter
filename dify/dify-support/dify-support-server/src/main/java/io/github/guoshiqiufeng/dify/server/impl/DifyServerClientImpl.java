@@ -94,4 +94,9 @@ public class DifyServerClientImpl implements DifyServer {
     public List<AverageSessionInteractionsResponse> averageSessionInteractions(String appId, LocalDateTime start, LocalDateTime end) {
         return difyServerClient.averageSessionInteractions(appId, start, end);
     }
+
+    @Override
+    public List<TokensPerSecondResponse> tokensPerSecond(String appId, LocalDateTime start, LocalDateTime end) {
+        return difyServerClient.tokensPerSecond(appId, start, end);
+    }
 }
