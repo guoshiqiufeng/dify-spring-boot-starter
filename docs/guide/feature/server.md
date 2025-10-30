@@ -109,25 +109,25 @@ AppsResponseResult apps(AppsRequest appsRequest);
 
 AppsRequest
 
-| 参数名        | 类型     | 是否必须 | 描述                                    |
-|------------|--------|------|---------------------------------------|
-| page       | Integer| 否    | 页码（默认：1）                            |
-| limit      | Integer| 否    | 每页数量（默认：20，范围：1-100）                |
-| mode       | String | 否    | 应用模式过滤：chat\agent-chat\completion\advanced-chat\workflow |
-| name       | String | 否    | 应用名称过滤                               |
-| isCreatedByMe | Boolean| 否    | 是否为当前用户创建的应用                        |
+| 参数名           | 类型      | 是否必须 | 描述                                                       |
+|---------------|---------|------|----------------------------------------------------------|
+| page          | Integer | 否    | 页码（默认：1）                                                 |
+| limit         | Integer | 否    | 每页数量（默认：20，范围：1-100）                                     |
+| mode          | String  | 否    | 应用模式过滤：chat\agent-chat\completion\advanced-chat\workflow |
+| name          | String  | 否    | 应用名称过滤                                                   |
+| isCreatedByMe | Boolean | 否    | 是否为当前用户创建的应用                                             |
 
 #### 响应参数
 
 AppsResponseResult
 
-| 参数名      | 类型                | 描述          |
-|----------|---------------------|-------------|
-| data     | `List<AppsResponse>`| 当前页数据列表      |
-| hasMore  | Boolean             | 是否有更多页      |
-| limit    | Integer             | 每页数量        |
-| page     | Integer             | 当前页码        |
-| total    | Integer             | 总数据数量       |
+| 参数名     | 类型                   | 描述      |
+|---------|----------------------|---------|
+| data    | `List<AppsResponse>` | 当前页数据列表 |
+| hasMore | Boolean              | 是否有更多页  |
+| limit   | Integer              | 每页数量    |
+| page    | Integer              | 当前页码    |
+| total   | Integer              | 总数据数量   |
 
 AppsResponse 的结构与 1.1 节中定义的相同。
 
@@ -150,7 +150,7 @@ public void testGetAppsPaginated() {
 
     // 获取分页应用列表
     AppsResponseResult result = difyServer.apps(request);
-    
+
     System.out.println("当前页: " + result.getPage());
     System.out.println("每页数量: " + result.getLimit());
     System.out.println("总数: " + result.getTotal());
@@ -314,5 +314,115 @@ private DifyServer difyServer;
 @Test
 public void testInitDatasetApiKey() {
     List<DatasetApiKeyResponseVO> datasetApiKeys = difyServer.initDatasetApiKey();
+}
+```
+
+## 3. 聊天会话管理
+
+### 3.1 获取应用的聊天会话列表
+
+#### 方法
+
+```java
+DifyPageResult<ChatConversationResponse> chatConversations(ChatConversationsRequest request);
+```
+
+#### 请求参数
+
+ChatConversationsRequest
+
+| 参数名              | 类型      | 是否必须 | 描述                               |
+|------------------|---------|------|----------------------------------|
+| appId            | String  | 是    | 应用ID                             |
+| page             | Integer | 否    | 页码（默认：1）                         |
+| limit            | Integer | 否    | 每页数量（默认：10，范围：1-100）             |
+| start            | String  | 否    | 开始时间，格式：yyyy-MM-dd HH:mm         |
+| end              | String  | 否    | 结束时间，格式：yyyy-MM-dd HH:mm         |
+| sortBy           | String  | 否    | 排序字段，例如：-created_at（按创建时间倒序）     |
+| annotationStatus | String  | 否    | 注释状态：all、not_annotated、annotated |
+
+#### 响应参数
+
+DifyPageResult<ChatConversationResponse>
+
+| 参数名     | 类型                               | 描述      |
+|---------|----------------------------------|---------|
+| data    | `List<ChatConversationResponse>` | 当前页数据列表 |
+| hasMore | Boolean                          | 是否有更多页  |
+| limit   | Integer                          | 每页数量    |
+| page    | Integer                          | 当前页码    |
+| total   | Integer                          | 总数据数量   |
+
+ChatConversationResponse
+
+| 参数名                  | 类型                    | 描述       |
+|----------------------|-----------------------|----------|
+| id                   | String                | 会话ID     |
+| status               | String                | 会话状态     |
+| fromSource           | String                | 来源       |
+| fromEndUserId        | String                | 终端用户ID   |
+| fromEndUserSessionId | String                | 终端用户会话ID |
+| fromAccountId        | String                | 账户ID     |
+| fromAccountName      | String                | 账户名称     |
+| name                 | String                | 会话名称     |
+| summary              | String                | 会话摘要     |
+| readAt               | Long                  | 阅读时间戳    |
+| createdAt            | Long                  | 创建时间戳    |
+| updatedAt            | Long                  | 更新时间戳    |
+| annotated            | Boolean               | 是否已标注    |
+| modelConfig          | `Map<String, Object>` | 模型配置     |
+| messageCount         | Integer               | 消息数量     |
+| userFeedbackStats    | FeedbackStats         | 用户反馈统计   |
+| adminFeedbackStats   | FeedbackStats         | 管理员反馈统计  |
+| statusCount          | StatusCount           | 状态计数     |
+
+FeedbackStats
+
+| 参数名     | 类型      | 描述  |
+|---------|---------|-----|
+| like    | Integer | 点赞数 |
+| dislike | Integer | 点踩数 |
+
+StatusCount
+
+| 参数名            | 类型      | 描述     |
+|----------------|---------|--------|
+| success        | Integer | 成功数量   |
+| failed         | Integer | 失败数量   |
+| partialSuccess | Integer | 部分成功数量 |
+
+#### 请求示例
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testGetChatConversations() {
+    // 创建请求对象
+    ChatConversationsRequest request = new ChatConversationsRequest();
+    request.setAppId("app-123456789");
+    request.setPage(1);
+    request.setLimit(10);
+    request.setStart("2025-10-23 00:00");
+    request.setEnd("2025-10-30 23:59");
+    request.setAnnotationStatus("all");
+    request.setSortBy("-created_at");
+
+    // 获取聊天会话列表
+    DifyPageResult<ChatConversationResponse> result = difyServer.chatConversations(request);
+
+    System.out.println("当前页: " + result.getPage());
+    System.out.println("每页数量: " + result.getLimit());
+    System.out.println("总数: " + result.getTotal());
+    System.out.println("是否有更多: " + result.getHasMore());
+    System.out.println("数据大小: " + result.getData().size());
+
+    for (ChatConversationResponse conversation : result.getData()) {
+        System.out.println("会话ID: " + conversation.getId());
+        System.out.println("会话名称: " + conversation.getName());
+        System.out.println("是否标注: " + conversation.isAnnotated());
+    }
 }
 ```

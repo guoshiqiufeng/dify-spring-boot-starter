@@ -15,9 +15,12 @@
  */
 package io.github.guoshiqiufeng.dify.server.impl;
 
+import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
+import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponse;
 import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponse;
+import io.github.guoshiqiufeng.dify.server.dto.response.ChatConversationResponse;
 import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -197,5 +200,47 @@ class DifyServerClientImplTest {
         assertEquals(expectedDatasetApiKeys.get(0).getId(), actualDatasetApiKeys.get(0).getId());
         assertEquals(expectedDatasetApiKeys.get(0).getToken(), actualDatasetApiKeys.get(0).getToken());
         verify(difyServerClient, times(1)).initDatasetApiKey();
+    }
+
+    @Test
+    void testChatConversations() {
+        // Arrange
+        String appId = "app-123";
+
+        ChatConversationsRequest request = new ChatConversationsRequest();
+        request.setAppId(appId);
+        request.setPage(1);
+        request.setLimit(10);
+        request.setAnnotationStatus("all");
+
+        ChatConversationResponse conversation1 = new ChatConversationResponse();
+        conversation1.setId("conv-123");
+        conversation1.setName("Test Conversation 1");
+        conversation1.setAnnotated(false);
+
+        ChatConversationResponse conversation2 = new ChatConversationResponse();
+        conversation2.setId("conv-456");
+        conversation2.setName("Test Conversation 2");
+        conversation2.setAnnotated(true);
+
+        DifyPageResult<ChatConversationResponse> expectedConversations = new DifyPageResult<>();
+        expectedConversations.setData(Arrays.asList(conversation1, conversation2));
+        expectedConversations.setPage(1);
+        expectedConversations.setLimit(10);
+        expectedConversations.setTotal(2);
+        expectedConversations.setHasMore(false);
+
+        when(difyServerClient.chatConversations(request)).thenReturn(expectedConversations);
+
+        // Act
+        DifyPageResult<ChatConversationResponse> actualConversations = difyServerClientImpl.chatConversations(request);
+
+        // Assert
+        assertNotNull(actualConversations);
+        assertEquals(expectedConversations.getTotal(), actualConversations.getTotal());
+        assertEquals(expectedConversations.getData().size(), actualConversations.getData().size());
+        assertEquals(expectedConversations.getData().get(0).getId(), actualConversations.getData().get(0).getId());
+        assertEquals(expectedConversations.getData().get(1).getName(), actualConversations.getData().get(1).getName());
+        verify(difyServerClient, times(1)).chatConversations(request);
     }
 }

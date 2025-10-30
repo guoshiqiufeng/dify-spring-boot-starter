@@ -15,33 +15,31 @@
  */
 package io.github.guoshiqiufeng.dify.server.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 
 /**
+ * Request DTO for chat conversations endpoint
+ *
  * @author yanghq
  * @version 1.5.0
- * @since 2025/10/29 16:35
+ * @since 2025/10/30
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class AppsRequest extends ServerPageRequest implements Serializable {
-    private static final long serialVersionUID = 5565437185630052876L;
+public class ChatConversationsRequest extends ServerPageRequest implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private String appId;
+    private String start;
+    private String end;
+    private String sortBy;
 
     /**
-     * 不传为所有，可选值： workflow、advanced-chat、chat、agent-chat、completion
+     * Annotation status filter: all, not_annotated, annotated
      */
-    private String mode;
-
-    private String name;
-
-    @JsonAlias("isCreatedByMe")
-    @JsonProperty("is_created_by_me")
-    private Boolean isCreatedByMe;
-
-
+    private String annotationStatus = "all";
 }

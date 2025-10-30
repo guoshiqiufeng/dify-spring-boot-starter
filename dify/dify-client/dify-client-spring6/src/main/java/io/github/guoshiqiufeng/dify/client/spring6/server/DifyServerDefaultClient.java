@@ -17,6 +17,7 @@ package io.github.guoshiqiufeng.dify.client.spring6.server;
 
 import io.github.guoshiqiufeng.dify.client.spring6.base.BaseDifyDefaultClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
+import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
 import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
@@ -24,6 +25,7 @@ import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
 import io.github.guoshiqiufeng.dify.server.client.RequestSupplier;
 import io.github.guoshiqiufeng.dify.server.constant.ServerUriConstant;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DifyLoginRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import lombok.extern.slf4j.Slf4j;
@@ -170,6 +172,28 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                         .body(DatasetApiKeyResponse.class)
         );
         return result != null ? new ArrayList<>(List.of(result)) : null;
+    }
+
+    @Override
+    public DifyPageResult<ChatConversationResponse> chatConversations(ChatConversationsRequest request) {
+        return executeWithRetry(
+                () -> restClient.get()
+                        .uri(uriBuilder -> uriBuilder
+                                .path(ServerUriConstant.APPS + "/{appId}/chat-conversations")
+                                .queryParam("page", request.getPage())
+                                .queryParam("limit", request.getLimit())
+                                .queryParamIfPresent("start", Optional.ofNullable(request.getStart()))
+                                .queryParamIfPresent("end", Optional.ofNullable(request.getEnd()))
+                                .queryParamIfPresent("sort_by", Optional.ofNullable(request.getSortBy()))
+                                .queryParamIfPresent("annotation_status", Optional.ofNullable(request.getAnnotationStatus()))
+                                .build(request.getAppId()))
+                        .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
+                        .retrieve()
+                        .onStatus(responseErrorHandler)
+                        .body(new org.springframework.core.ParameterizedTypeReference<DifyPageResult<ChatConversationResponse>>() {
+                        })
+        );
     }
 
     private void appPages(String mode, String name, int page, List<AppsResponse> result) {

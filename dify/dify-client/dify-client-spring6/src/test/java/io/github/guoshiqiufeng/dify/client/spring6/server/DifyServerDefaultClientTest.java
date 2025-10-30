@@ -17,9 +17,11 @@ package io.github.guoshiqiufeng.dify.client.spring6.server;
 
 import io.github.guoshiqiufeng.dify.client.spring6.BaseClientTest;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
+import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
 import io.github.guoshiqiufeng.dify.server.constant.ServerUriConstant;
+import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DifyLoginRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -468,5 +470,54 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(requestBodyUriSpec).uri(ServerUriConstant.DATASETS + "/api-keys");
         verify(requestBodySpec).headers(any());
         verify(responseSpec).body(DatasetApiKeyResponse.class);
+    }
+
+    @Test
+    @DisplayName("Test chatConversations method")
+    public void testChatConversations() {
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
+
+        // Create test request
+        ChatConversationsRequest request = new ChatConversationsRequest();
+        request.setAppId("app-123");
+        request.setPage(1);
+        request.setLimit(10);
+        request.setAnnotationStatus("all");
+        request.setStart("2025-10-23 00:00");
+        request.setEnd("2025-10-30 23:59");
+        request.setSortBy("-created_at");
+
+        // Create mock conversation data
+        ChatConversationResponse conversation = new ChatConversationResponse();
+        conversation.setId("b9f66e5f-ba2b-4179-88d0-2d36c7e2050a");
+        conversation.setName("What are the specs of the iPhone 13 Pro Max?");
+        conversation.setAnnotated(false);
+
+        // Create mock response
+        DifyPageResult<ChatConversationResponse> mockResponse = new DifyPageResult<>();
+        mockResponse.setData(List.of(conversation));
+        mockResponse.setPage(1);
+        mockResponse.setLimit(10);
+        mockResponse.setTotal(1);
+        mockResponse.setHasMore(false);
+
+        // Mock the response
+        when(responseSpec.body(any(org.springframework.core.ParameterizedTypeReference.class))).thenReturn(mockResponse);
+
+        // Call the method to test
+        DifyPageResult<ChatConversationResponse> response = client.chatConversations(request);
+
+        // Verify the response
+        assertNotNull(response);
+        assertEquals(1, response.getTotal());
+        assertEquals(1, response.getData().size());
+        assertEquals("b9f66e5f-ba2b-4179-88d0-2d36c7e2050a", response.getData().get(0).getId());
+        assertEquals("What are the specs of the iPhone 13 Pro Max?", response.getData().get(0).getName());
+
+        // Verify interactions with mocks
+        verify(requestHeadersUriSpec).uri(any(Function.class));
+        verify(requestHeadersSpec).headers(any());
     }
 }

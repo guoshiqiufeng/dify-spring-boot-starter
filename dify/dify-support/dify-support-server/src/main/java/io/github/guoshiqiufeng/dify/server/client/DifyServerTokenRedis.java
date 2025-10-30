@@ -70,7 +70,7 @@ public class DifyServerTokenRedis extends BaseDifyServerToken {
             redisTemplate.opsForValue().set(DifyRedisKey.ACCESS_TOKEN, accessToken);
             redisTemplate.expire(DifyRedisKey.ACCESS_TOKEN, TOKEN_EXPIRE_MINUTES, TimeUnit.MINUTES);
             redisTemplate.opsForValue().set(DifyRedisKey.REFRESH_TOKEN, loginResponse.getRefreshToken());
-            if(StrUtil.isNotEmpty(loginResponse.getCsrfToken())) {
+            if (StrUtil.isNotEmpty(loginResponse.getCsrfToken())) {
                 redisTemplate.opsForValue().set(DifyRedisKey.CSRF_TOKEN, loginResponse.getCsrfToken());
             }
 
@@ -92,7 +92,7 @@ public class DifyServerTokenRedis extends BaseDifyServerToken {
                 redisTemplate.opsForValue().set(DifyRedisKey.ACCESS_TOKEN, accessToken);
                 redisTemplate.expire(DifyRedisKey.ACCESS_TOKEN, TOKEN_EXPIRE_MINUTES, TimeUnit.MINUTES);
                 redisTemplate.opsForValue().set(DifyRedisKey.REFRESH_TOKEN, response.getRefreshToken());
-                if(StrUtil.isNotEmpty(response.getCsrfToken())) {
+                if (StrUtil.isNotEmpty(response.getCsrfToken())) {
                     redisTemplate.opsForValue().set(DifyRedisKey.CSRF_TOKEN, response.getCsrfToken());
                 }
                 return;
@@ -105,7 +105,7 @@ public class DifyServerTokenRedis extends BaseDifyServerToken {
             redisTemplate.opsForValue().set(DifyRedisKey.ACCESS_TOKEN, accessToken);
             redisTemplate.expire(DifyRedisKey.ACCESS_TOKEN, TOKEN_EXPIRE_MINUTES, TimeUnit.MINUTES);
             redisTemplate.opsForValue().set(DifyRedisKey.REFRESH_TOKEN, loginResponse.getRefreshToken());
-            if(StrUtil.isNotEmpty(loginResponse.getCsrfToken())) {
+            if (StrUtil.isNotEmpty(loginResponse.getCsrfToken())) {
                 redisTemplate.opsForValue().set(DifyRedisKey.CSRF_TOKEN, loginResponse.getCsrfToken());
             }
         }
