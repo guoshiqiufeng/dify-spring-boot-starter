@@ -324,6 +324,40 @@ public class ServerTest extends BaseServerContainerTest {
     }
 
     @Test
+    @Order(19)
+    @DisplayName("Test retrieving tokens per second statistics")
+    public void tokensPerSecondTest() {
+        // Check if test application ID is available
+        if (testAppId == null) {
+            List<AppsResponse> apps = difyServer.apps("", "");
+            if (!apps.isEmpty()) {
+                testAppId = apps.get(0).getId(); // Use get(0) instead of getFirst() for Java 8 compatibility
+            } else {
+                log.warn("No applications available, skipping tokens per second test");
+                return;
+            }
+        }
+
+        // Create date range for tokens per second
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
+        java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        // Get tokens per second statistics
+        List<io.github.guoshiqiufeng.dify.server.dto.response.TokensPerSecondResponse> tokensPerSecondStats =
+                difyServer.tokensPerSecond(testAppId, start, end);
+        log.debug("Tokens per second statistics: {}", JSONUtil.toJsonStr(tokensPerSecondStats));
+        assertNotNull(tokensPerSecondStats, "Tokens per second statistics should not be null");
+
+        // If statistics exist, verify the data structure
+        if (tokensPerSecondStats != null && !tokensPerSecondStats.isEmpty()) {
+            io.github.guoshiqiufeng.dify.server.dto.response.TokensPerSecondResponse firstStat = tokensPerSecondStats.get(0);
+            log.debug("First tokens per second statistic: {}", JSONUtil.toJsonStr(firstStat));
+            assertNotNull(firstStat.getDate(), "Tokens per second statistic date should not be null");
+            assertNotNull(firstStat.getTps(), "Tokens per second statistic should not be null");
+        }
+    }
+
+    @Test
     @Order(18)
     @DisplayName("Test error handling")
     public void errorHandlingTest() {

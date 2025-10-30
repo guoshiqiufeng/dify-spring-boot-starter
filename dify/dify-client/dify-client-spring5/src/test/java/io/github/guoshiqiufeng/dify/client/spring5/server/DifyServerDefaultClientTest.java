@@ -591,4 +591,40 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(requestHeadersUriSpecMock).uri(any(Function.class));
         verify(responseSpecMock).bodyToMono(any(org.springframework.core.ParameterizedTypeReference.class));
     }
+
+    @Test
+    @DisplayName("Test tokensPerSecond method")
+    public void testTokensPerSecond() {
+        // Prepare test data
+        String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
+        java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        // Create mock tokens per second data
+        TokensPerSecondResponse dailyStat = new TokensPerSecondResponse();
+        dailyStat.setDate("2025-09-02");
+        dailyStat.setTps(30.8603);
+
+        // Create mock response
+        List<TokensPerSecondResponse> mockResponse = List.of(dailyStat);
+        TokensPerSecondResultResponse response = new TokensPerSecondResultResponse();
+        response.setData(mockResponse);
+
+        // Set up the response mock to return our expected response
+        when(responseSpecMock.bodyToMono(any(org.springframework.core.ParameterizedTypeReference.class))).thenReturn(Mono.just(response));
+
+        // Execute the method
+        List<TokensPerSecondResponse> actualResponse = client.tokensPerSecond(appId, start, end);
+
+        // Verify the result
+        assertNotNull(actualResponse);
+        assertEquals(1, actualResponse.size());
+        assertEquals("2025-09-02", actualResponse.get(0).getDate());
+        assertEquals(30.8603, actualResponse.get(0).getTps());
+
+        // Verify WebClient interactions
+        verify(webClientMock).get();
+        verify(requestHeadersUriSpecMock).uri(any(Function.class));
+        verify(responseSpecMock).bodyToMono(any(org.springframework.core.ParameterizedTypeReference.class));
+    }
 }

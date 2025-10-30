@@ -37,4 +37,6 @@ public interface ServerUriConstant {
     String DAILY_END_USERS = APPS + "/{appId}/statistics/daily-end-users";
 
     String AVERAGE_SESSION_INTERACTIONS = APPS + "/{appId}/statistics/average-session-interactions";
+
+    String TOKENS_PER_SECOND = APPS + "/{appId}/statistics/tokens-per-second";
 }
