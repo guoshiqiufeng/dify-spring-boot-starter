@@ -428,6 +428,8 @@ public void testGetChatConversations() {
     }
 }
 
+```
+
 ## 4. Daily Conversation Statistics
 
 ### 4.1 Get Application Daily Conversation Statistics
@@ -478,6 +480,4 @@ public void testGetDailyConversations() {
         }
     }
 }
-```
-
 ```
