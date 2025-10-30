@@ -635,3 +635,55 @@ public void testGetTokensPerSecond() {
     }
 }
 ```
+
+## 8. User Satisfaction Rate Statistics
+
+### 8.1 Get Application User Satisfaction Rate Statistics
+
+#### Method
+
+```java
+List<UserSatisfactionRateResponse> userSatisfactionRate(String appId, LocalDateTime start, LocalDateTime end);
+```
+
+#### Request Parameters
+
+| Parameter name | Type          | Required | Description                          |
+|----------------|---------------|----------|--------------------------------------|
+| appId          | String        | Yes      | Application ID                       |
+| start          | LocalDateTime | Yes      | Start time, format: yyyy-MM-dd HH:mm |
+| end            | LocalDateTime | Yes      | End time, format: yyyy-MM-dd HH:mm   |
+
+#### Response Parameters
+
+UserSatisfactionRateResponse
+
+| Parameter name | Type   | Description                            |
+|----------------|--------|----------------------------------------|
+| date           | String | Date, format: yyyy-MM-dd               |
+| rate           | Double | User satisfaction rate on that day     |
+
+#### Request Example
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testGetUserSatisfactionRate() {
+    String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
+    LocalDateTime start = LocalDateTime.of(2025, 10, 23, 0, 0);
+    LocalDateTime end = LocalDateTime.of(2025, 10, 30, 23, 59);
+
+    // Get user satisfaction rate statistics
+    List<UserSatisfactionRateResponse> userSatisfactionRateStats = difyServer.userSatisfactionRate(appId, start, end);
+
+    if (userSatisfactionRateStats != null) {
+        for (UserSatisfactionRateResponse dailyStat : userSatisfactionRateStats) {
+            System.out.println("Date: " + dailyStat.getDate());
+            System.out.println("User satisfaction rate: " + dailyStat.getRate());
+        }
+    }
+}
+```

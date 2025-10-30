@@ -39,4 +39,6 @@ public interface ServerUriConstant {
     String AVERAGE_SESSION_INTERACTIONS = APPS + "/{appId}/statistics/average-session-interactions";
 
     String TOKENS_PER_SECOND = APPS + "/{appId}/statistics/tokens-per-second";
+
+    String USER_SATISFACTION_RATE = APPS + "/{appId}/statistics/user-satisfaction-rate";
 }

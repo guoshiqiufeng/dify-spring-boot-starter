@@ -99,4 +99,9 @@ public class DifyServerClientImpl implements DifyServer {
     public List<TokensPerSecondResponse> tokensPerSecond(String appId, LocalDateTime start, LocalDateTime end) {
         return difyServerClient.tokensPerSecond(appId, start, end);
     }
+
+    @Override
+    public List<UserSatisfactionRateResponse> userSatisfactionRate(String appId, LocalDateTime start, LocalDateTime end) {
+        return difyServerClient.userSatisfactionRate(appId, start, end);
+    }
 }

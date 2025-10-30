@@ -358,6 +358,40 @@ public class ServerTest extends BaseServerContainerTest {
     }
 
     @Test
+    @Order(20)
+    @DisplayName("Test retrieving user satisfaction rate statistics")
+    public void userSatisfactionRateTest() {
+        // Check if test application ID is available
+        if (testAppId == null) {
+            List<AppsResponse> apps = difyServer.apps("", "");
+            if (!apps.isEmpty()) {
+                testAppId = apps.get(0).getId(); // Use get(0) instead of getFirst() for Java 8 compatibility
+            } else {
+                log.warn("No applications available, skipping user satisfaction rate test");
+                return;
+            }
+        }
+
+        // Create date range for user satisfaction rate
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
+        java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        // Get user satisfaction rate statistics
+        List<io.github.guoshiqiufeng.dify.server.dto.response.UserSatisfactionRateResponse> userSatisfactionRateStats =
+                difyServer.userSatisfactionRate(testAppId, start, end);
+        log.debug("User satisfaction rate statistics: {}", JSONUtil.toJsonStr(userSatisfactionRateStats));
+        assertNotNull(userSatisfactionRateStats, "User satisfaction rate statistics should not be null");
+
+        // If statistics exist, verify the data structure
+        if (userSatisfactionRateStats != null && !userSatisfactionRateStats.isEmpty()) {
+            io.github.guoshiqiufeng.dify.server.dto.response.UserSatisfactionRateResponse firstStat = userSatisfactionRateStats.get(0);
+            log.debug("First user satisfaction rate statistic: {}", JSONUtil.toJsonStr(firstStat));
+            assertNotNull(firstStat.getDate(), "User satisfaction rate statistic date should not be null");
+            assertNotNull(firstStat.getRate(), "User satisfaction rate statistic should not be null");
+        }
+    }
+
+    @Test
     @Order(18)
     @DisplayName("Test error handling")
     public void errorHandlingTest() {
