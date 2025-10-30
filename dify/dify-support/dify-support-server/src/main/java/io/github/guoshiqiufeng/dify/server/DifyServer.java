@@ -20,6 +20,7 @@ import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -105,4 +106,15 @@ public interface DifyServer {
      * @return 分页结果，包含会话列表信息
      */
     DifyPageResult<ChatConversationResponse> chatConversations(ChatConversationsRequest request);
+
+    /**
+     * 获取应用的每日对话统计
+     *
+     * @param appId 应用的唯一标识符，不能为空
+     * @param start 开始时间，格式为 "yyyy-MM-dd HH:mm"
+     * @param end   结束时间，格式为 "yyyy-MM-dd HH:mm"
+     * @return 返回每日对话统计列表，每个统计封装为 {@link DailyConversationsResponse} 对象
+     * @throws IllegalArgumentException 如果传入的参数不符合预期格式或范围
+     */
+    List<DailyConversationsResponse> dailyConversations(String appId, LocalDateTime start, LocalDateTime end);
 }

@@ -427,4 +427,57 @@ public void testGetChatConversations() {
         System.out.println("Is annotated: " + conversation.isAnnotated());
     }
 }
+
+```
+
+## 4. Daily Conversation Statistics
+
+### 4.1 Get Application Daily Conversation Statistics
+
+#### Method
+
+```java
+List<DailyConversationsResponse> dailyConversations(String appId, LocalDateTime start, LocalDateTime end);
+```
+
+#### Request Parameters
+
+| Parameter name | Type          | Required | Description                          |
+|----------------|---------------|----------|--------------------------------------|
+| appId          | String        | Yes      | Application ID                       |
+| start          | LocalDateTime | Yes      | Start time, format: yyyy-MM-dd HH:mm |
+| end            | LocalDateTime | Yes      | End time, format: yyyy-MM-dd HH:mm   |
+
+#### Response Parameters
+
+DailyConversationsResponse
+
+| Parameter name    | Type    | Description                         |
+|-------------------|---------|-------------------------------------|
+| date              | String  | Date, format: yyyy-MM-dd            |
+| conversationCount | Integer | Number of conversations on that day |
+
+#### Request Example
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testGetDailyConversations() {
+    String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
+    LocalDateTime start = LocalDateTime.of(2025, 10, 23, 0, 0);
+    LocalDateTime end = LocalDateTime.of(2025, 10, 30, 23, 59);
+
+    // Get daily conversation statistics
+    List<DailyConversationsResponse> dailyStats = difyServer.dailyConversations(appId, start, end);
+
+    if (dailyStats != null) {
+        for (DailyConversationsResponse dailyStat : dailyStats) {
+            System.out.println("Date: " + dailyStat.getDate());
+            System.out.println("Conversation count: " + dailyStat.getConversationCount());
+        }
+    }
+}
 ```
