@@ -370,8 +370,20 @@ public class DatasetTest extends BaseDatasetContainerTest {
         DocumentCreateResponse response = difyDataset.createDocumentByText(request);
         assertNotNull(response);
         String documentId = response.getDocument().getId();
-        // Wait for indexing to complete
-        Thread.sleep(1500);
+
+        DocumentIndexingStatusRequest statusRequest = new DocumentIndexingStatusRequest();
+        statusRequest.setDatasetId(datasetId);
+        statusRequest.setBatch(response.getBatch());
+
+        DocumentIndexingStatusResponse statusResponse = difyDataset.indexingStatus(statusRequest);
+        assertNotNull(response);
+        log.info("Indexing status: {}", JSONUtil.toJsonStr(statusResponse));
+        int attempts = 0;
+        while (statusResponse.getData().getFirst().getIndexingStatus().equals("indexing") && attempts < 30) {
+            attempts++;
+            Thread.sleep(500);
+            statusResponse = difyDataset.indexingStatus(statusRequest);
+        }
 
         SegmentCreateRequest segmentCreateRequest = new SegmentCreateRequest();
         segmentCreateRequest.setDatasetId(datasetId);
