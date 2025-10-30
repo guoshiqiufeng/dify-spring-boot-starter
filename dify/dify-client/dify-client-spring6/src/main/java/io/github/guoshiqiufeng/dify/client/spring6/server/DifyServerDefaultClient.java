@@ -235,6 +235,27 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
         );
     }
 
+    @Override
+    public List<AverageSessionInteractionsResponse> averageSessionInteractions(String appId, java.time.LocalDateTime start, java.time.LocalDateTime end) {
+        return executeWithRetry(
+                () -> {
+                    AverageSessionInteractionsResultResponse response = restClient.get()
+                            .uri(uriBuilder -> uriBuilder
+                                    .path(ServerUriConstant.AVERAGE_SESSION_INTERACTIONS)
+                                    .queryParam("start", start.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
+                                    .queryParam("end", end.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
+                                    .build(appId))
+                            .headers(this::addAuthorizationHeader)
+                            .cookies(this::addAuthorizationCookies)
+                            .retrieve()
+                            .onStatus(responseErrorHandler)
+                            .body(new org.springframework.core.ParameterizedTypeReference<AverageSessionInteractionsResultResponse>() {
+                            });
+                    return response != null ? response.getData() : Collections.emptyList();
+                }
+        );
+    }
+
     private void appPages(String mode, String name, int page, List<AppsResponse> result) {
         AppsResponseResult response = executeWithRetry(
                 () -> restClient.get()

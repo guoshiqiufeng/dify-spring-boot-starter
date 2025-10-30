@@ -597,4 +597,43 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(requestHeadersUriSpec).uri(any(Function.class));
         verify(requestHeadersSpec).headers(any());
     }
+
+    @Test
+    @DisplayName("Test averageSessionInteractions method")
+    public void testAverageSessionInteractions() {
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
+
+        // Prepare test data
+        String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
+        java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        // Create mock average session interactions data
+        AverageSessionInteractionsResponse dailyStat = new AverageSessionInteractionsResponse();
+        dailyStat.setDate("2025-09-02");
+        dailyStat.setInteractions(1.0);
+
+        // Create mock response
+        List<AverageSessionInteractionsResponse> mockResponse = List.of(dailyStat);
+        AverageSessionInteractionsResultResponse response = new AverageSessionInteractionsResultResponse();
+        response.setData(mockResponse);
+
+        // Mock the response
+        when(responseSpec.body(any(org.springframework.core.ParameterizedTypeReference.class))).thenReturn(response);
+
+        // Call the method to test
+        List<AverageSessionInteractionsResponse> actualResponse = client.averageSessionInteractions(appId, start, end);
+
+        // Verify the response
+        assertNotNull(actualResponse);
+        assertEquals(1, actualResponse.size());
+        assertEquals("2025-09-02", actualResponse.get(0).getDate());
+        assertEquals(1.0, actualResponse.get(0).getInteractions(), 0.001); // Using delta for double comparison
+
+        // Verify interactions with mocks
+        verify(requestHeadersUriSpec).uri(any(Function.class));
+        verify(requestHeadersSpec).headers(any());
+    }
 }
