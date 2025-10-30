@@ -273,7 +273,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
         assertNotNull(response);
         log.info("Indexing status: {}", JSONUtil.toJsonStr(response));
         int attempts = 0;
-        while (response.getData().getFirst().getIndexingStatus().equals("indexing") && attempts < 30) {
+        while (!response.getData().getFirst().getIndexingStatus().equals("completed") && attempts < 30) {
             attempts++;
             Thread.sleep(500);
             response = difyDataset.indexingStatus(request);
