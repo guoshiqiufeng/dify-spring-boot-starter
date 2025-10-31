@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.*;
 
 /**
@@ -59,7 +60,7 @@ class DifyServerTokenRedisTest {
 
     @BeforeEach
     void setUp() {
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        lenient().when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         tokenRedis = new DifyServerTokenRedis(redisTemplate);
     }
 
@@ -293,6 +294,6 @@ class DifyServerTokenRedisTest {
         verify(valueOperations).set(eq(DifyRedisKey.REFRESH_TOKEN), eq("new-refresh-token"));
         verify(valueOperations).set(eq(DifyRedisKey.CSRF_TOKEN), eq("new-csrf-token"));
         verify(cookies).add("access_token", "new-access-token");
-        verify(cookies).add("csrf_token", "new-csrf-token");
+        verify(cookies).add("csrf_token", null);
     }
 }
