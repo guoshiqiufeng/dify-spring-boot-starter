@@ -440,7 +440,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
     }
 
     @Test
-    @DisplayName("Test chatConversations method")
+    @DisplayName("Test chatConversations method with all parameters")
     public void testChatConversations() {
         // Prepare test data
         ChatConversationsRequest request = new ChatConversationsRequest();
@@ -451,6 +451,153 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         request.setStart("2025-10-23 00:00");
         request.setEnd("2025-10-30 23:59");
         request.setSortBy("-created_at");
+
+        // Mock the UriBuilder for queryParam functionality
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("page"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("limit"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("start"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("end"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("sort_by"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("annotation_status"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build()).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
+
+        // Create mock conversation data
+        ChatConversationResponse conversation = new ChatConversationResponse();
+        conversation.setId("b9f66e5f-ba2b-4179-88d0-2d36c7e2050a");
+        conversation.setName("What are the specs of the iPhone 13 Pro Max?");
+        conversation.setAnnotated(false);
+
+        // Create mock response
+        DifyPageResult<ChatConversationResponse> mockResponse = new DifyPageResult<>();
+        mockResponse.setData(List.of(conversation));
+        mockResponse.setPage(1);
+        mockResponse.setLimit(10);
+        mockResponse.setTotal(1);
+        mockResponse.setHasMore(false);
+
+        // Set up the response mock to return our expected response
+        when(responseSpecMock.bodyToMono(any(org.springframework.core.ParameterizedTypeReference.class))).thenReturn(Mono.just(mockResponse));
+
+        // Execute the method
+        DifyPageResult<ChatConversationResponse> actualResponse = client.chatConversations(request);
+
+        // Verify the result
+        assertNotNull(actualResponse);
+        assertEquals(1, actualResponse.getTotal());
+        assertEquals(1, actualResponse.getData().size());
+        assertEquals("b9f66e5f-ba2b-4179-88d0-2d36c7e2050a", actualResponse.getData().get(0).getId());
+        assertEquals("What are the specs of the iPhone 13 Pro Max?", actualResponse.getData().get(0).getName());
+
+        // Verify WebClient interactions
+        verify(webClientMock).get();
+        verify(requestHeadersUriSpecMock).uri(any(Function.class));
+        verify(responseSpecMock).bodyToMono(any(org.springframework.core.ParameterizedTypeReference.class));
+    }
+
+    @Test
+    @DisplayName("Test chatConversations method with only required parameters")
+    public void testChatConversationsOnlyRequiredParams() {
+        // Prepare test data with only required parameters
+        ChatConversationsRequest request = new ChatConversationsRequest();
+        request.setAppId("app-123");
+        request.setPage(1);
+        request.setLimit(10);
+        // All optional parameters are null
+
+        // Mock the UriBuilder for queryParam functionality
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("page"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("limit"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("start"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("end"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("sort_by"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("annotation_status"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build()).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
+
+        // Create mock conversation data
+        ChatConversationResponse conversation = new ChatConversationResponse();
+        conversation.setId("b9f66e5f-ba2b-4179-88d0-2d36c7e2050a");
+        conversation.setName("What are the specs of the iPhone 13 Pro Max?");
+        conversation.setAnnotated(false);
+
+        // Create mock response
+        DifyPageResult<ChatConversationResponse> mockResponse = new DifyPageResult<>();
+        mockResponse.setData(List.of(conversation));
+        mockResponse.setPage(1);
+        mockResponse.setLimit(10);
+        mockResponse.setTotal(1);
+        mockResponse.setHasMore(false);
+
+        // Set up the response mock to return our expected response
+        when(responseSpecMock.bodyToMono(any(org.springframework.core.ParameterizedTypeReference.class))).thenReturn(Mono.just(mockResponse));
+
+        // Execute the method
+        DifyPageResult<ChatConversationResponse> actualResponse = client.chatConversations(request);
+
+        // Verify the result
+        assertNotNull(actualResponse);
+        assertEquals(1, actualResponse.getTotal());
+        assertEquals(1, actualResponse.getData().size());
+        assertEquals("b9f66e5f-ba2b-4179-88d0-2d36c7e2050a", actualResponse.getData().get(0).getId());
+        assertEquals("What are the specs of the iPhone 13 Pro Max?", actualResponse.getData().get(0).getName());
+
+        // Verify WebClient interactions
+        verify(webClientMock).get();
+        verify(requestHeadersUriSpecMock).uri(any(Function.class));
+        verify(responseSpecMock).bodyToMono(any(org.springframework.core.ParameterizedTypeReference.class));
+    }
+
+    @Test
+    @DisplayName("Test chatConversations method with some optional parameters")
+    public void testChatConversationsSomeOptionalParams() {
+        // Prepare test data with some optional parameters
+        ChatConversationsRequest request = new ChatConversationsRequest();
+        request.setAppId("app-123");
+        request.setPage(1);
+        request.setLimit(10);
+        request.setStart("2025-10-23 00:00");
+        // end, sortBy, and annotationStatus are null
+
+        // Mock the UriBuilder for queryParam functionality
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("page"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("limit"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("start"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("end"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("sort_by"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("annotation_status"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build()).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
 
         // Create mock conversation data
         ChatConversationResponse conversation = new ChatConversationResponse();
