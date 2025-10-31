@@ -109,4 +109,9 @@ public class DifyServerClientImpl implements DifyServer {
     public List<TokenCostsResponse> tokenCosts(String appId, LocalDateTime start, LocalDateTime end) {
         return difyServerClient.tokenCosts(appId, start, end);
     }
+
+    @Override
+    public List<DailyMessagesResponse> dailyMessages(String appId, LocalDateTime start, LocalDateTime end) {
+        return difyServerClient.dailyMessages(appId, start, end);
+    }
 }

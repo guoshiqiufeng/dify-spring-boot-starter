@@ -740,3 +740,55 @@ public void testGetTokenCosts() {
     }
 }
 ```
+
+### 10. 每日消息统计
+
+### 10.1 获取应用的每日消息统计
+
+#### 方法
+
+```java
+List<DailyMessagesResponse> dailyMessages(String appId, LocalDateTime start, LocalDateTime end);
+```
+
+#### 请求参数
+
+| 参数名   | 类型            | 是否必须 | 描述                       |
+|-------|---------------|------|--------------------------|
+| appId | String        | 是    | 应用 ID                    |
+| start | LocalDateTime | 是    | 开始时间，格式：yyyy-MM-dd HH:mm |
+| end   | LocalDateTime | 是    | 结束时间，格式：yyyy-MM-dd HH:mm |
+
+#### 响应参数
+
+DailyMessagesResponse
+
+| 参数名        | 类型   | 描述               |
+|-------------|------|------------------|
+| date        | String  | 日期，格式：yyyy-MM-dd |
+| message_count | Integer | 当日消息数量        |
+
+#### 请求示例
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testGetDailyMessages() {
+    String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
+    LocalDateTime start = LocalDateTime.of(2025, 10, 23, 0, 0);
+    LocalDateTime end = LocalDateTime.of(2025, 10, 30, 23, 59);
+
+    // 获取每日消息统计
+    List<DailyMessagesResponse> dailyMessagesStats = difyServer.dailyMessages(appId, start, end);
+
+    if (dailyMessagesStats != null) {
+        for (DailyMessagesResponse dailyStat : dailyMessagesStats) {
+            System.out.println("日期: " + dailyStat.getDate());
+            System.out.println("消息数量: " + dailyStat.getMessageCount());
+        }
+    }
+}
+```
