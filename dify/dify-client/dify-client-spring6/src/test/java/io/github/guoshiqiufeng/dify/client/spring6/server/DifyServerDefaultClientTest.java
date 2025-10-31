@@ -714,4 +714,47 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(requestHeadersUriSpec).uri(any(Function.class));
         verify(requestHeadersSpec).headers(any());
     }
+
+    @Test
+    @DisplayName("Test tokenCosts method")
+    public void testTokenCosts() {
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
+
+        // Prepare test data
+        String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
+        java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        // Create mock token costs data
+        TokenCostsResponse dailyStat = new TokenCostsResponse();
+        dailyStat.setDate("2025-09-02");
+        dailyStat.setTokenCount(25686);
+        dailyStat.setTotalPrice("0.0039254");
+        dailyStat.setCurrency("USD");
+
+        // Create mock response
+        List<TokenCostsResponse> mockResponse = List.of(dailyStat);
+        TokenCostsResultResponse response = new TokenCostsResultResponse();
+        response.setData(mockResponse);
+
+        // Mock the response
+        when(responseSpec.body(any(org.springframework.core.ParameterizedTypeReference.class))).thenReturn(response);
+
+        // Call the method to test
+        List<TokenCostsResponse> actualResponse = client.tokenCosts(appId, start, end);
+
+        // Verify the response
+        assertNotNull(actualResponse);
+        assertEquals(1, actualResponse.size());
+        assertEquals("2025-09-02", actualResponse.get(0).getDate());
+        assertEquals(Integer.valueOf(25686), actualResponse.get(0).getTokenCount());
+        assertEquals("0.0039254", actualResponse.get(0).getTotalPrice());
+        assertEquals("USD", actualResponse.get(0).getCurrency());
+
+        // Verify interactions with mocks
+        verify(requestHeadersUriSpec).uri(any(Function.class));
+        verify(requestHeadersSpec).headers(any());
+    }
 }

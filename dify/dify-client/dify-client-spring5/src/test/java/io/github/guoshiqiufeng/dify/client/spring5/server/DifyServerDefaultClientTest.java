@@ -663,4 +663,44 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(requestHeadersUriSpecMock).uri(any(Function.class));
         verify(responseSpecMock).bodyToMono(any(org.springframework.core.ParameterizedTypeReference.class));
     }
+
+    @Test
+    @DisplayName("Test tokenCosts method")
+    public void testTokenCosts() {
+        // Prepare test data
+        String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
+        java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        // Create mock token costs data
+        TokenCostsResponse dailyStat = new TokenCostsResponse();
+        dailyStat.setDate("2025-09-02");
+        dailyStat.setTokenCount(25686);
+        dailyStat.setTotalPrice("0.0039254");
+        dailyStat.setCurrency("USD");
+
+        // Create mock response
+        List<TokenCostsResponse> mockResponse = List.of(dailyStat);
+        TokenCostsResultResponse response = new TokenCostsResultResponse();
+        response.setData(mockResponse);
+
+        // Set up the response mock to return our expected response
+        when(responseSpecMock.bodyToMono(any(org.springframework.core.ParameterizedTypeReference.class))).thenReturn(Mono.just(response));
+
+        // Execute the method
+        List<TokenCostsResponse> actualResponse = client.tokenCosts(appId, start, end);
+
+        // Verify the result
+        assertNotNull(actualResponse);
+        assertEquals(1, actualResponse.size());
+        assertEquals("2025-09-02", actualResponse.get(0).getDate());
+        assertEquals(Integer.valueOf(25686), actualResponse.get(0).getTokenCount());
+        assertEquals("0.0039254", actualResponse.get(0).getTotalPrice());
+        assertEquals("USD", actualResponse.get(0).getCurrency());
+
+        // Verify WebClient interactions
+        verify(webClientMock).get();
+        verify(requestHeadersUriSpecMock).uri(any(Function.class));
+        verify(responseSpecMock).bodyToMono(any(org.springframework.core.ParameterizedTypeReference.class));
+    }
 }

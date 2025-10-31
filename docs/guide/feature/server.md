@@ -684,3 +684,59 @@ public void testGetUserSatisfactionRate() {
     }
 }
 ```
+
+### 9. 令牌费用统计
+
+### 9.1 获取应用的令牌费用统计
+
+#### 方法
+
+```java
+List<TokenCostsResponse> tokenCosts(String appId, LocalDateTime start, LocalDateTime end);
+```
+
+#### 请求参数
+
+| 参数名   | 类型            | 是否必须 | 描述                       |
+|-------|---------------|------|--------------------------|
+| appId | String        | 是    | 应用 ID                    |
+| start | LocalDateTime | 是    | 开始时间，格式：yyyy-MM-dd HH:mm |
+| end   | LocalDateTime | 是    | 结束时间，格式：yyyy-MM-dd HH:mm |
+
+#### 响应参数
+
+TokenCostsResponse
+
+| 参数名        | 类型   | 描述               |
+|-------------|------|------------------|
+| date        | String  | 日期，格式：yyyy-MM-dd |
+| token_count | Integer | 当日令牌数量        |
+| total_price | String  | 当日总费用          |
+| currency    | String  | 货币类型           |
+
+#### 请求示例
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testGetTokenCosts() {
+    String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
+    LocalDateTime start = LocalDateTime.of(2025, 10, 23, 0, 0);
+    LocalDateTime end = LocalDateTime.of(2025, 10, 30, 23, 59);
+
+    // 获取令牌费用统计
+    List<TokenCostsResponse> tokenCostsStats = difyServer.tokenCosts(appId, start, end);
+
+    if (tokenCostsStats != null) {
+        for (TokenCostsResponse dailyStat : tokenCostsStats) {
+            System.out.println("日期: " + dailyStat.getDate());
+            System.out.println("令牌数量: " + dailyStat.getTokenCount());
+            System.out.println("总费用: " + dailyStat.getTotalPrice());
+            System.out.println("货币类型: " + dailyStat.getCurrency());
+        }
+    }
+}
+```

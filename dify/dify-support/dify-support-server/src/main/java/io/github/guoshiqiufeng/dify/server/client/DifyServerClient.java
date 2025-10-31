@@ -166,4 +166,14 @@ public interface DifyServerClient {
      * @return List of user satisfaction rate statistics, each encapsulated in {@link UserSatisfactionRateResponse} object
      */
     List<UserSatisfactionRateResponse> userSatisfactionRate(String appId, LocalDateTime start, LocalDateTime end);
+
+    /**
+     * Retrieves token costs statistics for a specific application
+     *
+     * @param appId The ID of the application to get statistics for
+     * @param start Start time in format "yyyy-MM-dd HH:mm"
+     * @param end   End time in format "yyyy-MM-dd HH:mm"
+     * @return List of token costs statistics, each encapsulated in {@link TokenCostsResponse} object
+     */
+    List<TokenCostsResponse> tokenCosts(String appId, LocalDateTime start, LocalDateTime end);
 }

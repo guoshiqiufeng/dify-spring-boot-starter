@@ -41,4 +41,6 @@ public interface ServerUriConstant {
     String TOKENS_PER_SECOND = APPS + "/{appId}/statistics/tokens-per-second";
 
     String USER_SATISFACTION_RATE = APPS + "/{appId}/statistics/user-satisfaction-rate";
+
+    String TOKEN_COSTS = APPS + "/{appId}/statistics/token-costs";
 }

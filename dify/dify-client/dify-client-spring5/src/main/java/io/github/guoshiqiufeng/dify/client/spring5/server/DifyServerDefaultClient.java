@@ -305,6 +305,26 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
         );
     }
 
+    @Override
+    public List<TokenCostsResponse> tokenCosts(String appId, java.time.LocalDateTime start, java.time.LocalDateTime end) {
+        return executeWithRetry(
+                () -> webClient.get()
+                        .uri(uriBuilder -> uriBuilder
+                                .path(ServerUriConstant.TOKEN_COSTS)
+                                .queryParam("start", start.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
+                                .queryParam("end", end.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
+                                .build(appId))
+                        .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
+                        .retrieve()
+                        .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                        .bodyToMono(new org.springframework.core.ParameterizedTypeReference<TokenCostsResultResponse>() {
+                        })
+                        .map(TokenCostsResultResponse::getData)
+                        .block()
+        );
+    }
+
     private void appPages(String mode, String name, int page, List<AppsResponse> result) {
         AppsResponseResult response = executeWithRetry(
                 () -> webClient.get()

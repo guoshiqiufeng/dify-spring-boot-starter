@@ -155,10 +155,21 @@ public interface DifyServer {
      * 获取应用的用户满意度率统计
      *
      * @param appId 应用的唯一标识符，不能为空
-     * @param start 开始时间，格式为 "yyyy-MM-dd HH:mm"
+     * @param start 开始时间،格式为 "yyyy-MM-dd HH:mm"
      * @param end   结束时间，格式为 "yyyy-MM-dd HH:mm"
      * @return 返回用户满意度率统计列表，每个统计封装为 {@link UserSatisfactionRateResponse} 对象
      * @throws IllegalArgumentException 如果传入的参数不符合预期格式或范围
      */
     List<UserSatisfactionRateResponse> userSatisfactionRate(String appId, LocalDateTime start, LocalDateTime end);
+
+    /**
+     * 获取应用的令牌费用统计
+     *
+     * @param appId 应用的唯一标识符，不能为空
+     * @param start 开始时间，格式为 "yyyy-MM-dd HH:mm"
+     * @param end   结束时间，格式为 "yyyy-MM-dd HH:mm"
+     * @return 返回令牌费用统计列表，每个统计封装为 {@link TokenCostsResponse} 对象
+     * @throws IllegalArgumentException 如果传入的参数不符合预期格式或范围
+     */
+    List<TokenCostsResponse> tokenCosts(String appId, LocalDateTime start, LocalDateTime end);
 }

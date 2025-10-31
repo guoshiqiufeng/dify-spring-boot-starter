@@ -687,3 +687,59 @@ public void testGetUserSatisfactionRate() {
     }
 }
 ```
+
+## 9. Token Costs Statistics
+
+### 9.1 Get Application Token Costs Statistics
+
+#### Method
+
+```java
+List<TokenCostsResponse> tokenCosts(String appId, LocalDateTime start, LocalDateTime end);
+```
+
+#### Request Parameters
+
+| Parameter name | Type          | Required | Description                          |
+|----------------|---------------|----------|--------------------------------------|
+| appId          | String        | Yes      | Application ID                       |
+| start          | LocalDateTime | Yes      | Start time, format: yyyy-MM-dd HH:mm |
+| end            | LocalDateTime | Yes      | End time, format: yyyy-MM-dd HH:mm   |
+
+#### Response Parameters
+
+TokenCostsResponse
+
+| Parameter name | Type    | Description                            |
+|----------------|---------|----------------------------------------|
+| date           | String  | Date, format: yyyy-MM-dd               |
+| token_count    | Integer | Number of tokens on that day           |
+| total_price    | String  | Total price for that day               |
+| currency       | String  | Currency type                          |
+
+#### Request Example
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testGetTokenCosts() {
+    String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
+    LocalDateTime start = LocalDateTime.of(2025, 10, 23, 0, 0);
+    LocalDateTime end = LocalDateTime.of(2025, 10, 30, 23, 59);
+
+    // Get token costs statistics
+    List<TokenCostsResponse> tokenCostsStats = difyServer.tokenCosts(appId, start, end);
+
+    if (tokenCostsStats != null) {
+        for (TokenCostsResponse dailyStat : tokenCostsStats) {
+            System.out.println("Date: " + dailyStat.getDate());
+            System.out.println("Token count: " + dailyStat.getTokenCount());
+            System.out.println("Total price: " + dailyStat.getTotalPrice());
+            System.out.println("Currency: " + dailyStat.getCurrency());
+        }
+    }
+}
+```

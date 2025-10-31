@@ -104,4 +104,9 @@ public class DifyServerClientImpl implements DifyServer {
     public List<UserSatisfactionRateResponse> userSatisfactionRate(String appId, LocalDateTime start, LocalDateTime end) {
         return difyServerClient.userSatisfactionRate(appId, start, end);
     }
+
+    @Override
+    public List<TokenCostsResponse> tokenCosts(String appId, LocalDateTime start, LocalDateTime end) {
+        return difyServerClient.tokenCosts(appId, start, end);
+    }
 }

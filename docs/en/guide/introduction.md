@@ -127,6 +127,7 @@ Legend:
 | Get Application Average Session Interactions Statistics | ✅      |
 | Get Application Tokens Per Second Statistics      | ✅      |
 | Get Application User Satisfaction Rate Statistics | ✅      |
+| Get Application Token Costs Statistics            | ✅      |
 
 ## Code Hosting
 
