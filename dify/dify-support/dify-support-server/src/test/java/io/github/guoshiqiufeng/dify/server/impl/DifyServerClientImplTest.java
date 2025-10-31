@@ -243,4 +243,248 @@ class DifyServerClientImplTest {
         assertEquals(expectedConversations.getData().get(1).getName(), actualConversations.getData().get(1).getName());
         verify(difyServerClient, times(1)).chatConversations(request);
     }
+
+    @Test
+    void testDailyConversations() {
+        // Arrange
+        String appId = "app-123";
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
+        java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        io.github.guoshiqiufeng.dify.server.dto.response.DailyConversationsResponse dailyStat1 = 
+            new io.github.guoshiqiufeng.dify.server.dto.response.DailyConversationsResponse();
+        dailyStat1.setDate("2025-10-23");
+        dailyStat1.setConversationCount(10);
+
+        io.github.guoshiqiufeng.dify.server.dto.response.DailyConversationsResponse dailyStat2 = 
+            new io.github.guoshiqiufeng.dify.server.dto.response.DailyConversationsResponse();
+        dailyStat2.setDate("2025-10-24");
+        dailyStat2.setConversationCount(15);
+
+        List<io.github.guoshiqiufeng.dify.server.dto.response.DailyConversationsResponse> expectedStats = 
+            Arrays.asList(dailyStat1, dailyStat2);
+
+        when(difyServerClient.dailyConversations(appId, start, end)).thenReturn(expectedStats);
+
+        // Act
+        List<io.github.guoshiqiufeng.dify.server.dto.response.DailyConversationsResponse> actualStats = 
+            difyServerClientImpl.dailyConversations(appId, start, end);
+
+        // Assert
+        assertNotNull(actualStats);
+        assertEquals(expectedStats.size(), actualStats.size());
+        assertEquals(expectedStats.get(0).getDate(), actualStats.get(0).getDate());
+        assertEquals(expectedStats.get(0).getConversationCount(), actualStats.get(0).getConversationCount());
+        verify(difyServerClient, times(1)).dailyConversations(appId, start, end);
+    }
+
+    @Test
+    void testDailyEndUsers() {
+        // Arrange
+        String appId = "app-123";
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
+        java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        io.github.guoshiqiufeng.dify.server.dto.response.DailyEndUsersResponse dailyStat1 = 
+            new io.github.guoshiqiufeng.dify.server.dto.response.DailyEndUsersResponse();
+        dailyStat1.setDate("2025-10-23");
+        dailyStat1.setTerminalCount(5);
+
+        io.github.guoshiqiufeng.dify.server.dto.response.DailyEndUsersResponse dailyStat2 = 
+            new io.github.guoshiqiufeng.dify.server.dto.response.DailyEndUsersResponse();
+        dailyStat2.setDate("2025-10-24");
+        dailyStat2.setTerminalCount(8);
+
+        List<io.github.guoshiqiufeng.dify.server.dto.response.DailyEndUsersResponse> expectedStats = 
+            Arrays.asList(dailyStat1, dailyStat2);
+
+        when(difyServerClient.dailyEndUsers(appId, start, end)).thenReturn(expectedStats);
+
+        // Act
+        List<io.github.guoshiqiufeng.dify.server.dto.response.DailyEndUsersResponse> actualStats = 
+            difyServerClientImpl.dailyEndUsers(appId, start, end);
+
+        // Assert
+        assertNotNull(actualStats);
+        assertEquals(expectedStats.size(), actualStats.size());
+        assertEquals(expectedStats.get(0).getDate(), actualStats.get(0).getDate());
+        assertEquals(expectedStats.get(0).getTerminalCount(), actualStats.get(0).getTerminalCount());
+        verify(difyServerClient, times(1)).dailyEndUsers(appId, start, end);
+    }
+
+    @Test
+    void testAverageSessionInteractions() {
+        // Arrange
+        String appId = "app-123";
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
+        java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        io.github.guoshiqiufeng.dify.server.dto.response.AverageSessionInteractionsResponse dailyStat1 = 
+            new io.github.guoshiqiufeng.dify.server.dto.response.AverageSessionInteractionsResponse();
+        dailyStat1.setDate("2025-10-23");
+        dailyStat1.setInteractions(2.5);
+
+        io.github.guoshiqiufeng.dify.server.dto.response.AverageSessionInteractionsResponse dailyStat2 = 
+            new io.github.guoshiqiufeng.dify.server.dto.response.AverageSessionInteractionsResponse();
+        dailyStat2.setDate("2025-10-24");
+        dailyStat2.setInteractions(3.0);
+
+        List<io.github.guoshiqiufeng.dify.server.dto.response.AverageSessionInteractionsResponse> expectedStats = 
+            Arrays.asList(dailyStat1, dailyStat2);
+
+        when(difyServerClient.averageSessionInteractions(appId, start, end)).thenReturn(expectedStats);
+
+        // Act
+        List<io.github.guoshiqiufeng.dify.server.dto.response.AverageSessionInteractionsResponse> actualStats = 
+            difyServerClientImpl.averageSessionInteractions(appId, start, end);
+
+        // Assert
+        assertNotNull(actualStats);
+        assertEquals(expectedStats.size(), actualStats.size());
+        assertEquals(expectedStats.get(0).getDate(), actualStats.get(0).getDate());
+        assertEquals(expectedStats.get(0).getInteractions(), actualStats.get(0).getInteractions());
+        verify(difyServerClient, times(1)).averageSessionInteractions(appId, start, end);
+    }
+
+    @Test
+    void testTokensPerSecond() {
+        // Arrange
+        String appId = "app-123";
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
+        java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        io.github.guoshiqiufeng.dify.server.dto.response.TokensPerSecondResponse dailyStat1 = 
+            new io.github.guoshiqiufeng.dify.server.dto.response.TokensPerSecondResponse();
+        dailyStat1.setDate("2025-10-23");
+        dailyStat1.setTps(30.8603);
+
+        io.github.guoshiqiufeng.dify.server.dto.response.TokensPerSecondResponse dailyStat2 = 
+            new io.github.guoshiqiufeng.dify.server.dto.response.TokensPerSecondResponse();
+        dailyStat2.setDate("2025-10-24");
+        dailyStat2.setTps(45.12);
+
+        List<io.github.guoshiqiufeng.dify.server.dto.response.TokensPerSecondResponse> expectedStats = 
+            Arrays.asList(dailyStat1, dailyStat2);
+
+        when(difyServerClient.tokensPerSecond(appId, start, end)).thenReturn(expectedStats);
+
+        // Act
+        List<io.github.guoshiqiufeng.dify.server.dto.response.TokensPerSecondResponse> actualStats = 
+            difyServerClientImpl.tokensPerSecond(appId, start, end);
+
+        // Assert
+        assertNotNull(actualStats);
+        assertEquals(expectedStats.size(), actualStats.size());
+        assertEquals(expectedStats.get(0).getDate(), actualStats.get(0).getDate());
+        assertEquals(expectedStats.get(0).getTps(), actualStats.get(0).getTps());
+        verify(difyServerClient, times(1)).tokensPerSecond(appId, start, end);
+    }
+
+    @Test
+    void testUserSatisfactionRate() {
+        // Arrange
+        String appId = "app-123";
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
+        java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        io.github.guoshiqiufeng.dify.server.dto.response.UserSatisfactionRateResponse dailyStat1 = 
+            new io.github.guoshiqiufeng.dify.server.dto.response.UserSatisfactionRateResponse();
+        dailyStat1.setDate("2025-10-23");
+        dailyStat1.setRate(95.5);
+
+        io.github.guoshiqiufeng.dify.server.dto.response.UserSatisfactionRateResponse dailyStat2 = 
+            new io.github.guoshiqiufeng.dify.server.dto.response.UserSatisfactionRateResponse();
+        dailyStat2.setDate("2025-10-24");
+        dailyStat2.setRate(98.0);
+
+        List<io.github.guoshiqiufeng.dify.server.dto.response.UserSatisfactionRateResponse> expectedStats = 
+            Arrays.asList(dailyStat1, dailyStat2);
+
+        when(difyServerClient.userSatisfactionRate(appId, start, end)).thenReturn(expectedStats);
+
+        // Act
+        List<io.github.guoshiqiufeng.dify.server.dto.response.UserSatisfactionRateResponse> actualStats = 
+            difyServerClientImpl.userSatisfactionRate(appId, start, end);
+
+        // Assert
+        assertNotNull(actualStats);
+        assertEquals(expectedStats.size(), actualStats.size());
+        assertEquals(expectedStats.get(0).getDate(), actualStats.get(0).getDate());
+        assertEquals(expectedStats.get(0).getRate(), actualStats.get(0).getRate());
+        verify(difyServerClient, times(1)).userSatisfactionRate(appId, start, end);
+    }
+
+    @Test
+    void testTokenCosts() {
+        // Arrange
+        String appId = "app-123";
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
+        java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        io.github.guoshiqiufeng.dify.server.dto.response.TokenCostsResponse dailyStat1 = 
+            new io.github.guoshiqiufeng.dify.server.dto.response.TokenCostsResponse();
+        dailyStat1.setDate("2025-10-23");
+        dailyStat1.setTokenCount(1000);
+        dailyStat1.setTotalPrice("0.00123");
+        dailyStat1.setCurrency("USD");
+
+        io.github.guoshiqiufeng.dify.server.dto.response.TokenCostsResponse dailyStat2 = 
+            new io.github.guoshiqiufeng.dify.server.dto.response.TokenCostsResponse();
+        dailyStat2.setDate("2025-10-24");
+        dailyStat2.setTokenCount(2500);
+        dailyStat2.setTotalPrice("0.003075");
+        dailyStat2.setCurrency("USD");
+
+        List<io.github.guoshiqiufeng.dify.server.dto.response.TokenCostsResponse> expectedStats = 
+            Arrays.asList(dailyStat1, dailyStat2);
+
+        when(difyServerClient.tokenCosts(appId, start, end)).thenReturn(expectedStats);
+
+        // Act
+        List<io.github.guoshiqiufeng.dify.server.dto.response.TokenCostsResponse> actualStats = 
+            difyServerClientImpl.tokenCosts(appId, start, end);
+
+        // Assert
+        assertNotNull(actualStats);
+        assertEquals(expectedStats.size(), actualStats.size());
+        assertEquals(expectedStats.get(0).getDate(), actualStats.get(0).getDate());
+        assertEquals(expectedStats.get(0).getTokenCount(), actualStats.get(0).getTokenCount());
+        assertEquals(expectedStats.get(0).getTotalPrice(), actualStats.get(0).getTotalPrice());
+        assertEquals(expectedStats.get(0).getCurrency(), actualStats.get(0).getCurrency());
+        verify(difyServerClient, times(1)).tokenCosts(appId, start, end);
+    }
+
+    @Test
+    void testDailyMessages() {
+        // Arrange
+        String appId = "app-123";
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
+        java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        io.github.guoshiqiufeng.dify.server.dto.response.DailyMessagesResponse dailyStat1 = 
+            new io.github.guoshiqiufeng.dify.server.dto.response.DailyMessagesResponse();
+        dailyStat1.setDate("2025-10-23");
+        dailyStat1.setMessageCount(15);
+
+        io.github.guoshiqiufeng.dify.server.dto.response.DailyMessagesResponse dailyStat2 = 
+            new io.github.guoshiqiufeng.dify.server.dto.response.DailyMessagesResponse();
+        dailyStat2.setDate("2025-10-24");
+        dailyStat2.setMessageCount(22);
+
+        List<io.github.guoshiqiufeng.dify.server.dto.response.DailyMessagesResponse> expectedStats = 
+            Arrays.asList(dailyStat1, dailyStat2);
+
+        when(difyServerClient.dailyMessages(appId, start, end)).thenReturn(expectedStats);
+
+        // Act
+        List<io.github.guoshiqiufeng.dify.server.dto.response.DailyMessagesResponse> actualStats = 
+            difyServerClientImpl.dailyMessages(appId, start, end);
+
+        // Assert
+        assertNotNull(actualStats);
+        assertEquals(expectedStats.size(), actualStats.size());
+        assertEquals(expectedStats.get(0).getDate(), actualStats.get(0).getDate());
+        assertEquals(expectedStats.get(0).getMessageCount(), actualStats.get(0).getMessageCount());
+        verify(difyServerClient, times(1)).dailyMessages(appId, start, end);
+    }
 }
