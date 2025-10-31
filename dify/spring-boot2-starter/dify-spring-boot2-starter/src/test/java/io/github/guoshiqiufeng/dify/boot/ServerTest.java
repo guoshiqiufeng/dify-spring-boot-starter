@@ -392,6 +392,42 @@ public class ServerTest extends BaseServerContainerTest {
     }
 
     @Test
+    @Order(21)
+    @DisplayName("Test retrieving token costs statistics")
+    public void tokenCostsTest() {
+        // Check if test application ID is available
+        if (testAppId == null) {
+            List<AppsResponse> apps = difyServer.apps("", "");
+            if (!apps.isEmpty()) {
+                testAppId = apps.get(0).getId(); // Use get(0) instead of getFirst() for Java 8 compatibility
+            } else {
+                log.warn("No applications available, skipping token costs test");
+                return;
+            }
+        }
+
+        // Create date range for token costs
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
+        java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        // Get token costs statistics
+        List<io.github.guoshiqiufeng.dify.server.dto.response.TokenCostsResponse> tokenCostsStats =
+                difyServer.tokenCosts(testAppId, start, end);
+        log.debug("Token costs statistics: {}", JSONUtil.toJsonStr(tokenCostsStats));
+        assertNotNull(tokenCostsStats, "Token costs statistics should not be null");
+
+        // If statistics exist, verify the data structure
+        if (tokenCostsStats != null && !tokenCostsStats.isEmpty()) {
+            io.github.guoshiqiufeng.dify.server.dto.response.TokenCostsResponse firstStat = tokenCostsStats.get(0);
+            log.debug("First token costs statistic: {}", JSONUtil.toJsonStr(firstStat));
+            assertNotNull(firstStat.getDate(), "Token costs statistic date should not be null");
+            assertNotNull(firstStat.getTokenCount(), "Token costs statistic token count should not be null");
+            assertNotNull(firstStat.getTotalPrice(), "Token costs statistic total price should not be null");
+            assertNotNull(firstStat.getCurrency(), "Token costs statistic currency should not be null");
+        }
+    }
+
+    @Test
     @Order(18)
     @DisplayName("Test error handling")
     public void errorHandlingTest() {
