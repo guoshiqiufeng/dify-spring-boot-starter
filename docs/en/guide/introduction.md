@@ -126,6 +126,7 @@ Legend:
 | Get Application Daily End Users Statistics        | ✅      |
 | Get Application Average Session Interactions Statistics | ✅      |
 | Get Application Tokens Per Second Statistics      | ✅      |
+| Get Application User Satisfaction Rate Statistics | ✅      |
 
 ## Code Hosting
 
