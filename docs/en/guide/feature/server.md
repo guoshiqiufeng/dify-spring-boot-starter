@@ -743,3 +743,55 @@ public void testGetTokenCosts() {
     }
 }
 ```
+
+## 10. Daily Messages Statistics
+
+### 10.1 Get Application Daily Messages Statistics
+
+#### Method
+
+```java
+List<DailyMessagesResponse> dailyMessages(String appId, LocalDateTime start, LocalDateTime end);
+```
+
+#### Request Parameters
+
+| Parameter name | Type          | Required | Description                          |
+|----------------|---------------|----------|--------------------------------------|
+| appId          | String        | Yes      | Application ID                       |
+| start          | LocalDateTime | Yes      | Start time, format: yyyy-MM-dd HH:mm |
+| end            | LocalDateTime | Yes      | End time, format: yyyy-MM-dd HH:mm   |
+
+#### Response Parameters
+
+DailyMessagesResponse
+
+| Parameter name | Type    | Description                            |
+|----------------|---------|----------------------------------------|
+| date           | String  | Date, format: yyyy-MM-dd               |
+| message_count  | Integer | Number of messages on that day         |
+
+#### Request Example
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testGetDailyMessages() {
+    String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
+    LocalDateTime start = LocalDateTime.of(2025, 10, 23, 0, 0);
+    LocalDateTime end = LocalDateTime.of(2025, 10, 30, 23, 59);
+
+    // Get daily messages statistics
+    List<DailyMessagesResponse> dailyMessagesStats = difyServer.dailyMessages(appId, start, end);
+
+    if (dailyMessagesStats != null) {
+        for (DailyMessagesResponse dailyStat : dailyMessagesStats) {
+            System.out.println("Date: " + dailyStat.getDate());
+            System.out.println("Message count: " + dailyStat.getMessageCount());
+        }
+    }
+}
+```

@@ -128,6 +128,7 @@ Legend:
 | Get Application Tokens Per Second Statistics      | ✅      |
 | Get Application User Satisfaction Rate Statistics | ✅      |
 | Get Application Token Costs Statistics            | ✅      |
+| Get Application Daily Messages Statistics         | ✅      |
 
 ## Code Hosting
 

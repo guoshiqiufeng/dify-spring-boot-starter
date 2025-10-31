@@ -21,7 +21,6 @@ jobs:
       PLUGIN_ID: "langgenius/ollama:0.0.6@f430f3eb959f4863b1e87171544a8fec179441b90deda5693c85f07712d2a68c"
       MODEL_EMBEDDING: bge-m3:latest
       MODEL_LLM: qwen2.5:1.5b
-      OLLAMA_VOLUME: ollama_data  # 新增：命名卷名称
 
     steps:
       - name: Check marketplace access
@@ -80,68 +79,22 @@ jobs:
           timeout 120 bash -c 'until curl -sSf http://localhost/console/api/init; do sleep 5; done'
           docker compose ps
 
-      # === 新增：Ollama 模型缓存机制 ===
-      - name: Set Ollama cache key
-        id: cache-key
-        run: |
-          # 生成安全的缓存键（替换特殊字符）
-          EMBEDDING_SAFE=$(echo "${{ env.MODEL_EMBEDDING }}" | tr ':/' '_')
-          LLM_SAFE=$(echo "${{ env.MODEL_LLM }}" | tr ':/' '_')
-          echo "cache-key=ollama-models-${EMBEDDING_SAFE}-${LLM_SAFE}" >> $GITHUB_OUTPUT
-
-      - name: Create Ollama volume
-        run: docker volume create ${{ env.OLLAMA_VOLUME }}
-
-      - name: Restore Ollama models cache
-        id: cache-restore
-        uses: actions/cache/restore@v4
-        with:
-          path: ./ollama-cache
-          key: ${{ steps.cache-key.outputs.cache-key }}
-
-      - name: Extract cache to volume
-        if: steps.cache-restore.outputs.cache-hit == 'true'
-        run: |
-          # 将缓存解压到 Docker 卷
-          docker run --rm -v ${{ env.OLLAMA_VOLUME }}:/volume -v $(pwd):/cache busybox \
-            sh -c "cd /volume && tar xzf /cache/ollama-cache/ollama-data.tar"
-
       - name: Setup Ollama
         run: |
           docker run -d --name ${{ env.OLLAMA_CONTAINER }} -p 11434:11434 \
-            --network ${{ env.DIFY_NETWORK }} \
-            -v ${{ env.OLLAMA_VOLUME }}:/var/lib/ollama \
-            ollama/ollama
+            --network ${{ env.DIFY_NETWORK }} ollama/ollama
           
           echo "Waiting for Ollama to be ready..."
           timeout 60 bash -c 'until curl -sSf http://localhost:11434/api/tags; do sleep 2; done'
           
-          # 验证模型是否存在（缓存可能损坏）
-          if ! docker exec ${{ env.OLLAMA_CONTAINER }} ollama list | grep -q "${{ env.MODEL_EMBEDDING }}"; then
-            echo "::warning::Embedding model not found in cache, will pull"
-            docker exec ${{ env.OLLAMA_CONTAINER }} ollama pull ${{ env.MODEL_EMBEDDING }}
-          fi
-          if ! docker exec ${{ env.OLLAMA_CONTAINER }} ollama list | grep -q "${{ env.MODEL_LLM }}"; then
-            echo "::warning::LLM model not found in cache, will pull"
-            docker exec ${{ env.OLLAMA_CONTAINER }} ollama pull ${{ env.MODEL_LLM }}
-          fi
+          # Verify network connectivity
+          docker inspect ${{ env.OLLAMA_CONTAINER }} | grep -q ${{ env.DIFY_NETWORK }} \
+            || echo "::warning::Ollama not connected to ${{ env.DIFY_NETWORK }} network"
 
-      - name: Save Ollama models cache
-        if: steps.cache-restore.outputs.cache-hit != 'true'
+      - name: Pull Ollama models
         run: |
-          # 将卷内容打包
-          docker run --rm -v ${{ env.OLLAMA_VOLUME }}:/volume -v $(pwd):/backup busybox \
-            sh -c "cd /volume && tar czf /backup/ollama-data.tar ."
-          mkdir -p ./ollama-cache
-          mv ollama-data.tar ./ollama-cache/
-
-      - name: Upload Ollama cache
-        if: steps.cache-restore.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: ./ollama-cache
-          key: ${{ steps.cache-key.outputs.cache-key }}
-      # === 缓存机制结束 ===
+          docker exec ${{ env.OLLAMA_CONTAINER }} ollama pull bge-m3:latest
+          docker exec ${{ env.OLLAMA_CONTAINER }} ollama pull qwen2.5:1.5b
 
       - name: Initialize Dify
         run: |

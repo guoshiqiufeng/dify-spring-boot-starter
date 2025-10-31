@@ -428,6 +428,40 @@ public class ServerTest extends BaseServerContainerTest {
     }
 
     @Test
+    @Order(22)
+    @DisplayName("Test retrieving daily messages statistics")
+    public void dailyMessagesTest() {
+        // Check if test application ID is available
+        if (testAppId == null) {
+            List<AppsResponse> apps = difyServer.apps("", "");
+            if (!apps.isEmpty()) {
+                testAppId = apps.get(0).getId(); // Use get(0) instead of getFirst() for Java 8 compatibility
+            } else {
+                log.warn("No applications available, skipping daily messages test");
+                return;
+            }
+        }
+
+        // Create date range for daily messages
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
+        java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        // Get daily messages statistics
+        List<io.github.guoshiqiufeng.dify.server.dto.response.DailyMessagesResponse> dailyMessagesStats =
+                difyServer.dailyMessages(testAppId, start, end);
+        log.debug("Daily messages statistics: {}", JSONUtil.toJsonStr(dailyMessagesStats));
+        assertNotNull(dailyMessagesStats, "Daily messages statistics should not be null");
+
+        // If statistics exist, verify the data structure
+        if (dailyMessagesStats != null && !dailyMessagesStats.isEmpty()) {
+            io.github.guoshiqiufeng.dify.server.dto.response.DailyMessagesResponse firstStat = dailyMessagesStats.get(0);
+            log.debug("First daily messages statistic: {}", JSONUtil.toJsonStr(firstStat));
+            assertNotNull(firstStat.getDate(), "Daily messages statistic date should not be null");
+            assertNotNull(firstStat.getMessageCount(), "Daily messages statistic message count should not be null");
+        }
+    }
+
+    @Test
     @Order(18)
     @DisplayName("Test error handling")
     public void errorHandlingTest() {

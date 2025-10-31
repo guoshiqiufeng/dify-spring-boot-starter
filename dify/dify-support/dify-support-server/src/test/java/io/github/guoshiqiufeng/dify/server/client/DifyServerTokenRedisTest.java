@@ -29,7 +29,9 @@ import org.springframework.http.HttpHeaders;
 
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.*;
 
 /**
@@ -58,7 +60,7 @@ class DifyServerTokenRedisTest {
 
     @BeforeEach
     void setUp() {
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        lenient().when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         tokenRedis = new DifyServerTokenRedis(redisTemplate);
     }
 
@@ -171,5 +173,127 @@ class DifyServerTokenRedisTest {
         verify(valueOperations).set(eq(DifyRedisKey.ACCESS_TOKEN), eq("new-access-token"));
         verify(redisTemplate).expire(eq(DifyRedisKey.ACCESS_TOKEN), anyLong(), eq(TimeUnit.MINUTES));
         verify(valueOperations).set(eq(DifyRedisKey.REFRESH_TOKEN), eq("new-refresh-token"));
+    }
+
+    @Test
+    @DisplayName("Test executeWithRetry with successful operation")
+    void testExecuteWithRetrySuccessful() {
+        // Setup
+        String expectedResult = "success";
+        RequestSupplier<String> supplier = () -> expectedResult;
+
+        // Execute
+        String result = tokenRedis.executeWithRetry(supplier, difyServerClient);
+
+        // Verify
+        assertEquals(expectedResult, result);
+    }
+
+    @Test
+    @DisplayName("Test executeWithRetry with 401 error that gets resolved after retry")
+    void testExecuteWithRetryWith401() {
+        // Setup - first call throws 401, second succeeds
+        String expectedResult = "success";
+        RequestSupplier<String> mockSupplier = mock(RequestSupplier.class);
+        when(mockSupplier.get())
+            .thenThrow(new RuntimeException("[401] Unauthorized"))
+            .thenReturn(expectedResult);
+
+        // Execute - this should trigger refresh and retry
+        String result = tokenRedis.executeWithRetry(mockSupplier, difyServerClient);
+
+        // Verify
+        assertEquals(expectedResult, result);
+        verify(mockSupplier, times(2)).get();
+        verify(difyServerClient, times(1)).login(); // Should attempt to get new token
+    }
+
+    @Test
+    @DisplayName("Test executeWithRetry with non-401 error that should not retry")
+    void testExecuteWithRetryWithNon401Error() {
+        // Setup
+        RequestSupplier<String> supplier = mock(RequestSupplier.class);
+        RuntimeException expectedException = new RuntimeException("Some other error");
+        when(supplier.get()).thenThrow(expectedException);
+
+        // Execute and verify exception is re-thrown
+        RuntimeException thrown = org.junit.jupiter.api.Assertions.assertThrows(
+            RuntimeException.class,
+            () -> tokenRedis.executeWithRetry(supplier, difyServerClient)
+        );
+
+        // Verify
+        assertEquals(expectedException, thrown);
+        verify(supplier, times(1)).get();
+        verify(difyServerClient, never()).login(); // Should not attempt to refresh
+    }
+
+    @Test
+    @DisplayName("Test executeWithRetry with multiple 401 errors that reach max retries")
+    void testExecuteWithRetryMaxRetriesReached() {
+        // Setup - always throw 401
+        RequestSupplier<String> supplier = mock(RequestSupplier.class);
+        when(supplier.get()).thenThrow(new RuntimeException("[401] Unauthorized"));
+
+        // Execute and verify exception is thrown after max retries
+        RuntimeException thrown = org.junit.jupiter.api.Assertions.assertThrows(
+            RuntimeException.class,
+            () -> tokenRedis.executeWithRetry(supplier, difyServerClient)
+        );
+
+        // Verify
+        org.junit.jupiter.api.Assertions.assertTrue(thrown.getMessage().contains("[401] Unauthorized"));
+        verify(supplier, times(3)).get(); // MAX_RETRY_ATTEMPTS = 3
+        verify(difyServerClient, times(2)).login(); // Should attempt to refresh token 3 times
+    }
+
+    @Test
+    @DisplayName("Test addAuthorizationCookies with token in Redis")
+    void testAddAuthorizationCookiesWithTokenInRedis() {
+        // Setup
+        org.springframework.util.MultiValueMap<String, String> cookies = mock(org.springframework.util.MultiValueMap.class);
+
+        when(valueOperations.get(DifyRedisKey.ACCESS_TOKEN)).thenReturn("redis-access-token");
+        when(valueOperations.get(DifyRedisKey.CSRF_TOKEN)).thenReturn("redis-csrf-token");
+
+        // Execute
+        tokenRedis.addAuthorizationCookies(cookies, difyServerClient);
+
+        // Verify
+        verify(valueOperations).get(DifyRedisKey.ACCESS_TOKEN);
+        verify(valueOperations).get(DifyRedisKey.CSRF_TOKEN);
+        verify(difyServerClient, never()).login();
+        verify(cookies).add("access_token", "redis-access-token");
+        verify(cookies).add("csrf_token", "redis-csrf-token");
+    }
+
+    @Test
+    @DisplayName("Test addAuthorizationCookies without token in Redis")
+    void testAddAuthorizationCookiesWithoutTokenInRedis() {
+        // Setup
+        org.springframework.util.MultiValueMap<String, String> cookies = mock(org.springframework.util.MultiValueMap.class);
+
+        when(valueOperations.get(DifyRedisKey.ACCESS_TOKEN)).thenReturn(null);
+        when(valueOperations.get(DifyRedisKey.CSRF_TOKEN)).thenReturn(null);
+
+        LoginResponse loginResponse = new LoginResponse();
+        loginResponse.setAccessToken("new-access-token");
+        loginResponse.setRefreshToken("new-refresh-token");
+        loginResponse.setCsrfToken("new-csrf-token");
+        when(difyServerClient.login()).thenReturn(loginResponse);
+
+        // Execute
+        tokenRedis.addAuthorizationCookies(cookies, difyServerClient);
+
+        // Verify
+        verify(valueOperations).get(DifyRedisKey.ACCESS_TOKEN);
+        verify(valueOperations).get(DifyRedisKey.CSRF_TOKEN);
+        verify(difyServerClient).login();
+        verify(valueOperations).set(eq(DifyRedisKey.ACCESS_TOKEN), eq("new-access-token"));
+        verify(redisTemplate).expire(eq(DifyRedisKey.ACCESS_TOKEN), anyLong(), eq(TimeUnit.MINUTES));
+        verify(valueOperations).set(eq(DifyRedisKey.REFRESH_TOKEN), eq("new-refresh-token"));
+        verify(valueOperations).set(eq(DifyRedisKey.CSRF_TOKEN), eq("new-csrf-token"));
+        verify(cookies).add("access_token", "new-access-token");
+        verify(cookies).add("csrf_token", null);
     }
 }

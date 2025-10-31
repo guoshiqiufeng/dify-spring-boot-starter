@@ -3,6 +3,11 @@ coverage:
     project:
       default:
         threshold: 20%
+
+    patch:
+      target: 80%                 # 可选：期望值，低于它会标黄
+      threshold: 5%               # 可选：允许比目标低 5%
+      informational: true         # 👈 关键：只做提示，不报错！
 component_management:
   individual_components:
     - component_id: "springboot2"
