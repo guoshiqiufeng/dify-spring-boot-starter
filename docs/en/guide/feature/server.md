@@ -532,9 +532,7 @@ public void testGetDailyEndUsers() {
 }
 ```
 
-## 6. Average Session Interactions Statistics
-
-### 6.1 Get Application Average Session Interactions Statistics
+### 4.3 Get Application Average Session Interactions Statistics
 
 #### Method
 
@@ -584,9 +582,7 @@ public void testGetAverageSessionInteractions() {
 }
 ```
 
-## 7. Tokens Per Second Statistics
-
-### 7.1 Get Application Tokens Per Second Statistics
+### 4.4 Get Application Tokens Per Second Statistics
 
 #### Method
 
@@ -636,9 +632,7 @@ public void testGetTokensPerSecond() {
 }
 ```
 
-## 8. User Satisfaction Rate Statistics
-
-### 8.1 Get Application User Satisfaction Rate Statistics
+### 4.5 Get Application User Satisfaction Rate Statistics
 
 #### Method
 
@@ -688,9 +682,7 @@ public void testGetUserSatisfactionRate() {
 }
 ```
 
-## 9. Token Costs Statistics
-
-### 9.1 Get Application Token Costs Statistics
+### 4.6 Get Application Token Costs Statistics
 
 #### Method
 
@@ -744,9 +736,7 @@ public void testGetTokenCosts() {
 }
 ```
 
-## 10. Daily Messages Statistics
-
-### 10.1 Get Application Daily Messages Statistics
+### 4.7 Get Application Daily Messages Statistics
 
 #### Method
 
