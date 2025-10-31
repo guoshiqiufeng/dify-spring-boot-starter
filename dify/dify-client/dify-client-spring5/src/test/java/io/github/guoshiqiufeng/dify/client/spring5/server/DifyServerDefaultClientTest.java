@@ -640,6 +640,22 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
 
+        // Mock the UriBuilder for queryParam functionality
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("start"), eq("2025-10-23 00:00"))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("end"), eq("2025-10-30 23:59"))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build(eq(appId))).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
+
         // Create mock daily conversation data
         DailyConversationsResponse dailyStat = new DailyConversationsResponse();
         dailyStat.setDate("2025-09-02");
@@ -674,6 +690,22 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
         java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        // Mock the UriBuilder for queryParam functionality
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("start"), eq("2025-10-23 00:00"))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("end"), eq("2025-10-30 23:59"))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build(eq(appId))).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
 
         // Create mock daily end users data
         DailyEndUsersResponse dailyStat = new DailyEndUsersResponse();
@@ -711,6 +743,22 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
 
+        // Mock the UriBuilder for queryParam functionality
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("start"), eq("2025-10-23 00:00"))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("end"), eq("2025-10-30 23:59"))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build(eq(appId))).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
+
         // Create mock average session interactions data
         AverageSessionInteractionsResponse dailyStat = new AverageSessionInteractionsResponse();
         dailyStat.setDate("2025-09-02");
@@ -746,6 +794,22 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
         java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        // Mock the UriBuilder for queryParam functionality
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("start"), eq("2025-10-23 00:00"))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("end"), eq("2025-10-30 23:59"))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build(eq(appId))).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
 
         // Create mock tokens per second data
         TokensPerSecondResponse dailyStat = new TokensPerSecondResponse();
@@ -783,6 +847,22 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
 
+        // Mock the UriBuilder for queryParam functionality
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("start"), eq("2025-10-23 00:00"))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("end"), eq("2025-10-30 23:59"))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build(eq(appId))).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
+
         // Create mock user satisfaction rate data
         UserSatisfactionRateResponse dailyStat = new UserSatisfactionRateResponse();
         dailyStat.setDate("2025-09-02");
@@ -818,6 +898,22 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
         java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        // Mock the UriBuilder for queryParam functionality
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("start"), eq("2025-10-23 00:00"))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("end"), eq("2025-10-30 23:59"))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build(eq(appId))).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
 
         // Create mock token costs data
         TokenCostsResponse dailyStat = new TokenCostsResponse();
@@ -858,6 +954,22 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
         java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        // Mock the UriBuilder for queryParam functionality
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("start"), eq("2025-10-23 00:00"))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("end"), eq("2025-10-30 23:59"))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build(eq(appId))).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
 
         // Create mock daily messages data
         DailyMessagesResponse dailyStat = new DailyMessagesResponse();
