@@ -1509,4 +1509,28 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
             fail("Failed to test extractTokenValue method: " + e.getMessage());
         }
     }
+
+    @Test
+    @DisplayName("Test deleteAppApiKey method")
+    public void testDeleteAppApiKey() {
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+
+        // Prepare test data
+        String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
+        String apiKeyId = "780b00d8-4d3d-4d39-8fb4-a641a992976f";
+
+        // Set up the response mock to return void (for delete operation)
+        when(responseSpec.body(Void.class)).thenReturn(null);
+
+        // Execute the method
+        client.deleteAppApiKey(appId, apiKeyId);
+
+        // Verify RestClient interactions
+        verify(restClient).delete();
+        verify(requestHeadersUriSpec).uri(eq(ServerUriConstant.APP_API_KEYS + "/{apiKeyId}"), eq(appId), eq(apiKeyId));
+        verify(requestHeadersSpec).headers(any());
+        verify(responseSpec).body(Void.class);
+    }
 }

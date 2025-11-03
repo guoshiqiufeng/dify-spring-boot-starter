@@ -259,6 +259,39 @@ public void testInitAppApiKey() {
 }
 ```
 
+### 1.6 Delete Application API Key
+
+#### Method
+
+```java
+void deleteAppApiKey(String appId, String apiKeyId);
+```
+
+#### Request Parameters
+
+| Parameter name | Type   | Required | Description      |
+|----------------|--------|----------|------------------|
+| appId          | String | Yes      | Application ID   |
+| apiKeyId       | String | Yes      | API Key ID       |
+
+#### Response Parameters
+
+This method does not return a value. It returns 204 No Content on success.
+
+#### Request Example
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testDeleteAppApiKey() {
+    // Delete API key for specified application
+    difyServer.deleteAppApiKey("app-123456789", "key-789012345");
+}
+```
+
 ## 2. Knowledge Base Management
 
 ### 2.1 Get Knowledge Base API Keys

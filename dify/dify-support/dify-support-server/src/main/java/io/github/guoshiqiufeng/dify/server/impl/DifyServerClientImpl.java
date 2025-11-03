@@ -66,6 +66,11 @@ public class DifyServerClientImpl implements DifyServer {
     }
 
     @Override
+    public void deleteAppApiKey(String appId, String apiKeyId) {
+        difyServerClient.deleteAppApiKey(appId, apiKeyId);
+    }
+
+    @Override
     public List<DatasetApiKeyResponse> getDatasetApiKey() {
         return difyServerClient.getDatasetApiKey();
     }

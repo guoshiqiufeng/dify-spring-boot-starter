@@ -79,6 +79,14 @@ public interface DifyServerClient {
     List<ApiKeyResponse> initAppApiKey(String appId);
 
     /**
+     * Deletes an API key for a specific application
+     *
+     * @param appId The ID of the application to delete API key for
+     * @param apiKeyId The ID of the API key to delete
+     */
+    void deleteAppApiKey(String appId, String apiKeyId);
+
+    /**
      * Retrieves existing API keys for datasets
      *
      * @return List of dataset API key responses
