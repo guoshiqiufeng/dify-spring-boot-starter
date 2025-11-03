@@ -1575,4 +1575,23 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(requestHeadersSpecMock).headers(any());
         verify(responseSpecMock).bodyToMono(eq(Void.class));
     }
+
+    @Test
+    @DisplayName("Test deleteDatasetApiKey method")
+    public void testDeleteDatasetApiKey() {
+        // Prepare test data
+        String apiKeyId = "780b00d8-4d3d-4d39-8fb4-a641a992976f";
+
+        // Set up the response mock to return void (for delete operation)
+        when(responseSpecMock.bodyToMono(eq(Void.class))).thenReturn(Mono.empty());
+
+        // Execute the method
+        client.deleteDatasetApiKey(apiKeyId);
+
+        // Verify WebClient interactions
+        verify(webClientMock).delete();
+        verify(requestHeadersUriSpecMock).uri(eq(ServerUriConstant.DATASET_API_KEYS), eq(apiKeyId));
+        verify(requestHeadersSpecMock).headers(any());
+        verify(responseSpecMock).bodyToMono(eq(Void.class));
+    }
 }

@@ -38,6 +38,12 @@
 - **单元测试**：在对应 test 目录下实现完整测试用例
     - 覆盖正常流程与异常场景
     - 使用 Mock 框架验证交互逻辑
+  ```
+  dify-support/dify-support-server/src/test/java/io/github/guoshiqiufeng/dify/server/impl/DifyServerClientImplTest.java
+  dify-support/dify-support-server/src/test/java/io/github/guoshiqiufeng/dify/server/client/DifyServerClientTest.java
+  dify-client/dify-client-spring6/src/test/java/io/github/guoshiqiufeng/dify/client/spring5/server/DifyServerDefaultClientTest.java
+  dify-client/dify-client-spring6/src/test/java/io/github/guoshiqiufeng/dify/client/spring6/server/DifyServerDefaultClientTest.java
+  ```
 - **集成测试**：
   ```
   dify-spring-boot-starter/src/test/java/io/github/guoshiqiufeng/dify/boot/ServerTest.java
@@ -66,6 +72,8 @@
 完成以上步骤后，执行以下命令：
 ```bash
 ./gradlew licenseFormat  # 确保许可证格式正确
+```
+```bash
 ./gradlew test           # 验证所有测试通过
 ```
 

@@ -352,6 +352,38 @@ public void testInitDatasetApiKey() {
 }
 ```
 
+### 2.3 Delete Knowledge Base API Key
+
+#### Method
+
+```java
+void deleteDatasetApiKey(String apiKeyId);
+```
+
+#### Request Parameters
+
+| Parameter name | Type   | Required | Description      |
+|----------------|--------|----------|------------------|
+| apiKeyId       | String | Yes      | API Key ID       |
+
+#### Response Parameters
+
+This method does not return a value. It returns 204 No Content on success.
+
+#### Request Example
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testDeleteDatasetApiKey() {
+    // Delete specified knowledge base API key
+    difyServer.deleteDatasetApiKey("89f04b59-6906-4d32-a630-d2911d3b5fd8");
+}
+```
+
 ## 3. Chat Conversation Management
 
 ### 3.1 Get Application Chat Conversation List
