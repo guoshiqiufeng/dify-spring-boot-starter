@@ -82,6 +82,15 @@ public interface DifyServer {
     List<ApiKeyResponse> initAppApiKey(String appId);
 
     /**
+     * 删除指定应用的API Key
+     *
+     * @param appId 应用的唯一标识符，不能为空
+     * @param apiKeyId API Key的唯一标识符，不能为空
+     * @throws NullPointerException 如果 appId 或 apiKeyId 为 null
+     */
+    void deleteAppApiKey(String appId, String apiKeyId);
+
+    /**
      * 获取知识库的API Key列表
      * 用于访问Dify平台上的知识库资源
      *

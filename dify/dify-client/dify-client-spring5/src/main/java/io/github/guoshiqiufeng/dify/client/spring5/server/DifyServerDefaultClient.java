@@ -151,6 +151,20 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
     }
 
     @Override
+    public void deleteAppApiKey(String appId, String apiKeyId) {
+        executeWithRetry(
+                () -> webClient.delete()
+                        .uri(ServerUriConstant.APP_API_KEYS + "/{apiKeyId}", appId, apiKeyId)
+                        .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
+                        .retrieve()
+                        .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                        .bodyToMono(Void.class)
+                        .block()
+        );
+    }
+
+    @Override
     public List<DatasetApiKeyResponse> getDatasetApiKey() {
         DatasetApiKeyResult result = executeWithRetry(
                 () -> webClient.get()

@@ -257,6 +257,39 @@ public void testInitAppApiKey() {
 }
 ```
 
+### 1.6 删除应用API密钥
+
+#### 方法
+
+```java
+void deleteAppApiKey(String appId, String apiKeyId);
+```
+
+#### 请求参数
+
+| 参数名     | 类型     | 是否必须 | 描述      |
+|---------|--------|------|---------|
+| appId   | String | 是    | 应用 ID   |
+| apiKeyId | String | 是    | API密钥ID |
+
+#### 响应参数
+
+该方法不返回值，成功时返回204 No Content。
+
+#### 请求示例
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testDeleteAppApiKey() {
+    // 删除指定应用的API密钥
+    difyServer.deleteAppApiKey("app-123456789", "key-789012345");
+}
+```
+
 ## 2. 知识库管理
 
 ### 2.1 获取知识库API密钥

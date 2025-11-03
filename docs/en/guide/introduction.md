@@ -119,6 +119,7 @@ Legend:
 | Get Application Information                       | ✅      |
 | Get Application API Keys                          | ✅      |
 | Initialize Application API Key                    | ✅      |
+| Delete Application API Key                        | ✅      |
 | Get Knowledge Base API Keys                       | ✅      |
 | Initialize Knowledge Base API Key                 | ✅      |
 | Get Application Chat Conversation List            | ✅      |

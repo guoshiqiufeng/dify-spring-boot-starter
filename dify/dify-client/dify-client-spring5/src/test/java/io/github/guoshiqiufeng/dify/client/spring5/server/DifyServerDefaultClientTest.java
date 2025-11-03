@@ -1555,4 +1555,24 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
             fail("Failed to test extractTokenValue method: " + e.getMessage());
         }
     }
+
+    @Test
+    @DisplayName("Test deleteAppApiKey method")
+    public void testDeleteAppApiKey() {
+        // Prepare test data
+        String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
+        String apiKeyId = "780b00d8-4d3d-4d39-8fb4-a641a992976f";
+
+        // Set up the response mock to return void (for delete operation)
+        when(responseSpecMock.bodyToMono(eq(Void.class))).thenReturn(Mono.empty());
+
+        // Execute the method
+        client.deleteAppApiKey(appId, apiKeyId);
+
+        // Verify WebClient interactions
+        verify(webClientMock).delete();
+        verify(requestHeadersUriSpecMock).uri(eq(ServerUriConstant.APP_API_KEYS + "/{apiKeyId}"), eq(appId), eq(apiKeyId));
+        verify(requestHeadersSpecMock).headers(any());
+        verify(responseSpecMock).bodyToMono(eq(Void.class));
+    }
 }
