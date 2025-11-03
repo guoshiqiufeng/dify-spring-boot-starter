@@ -487,4 +487,16 @@ class DifyServerClientImplTest {
         assertEquals(expectedStats.get(0).getMessageCount(), actualStats.get(0).getMessageCount());
         verify(difyServerClient, times(1)).dailyMessages(appId, start, end);
     }
+
+    @Test
+    void testDeleteAppApiKey() {
+        // Arrange
+        String apiKeyId = "89f04b59-6906-4d32-a630-d2911d3b5fd8";
+        String appId = "app-123";
+        // Act
+        difyServerClientImpl.deleteAppApiKey(apiKeyId, appId);
+
+        // Assert
+        verify(difyServerClient, times(1)).deleteAppApiKey(apiKeyId, appId);
+    }
 }
