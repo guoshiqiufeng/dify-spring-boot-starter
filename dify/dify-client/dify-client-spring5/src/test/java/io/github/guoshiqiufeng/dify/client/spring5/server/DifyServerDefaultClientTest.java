@@ -30,7 +30,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
 
@@ -39,6 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -1227,6 +1231,39 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         expectedResponse.setId("app-123");
         expectedResponse.setName("Test App");
         expectedResponse.setMode("completion");
+
+        // Fix for headers(Consumer) method - execute the consumer function
+        doAnswer(invocation -> {
+            Consumer<HttpHeaders> consumer = invocation.getArgument(0);
+            HttpHeaders headers = new HttpHeaders();
+            consumer.accept(headers);
+            return requestHeadersSpecMock;
+        }).when(requestHeadersSpecMock).headers(any(Consumer.class));
+
+        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
+
+        // Fix for cookies(Consumer) method - execute the consumer function
+        doAnswer(invocation -> {
+            Consumer<MultiValueMap<String, String>> consumer = invocation.getArgument(0);
+            // Create an empty map to pass to the consumer, simulating the cookies map
+            MultiValueMap<String, String> cookiesMap = new LinkedMultiValueMap<>();
+            consumer.accept(cookiesMap);
+            return requestHeadersSpecMock;
+        }).when(requestHeadersSpecMock).cookies(any(Consumer.class));
+
+        // Mock the login response
+        LoginResultResponse mockLoginResult = new LoginResultResponse();
+        mockLoginResult.setResult(DifyResult.SUCCESS);
+        LoginResponse mockLoginData = new LoginResponse();
+        mockLoginData.setAccessToken("test-access-token");
+        mockLoginData.setRefreshToken("test-refresh-token");
+        mockLoginResult.setData(mockLoginData);
+
+        // Create a ResponseEntity with the mock result
+        ResponseEntity<LoginResultResponse> responseEntity = ResponseEntity.ok(mockLoginResult);
+
+        // Mock the toEntity method to return the response entity
+        when(responseSpecMock.toEntity(LoginResultResponse.class)).thenReturn(Mono.just(responseEntity));
 
         // Set up the response mock to return our expected response
         when(responseSpecMock.bodyToMono(AppsResponse.class)).thenReturn(Mono.just(expectedResponse));
