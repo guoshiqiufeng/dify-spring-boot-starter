@@ -277,4 +277,16 @@ class DifyServerClientTest {
         assertEquals(expectedConversations.getData().get(1).getName(), actualConversations.getData().get(1).getName());
         verify(difyServerClient, times(1)).chatConversations(request);
     }
+
+    @Test
+    void testDeleteDatasetApiKey() {
+        // Arrange
+        String apiKeyId = "89f04b59-6906-4d32-a630-d2911d3b5fd8";
+
+        // Act
+        difyServerClient.deleteDatasetApiKey(apiKeyId);
+
+        // Assert
+        verify(difyServerClient, times(1)).deleteDatasetApiKey(apiKeyId);
+    }
 }

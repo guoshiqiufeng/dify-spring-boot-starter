@@ -122,6 +122,7 @@ Legend:
 | Delete Application API Key                        | ✅      |
 | Get Knowledge Base API Keys                       | ✅      |
 | Initialize Knowledge Base API Key                 | ✅      |
+| Delete Knowledge Base API Key                     | ✅      |
 | Get Application Chat Conversation List            | ✅      |
 | Get Application Daily Conversation Statistics     | ✅      |
 | Get Application Daily End Users Statistics        | ✅      |

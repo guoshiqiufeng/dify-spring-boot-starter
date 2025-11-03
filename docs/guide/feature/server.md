@@ -350,6 +350,38 @@ public void testInitDatasetApiKey() {
 }
 ```
 
+### 2.3 删除知识库API密钥
+
+#### 方法
+
+```java
+void deleteDatasetApiKey(String apiKeyId);
+```
+
+#### 请求参数
+
+| 参数名     | 类型     | 是否必须 | 描述      |
+|---------|--------|------|---------|
+| apiKeyId | String | 是    | API密钥ID |
+
+#### 响应参数
+
+该方法不返回值，成功时返回204 No Content。
+
+#### 请求示例
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testDeleteDatasetApiKey() {
+    // 删除指定的知识库API密钥
+    difyServer.deleteDatasetApiKey("89f04b59-6906-4d32-a630-d2911d3b5fd8");
+}
+```
+
 ## 3. 聊天会话管理
 
 ### 3.1 获取应用的聊天会话列表

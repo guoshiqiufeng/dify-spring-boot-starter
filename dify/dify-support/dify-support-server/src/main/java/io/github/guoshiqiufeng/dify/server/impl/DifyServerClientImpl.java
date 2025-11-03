@@ -81,6 +81,11 @@ public class DifyServerClientImpl implements DifyServer {
     }
 
     @Override
+    public void deleteDatasetApiKey(String apiKeyId) {
+        difyServerClient.deleteDatasetApiKey(apiKeyId);
+    }
+
+    @Override
     public DifyPageResult<ChatConversationResponse> chatConversations(ChatConversationsRequest request) {
         return difyServerClient.chatConversations(request);
     }

@@ -101,6 +101,13 @@ public interface DifyServerClient {
     List<DatasetApiKeyResponse> initDatasetApiKey();
 
     /**
+     * Deletes a dataset API key
+     *
+     * @param apiKeyId The ID of the dataset API key to delete
+     */
+    void deleteDatasetApiKey(String apiKeyId);
+
+    /**
      * Authenticates with the Dify server and returns login credentials
      *
      * @return Login response containing access token and refresh token

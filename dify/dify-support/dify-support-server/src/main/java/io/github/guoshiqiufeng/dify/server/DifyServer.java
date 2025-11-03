@@ -109,6 +109,14 @@ public interface DifyServer {
     List<DatasetApiKeyResponse> initDatasetApiKey();
 
     /**
+     * 删除指定知识库的API Key
+     *
+     * @param apiKeyId API Key的唯一标识符，不能为空
+     * @throws NullPointerException 如果 apiKeyId 为 null
+     */
+    void deleteDatasetApiKey(String apiKeyId);
+
+    /**
      * 获取应用的聊天会话列表
      *
      * @param request 聊天会话查询请求，包含分页参数和过滤条件

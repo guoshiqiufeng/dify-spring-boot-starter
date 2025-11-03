@@ -185,6 +185,19 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
     }
 
     @Override
+    public void deleteDatasetApiKey(String apiKeyId) {
+        executeWithRetry(
+                () -> restClient.delete()
+                        .uri(ServerUriConstant.DATASET_API_KEYS, apiKeyId)
+                        .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
+                        .retrieve()
+                        .onStatus(responseErrorHandler)
+                        .body(Void.class)
+        );
+    }
+
+    @Override
     public DifyPageResult<ChatConversationResponse> chatConversations(ChatConversationsRequest request) {
         return executeWithRetry(
                 () -> restClient.get()
