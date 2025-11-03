@@ -19,6 +19,7 @@ import io.github.guoshiqiufeng.dify.client.spring6.BaseClientTest;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
+import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
 import io.github.guoshiqiufeng.dify.server.constant.ServerUriConstant;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
@@ -58,7 +59,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
     private static final String BASE_URL = "https://api.dify.ai";
 
     private DifyServerDefaultClient client;
-    private io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken difyServerTokenMock;
+    private BaseDifyServerToken difyServerTokenMock;
 
     private RestClient restClient;
     private RestClient.RequestBodySpec requestBodySpec;
@@ -71,8 +72,8 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
     @BeforeEach
     public void setup() {
         super.setup();
-        difyServerTokenMock = mock(io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken.class);
-        client = new DifyServerDefaultClient(new DifyProperties.Server(), difyServerTokenMock,
+        difyServerTokenMock = mock(DifyServerTokenDefault.class);
+        client = new DifyServerDefaultClient(new DifyProperties.Server(), new DifyServerTokenDefault(),
                 BASE_URL, new DifyProperties.ClientConfig(), restClientMock.getRestClientBuilder(), webClientMock.getWebClientBuilder());
         restClient = restClientMock.getRestClient();
         requestBodySpec = restClientMock.getRequestBodySpec();

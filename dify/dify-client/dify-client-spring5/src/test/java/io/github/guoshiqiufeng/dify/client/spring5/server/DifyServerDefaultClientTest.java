@@ -19,6 +19,7 @@ import io.github.guoshiqiufeng.dify.client.spring5.BaseClientTest;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
+import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
 import io.github.guoshiqiufeng.dify.server.constant.ServerUriConstant;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
@@ -55,11 +56,12 @@ import static org.mockito.Mockito.*;
 public class DifyServerDefaultClientTest extends BaseClientTest {
 
     private DifyServerDefaultClient client;
-    private io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken difyServerTokenMock;
+    private BaseDifyServerToken difyServerTokenMock;
 
     @BeforeEach
     public void setup() {
         super.setup();
+        difyServerTokenMock = mock(DifyServerTokenDefault.class);
         // Create real client with mocked WebClient
         DifyProperties.ClientConfig clientConfig = new DifyProperties.ClientConfig();
         DifyProperties.Server serverConfig = new DifyProperties.Server();
