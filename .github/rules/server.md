@@ -1,0 +1,77 @@
+
+## Dify 服务器功能实现指南
+
+请按照以下结构化步骤实现 Dify 服务器功能，确保代码质量与项目规范：
+
+### 1. 接口定义
+- **核心接口**：在以下位置创建服务器接口
+  ```
+  dify-support/dify-support-server/src/main/java/io/github/guoshiqiufeng/dify/server/DifyServer.java
+  ```
+- **客户端接口**：在以下位置定义客户端接口
+  ```
+  dify-support/dify-support-server/src/main/java/io/github/guoshiqiufeng/dify/server/client/DifyServerClient.java
+  ```
+
+### 2. 接口实现
+- **服务端实现**：在以下位置实现核心功能
+  ```
+  dify-support/dify-support-server/src/main/java/io/github/guoshiqiufeng/dify/server/impl/DifyServerClientImpl.java
+  ```
+    - 遵循 Alibaba Java 代码规范
+    - 确保实现完整的异常处理机制
+    - 添加必要的 JavaDoc 注释 
+
+### 3. 客户端适配层
+- **Spring 5 适配**：
+  ```
+  dify-client/dify-client-spring5/src/main/java/io/github/guoshiqiufeng/dify/client/spring5/server/DifyServerDefaultClient.java
+  ```
+- **Spring 6 适配**：
+  ```
+  dify-client/dify-client-spring6/src/main/java/io/github/guoshiqiufeng/dify/client/spring6/server/DifyServerDefaultClient.java
+  ```
+    - 确保与 Spring 框架版本兼容
+    - 实现自动配置支持
+
+### 4. 测试验证
+- **单元测试**：在对应 test 目录下实现完整测试用例
+    - 覆盖正常流程与异常场景
+    - 使用 Mock 框架验证交互逻辑
+- **集成测试**：
+  ```
+  dify-spring-boot-starter/src/test/java/io/github/guoshiqiufeng/dify/boot/ServerTest.java
+  dify-spring-boot2-starter/src/test/java/io/github/guoshiqiufeng/dify/boot/ServerTest.java
+  ```
+    - 验证 Starter 自动配置功能
+    - 测试实际调用场景
+
+### 5. 文档编写
+- **功能文档**：
+  ```
+  docs/guide/feature/server.md (中文)
+  docs/en/guide/feature/server.md (英文)
+  ```
+    - 包含功能介绍、使用示例、配置说明
+    - 添加代码片段和流程图
+- **项目声明**：
+  ```
+  docs/guide/introduction.md (中文)
+  docs/en/guide/introduction.md (英文)
+  ```
+    - 在"已实现功能"部分添加新功能说明
+    - 保持与其他功能描述风格一致
+
+### 6. 最终验证
+完成以上步骤后，执行以下命令：
+```bash
+./gradlew licenseFormat  # 确保许可证格式正确
+./gradlew test           # 验证所有测试通过
+```
+
+### 注意事项
+1. 所有实现必须严格遵循 Alibaba Java 代码规范
+2. 保持中英文文档内容同步更新
+3. 测试覆盖率不得低于 80%
+4. 确保向后兼容性，避免破坏现有功能
+5. 代码提交前需进行本地完整测试
