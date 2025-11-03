@@ -38,14 +38,11 @@
 ### 4. 数据模型
 - **请求模型**：定义工作流相关的请求数据结构
   ```
-  dify-support/dify-support-server/src/main/java/io/github/guoshiqiufeng/dify/server/dto/request/WorkflowRequest.java
-  dify-support/dify-support-server/src/main/java/io/github/guoshiqiufeng/dify/server/dto/request/WorkflowExecuteRequest.java
+  dify-support/dify-support-server/src/main/java/io/github/guoshiqiufeng/dify/server/dto/request
   ```
 - **响应模型**：定义工作流相关的响应数据结构
   ```
-  dify-support/dify-support-server/src/main/java/io/github/guoshiqiufeng/dify/server/dto/response/WorkflowResponse.java
-  dify-support/dify-support-server/src/main/java/io/github/guoshiqiufeng/dify/server/dto/response/WorkflowExecuteResponse.java
-  dify-support/dify-support-server/src/main/java/io/github/guoshiqiufeng/dify/server/dto/response/WorkflowStatusResponse.java
+  dify-support/dify-support-server/src/main/java/io/github/guoshiqiufeng/dify/server/dto/response
   ```
 
 ### 5. 测试验证
@@ -83,6 +80,8 @@
 完成以上步骤后，执行以下命令：
 ```bash
 ./gradlew licenseFormat  # 确保许可证格式正确
+```
+```bash
 ./gradlew test           # 验证所有测试通过
 ```
 
