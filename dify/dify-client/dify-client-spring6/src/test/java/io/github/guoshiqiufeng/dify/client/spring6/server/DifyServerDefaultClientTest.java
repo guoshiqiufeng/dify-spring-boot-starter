@@ -58,6 +58,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
     private static final String BASE_URL = "https://api.dify.ai";
 
     private DifyServerDefaultClient client;
+    private io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken difyServerTokenMock;
 
     private RestClient restClient;
     private RestClient.RequestBodySpec requestBodySpec;
@@ -70,7 +71,8 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
     @BeforeEach
     public void setup() {
         super.setup();
-        client = new DifyServerDefaultClient(new DifyProperties.Server(), new DifyServerTokenDefault(),
+        difyServerTokenMock = mock(io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken.class);
+        client = new DifyServerDefaultClient(new DifyProperties.Server(), difyServerTokenMock,
                 BASE_URL, new DifyProperties.ClientConfig(), restClientMock.getRestClientBuilder(), webClientMock.getWebClientBuilder());
         restClient = restClientMock.getRestClient();
         requestBodySpec = restClientMock.getRequestBodySpec();
@@ -106,7 +108,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         DifyProperties.Server serverProperties = new DifyProperties.Server();
         serverProperties.setEmail("test@example.com");
         serverProperties.setPassword("password123");
-        client = new DifyServerDefaultClient(serverProperties, new DifyServerTokenDefault(),
+        client = new DifyServerDefaultClient(serverProperties, difyServerTokenMock,
                 BASE_URL, new DifyProperties.ClientConfig(), restClientMock.getRestClientBuilder(), webClientMock.getWebClientBuilder());
         // Call the method to test
         LoginResponse response = client.login();
@@ -454,6 +456,50 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(responseSpec).body(AppsResponseResult.class);
 
         client.apps("", "");
+    }
+
+    @Test
+    public void testAppsWithEmptyValues() {
+        // Prepare test data with empty values to test filtering
+        String mode = "";
+        String name = "";
+
+        // We need to mock the UriBuilder for the queryParam functionality
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+
+        when(requestHeadersUriSpec.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("page"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("limit"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("mode"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("name"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build()).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpec;
+        });
+
+        // Create expected response
+        AppsResponseResult resultResponseVO = new AppsResponseResult();
+        List<AppsResponse> appsPage1 = new ArrayList<>();
+        resultResponseVO.setData(appsPage1);
+        resultResponseVO.setHasMore(false);
+
+        // Set up the response mock to return our expected response
+        when(responseSpec.body(AppsResponseResult.class)).thenReturn(resultResponseVO);
+
+        // Execute the method
+        List<AppsResponse> actualResponse = client.apps(mode, name);
+
+        // Verify the result
+        assertNotNull(actualResponse);
+
+        // Verify WebClient interactions
+        verify(restClient).get();
+        verify(responseSpec).body(AppsResponseResult.class);
     }
 
     @Test
