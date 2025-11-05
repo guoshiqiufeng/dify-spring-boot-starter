@@ -146,3 +146,5 @@ DifyServer difyServer = DifyServerBuilder.create(
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=guoshiqiufeng/dify-spring-boot-starter&type=Date)](https://www.star-history.com/#guoshiqiufeng/dify-spring-boot-starter&Date)
+
+![Alt](https://repobeats.axiom.co/api/embed/55a4a85285edbb431a80f6261b7aa1c0a8dc3612.svg "Repobeats analytics image")
