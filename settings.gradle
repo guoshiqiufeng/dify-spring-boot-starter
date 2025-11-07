@@ -15,6 +15,9 @@ buildscript {
     }
 }
 
+// 启用类型安全的项目访问器功能
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 rootProject.name = 'root'
 
 include 'dify'

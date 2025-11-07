@@ -5,8 +5,6 @@ allprojects {
     version APP_VERSION
 }
 
-apply from: 'ext.gradle'
-
 description = "Provide springboot starter for dify to simplify development."
 
 subprojects {
@@ -15,15 +13,16 @@ subprojects {
     apply plugin: 'signing'
     apply plugin: 'maven-publish'
     apply plugin: 'tech.yanand.maven-central-publish'
-    apply plugin: "io.freefair.lombok"
+    apply plugin: 'io.freefair.lombok'
     apply plugin: 'com.github.hierynomus.license'
-    apply plugin: "io.spring.dependency-management"
+    apply plugin: 'io.spring.dependency-management'
 
-    sourceCompatibility = "${javaVersion}"
-    targetCompatibility = "${javaVersion}"
+    // 使用 Java 8 以保持向后兼容性
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 
     lombok {
-        version = "1.18.30"
+        version = libs.versions.lombok.get()
     }
 
     compileJava {
@@ -45,11 +44,11 @@ subprojects {
         dependencyManagement {
             imports {
                 if (project.name.contains("spring5") || project.name.contains("core") || project.name.contains("support") || project.name.contains("spring-boot2-starter")) {
-                    mavenBom "org.springframework.boot:spring-boot-dependencies:${springBoot2Version}"
+                    mavenBom "org.springframework.boot:spring-boot-dependencies:${libs.versions.springBoot2.get()}"
                 } else if (project.name.contains("spring-boot-starter") || project.name.contains("spring6")) {
-                    mavenBom "org.springframework.boot:spring-boot-dependencies:${springBoot3Version}"
+                    mavenBom "org.springframework.boot:spring-boot-dependencies:${libs.versions.springBoot3.get()}"
                 }
-                mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
+                mavenBom "org.testcontainers:testcontainers-bom:${libs.versions.testcontainers.get()}"
             }
             dependencies {
 
@@ -148,7 +147,7 @@ subprojects {
     }
 
     jacoco {
-        toolVersion = "0.8.13"
+        toolVersion = libs.versions.jacoco.get()
     }
 
     task javadocJar(type: Jar) {
