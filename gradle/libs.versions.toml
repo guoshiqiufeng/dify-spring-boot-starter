@@ -1,0 +1,47 @@
+[versions]
+springBoot3 = "3.5.7"
+springBoot2 = "2.7.18"
+hutool = "5.8.41"
+testcontainers = "1.21.3"
+mockito = "5.20.0"
+bytebuddy = "1.17.8"
+lombok = "1.18.30"
+jacoco = "0.8.13"
+junit = "5.10.2"
+
+[libraries]
+# Hutool libraries
+hutool-core = { group = "cn.hutool", name = "hutool-core", version.ref = "hutool" }
+hutool-extra = { group = "cn.hutool", name = "hutool-extra", version.ref = "hutool" }
+hutool-json = { group = "cn.hutool", name = "hutool-json", version.ref = "hutool" }
+
+# Spring Boot dependencies
+spring-webflux = { group = "org.springframework", name = "spring-webflux" }
+spring-boot-starter-reactor-netty = { group = "org.springframework.boot", name = "spring-boot-starter-reactor-netty" }
+spring-boot-starter-data-redis = { group = "org.springframework.boot", name = "spring-boot-starter-data-redis" }
+spring-boot-autoconfigure = { group = "org.springframework.boot", name = "spring-boot-autoconfigure" }
+spring-boot-starter-test = { group = "org.springframework.boot", name = "spring-boot-starter-test" }
+
+# Core dependencies
+slf4j-api = { group = "org.slf4j", name = "slf4j-api" }
+jackson-annotations = { group = "com.fasterxml.jackson.core", name = "jackson-annotations" }
+jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-databind" }
+jackson-core = { group = "com.fasterxml.jackson.core", name = "jackson-core" }
+jackson-datatype-jsr310 = { group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310" }
+
+# Test dependencies
+junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit" }
+mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
+mockito-junit-jupiter = { group = "org.mockito", name = "mockito-junit-jupiter", version.ref = "mockito" }
+bytebuddy = { group = "net.bytebuddy", name = "byte-buddy", version.ref = "bytebuddy" }
+bytebuddy-agent = { group = "net.bytebuddy", name = "byte-buddy-agent", version.ref = "bytebuddy" }
+reactor-test = { group = "io.projectreactor", name = "reactor-test" }
+
+# TestContainers
+testcontainers-bom = { group = "org.testcontainers", name = "testcontainers-bom", version.ref = "testcontainers" }
+
+[plugins]
+lombok = { id = "io.freefair.lombok", version.ref = "lombok" }
+dependency-management = { id = "io.spring.dependency-management", version = "1.1.6" }
+maven-central-publish = { id = "tech.yanand.maven-central-publish", version = "1.3.0" }
+license = { id = "com.hierynomus.license", version = "0.16.1" }

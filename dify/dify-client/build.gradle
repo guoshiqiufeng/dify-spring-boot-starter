@@ -1,10 +1,10 @@
 subprojects {
     dependencies {
-        testImplementation "org.mockito:mockito-core:${mockitoVersion}"
-        testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
-        testImplementation "net.bytebuddy:byte-buddy:${bytebuddyVersion}"
-        testImplementation "net.bytebuddy:byte-buddy-agent:${bytebuddyVersion}"
-        testImplementation "io.projectreactor:reactor-test"
+        testImplementation libs.mockito.core
+        testImplementation libs.mockito.junit.jupiter
+        testImplementation libs.bytebuddy
+        testImplementation libs.bytebuddy.agent
+        testImplementation libs.reactor.test
     }
 }
 tasks.matching {

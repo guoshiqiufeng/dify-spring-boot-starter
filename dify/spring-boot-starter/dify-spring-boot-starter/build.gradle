@@ -6,16 +6,16 @@ dependencies {
     api project(":dify:dify-support:dify-support-server")
     api project(":dify:dify-support:dify-support-workflow")
 
-    implementation "org.springframework.boot:spring-boot-starter-data-redis"
+    implementation libs.spring.boot.starter.data.redis
 
     annotationProcessor "org.springframework.boot:spring-boot-starter-actuator"
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
-    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation libs.spring.boot.starter.test
     testImplementation "org.junit.platform:junit-platform-launcher"
-    testImplementation "org.junit.jupiter:junit-jupiter"
+    testImplementation libs.junit.jupiter
     testImplementation 'org.testcontainers:junit-jupiter'
-    testImplementation "io.projectreactor:reactor-test"
+    testImplementation libs.reactor.test
     testImplementation "org.apache.httpcomponents.client5:httpclient5"
-    testImplementation "${lib["hutool-json"]}"
+    testImplementation libs.hutool.json
 }
