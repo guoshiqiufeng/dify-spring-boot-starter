@@ -8,7 +8,7 @@ dependencies {
     implementation "org.springframework:spring-context"
 
     implementation libs.jackson.databind
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
+    implementation libs.jackson.datatype.jsr310
 
     testImplementation libs.junit.jupiter
     testImplementation 'org.springframework:spring-test'
