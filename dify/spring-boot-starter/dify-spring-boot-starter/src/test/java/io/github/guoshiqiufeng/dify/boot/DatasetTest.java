@@ -70,8 +70,8 @@ public class DatasetTest extends BaseDatasetContainerTest {
     public void testDatasetOperations() {
         // Test dataset creation
         DatasetCreateRequest createRequest = new DatasetCreateRequest();
-        createRequest.setName("api-test-dataset");
-        createRequest.setDescription("Test dataset for API testing");
+        createRequest.setName("api-test-dataset springboot");
+        createRequest.setDescription("Test dataset for API testing springboot");
 
         DatasetResponse response = difyDataset.create(createRequest);
         assertNotNull(response);
@@ -109,7 +109,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
 
         DocumentCreateByTextRequest request = new DocumentCreateByTextRequest();
         request.setDatasetId(datasetId);
-        request.setName("Text Document Test");
+        request.setName("Text Document Test springboot");
         request.setText("This is a test document content for API testing.");
         request.setDocType(DocTypeEnum.others);
 
@@ -217,7 +217,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
         DocumentUpdateByTextRequest request = new DocumentUpdateByTextRequest();
         request.setDatasetId(datasetId);
         request.setDocumentId(documentTextId);
-        request.setName("Updated Text Document");
+        request.setName("Updated Text Document springboot");
 
         ProcessRule processRule = new ProcessRule();
         processRule.setMode(ModeEnum.hierarchical);
