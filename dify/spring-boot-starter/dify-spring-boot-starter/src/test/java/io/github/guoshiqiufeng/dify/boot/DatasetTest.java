@@ -551,12 +551,12 @@ public class DatasetTest extends BaseDatasetContainerTest {
     @DisplayName("Test create tag")
     public void testTag() {
         TagCreateRequest tagCreateRequest = new TagCreateRequest();
-        tagCreateRequest.setName("test");
+        tagCreateRequest.setName("test springboot");
         TagInfoResponse tag = difyDataset.createTag(tagCreateRequest);
         assertNotNull(tag);
 
         TagUpdateRequest tagUpdateRequest = new TagUpdateRequest();
-        tagUpdateRequest.setName("test update");
+        tagUpdateRequest.setName("test update springboot");
         String tagId = tag.getId();
         tagUpdateRequest.setTagId(tagId);
         TagInfoResponse tagInfoResponse = difyDataset.updateTag(tagUpdateRequest);
