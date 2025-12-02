@@ -17,6 +17,7 @@ dependencyManagement {
         dependency "${APP_GROUP}:dify-core:${APP_VERSION}"
         dependency "${APP_GROUP}:dify-client-spring5:${APP_VERSION}"
         dependency "${APP_GROUP}:dify-client-spring6:${APP_VERSION}"
+        dependency "${APP_GROUP}:dify-client-spring7:${APP_VERSION}"
         dependency "${APP_GROUP}:dify-support-chat:${APP_VERSION}"
         dependency "${APP_GROUP}:dify-support-dataset:${APP_VERSION}"
         dependency "${APP_GROUP}:dify-support-server:${APP_VERSION}"
@@ -33,5 +34,11 @@ dependencyManagement {
         dependency "${APP_GROUP}:dify-spring-boot2-starter-dataset:${APP_VERSION}"
         dependency "${APP_GROUP}:dify-spring-boot2-starter-server:${APP_VERSION}"
         dependency "${APP_GROUP}:dify-spring-boot2-starter-workflow:${APP_VERSION}"
+        dependency "${APP_GROUP}:dify-spring-boot4-starter:${APP_VERSION}"
+        dependency "${APP_GROUP}:dify-spring-boot4-starter-autoconfigure:${APP_VERSION}"
+        dependency "${APP_GROUP}:dify-spring-boot4-starter-chat:${APP_VERSION}"
+        dependency "${APP_GROUP}:dify-spring-boot4-starter-dataset:${APP_VERSION}"
+        dependency "${APP_GROUP}:dify-spring-boot4-starter-server:${APP_VERSION}"
+        dependency "${APP_GROUP}:dify-spring-boot4-starter-workflow:${APP_VERSION}"
     }
 }

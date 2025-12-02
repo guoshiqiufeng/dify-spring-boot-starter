@@ -45,6 +45,8 @@ subprojects {
             imports {
                 if (project.name.contains("spring5") || project.name.contains("core") || project.name.contains("support") || project.name.contains("spring-boot2-starter")) {
                     mavenBom "org.springframework.boot:spring-boot-dependencies:${libs.versions.springBoot2.get()}"
+                } else if (project.name.contains("spring-boot4-starter") || project.name.contains("spring7")) {
+                    mavenBom "org.springframework.boot:spring-boot-dependencies:${libs.versions.springBoot4.get()}"
                 } else if (project.name.contains("spring-boot-starter") || project.name.contains("spring6")) {
                     mavenBom "org.springframework.boot:spring-boot-dependencies:${libs.versions.springBoot3.get()}"
                 }
