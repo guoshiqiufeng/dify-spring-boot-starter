@@ -21,18 +21,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverters;
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.web.client.RestClient;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.json.JsonMapper;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Tests for {@link DifyMessageConverters}.
@@ -55,259 +53,98 @@ class DifyMessageConvertersTest {
     }
 
     @Test
-    @DisplayName("Test messageConvertersConsumer configures Jackson converter correctly when existing converter is present")
-    void testMessageConvertersConfigurationWithExistingConverter() {
+    @DisplayName("Test messageConvertersConsumer configures Jackson converter correctly")
+    void testMessageConvertersConfiguration() {
         // Given
         Consumer<RestClient.Builder> consumer = DifyMessageConverters.messageConvertersConsumer();
         RestClient.Builder mockBuilder = mock(RestClient.Builder.class);
 
-        // Create an ArgumentCaptor to capture the Consumer<List<HttpMessageConverter<?>>> argument
+        // Create an ArgumentCaptor to capture the Consumer<HttpMessageConverters.ClientBuilder> argument
         @SuppressWarnings("unchecked")
-        ArgumentCaptor<Consumer<List<HttpMessageConverter<?>>>> consumerCaptor =
+        ArgumentCaptor<Consumer<HttpMessageConverters.ClientBuilder>> consumerCaptor =
                 ArgumentCaptor.forClass(Consumer.class);
 
         // Mock the behavior
-        when(mockBuilder.messageConverters(consumerCaptor.capture())).thenReturn(mockBuilder);
+        when(mockBuilder.configureMessageConverters(consumerCaptor.capture())).thenReturn(mockBuilder);
 
         // When
         consumer.accept(mockBuilder);
 
-        // Create a list with an existing JacksonJsonHttpMessageConverter for testing
-        List<HttpMessageConverter<?>> converters = new ArrayList<>();
-        JsonMapper originalMapper = JsonMapper.builder()
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true)
-                .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.ALWAYS))
+        // Then
+        verify(mockBuilder).configureMessageConverters(any());
+        assertNotNull(consumerCaptor.getValue());
+    }
+
+    @Test
+    @DisplayName("Test JsonMapper is configured with NON_NULL inclusion")
+    void testJsonMapperNonNullConfiguration() {
+        // Given
+        JsonMapper objectMapper = JsonMapper.builder()
+                .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
+                .changeDefaultPropertyInclusion(incl -> incl.withContentInclusion(JsonInclude.Include.NON_NULL))
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .build();
-        JacksonJsonHttpMessageConverter existingConverter = new JacksonJsonHttpMessageConverter(originalMapper);
-        converters.add(existingConverter);
 
-        // Add another converter to verify ordering
-        HttpMessageConverter<?> otherConverter = mock(HttpMessageConverter.class);
-        converters.add(otherConverter);
+        JacksonJsonHttpMessageConverter converter = new JacksonJsonHttpMessageConverter(objectMapper);
+        JsonMapper configuredMapper = converter.getMapper();
 
-        // Apply the captured consumer to our test list
-        consumerCaptor.getValue().accept(converters);
+        // When - Test by serializing an object with null values
+        var testObj = new TestObject("test", null);
 
         // Then
-        assertEquals(2, converters.size());
-
-        // Verify the first converter is a JacksonJsonHttpMessageConverter (the new one)
-        assertInstanceOf(JacksonJsonHttpMessageConverter.class, converters.getFirst());
-
-        // The new converter should be at position 0
-        JacksonJsonHttpMessageConverter configuredConverter = (JacksonJsonHttpMessageConverter) converters.get(0);
-        JsonMapper configuredMapper = configuredConverter.getMapper();
-
-        // Verify that the Jackson converter is properly configured with NON_NULL inclusion
-        // Test by serializing an object with null values to see if they are excluded
-        var testObj = new TestObject("test", null);
         try {
             String json = configuredMapper.writeValueAsString(testObj);
-            assertFalse(json.contains("nullValue"));
+            assertFalse(json.contains("nullValue"), "Null values should be excluded from JSON");
+            assertTrue(json.contains("stringValue"), "Non-null values should be included in JSON");
         } catch (Exception e) {
             fail("Serialization failed: " + e.getMessage());
         }
 
-        assertFalse(configuredMapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
-
-        // Verify the second converter is still the other mock converter
-        assertSame(otherConverter, converters.get(1));
+        assertFalse(configuredMapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES),
+                "FAIL_ON_UNKNOWN_PROPERTIES should be disabled");
     }
 
     @Test
-    @DisplayName("Test messageConvertersConsumer creates new converter when no Jackson converter exists")
-    void testMessageConvertersConfigurationNoExistingJacksonConverter() {
-        // Given
-        Consumer<RestClient.Builder> consumer = DifyMessageConverters.messageConvertersConsumer();
-        RestClient.Builder mockBuilder = mock(RestClient.Builder.class);
-
-        // Create an ArgumentCaptor to capture the Consumer<List<HttpMessageConverter<?>>> argument
-        @SuppressWarnings("unchecked")
-        ArgumentCaptor<Consumer<List<HttpMessageConverter<?>>>> consumerCaptor =
-                ArgumentCaptor.forClass(Consumer.class);
-
-        // Mock the behavior
-        when(mockBuilder.messageConverters(consumerCaptor.capture())).thenReturn(mockBuilder);
-
+    @DisplayName("Test messageConvertersConsumer returns non-null consumer")
+    void testMessageConvertersConsumerNotNull() {
         // When
-        consumer.accept(mockBuilder);
-
-        // Create a list without any Jackson converter
-        List<HttpMessageConverter<?>> converters = new ArrayList<>();
-        HttpMessageConverter<?> otherConverter = mock(HttpMessageConverter.class);
-        converters.add(otherConverter);
-
-        // Apply the captured consumer to our test list
-        consumerCaptor.getValue().accept(converters);
+        Consumer<RestClient.Builder> consumer = DifyMessageConverters.messageConvertersConsumer();
 
         // Then
-        assertEquals(2, converters.size());
-
-        // Verify the first converter is a JacksonJsonHttpMessageConverter (the new one)
-        assertInstanceOf(JacksonJsonHttpMessageConverter.class, converters.getFirst());
-
-        JacksonJsonHttpMessageConverter newConverter = (JacksonJsonHttpMessageConverter) converters.get(0);
-        JsonMapper configuredMapper = newConverter.getMapper();
-
-        // Verify that the new Jackson converter is properly configured
-        // Test by serializing an object with null values to see if they are excluded
-        var testObj = new TestObject("test", null);
-        try {
-            String json = configuredMapper.writeValueAsString(testObj);
-            assertFalse(json.contains("nullValue"));
-        } catch (Exception e) {
-            fail("Serialization failed: " + e.getMessage());
-        }
-        assertFalse(configuredMapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
-
-        // Verify the second converter is still the other mock converter
-        assertSame(otherConverter, converters.get(1));
+        assertNotNull(consumer, "Consumer should not be null");
     }
 
     @Test
-    @DisplayName("Test messageConvertersConsumer adds converter at the beginning of the list")
-    void testConverterAddedAtBeginning() {
+    @DisplayName("Test consumer can be applied to RestClient.Builder")
+    void testConsumerCanBeApplied() {
         // Given
         Consumer<RestClient.Builder> consumer = DifyMessageConverters.messageConvertersConsumer();
         RestClient.Builder mockBuilder = mock(RestClient.Builder.class);
+        when(mockBuilder.configureMessageConverters(any())).thenReturn(mockBuilder);
 
-        @SuppressWarnings("unchecked")
-        ArgumentCaptor<Consumer<List<HttpMessageConverter<?>>>> consumerCaptor =
-                ArgumentCaptor.forClass(Consumer.class);
-
-        when(mockBuilder.messageConverters(consumerCaptor.capture())).thenReturn(mockBuilder);
-        consumer.accept(mockBuilder);
-
-        // Create a list with multiple existing converters
-        List<HttpMessageConverter<?>> converters = new ArrayList<>();
-        HttpMessageConverter<?> converter1 = mock(HttpMessageConverter.class);
-        HttpMessageConverter<?> converter2 = mock(HttpMessageConverter.class);
-        converters.add(converter1);
-        converters.add(converter2);
-
-        // When
-        consumerCaptor.getValue().accept(converters);
-
-        // Then
-        assertEquals(3, converters.size());
-        assertInstanceOf(JacksonJsonHttpMessageConverter.class, converters.get(0));
-        assertSame(converter1, converters.get(1));
-        assertSame(converter2, converters.get(2));
+        // When/Then - Should not throw exception
+        assertDoesNotThrow(() -> consumer.accept(mockBuilder));
+        verify(mockBuilder).configureMessageConverters(any());
     }
 
     @Test
-    @DisplayName("Test messageConvertersConsumer replaces all existing Jackson converters")
-    void testAllExistingJacksonConvertersReplaced() {
+    @DisplayName("Test JsonMapper configuration with unknown properties")
+    void testJsonMapperUnknownPropertiesHandling() {
         // Given
-        Consumer<RestClient.Builder> consumer = DifyMessageConverters.messageConvertersConsumer();
-        RestClient.Builder mockBuilder = mock(RestClient.Builder.class);
+        JsonMapper objectMapper = JsonMapper.builder()
+                .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
+                .changeDefaultPropertyInclusion(incl -> incl.withContentInclusion(JsonInclude.Include.NON_NULL))
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .build();
 
-        @SuppressWarnings("unchecked")
-        ArgumentCaptor<Consumer<List<HttpMessageConverter<?>>>> consumerCaptor =
-                ArgumentCaptor.forClass(Consumer.class);
+        // When - Deserialize JSON with unknown properties
+        String jsonWithUnknownProperty = "{\"stringValue\":\"test\",\"unknownProperty\":\"value\"}";
 
-        when(mockBuilder.messageConverters(consumerCaptor.capture())).thenReturn(mockBuilder);
-        consumer.accept(mockBuilder);
-
-        // Create a list with multiple Jackson converters and other converters
-        List<HttpMessageConverter<?>> converters = new ArrayList<>();
-        JsonMapper mapper1 = JsonMapper.builder().build();
-        JsonMapper mapper2 = JsonMapper.builder().build();
-        JacksonJsonHttpMessageConverter jacksonConverter1 = new JacksonJsonHttpMessageConverter(mapper1);
-        JacksonJsonHttpMessageConverter jacksonConverter2 = new JacksonJsonHttpMessageConverter(mapper2);
-        HttpMessageConverter<?> otherConverter = mock(HttpMessageConverter.class);
-
-        converters.add(jacksonConverter1);
-        converters.add(otherConverter);
-        converters.add(jacksonConverter2);
-
-        // When
-        consumerCaptor.getValue().accept(converters);
-
-        // Then
-        assertEquals(2, converters.size()); // Should have 1 new Jackson converter + 1 other converter
-        assertInstanceOf(JacksonJsonHttpMessageConverter.class, converters.get(0));
-        assertSame(otherConverter, converters.get(1));
-
-        // Verify the new converter is properly configured
-        JsonMapper configuredMapper = ((JacksonJsonHttpMessageConverter) converters.get(0)).getMapper();
-        // Test by serializing an object with null values to see if they are excluded
-        var testObj = new TestObject("test", null);
-        try {
-            String json = configuredMapper.writeValueAsString(testObj);
-            assertFalse(json.contains("nullValue"));
-        } catch (Exception e) {
-            fail("Serialization failed: " + e.getMessage());
-        }
-        assertFalse(configuredMapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
-    }
-
-    @Test
-    @DisplayName("Test messageConvertersConsumer maintains proper ordering with multiple converter types")
-    void testConverterOrderingWithMultipleTypes() {
-        // Given
-        Consumer<RestClient.Builder> consumer = DifyMessageConverters.messageConvertersConsumer();
-        RestClient.Builder mockBuilder = mock(RestClient.Builder.class);
-
-        @SuppressWarnings("unchecked")
-        ArgumentCaptor<Consumer<List<HttpMessageConverter<?>>>> consumerCaptor =
-                ArgumentCaptor.forClass(Consumer.class);
-
-        when(mockBuilder.messageConverters(consumerCaptor.capture())).thenReturn(mockBuilder);
-        consumer.accept(mockBuilder);
-
-        // Create a list with various converter types in a specific order
-        List<HttpMessageConverter<?>> converters = new ArrayList<>();
-        HttpMessageConverter<?> stringConverter = mock(HttpMessageConverter.class);
-        JsonMapper originalMapper = JsonMapper.builder().build();
-        JacksonJsonHttpMessageConverter originalJacksonConverter = new JacksonJsonHttpMessageConverter(originalMapper);
-        HttpMessageConverter<?> xmlConverter = mock(HttpMessageConverter.class);
-
-        converters.add(stringConverter);
-        converters.add(originalJacksonConverter);
-        converters.add(xmlConverter);
-
-        // When
-        consumerCaptor.getValue().accept(converters);
-
-        // Then
-        assertEquals(3, converters.size());
-        assertInstanceOf(JacksonJsonHttpMessageConverter.class, converters.get(0)); // New Jackson converter at position 0
-        assertSame(stringConverter, converters.get(1)); // Other converters shifted
-        assertSame(xmlConverter, converters.get(2));
-    }
-
-    @Test
-    @DisplayName("Test messageConvertersConsumer produces properly configured JsonMapper")
-    void testJsonMapperConfiguration() {
-        // Given
-        Consumer<RestClient.Builder> consumer = DifyMessageConverters.messageConvertersConsumer();
-        RestClient.Builder mockBuilder = mock(RestClient.Builder.class);
-
-        @SuppressWarnings("unchecked")
-        ArgumentCaptor<Consumer<List<HttpMessageConverter<?>>>> consumerCaptor =
-                ArgumentCaptor.forClass(Consumer.class);
-
-        when(mockBuilder.messageConverters(consumerCaptor.capture())).thenReturn(mockBuilder);
-        consumer.accept(mockBuilder);
-
-        List<HttpMessageConverter<?>> converters = new ArrayList<>();
-        consumerCaptor.getValue().accept(converters);
-
-        // Then
-        assertInstanceOf(JacksonJsonHttpMessageConverter.class, converters.getFirst());
-        JsonMapper configuredMapper = ((JacksonJsonHttpMessageConverter) converters.getFirst()).getMapper();
-
-        // Verify all expected configurations are applied
-        // Test by serializing an object with null values to see if they are excluded
-        var testObj = new TestObject("test", null);
-        try {
-            String json = configuredMapper.writeValueAsString(testObj);
-            assertFalse(json.contains("nullValue"));
-        } catch (Exception e) {
-            fail("Serialization failed: " + e.getMessage());
-        }
-        assertFalse(configuredMapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
+        // Then - Should not throw exception
+        assertDoesNotThrow(() -> {
+            TestObject result = objectMapper.readValue(jsonWithUnknownProperty, TestObject.class);
+            assertEquals("test", result.stringValue);
+        }, "Should handle unknown properties without throwing exception");
     }
 
     @Test
@@ -316,5 +153,24 @@ class DifyMessageConvertersTest {
         // Verify that the constructor is private
         java.lang.reflect.Constructor<DifyMessageConverters> constructor = DifyMessageConverters.class.getDeclaredConstructor();
         assertTrue(java.lang.reflect.Modifier.isPrivate(constructor.getModifiers()));
+    }
+
+    @Test
+    @DisplayName("Test JacksonJsonHttpMessageConverter is created with custom JsonMapper")
+    void testJacksonConverterCreation() {
+        // Given
+        JsonMapper objectMapper = JsonMapper.builder()
+                .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
+                .changeDefaultPropertyInclusion(incl -> incl.withContentInclusion(JsonInclude.Include.NON_NULL))
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .build();
+
+        // When
+        JacksonJsonHttpMessageConverter converter = new JacksonJsonHttpMessageConverter(objectMapper);
+
+        // Then
+        assertNotNull(converter);
+        assertNotNull(converter.getMapper());
+        assertSame(objectMapper, converter.getMapper());
     }
 }

@@ -34,70 +34,22 @@ public class DifyMessageConverters {
     private DifyMessageConverters() {
     }
 
-//    public static Consumer<RestClient.Builder> messageConvertersConsumer() {
-//        return builder -> {
-//            builder.configureMessageConverters(configurer -> {
-//                List<HttpMessageConverter<?>> list = new ArrayList<>();
-//                configurer.configureMessageConverters(list::add);
-//                Optional<JacksonJsonHttpMessageConverter> existingConverter = list.stream().filter(c -> c instanceof JacksonJsonHttpMessageConverter)
-//                        .map(c -> (JacksonJsonHttpMessageConverter) c)
-//                        .findFirst();
-//                // 创建新的converter，基于现有配置
-//                JacksonJsonHttpMessageConverter newConverter;
-//                if (existingConverter.isPresent()) {
-//                    JsonMapper newMapper = existingConverter.get().getMapper().rebuild()
-//                            .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
-//                            .changeDefaultPropertyInclusion(incl -> incl.withContentInclusion(JsonInclude.Include.NON_NULL))
-//                            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-//                            .build();
-//                    ;
-//                    newConverter = new JacksonJsonHttpMessageConverter(newMapper);
-//                } else {
-//                    JsonMapper objectMapper = JsonMapper.builder()
-//                            .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
-//                            .changeDefaultPropertyInclusion(incl -> incl.withContentInclusion(JsonInclude.Include.NON_NULL))
-//                            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-//                            .build();
-//                    newConverter = new JacksonJsonHttpMessageConverter(objectMapper);
-//                }
-//                // 移除旧的，添加新的
-//                configurer.addCustomConverter(newConverter);
-//            });
-//        };
-//    }
-
-
     public static Consumer<RestClient.Builder> messageConvertersConsumer() {
         return builder -> {
-            builder.messageConverters(converters -> {
-                // 找到现有的Jackson converter
-                Optional<JacksonJsonHttpMessageConverter> existingConverter = converters.stream()
-                        .filter(c -> c instanceof JacksonJsonHttpMessageConverter)
-                        .map(c -> (JacksonJsonHttpMessageConverter) c)
-                        .findFirst();
+            // 创建自定义的JsonMapper
+            JsonMapper objectMapper = JsonMapper.builder()
+                    .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
+                    .changeDefaultPropertyInclusion(incl -> incl.withContentInclusion(JsonInclude.Include.NON_NULL))
+                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                    .build();
 
-                // 创建新的converter，基于现有配置
-                JacksonJsonHttpMessageConverter newConverter;
-                if (existingConverter.isPresent()) {
-                    JsonMapper newMapper = existingConverter.get().getMapper().rebuild()
-                            .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
-                            .changeDefaultPropertyInclusion(incl -> incl.withContentInclusion(JsonInclude.Include.NON_NULL))
-                            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                            .build();
-                    ;
-                    newConverter = new JacksonJsonHttpMessageConverter(newMapper);
-                } else {
-                    JsonMapper objectMapper = JsonMapper.builder()
-                            .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
-                            .changeDefaultPropertyInclusion(incl -> incl.withContentInclusion(JsonInclude.Include.NON_NULL))
-                            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                            .build();
-                    newConverter = new JacksonJsonHttpMessageConverter(objectMapper);
-                }
-                // 移除旧的，添加新的
-                converters.removeIf(c -> c instanceof JacksonJsonHttpMessageConverter);
-                converters.add(0, newConverter);
-            });
+            // 使用自定义的Jackson converter
+            JacksonJsonHttpMessageConverter converter = new JacksonJsonHttpMessageConverter(objectMapper);
+
+            // 使用 configureMessageConverters 配置 JSON converter，同时保留默认的converters
+            builder.configureMessageConverters(convertersBuilder ->
+                convertersBuilder.registerDefaults().withJsonConverter(converter)
+            );
         };
     }
 }
