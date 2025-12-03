@@ -206,7 +206,7 @@ jobs:
 
       - name: Run Gradle tests
         run: |
-          ./gradlew jacocoTestReport --info --no-daemon
+          ./gradlew jacocoTestReport --no-daemon
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5

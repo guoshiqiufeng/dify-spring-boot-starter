@@ -1,5 +1,6 @@
 [versions]
-springBoot3 = "3.5.7"
+springBoot4 = "4.0.0"
+springBoot3 = "3.5.8"
 springBoot2 = "2.7.18"
 hutool = "5.8.41"
 testcontainers = "1.21.3"
@@ -28,6 +29,9 @@ jackson-annotations = { group = "com.fasterxml.jackson.core", name = "jackson-an
 jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-databind" }
 jackson-core = { group = "com.fasterxml.jackson.core", name = "jackson-core" }
 jackson-datatype-jsr310 = { group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310" }
+
+tools-jackson-core = { group = "tools.jackson.core", name = "jackson-core" }
+tools-jackson-databind = { group = "tools.jackson.core", name = "jackson-databind" }
 
 # Test dependencies
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit" }

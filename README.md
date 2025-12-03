@@ -25,7 +25,7 @@ Provide springboot starter for dify to simplify development.
 
 ### Development Framework
 
-- Spring Boot 3/2
+- Spring Boot 4/3/2
 
 ### Running the minimum version
 
@@ -63,13 +63,25 @@ Provide springboot starter for dify to simplify development.
 
 #### Introducing starter dependencies
 
-- springboot3.1 及以上
+- springboot3.1 and above
 
 ```xml
 
 <dependency>
     <groupId>io.github.guoshiqiufeng.dify</groupId>
     <artifactId>dify-spring-boot-starter</artifactId>
+</dependency>
+```
+
+- springboot4
+
+> dify-spring-boot-starter v1.6.0 or above is available.
+
+```xml
+
+<dependency>
+    <groupId>io.github.guoshiqiufeng.dify</groupId>
+    <artifactId>dify-spring-boot4-starter</artifactId>
 </dependency>
 ```
 
