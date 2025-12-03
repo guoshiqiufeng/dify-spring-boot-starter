@@ -34,7 +34,7 @@ Provide springboot starter for dify to simplify development.
 
 ### Recommended Running Versions
 
-- Spring Boot 3
+- Spring Boot 4/3
 
 ### Features
 

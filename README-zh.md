@@ -34,7 +34,7 @@
 
 ### 推荐运行版本
 
-- Spring Boot 3
+- Spring Boot 4/3
 
 ### 功能
 
