@@ -109,7 +109,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
 
         DocumentCreateByTextRequest request = new DocumentCreateByTextRequest();
         request.setDatasetId(datasetId);
-        request.setName("Text Document Test springboot");
+        request.setName("Text Document Test springboot4");
         request.setText("This is a test document content for API testing.");
         request.setDocType(DocTypeEnum.others);
 
@@ -217,7 +217,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
         DocumentUpdateByTextRequest request = new DocumentUpdateByTextRequest();
         request.setDatasetId(datasetId);
         request.setDocumentId(documentTextId);
-        request.setName("Updated Text Document springboot");
+        request.setName("Updated Text Document springboot4");
 
         ProcessRule processRule = new ProcessRule();
         processRule.setMode(ModeEnum.hierarchical);
@@ -551,12 +551,12 @@ public class DatasetTest extends BaseDatasetContainerTest {
     @DisplayName("Test create tag")
     public void testTag() {
         TagCreateRequest tagCreateRequest = new TagCreateRequest();
-        tagCreateRequest.setName("test springboot");
+        tagCreateRequest.setName("test springboot4");
         TagInfoResponse tag = difyDataset.createTag(tagCreateRequest);
         assertNotNull(tag);
 
         TagUpdateRequest tagUpdateRequest = new TagUpdateRequest();
-        tagUpdateRequest.setName("test update springboot");
+        tagUpdateRequest.setName("test update springboot4");
         String tagId = tag.getId();
         tagUpdateRequest.setTagId(tagId);
         TagInfoResponse tagInfoResponse = difyDataset.updateTag(tagUpdateRequest);

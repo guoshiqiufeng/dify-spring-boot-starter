@@ -12,6 +12,7 @@ dependencies {
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
     testImplementation libs.spring.boot.starter.test
+    testImplementation "org.springframework.boot:spring-boot-starter-webmvc-test"
     testImplementation "org.junit.platform:junit-platform-launcher"
     testImplementation libs.junit.jupiter
     testImplementation 'org.testcontainers:junit-jupiter'
