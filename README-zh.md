@@ -25,7 +25,7 @@
 
 ### 开发框架
 
-- Spring Boot 3/2
+- Spring Boot 4/3/2
 
 ### 运行最低版本
 
@@ -75,6 +75,18 @@
 <dependency>
     <groupId>io.github.guoshiqiufeng.dify</groupId>
     <artifactId>dify-spring-boot-starter</artifactId>
+</dependency>
+```
+
+- springboot4
+
+> dify-spring-boot-starter v1.6.0 以上版本可用
+
+```xml
+
+<dependency>
+    <groupId>io.github.guoshiqiufeng.dify</groupId>
+    <artifactId>dify-spring-boot4-starter</artifactId>
 </dependency>
 ```
 
