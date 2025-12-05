@@ -15,6 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.springboot4.autoconfigure;
 
+import org.springframework.boot.autoconfigure.service.connection.ConnectionDetails;
+
 /**
  * Dify Connection Details Interface
  * Provides connection information required to establish a connection to the Dify API.
@@ -25,7 +27,7 @@ package io.github.guoshiqiufeng.dify.springboot4.autoconfigure;
  * @version 0.9.0
  * @since 2025/4/7 16:53
  */
-public interface DifyConnectionDetails {
+public interface DifyConnectionDetails extends ConnectionDetails {
 
     /**
      * Retrieves the URL of the Dify API server
