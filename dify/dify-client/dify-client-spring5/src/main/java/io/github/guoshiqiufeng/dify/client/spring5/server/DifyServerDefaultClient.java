@@ -34,10 +34,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author yanghq
@@ -406,10 +408,19 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
 
     private void addAuthorizationHeader(HttpHeaders headers) {
         difyServerToken.addAuthorizationHeader(headers, this);
+        MultiValueMap<String, String> cookies = new LinkedMultiValueMap<>();
+        difyServerToken.addAuthorizationCookies(cookies, this);
+        if (!cookies.isEmpty()) {
+            String cookieHeader = cookies.entrySet().stream()
+                    .flatMap(entry -> entry.getValue().stream()
+                            .map(value -> entry.getKey() + "=" + value))
+                    .collect(Collectors.joining("; "));
+            headers.add("Cookie", cookieHeader);
+        }
     }
 
     private void addAuthorizationCookies(MultiValueMap<String, String> cookies) {
-        difyServerToken.addAuthorizationCookies(cookies, this);
+        // difyServerToken.addAuthorizationCookies(cookies, this);
     }
 
     private <T> T executeWithRetry(RequestSupplier<T> supplier) {

@@ -61,8 +61,8 @@ public class DifyLoggingFilter implements ExchangeFilterFunction {
 
     private void logRequest(String requestId, ClientRequest request) {
         if (log.isDebugEnabled()) {
-            log.debug("logRequest，requestId：{}，url：{}，method：{}，headers：{}",
-                    requestId, request.url(), request.method(), request.headers());
+            log.debug("logRequest，requestId：{}，url：{}，method：{}，headers：{}, cookies: {}",
+                    requestId, request.url(), request.method(), request.headers(), request.cookies());
         }
     }
 
