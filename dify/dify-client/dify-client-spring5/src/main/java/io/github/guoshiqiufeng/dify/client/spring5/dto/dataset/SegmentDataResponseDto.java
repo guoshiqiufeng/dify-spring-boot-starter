@@ -16,8 +16,8 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonDeserialize(using = SegmentDataResponseDeserializer.class)
-public class SegmentDataResponse implements Serializable {
+@JsonDeserialize(using = SegmentDataResponseDtoDeserializer.class)
+public class SegmentDataResponseDto implements Serializable {
 
     private SegmentData data;
 }

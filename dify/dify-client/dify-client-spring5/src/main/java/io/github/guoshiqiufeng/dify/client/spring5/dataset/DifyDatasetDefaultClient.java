@@ -16,7 +16,7 @@
 package io.github.guoshiqiufeng.dify.client.spring5.dataset;
 
 import io.github.guoshiqiufeng.dify.client.spring5.base.BaseDifyDefaultClient;
-import io.github.guoshiqiufeng.dify.client.spring5.dto.dataset.SegmentDataResponse;
+import io.github.guoshiqiufeng.dify.client.spring5.dto.dataset.SegmentDataResponseDto;
 import io.github.guoshiqiufeng.dify.client.spring5.utils.DatasetHeaderUtils;
 import io.github.guoshiqiufeng.dify.client.spring5.utils.WebClientUtil;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
@@ -326,12 +326,12 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
         Assert.notNull(datasetId, "datasetId can not be null");
         Assert.notNull(documentId, "documentId can not be null");
         Assert.notNull(segmentId, "segmentId can not be null");
-        SegmentDataResponse body = webClient.get()
+        SegmentDataResponseDto body = webClient.get()
                 .uri(DatasetUriConstant.V1_DOCUMENTS_SEGMENT_URL, datasetId, documentId, segmentId)
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
                 .retrieve()
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
-                .bodyToMono(SegmentDataResponse.class).block();
+                .bodyToMono(SegmentDataResponseDto.class).block();
         if (body == null) {
             return null;
         }

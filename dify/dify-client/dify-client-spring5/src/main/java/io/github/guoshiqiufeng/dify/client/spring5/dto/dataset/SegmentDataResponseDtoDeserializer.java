@@ -1,4 +1,4 @@
-package io.github.guoshiqiufeng.dify.client.spring6.dto.dataset;
+package io.github.guoshiqiufeng.dify.client.spring5.dto.dataset;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
@@ -17,7 +17,7 @@ import java.io.IOException;
  * @version 1.6.2
  * @since 2025/12/11 19:55
  */
-public class SegmentDataResponseDeserializer extends StdDeserializer<SegmentDataResponse> {
+public class SegmentDataResponseDtoDeserializer extends StdDeserializer<SegmentDataResponseDto> {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -26,20 +26,20 @@ public class SegmentDataResponseDeserializer extends StdDeserializer<SegmentData
         MAPPER.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
-    public SegmentDataResponseDeserializer() {
-        super(SegmentDataResponse.class);
+    public SegmentDataResponseDtoDeserializer() {
+        super(SegmentDataResponseDto.class);
     }
 
     @Override
-    public SegmentDataResponse deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
+    public SegmentDataResponseDto deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
         ObjectNode root = MAPPER.readTree(p);
 
         JsonNode eventNode = root.get(CONSTANT_DATA);
         if (eventNode == null) {
             SegmentData segmentData = MAPPER.treeToValue(root, SegmentData.class);
-            return new SegmentDataResponse(segmentData);
+            return new SegmentDataResponseDto(segmentData);
         }
         SegmentData segmentData = MAPPER.treeToValue(eventNode, SegmentData.class);
-        return new SegmentDataResponse(segmentData);
+        return new SegmentDataResponseDto(segmentData);
     }
 }

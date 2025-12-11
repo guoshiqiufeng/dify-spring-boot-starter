@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.client.spring5.dataset;
 
 import io.github.guoshiqiufeng.dify.client.spring5.BaseClientTest;
+import io.github.guoshiqiufeng.dify.client.spring5.dto.dataset.SegmentDataResponseDto;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.dataset.constant.DatasetUriConstant;
@@ -1860,7 +1861,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         expectedResponse.setKeywords(List.of("keyword1", "keyword2"));
 
         // Set up the response mock to return our expected response
-        when(responseSpecMock.bodyToMono(SegmentData.class)).thenReturn(Mono.just(expectedResponse));
+        when(responseSpecMock.bodyToMono(SegmentDataResponseDto.class)).thenReturn(Mono.just(new SegmentDataResponseDto(expectedResponse)));
 
         // Execute the method
         SegmentData actualResponse = client.getSegment(datasetId, documentId, segmentId, apiKey);
@@ -1876,6 +1877,5 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         verify(webClientMock).get();
         verify(requestHeadersUriSpecMock).uri(eq(DatasetUriConstant.V1_DOCUMENTS_SEGMENT_URL), eq(datasetId), eq(documentId), eq(segmentId));
         verify(requestHeadersSpecMock).headers(any(Consumer.class));
-        verify(responseSpecMock).bodyToMono(SegmentData.class);
     }
 }
