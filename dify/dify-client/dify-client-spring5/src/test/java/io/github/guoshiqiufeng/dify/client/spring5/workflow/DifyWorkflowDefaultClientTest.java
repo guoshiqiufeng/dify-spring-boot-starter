@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.client.spring5.workflow;
 
 import io.github.guoshiqiufeng.dify.client.spring5.BaseClientTest;
+import io.github.guoshiqiufeng.dify.client.spring5.dto.workflow.WorkflowRunStreamResponseDto;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.request.ChatMessageVO;
@@ -182,10 +183,14 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         data3.put("text", "The weather today is sunny.");
         response3.setData(data3);
 
-        List<WorkflowRunStreamResponse> responses = List.of(response1, response2, response3);
+        WorkflowRunStreamResponseDto dto1 = new WorkflowRunStreamResponseDto(response1);
+        WorkflowRunStreamResponseDto dto2 = new WorkflowRunStreamResponseDto(response2);
+        WorkflowRunStreamResponseDto dto3 = new WorkflowRunStreamResponseDto(response3);
+
+        List<WorkflowRunStreamResponseDto> responses = List.of(dto1, dto2, dto3);
 
         // Mock the response
-        when(responseSpecMock.bodyToFlux(WorkflowRunStreamResponse.class)).thenReturn(Flux.fromIterable(responses));
+        when(responseSpecMock.bodyToFlux(WorkflowRunStreamResponseDto.class)).thenReturn(Flux.fromIterable(responses));
 
         // Execute the method
         Flux<WorkflowRunStreamResponse> actualResponseFlux = client.runWorkflowStream(request);
@@ -203,7 +208,6 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         verify(requestBodyUriSpecMock).uri(WorkflowConstant.WORKFLOW_RUN_URL);
         verify(requestBodySpecMock).header(eq(HttpHeaders.AUTHORIZATION), eq("Bearer " + apiKey));
         verify(requestBodySpecMock).bodyValue(any(ChatMessageVO.class));
-        verify(responseSpecMock).bodyToFlux(WorkflowRunStreamResponse.class);
     }
 
     @Test

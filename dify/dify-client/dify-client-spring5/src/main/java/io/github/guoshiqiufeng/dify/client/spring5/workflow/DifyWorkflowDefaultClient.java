@@ -18,6 +18,7 @@ package io.github.guoshiqiufeng.dify.client.spring5.workflow;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import io.github.guoshiqiufeng.dify.client.spring5.base.BaseDifyDefaultClient;
+import io.github.guoshiqiufeng.dify.client.spring5.dto.workflow.WorkflowRunStreamResponseDto;
 import io.github.guoshiqiufeng.dify.client.spring5.utils.WebClientUtil;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.enums.ResponseModeEnum;
@@ -86,7 +87,13 @@ public class DifyWorkflowDefaultClient extends BaseDifyDefaultClient implements 
                 .bodyValue(chatMessage)
                 .retrieve()
                 .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
-                .bodyToFlux(WorkflowRunStreamResponse.class);
+                .bodyToFlux(WorkflowRunStreamResponseDto.class)
+                .mapNotNull(dto -> {
+                    if (dto.getData() == null) {
+                        return null;
+                    }
+                    return dto.getData();
+                });
     }
 
 

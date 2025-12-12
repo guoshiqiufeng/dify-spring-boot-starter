@@ -24,6 +24,7 @@ import io.github.guoshiqiufeng.dify.chat.dto.response.*;
 import io.github.guoshiqiufeng.dify.chat.exception.DiftChatException;
 import io.github.guoshiqiufeng.dify.chat.exception.DiftChatExceptionEnum;
 import io.github.guoshiqiufeng.dify.client.spring6.base.BaseDifyDefaultClient;
+import io.github.guoshiqiufeng.dify.client.spring6.dto.chat.ChatMessageSendCompletionResponseDto;
 import io.github.guoshiqiufeng.dify.client.spring6.utils.DatasetHeaderUtils;
 import io.github.guoshiqiufeng.dify.client.spring6.utils.MultipartInputStreamFileResource;
 import io.github.guoshiqiufeng.dify.client.spring6.utils.WebClientUtil;
@@ -100,7 +101,13 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
                 .body(Mono.just(chatMessage), ChatMessageVO.class)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, WebClientUtil::exceptionFunction)
-                .bodyToFlux(ChatMessageSendCompletionResponse.class);
+                .bodyToFlux(ChatMessageSendCompletionResponseDto.class)
+                .mapNotNull(dto -> {
+                    if (dto.getData() == null) {
+                        return null;
+                    }
+                    return dto.getData();
+                });
     }
 
     @Override

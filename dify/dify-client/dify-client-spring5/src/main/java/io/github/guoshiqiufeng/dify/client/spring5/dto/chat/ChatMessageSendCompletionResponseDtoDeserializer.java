@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.chat.dto.response.jackson;
+package io.github.guoshiqiufeng.dify.client.spring5.dto.chat;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -37,12 +37,11 @@ import java.util.Map;
 
 /**
  * @author yanghq
- * @version 1.0.3
- * @since 2025/5/29 09:53
+ * @version 1.6.2
+ * @since 2025/12/11 20:16
  */
 @Slf4j
-@Deprecated
-public class ChatMessageSendCompletionResponseDeserializer extends StdDeserializer<ChatMessageSendCompletionResponse> {
+public class ChatMessageSendCompletionResponseDtoDeserializer extends StdDeserializer<ChatMessageSendCompletionResponseDto> {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -66,19 +65,19 @@ public class ChatMessageSendCompletionResponseDeserializer extends StdDeserializ
         MAPPER.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
-    public ChatMessageSendCompletionResponseDeserializer() {
-        super(ChatMessageSendCompletionResponse.class);
+    public ChatMessageSendCompletionResponseDtoDeserializer() {
+        super(ChatMessageSendCompletionResponseDto.class);
     }
 
     @Override
-    public ChatMessageSendCompletionResponse deserialize(JsonParser p, DeserializationContext ctxt)
+    public ChatMessageSendCompletionResponseDto deserialize(JsonParser p, DeserializationContext ctxt)
             throws IOException {
 
         ObjectNode root = MAPPER.readTree(p);
 
         JsonNode eventNode = root.get(CONSTANT_EVENT);
         if (eventNode == null || !eventNode.isTextual()) {
-            return builderResponse(root);
+            return new ChatMessageSendCompletionResponseDto(builderResponse(root));
         }
 
         StreamEventEnum event;
@@ -88,7 +87,7 @@ public class ChatMessageSendCompletionResponseDeserializer extends StdDeserializ
             dataClass = event.getClazz();
         } catch (IllegalArgumentException e) {
             log.warn("Unknown event type: {}", eventNode.asText());
-            return builderResponse(root);
+            return new ChatMessageSendCompletionResponseDto(builderResponse(root));
         }
 
         ChatMessageSendCompletionResponse response = builderResponse(root);
@@ -101,7 +100,7 @@ public class ChatMessageSendCompletionResponseDeserializer extends StdDeserializ
             }
             response.setData(data);
         }
-        return response;
+        return new ChatMessageSendCompletionResponseDto(response);
     }
 
     private static ChatMessageSendCompletionResponse builderResponse(ObjectNode root) throws JsonProcessingException {

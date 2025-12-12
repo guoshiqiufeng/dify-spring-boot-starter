@@ -13,26 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.client.spring6.dto.dataset;
+package io.github.guoshiqiufeng.dify.client.spring6.dto.chat;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.github.guoshiqiufeng.dify.dataset.dto.response.SegmentData;
+import io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendCompletionResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 /**
  * @author yanghq
  * @version 1.6.2
- * @since 2025/12/11 19:53
+ * @since 2025/12/11 20:17
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonDeserialize(using = SegmentDataResponseDtoDeserializer.class)
-public class SegmentDataResponseDto implements Serializable {
+@JsonDeserialize(using = ChatMessageSendCompletionResponseDtoDeserializer.class)
+public class ChatMessageSendCompletionResponseDto {
 
-    private SegmentData data;
+    private ChatMessageSendCompletionResponse data;
 }
