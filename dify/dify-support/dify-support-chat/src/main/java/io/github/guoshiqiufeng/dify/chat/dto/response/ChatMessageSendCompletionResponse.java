@@ -33,7 +33,7 @@ import java.util.Map;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@JsonDeserialize(using = ChatMessageSendCompletionResponseDeserializer.class)
+//@JsonDeserialize(using = ChatMessageSendCompletionResponseDeserializer.class)
 public class ChatMessageSendCompletionResponse extends ChatMessageSendResponse implements Serializable {
 
     private static final long serialVersionUID = 3819274658903174523L;

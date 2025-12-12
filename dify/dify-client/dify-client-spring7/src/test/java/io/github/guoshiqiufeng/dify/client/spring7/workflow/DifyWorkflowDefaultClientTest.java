@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.client.spring7.workflow;
 
 import io.github.guoshiqiufeng.dify.client.spring7.BaseClientTest;
+import io.github.guoshiqiufeng.dify.client.spring7.dto.workflow.WorkflowRunStreamResponseDto;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.enums.ResponseModeEnum;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
@@ -131,8 +132,12 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         mockStreamResponse3.setEvent(StreamEventEnum.text_chunk);
         mockStreamResponse3.setData(Map.of("text", "\n\n", "from_variable_selector", "[]"));
 
-        Flux<WorkflowRunStreamResponse> mockFlux = Flux.just(mockStreamResponse1, mockStreamResponse2, mockStreamResponse3);
-        doReturn(mockFlux).when(responseSpec).bodyToFlux(WorkflowRunStreamResponse.class);
+        WorkflowRunStreamResponseDto dto1 = new WorkflowRunStreamResponseDto(mockStreamResponse1);
+        WorkflowRunStreamResponseDto dto2 = new WorkflowRunStreamResponseDto(mockStreamResponse2);
+        WorkflowRunStreamResponseDto dto3 = new WorkflowRunStreamResponseDto(mockStreamResponse3);
+
+        Flux<WorkflowRunStreamResponseDto> mockFlux = Flux.just(dto1, dto2, dto3);
+        doReturn(mockFlux).when(responseSpec).bodyToFlux(WorkflowRunStreamResponseDto.class);
 
         // Create a workflow run request
         WorkflowRunRequest request = new WorkflowRunRequest();

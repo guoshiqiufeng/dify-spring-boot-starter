@@ -21,6 +21,7 @@ import io.github.guoshiqiufeng.dify.chat.dto.response.*;
 import io.github.guoshiqiufeng.dify.chat.enums.AnnotationReplyActionEnum;
 import io.github.guoshiqiufeng.dify.chat.enums.IconTypeEnum;
 import io.github.guoshiqiufeng.dify.client.spring7.BaseClientTest;
+import io.github.guoshiqiufeng.dify.client.spring7.dto.chat.ChatMessageSendCompletionResponseDto;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.enums.ResponseModeEnum;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
@@ -142,9 +143,15 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         response2.setCreatedAt(1713841200L);
         response2.setAnswer("this is a test response.");
 
-        Flux<ChatMessageSendCompletionResponse> mockFlux = Flux.just(response1, response2);
+        ChatMessageSendCompletionResponseDto dto1 = new ChatMessageSendCompletionResponseDto();
+        dto1.setData(response1);
 
-        when(responseSpec.bodyToFlux(ChatMessageSendCompletionResponse.class)).thenReturn(mockFlux);
+        ChatMessageSendCompletionResponseDto dto2 = new ChatMessageSendCompletionResponseDto();
+        dto2.setData(response2);
+
+        Flux<ChatMessageSendCompletionResponseDto> mockFlux = Flux.just(dto1, dto2);
+
+        when(responseSpec.bodyToFlux(ChatMessageSendCompletionResponseDto.class)).thenReturn(mockFlux);
 
         // Create a chat request
         ChatMessageSendRequest request = new ChatMessageSendRequest();

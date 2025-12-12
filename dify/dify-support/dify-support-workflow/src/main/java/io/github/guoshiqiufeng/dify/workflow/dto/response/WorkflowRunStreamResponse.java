@@ -29,7 +29,7 @@ import java.io.Serializable;
  * @since 2025/3/11 14:36
  */
 @Data
-@JsonDeserialize(using = WorkflowRunStreamResponseDeserializer.class)
+//@JsonDeserialize(using = WorkflowRunStreamResponseDeserializer.class)
 public class WorkflowRunStreamResponse implements Serializable {
     private static final long serialVersionUID = 7374887951820521203L;
 

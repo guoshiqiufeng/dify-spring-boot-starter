@@ -15,8 +15,16 @@
  */
 package io.github.guoshiqiufeng.dify.boot.application;
 
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import java.time.Duration;
 
 /**
  * @author yanghq
@@ -29,5 +37,4 @@ public class DifyTestSpringBootApplication {
     public static void main(String[] args) {
         SpringApplication.run(DifyTestSpringBootApplication.class, args);
     }
-
 }
