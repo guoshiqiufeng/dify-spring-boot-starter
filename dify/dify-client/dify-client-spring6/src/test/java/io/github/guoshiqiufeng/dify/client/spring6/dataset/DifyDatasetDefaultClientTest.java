@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.client.spring6.dataset;
 
 import io.github.guoshiqiufeng.dify.client.spring6.BaseClientTest;
+import io.github.guoshiqiufeng.dify.client.spring6.dto.dataset.SegmentDataResponseDto;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.dataset.constant.DatasetUriConstant;
@@ -1922,7 +1923,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         expectedResponse.setKeywords(List.of("keyword1", "keyword2"));
 
         // Set up the response mock
-        when(responseSpec.body(SegmentData.class)).thenReturn(expectedResponse);
+        when(responseSpec.body(SegmentDataResponseDto.class)).thenReturn(new SegmentDataResponseDto(expectedResponse));
 
         // Execute the method
         SegmentData actualResponse = client.getSegment(datasetId, documentId, segmentId, apiKey);
@@ -1938,6 +1939,5 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         verify(restClient).get();
         verify(requestHeadersUriSpec).uri(eq(DatasetUriConstant.V1_DOCUMENTS_SEGMENT_URL), eq(datasetId), eq(documentId), eq(segmentId));
         verify(requestHeadersSpec).headers(any(Consumer.class));
-        verify(responseSpec).body(SegmentData.class);
     }
 }

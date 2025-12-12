@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.client.spring7.dataset;
 
 import io.github.guoshiqiufeng.dify.client.spring7.base.BaseDifyDefaultClient;
+import io.github.guoshiqiufeng.dify.client.spring7.dto.dataset.SegmentDataResponseDto;
 import io.github.guoshiqiufeng.dify.client.spring7.utils.DatasetHeaderUtils;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
@@ -335,13 +336,16 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
         Assert.notNull(datasetId, "datasetId can not be null");
         Assert.notNull(documentId, "documentId can not be null");
         Assert.notNull(segmentId, "segmentId can not be null");
-        RestClient.RequestHeadersSpec<?> uri = restClient.get()
-                .uri(DatasetUriConstant.V1_DOCUMENTS_SEGMENT_URL, datasetId, documentId, segmentId);
-        return uri
+        SegmentDataResponseDto body = restClient.get()
+                .uri(DatasetUriConstant.V1_DOCUMENTS_SEGMENT_URL, datasetId, documentId, segmentId)
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
                 .retrieve()
                 .onStatus(responseErrorHandler)
-                .body(SegmentData.class);
+                .body(SegmentDataResponseDto.class);
+        if(body == null) {
+            return null;
+        }
+        return body.getData();
     }
 
     @Override

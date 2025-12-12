@@ -70,8 +70,8 @@ public class DatasetTest extends BaseDatasetContainerTest {
     public void testDatasetOperations() {
         // Test dataset creation
         DatasetCreateRequest createRequest = new DatasetCreateRequest();
-        createRequest.setName("api-test-dataset springboot");
-        createRequest.setDescription("Test dataset for API testing springboot");
+        createRequest.setName("api-test-dataset springboot4");
+        createRequest.setDescription("Test dataset for API testing springboot4");
 
         DatasetResponse response = difyDataset.create(createRequest);
         assertNotNull(response);
