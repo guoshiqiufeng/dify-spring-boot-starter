@@ -37,9 +37,4 @@ public class DifyTestSpringBootApplication {
     public static void main(String[] args) {
         SpringApplication.run(DifyTestSpringBootApplication.class, args);
     }
-
-    @Bean
-    public WebClient.Builder webClientBuilder() {
-        return WebClient.builder();
-    }
 }
