@@ -284,6 +284,8 @@ class DifyServerTokenDefaultTest {
         verify(difyServerClient).login();
         verify(cookies).add("access_token", "test-access-token");
         verify(cookies).add("csrf_token", "test-csrf-token");
+        verify(cookies).add("__Host-access_token", "test-access-token");
+        verify(cookies).add("__Host-csrf_token", "test-csrf-token");
     }
 
     @Test
@@ -305,6 +307,8 @@ class DifyServerTokenDefaultTest {
         verify(difyServerClient).login();
         verify(initialCookies).add("access_token", "test-access-token");
         verify(initialCookies).add("csrf_token", "test-csrf-token");
+        verify(initialCookies).add("__Host-access_token", "test-access-token");
+        verify(initialCookies).add("__Host-csrf_token", "test-csrf-token");
 
         // Reset difyServerClient mock
         reset(difyServerClient);
@@ -319,5 +323,7 @@ class DifyServerTokenDefaultTest {
         verify(difyServerClient, never()).login(); // Should not call login again
         verify(secondCookies).add("access_token", "test-access-token");
         verify(secondCookies).add("csrf_token", "test-csrf-token");
+        verify(secondCookies).add("__Host-access_token", "test-access-token");
+        verify(secondCookies).add("__Host-csrf_token", "test-csrf-token");
     }
 }
