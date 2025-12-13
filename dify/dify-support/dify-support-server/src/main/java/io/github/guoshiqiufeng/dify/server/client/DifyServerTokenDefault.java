@@ -54,6 +54,9 @@ public class DifyServerTokenDefault extends BaseDifyServerToken {
         }
         cookies.add("access_token", accessToken);
         cookies.add("csrf_token", csrfToken);
+        // support Https
+        cookies.add("__Host-access_token", accessToken);
+        cookies.add("__Host-csrf_token", csrfToken);
     }
 
     private void obtainToken(DifyServerClient difyServerClient) {

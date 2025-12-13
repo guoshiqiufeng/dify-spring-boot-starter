@@ -459,6 +459,8 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
         requestVO.put("refresh_token", refreshToken);
         ResponseEntity<LoginResultResponse> responseEntity = webClient.post()
                 .uri(ServerUriConstant.REFRESH_TOKEN)
+                // support Https
+                .cookie("__Host-refresh_token", refreshToken)
                 .cookie("refresh_token", refreshToken)
                 .bodyValue(requestVO)
                 .retrieve()
@@ -498,20 +500,49 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
         if (loginResponse == null && setCookieHeaders != null) {
             loginResponse = new LoginResponse();
             for (String cookieHeader : setCookieHeaders) {
-                if (cookieHeader.startsWith("access_token=") && !cookieHeader.contains("access_token=;")) {
-                    String accessToken = extractTokenValue(cookieHeader, "access_token=");
+                String accessToken = extractToken(cookieHeader, "access_token");
+                String refreshToken = extractToken(cookieHeader, "refresh_token");
+                String csrfToken = extractToken(cookieHeader, "csrf_token");
+                if (accessToken != null) {
                     loginResponse.setAccessToken(accessToken);
-                } else if (cookieHeader.startsWith("refresh_token=") && !cookieHeader.contains("refresh_token=;")) {
-                    String refreshToken = extractTokenValue(cookieHeader, "refresh_token=");
+                }
+                if (refreshToken != null) {
                     loginResponse.setRefreshToken(refreshToken);
-                } else if (cookieHeader.startsWith("csrf_token=") && !cookieHeader.contains("csrf_token=;")) {
-                    String csrfToken = extractTokenValue(cookieHeader, "csrf_token=");
+                }
+                if (csrfToken != null) {
                     loginResponse.setCsrfToken(csrfToken);
                 }
             }
         }
 
         return loginResponse;
+    }
+
+    /**
+     * Extracts the token value for a specified key from the Cookie header.
+     * Supports both the standard key prefix and the secure "__Host-" prefix
+     * for compatibility. If the extracted value is empty (e.g., "access_token=;"),
+     * it returns null.
+     *
+     * @param cookieHeader The raw Cookie header string.
+     * @param key The name of the token to extract.
+     * @return The token value if present and non-empty; null otherwise.
+     */
+    private String extractToken(String cookieHeader, String key) {
+        String prefix = key + "=";
+        String hostPrefix = "__Host-" + key + "=";
+
+        String value = null;
+        if (cookieHeader.startsWith(prefix)) {
+            value = extractTokenValue(cookieHeader, prefix);
+        } else if (cookieHeader.startsWith(hostPrefix)) {
+            value = extractTokenValue(cookieHeader, hostPrefix);
+        }
+
+        if (value != null && !value.isEmpty()) {
+            return value;
+        }
+        return null;
     }
 
     /**

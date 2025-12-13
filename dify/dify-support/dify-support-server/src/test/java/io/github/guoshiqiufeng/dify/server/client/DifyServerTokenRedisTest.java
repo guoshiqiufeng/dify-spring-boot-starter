@@ -265,6 +265,8 @@ class DifyServerTokenRedisTest {
         verify(difyServerClient, never()).login();
         verify(cookies).add("access_token", "redis-access-token");
         verify(cookies).add("csrf_token", "redis-csrf-token");
+        verify(cookies).add("__Host-access_token", "redis-access-token");
+        verify(cookies).add("__Host-csrf_token", "redis-csrf-token");
     }
 
     @Test
@@ -295,5 +297,7 @@ class DifyServerTokenRedisTest {
         verify(valueOperations).set(eq(DifyRedisKey.CSRF_TOKEN), eq("new-csrf-token"));
         verify(cookies).add("access_token", "new-access-token");
         verify(cookies).add("csrf_token", null);
+        verify(cookies).add("__Host-access_token", "new-access-token");
+        verify(cookies).add("__Host-csrf_token", null);
     }
 }

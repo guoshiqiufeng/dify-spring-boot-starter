@@ -61,6 +61,9 @@ public class DifyServerTokenRedis extends BaseDifyServerToken {
         String csrfToken = redisTemplate.opsForValue().get(DifyRedisKey.CSRF_TOKEN);
         cookies.add("access_token", accessToken);
         cookies.add("csrf_token", csrfToken);
+        // support Https
+        cookies.add("__Host-access_token", accessToken);
+        cookies.add("__Host-csrf_token", csrfToken);
     }
 
     private String obtainToken(DifyServerClient difyServerClient) {
