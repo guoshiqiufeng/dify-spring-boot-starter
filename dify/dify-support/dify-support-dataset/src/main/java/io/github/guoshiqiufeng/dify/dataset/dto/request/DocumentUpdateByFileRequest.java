@@ -80,20 +80,12 @@ public class DocumentUpdateByFileRequest extends BaseDatasetRequest implements F
     @Deprecated
     private IndexingTechniqueEnum indexingTechnique;
 
-    /**
-     * @deprecated 1.4.3
-     */
     @JsonProperty("doc_form")
     @JsonAlias("docForm")
-    @Deprecated
     private DocFormEnum docForm;
 
-    /**
-     * @deprecated 1.4.3
-     */
     @JsonProperty("doc_language")
     @JsonAlias("docLanguage")
-    @Deprecated
     private String docLanguage;
 
     @JsonProperty("process_rule")

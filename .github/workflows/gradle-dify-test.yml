@@ -17,7 +17,7 @@ jobs:
     env:
       DIFY_NETWORK: docker_default
       OLLAMA_CONTAINER: ollama
-      DIFY_VERSION: 1.7.2
+      DIFY_VERSION: 1.11.1
       PLUGIN_ID: "langgenius/ollama:0.0.6@f430f3eb959f4863b1e87171544a8fec179441b90deda5693c85f07712d2a68c"
       MODEL_EMBEDDING: bge-m3:latest
       MODEL_LLM: qwen2.5:1.5b
@@ -114,18 +114,50 @@ jobs:
           sudo apt-get update && sudo apt-get install -y jq
           RESPONSE=$(curl -sf -X POST 'http://localhost/console/api/login' \
             -H 'Content-Type: application/json' \
-            --data '{"email":"admin@admin.com","password":"admin123456"}')
-          
-          TOKEN=$(echo "$RESPONSE" | jq -r '.data.access_token')
-          [ -z "$TOKEN" ] && { echo "::error::Failed to get token"; exit 1; }
-          echo "admin_token=$TOKEN" >> $GITHUB_OUTPUT
+            --data '{"email":"admin@admin.com","password":"admin123456"}' \
+            -c /tmp/cookies.txt -D /tmp/headers.txt)
+
+          echo "=== Response Headers ==="
+          cat /tmp/headers.txt
+          echo ""
+          echo "=== Cookies ==="
+          cat /tmp/cookies.txt
+          echo ""
+
+          # Extract tokens from Netscape cookie file format
+          # Format: domain flag path secure expiration name value
+          ACCESS_TOKEN=$(awk '/access_token/ {print $NF}' /tmp/cookies.txt)
+          CSRF_TOKEN=$(awk '/csrf_token/ {print $NF}' /tmp/cookies.txt)
+
+          [ -z "$ACCESS_TOKEN" ] && { echo "::error::Failed to get access_token from cookies"; exit 1; }
+          [ -z "$CSRF_TOKEN" ] && { echo "::error::Failed to get csrf_token from cookies"; exit 1; }
+
+          echo "✅ Extracted access_token: ${ACCESS_TOKEN:0:20}..."
+          echo "✅ Extracted csrf_token: ${CSRF_TOKEN:0:20}..."
+
+          echo "admin_token=$ACCESS_TOKEN" >> $GITHUB_OUTPUT
+          echo "csrf_token=$CSRF_TOKEN" >> $GITHUB_OUTPUT
 
       - name: Install Ollama Plugin
         run: |
-          curl -sf -X POST 'http://localhost/console/api/workspaces/current/plugin/install/marketplace' \
+          echo "Installing plugin: ${{ env.PLUGIN_ID }}"
+          RESPONSE=$(curl -w "\nHTTP_CODE:%{http_code}" -X POST 'http://localhost/console/api/workspaces/current/plugin/install/marketplace' \
             -H "Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}" \
+            -H "Cookie: access_token=${{ steps.get_token.outputs.admin_token }}; csrf_token=${{ steps.get_token.outputs.csrf_token }}" \
+            -H "X-CSRF-Token: ${{ steps.get_token.outputs.csrf_token }}" \
             -H 'Content-Type: application/json' \
-            --data '{"plugin_unique_identifiers":["${{ env.PLUGIN_ID }}"]}'
+            --data '{"plugin_unique_identifiers":["${{ env.PLUGIN_ID }}"]}')
+
+          HTTP_CODE=$(echo "$RESPONSE" | grep -oP 'HTTP_CODE:\K\d+')
+          BODY=$(echo "$RESPONSE" | sed 's/HTTP_CODE:[0-9]*$//')
+
+          echo "Response code: $HTTP_CODE"
+          echo "Response body: $BODY"
+
+          if [ "$HTTP_CODE" -ge 400 ]; then
+            echo "::error::Plugin installation request failed with HTTP $HTTP_CODE"
+            exit 1
+          fi
 
       - name: Verify plugin installation
         run: |
@@ -133,6 +165,8 @@ jobs:
           for i in $(seq 1 $MAX_ATTEMPTS); do
             if curl -sSf -X GET 'http://localhost/console/api/workspaces/current/plugin/list' \
               -H "Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}" \
+              -H "Cookie: access_token=${{ steps.get_token.outputs.admin_token }}; csrf_token=${{ steps.get_token.outputs.csrf_token }}" \
+              -H "X-CSRF-Token: ${{ steps.get_token.outputs.csrf_token }}" \
               | jq -e '.plugins[] | select(.plugin_id=="langgenius/ollama")' >/dev/null; then
               echo "✅ Plugin installed successfully"
               exit 0
@@ -149,16 +183,22 @@ jobs:
 
           curl -X POST 'http://localhost/console/api/workspaces/current/model-providers/langgenius/ollama/ollama/models/credentials' \
             -H "Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}" \
+            -H "Cookie: access_token=${{ steps.get_token.outputs.admin_token }}; csrf_token=${{ steps.get_token.outputs.csrf_token }}" \
+            -H "X-CSRF-Token: ${{ steps.get_token.outputs.csrf_token }}" \
             -H 'Content-Type: application/json' \
             --data-raw '{"credentials":{"base_url":"'"$BASE_URL"'","mode":"chat","context_size":"4096","max_tokens":"4096","vision_support":"false","function_call_support":"false","__model_name":"'"${{ env.MODEL_EMBEDDING }}"'","__model_type":"text-embedding"},"name":"local","model":"'"${{ env.MODEL_EMBEDDING }}"'","model_type":"text-embedding"}'
 
           curl -X POST 'http://localhost/console/api/workspaces/current/model-providers/langgenius/ollama/ollama/models/credentials' \
             -H "Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}" \
+            -H "Cookie: access_token=${{ steps.get_token.outputs.admin_token }}; csrf_token=${{ steps.get_token.outputs.csrf_token }}" \
+            -H "X-CSRF-Token: ${{ steps.get_token.outputs.csrf_token }}" \
             -H 'Content-Type: application/json' \
             --data-raw '{"credentials":{"base_url":"'"$BASE_URL"'","mode":"chat","context_size":"4096","max_tokens":"4096","vision_support":"false","function_call_support":"false","__model_name":"'"${{ env.MODEL_LLM }}"'","__model_type":"llm"},"name":"local","model":"'"${{ env.MODEL_LLM }}"'","model_type":"llm"}'
-          
+
           curl -sf -X POST 'http://localhost/console/api/workspaces/current/model-providers/langgenius/ollama/ollama/models' \
             -H "Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}" \
+            -H "Cookie: access_token=${{ steps.get_token.outputs.admin_token }}; csrf_token=${{ steps.get_token.outputs.csrf_token }}" \
+            -H "X-CSRF-Token: ${{ steps.get_token.outputs.csrf_token }}" \
             -H 'Content-Type: application/json' \
             --data '{
               "model": "'"${{ env.MODEL_EMBEDDING }}"'",
@@ -170,9 +210,11 @@ jobs:
                 "base_url": "'"$BASE_URL"'"
               }
             }'
-          
+
           curl -sf -X POST 'http://localhost/console/api/workspaces/current/model-providers/langgenius/ollama/ollama/models' \
             -H "Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}" \
+            -H "Cookie: access_token=${{ steps.get_token.outputs.admin_token }}; csrf_token=${{ steps.get_token.outputs.csrf_token }}" \
+            -H "X-CSRF-Token: ${{ steps.get_token.outputs.csrf_token }}" \
             -H 'Content-Type: application/json' \
             --data '{
               "model": "'"${{ env.MODEL_LLM }}"'",
@@ -189,6 +231,8 @@ jobs:
         run: |
           curl 'http://localhost/console/api/apps/imports' \
             -H "Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}" \
+            -H "Cookie: access_token=${{ steps.get_token.outputs.admin_token }}; csrf_token=${{ steps.get_token.outputs.csrf_token }}" \
+            -H "X-CSRF-Token: ${{ steps.get_token.outputs.csrf_token }}" \
             -H 'content-type: application/json' \
             --data-raw $'{"mode":"yaml-content","yaml_content":"app:\\n  description: \'\'\\n  icon: 🤖\\n  icon_background: \'#FFEAD5\'\\n  mode: chat\\n  name: test\\n  use_icon_as_answer_icon: false\\ndependencies:\\n- current_identifier: null\\n  type: marketplace\\n  value:\\n    marketplace_plugin_unique_identifier: ${{ env.PLUGIN_ID }}\\nkind: app\\nmodel_config:\\n  agent_mode:\\n    enabled: false\\n    max_iteration: 5\\n    strategy: function_call\\n    tools: []\\n  annotation_reply:\\n    enabled: false\\n  chat_prompt_config: {}\\n  completion_prompt_config: {}\\n  dataset_configs:\\n    datasets:\\n      datasets: []\\n    reranking_enable: false\\n    retrieval_model: multiple\\n    top_k: 4\\n  dataset_query_variable: \'\'\\n  external_data_tools: []\\n  file_upload:\\n    allowed_file_extensions:\\n    - .JPG\\n    - .JPEG\\n    - .PNG\\n    - .GIF\\n    - .WEBP\\n    - .SVG\\n    - .MP4\\n    - .MOV\\n    - .MPEG\\n    - .MPGA\\n    allowed_file_types: []\\n    allowed_file_upload_methods:\\n    - remote_url\\n    - local_file\\n    enabled: false\\n    image:\\n      detail: high\\n      enabled: false\\n      number_limits: 3\\n      transfer_methods:\\n      - remote_url\\n      - local_file\\n    number_limits: 3\\n  model:\\n    completion_params:\\n      stop: []\\n    mode: chat\\n    name: ${{ env.MODEL_LLM }}\\n    provider: langgenius/ollama/ollama\\n  more_like_this:\\n    enabled: false\\n  opening_statement: \'\'\\n  pre_prompt: \'\'\\n  prompt_type: simple\\n  retriever_resource:\\n    enabled: true\\n  sensitive_word_avoidance:\\n    configs: []\\n    enabled: false\\n    type: \'\'\\n  speech_to_text:\\n    enabled: false\\n  suggested_questions: []\\n  suggested_questions_after_answer:\\n    enabled: false\\n  text_to_speech:\\n    enabled: false\\n    language: \'\'\\n    voice: \'\'\\n  user_input_form: []\\nversion: ${{ env.CURRENT_DSL_VERSION }}\\n"}'
 
@@ -196,6 +240,8 @@ jobs:
         run: |
           curl -X POST 'http://localhost/console/api/workspaces/current/default-model' \
             -H "Authorization: Bearer ${{ steps.get_token.outputs.admin_token }}" \
+            -H "Cookie: access_token=${{ steps.get_token.outputs.admin_token }}; csrf_token=${{ steps.get_token.outputs.csrf_token }}" \
+            -H "X-CSRF-Token: ${{ steps.get_token.outputs.csrf_token }}" \
             -H 'Content-Type: application/json' \
             --data '{
               "model_settings": [
@@ -206,7 +252,7 @@ jobs:
 
       - name: Run Gradle tests
         run: |
-          ./gradlew jacocoTestReport --no-daemon
+          ./gradlew jacocoTestReport --info --no-daemon
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5

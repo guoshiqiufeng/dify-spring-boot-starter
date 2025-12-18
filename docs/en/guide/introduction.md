@@ -68,69 +68,69 @@ Legend:
 
 ### Dataset (Knowledge Base) Features
 
-| Feature                                      | Status |
-|----------------------------------------------|--------|
-| Create Document from Text                    | ✅      |
-| Create Document from File                    | ✅      |
-| Create Empty Knowledge Base                  | ✅      |
-| Get Knowledge Base Details by ID             | ✅      |
-| Update Knowledge Base                        | ✅      |
-| Get Knowledge Base List                      | ✅      |
-| Delete Knowledge Base                        | ✅      |
-| Update Document with Text                    | ✅      |
-| Update Document with File                    | ✅      |
-| Get Document Embedding Status (Progress)     | ✅      |
-| Delete Document                              | ✅      |
-| Get Document List of Knowledge Base          | ✅      |
-| Get Document Details                         | ✅      |
-| Get Document Details with Metadata Filtering | ✅      |
-| Get Segment Details                          | ✅      |
-| Add Chunks to Document                       | ✅      |
-| Get Chunks from Document                     | ✅      |
-| Delete Chunk in Document                     | ✅      |
-| Update Chunk in Document                     | ✅      |
-| Create Child Chunk                           | ✅      |
-| Get Child Chunks                             | ✅      |
-| Delete Child Chunk                           | ✅      |
-| Update Child Chunk                           | ✅      |
-| Get Upload File                              | ✅      |
-| Retrieve Chunks from Knowledge Base          | ✅      |
-| Create Knowledge Metadata                    | ✅      |
-| Update Knowledge Metadata                    | ✅      |
-| Delete Knowledge Metadata                    | ✅      |
-| Disable/Enable Built-in Metadata             | ✅      |
-| Update Documents Metadata                    | ✅      |
-| Get Knowledge Metadata List                  | ✅      |
-| Get Available Embedding Models               | ✅      |
-| Get Rerank Models                            | ✅      |
-| Create Knowledge Base Type Tag               | ✅      |
-| Modify Knowledge Base Type Tag Name          | ✅      |
-| Delete Knowledge Base Type Tag               | ✅      |
-| Bind Dataset to Knowledge Base Type Tag      | ✅      |
-| Unbind Dataset and Knowledge Base Type Tag   | ✅      |
-| Query Tags Bound to Dataset                  | ✅      |
+| Feature                                                      | Status |
+|--------------------------------------------------------------|--------|
+| Create Document from Text                                    | ✅      |
+| Create Document from File                                    | ✅      |
+| Create Empty Knowledge Base                                  | ✅      |
+| Get Knowledge Base Details by ID                             | ✅      |
+| Update Knowledge Base                                        | ✅      |
+| Get Knowledge Base List                                      | ✅      |
+| Delete Knowledge Base                                        | ✅      |
+| Update Document with Text                                    | ✅      |
+| Update Document with File                                    | ✅      |
+| Get Document Embedding Status (Progress)                     | ✅      |
+| Delete Document                                              | ✅      |
+| Get Document List of Knowledge Base                          | ✅      |
+| Get Document Details                                         | ✅      |
+| Get Document Details with Metadata Filtering                 | ✅      |
+| Get Segment Details                                          | ✅      |
+| Add Chunks to Document                                       | ✅      |
+| Get Chunks from Document                                     | ✅      |
+| Delete Chunk in Document                                     | ✅      |
+| Update Chunk in Document                                     | ✅      |
+| Create Child Chunk                                           | ✅      |
+| Get Child Chunks                                             | ✅      |
+| Delete Child Chunk                                           | ✅      |
+| Update Child Chunk                                           | ✅      |
+| Get Upload File  (dify was temporarily removed after v1.9.2) | ✅      |
+| Retrieve Chunks from Knowledge Base                          | ✅      |
+| Create Knowledge Metadata                                    | ✅      |
+| Update Knowledge Metadata                                    | ✅      |
+| Delete Knowledge Metadata                                    | ✅      |
+| Disable/Enable Built-in Metadata                             | ✅      |
+| Update Documents Metadata                                    | ✅      |
+| Get Knowledge Metadata List                                  | ✅      |
+| Get Available Embedding Models                               | ✅      |
+| Get Rerank Models                                            | ✅      |
+| Create Knowledge Base Type Tag                               | ✅      |
+| Modify Knowledge Base Type Tag Name                          | ✅      |
+| Delete Knowledge Base Type Tag                               | ✅      |
+| Bind Dataset to Knowledge Base Type Tag                      | ✅      |
+| Unbind Dataset and Knowledge Base Type Tag                   | ✅      |
+| Query Tags Bound to Dataset                                  | ✅      |
 
 ### Server Features
 
-| Feature                                           | Status |
-|---------------------------------------------------|--------|
-| Get All Applications List                         | ✅      |
-| Get Applications Page List                        | ✅      |
-| Get Application Information                       | ✅      |
-| Get Application API Keys                          | ✅      |
-| Initialize Application API Key                    | ✅      |
-| Delete Application API Key                        | ✅      |
-| Get Knowledge Base API Keys                       | ✅      |
-| Initialize Knowledge Base API Key                 | ✅      |
-| Delete Knowledge Base API Key                     | ✅      |
-| Get Application Chat Conversation List            | ✅      |
-| Get Application Daily Conversation Statistics     | ✅      |
-| Get Application Daily End Users Statistics        | ✅      |
+| Feature                                                 | Status |
+|---------------------------------------------------------|--------|
+| Get All Applications List                               | ✅      |
+| Get Applications Page List                              | ✅      |
+| Get Application Information                             | ✅      |
+| Get Application API Keys                                | ✅      |
+| Initialize Application API Key                          | ✅      |
+| Delete Application API Key                              | ✅      |
+| Get Knowledge Base API Keys                             | ✅      |
+| Initialize Knowledge Base API Key                       | ✅      |
+| Delete Knowledge Base API Key                           | ✅      |
+| Get Application Chat Conversation List                  | ✅      |
+| Get Application Daily Conversation Statistics           | ✅      |
+| Get Application Daily End Users Statistics              | ✅      |
 | Get Application Average Session Interactions Statistics | ✅      |
-| Get Application Tokens Per Second Statistics      | ✅      |
-| Get Application User Satisfaction Rate Statistics | ✅      |
-| Get Application Token Costs Statistics            | ✅      |
-| Get Application Daily Messages Statistics         | ✅      |
+| Get Application Tokens Per Second Statistics            | ✅      |
+| Get Application User Satisfaction Rate Statistics       | ✅      |
+| Get Application Token Costs Statistics                  | ✅      |
+| Get Application Daily Messages Statistics               | ✅      |
 
 ## Code Hosting
 
