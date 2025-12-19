@@ -1,0 +1,33 @@
+dependencies {
+    implementation project(":dify:dify-support:dify-support-chat")
+    implementation project(":dify:dify-support:dify-support-dataset")
+    implementation project(":dify:dify-support:dify-support-server")
+    implementation project(":dify:dify-support:dify-support-workflow")
+    implementation project(":dify:dify-core")
+
+    // Spring Boot Actuator
+    compileOnly "org.springframework.boot:spring-boot-starter-actuator"
+
+    // Spring Web for HTTP client exceptions
+    compileOnly "org.springframework:spring-web"
+
+    // Lombok
+    compileOnly "org.projectlombok:lombok"
+    annotationProcessor "org.projectlombok:lombok"
+
+    // Jackson for JSON
+    compileOnly "com.fasterxml.jackson.core:jackson-annotations"
+
+    // SLF4J for logging
+    compileOnly "org.slf4j:slf4j-api"
+
+    // Test dependencies
+    testImplementation "org.junit.jupiter:junit-jupiter:5.9.3"
+    testImplementation "org.mockito:mockito-core:5.3.1"
+    testImplementation "org.mockito:mockito-junit-jupiter:5.3.1"
+    testImplementation "org.mockito:mockito-inline:5.2.0"
+    testImplementation "org.springframework:spring-test"
+    testImplementation "org.springframework:spring-web"
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation "org.springframework.boot:spring-boot-starter-actuator"
+}

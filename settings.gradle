@@ -28,6 +28,8 @@ include 'dify:dify-client:dify-client-spring5'
 include 'dify:dify-client:dify-client-spring6'
 include 'dify:dify-client:dify-client-spring7'
 
+include 'dify:dify-status'
+
 include 'dify:dify-support'
 include 'dify:dify-support:dify-support-chat'
 include 'dify:dify-support:dify-support-dataset'

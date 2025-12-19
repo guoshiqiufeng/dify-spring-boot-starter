@@ -16,10 +16,12 @@
 package io.github.guoshiqiufeng.dify.core.config;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Dify 配置
@@ -51,6 +53,8 @@ public class DifyProperties implements Serializable {
      * 请求配置
      */
     private ClientConfig clientConfig = new ClientConfig();
+
+    private StatusConfig status = new StatusConfig();
 
     @Data
     @AllArgsConstructor
@@ -86,5 +90,39 @@ public class DifyProperties implements Serializable {
         private Boolean skipNull = true;
 
         private Boolean logging = true;
+    }
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class StatusConfig implements Serializable {
+        private static final long serialVersionUID = -9124280674952624154L;
+
+        @Builder.Default
+        private Boolean healthIndicatorEnabled = false;
+
+        @Builder.Default
+        private Boolean healthIndicatorInitByServer = true;
+
+        /**
+         * all apikey
+         */
+        private String apiKey;
+
+        /**
+         * Dataset API key (for DifyDataset client)
+         */
+        private String datasetApiKey;
+
+        /**
+         * Chat API key (for DifyChat client)
+         */
+        private List<String> chatApiKey;
+
+        /**
+         * Workflow API key (for DifyWorkflow client)
+         */
+        private List<String> workflowApiKey;
     }
 }

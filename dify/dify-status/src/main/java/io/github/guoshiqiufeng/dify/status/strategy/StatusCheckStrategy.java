@@ -13,27 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.dataset.enums.document;
+package io.github.guoshiqiufeng.dify.status.strategy;
+
+import io.github.guoshiqiufeng.dify.status.dto.ApiStatusResult;
 
 /**
+ * Status check strategy interface
+ *
  * @author yanghq
- * @version 1.0
- * @since 2025/3/13 14:27
+ * @version 1.7.0
+ * @since 2025/12/19 14:00
  */
-public enum DocFormEnum {
+public interface StatusCheckStrategy {
+    /**
+     * Check the status of a specific API method
+     *
+     * @param methodName The name of the method to check
+     * @param apiKey     The API key for authentication
+     * @return ApiStatusResult containing the check result
+     */
+    ApiStatusResult checkStatus(String methodName, String apiKey);
 
     /**
-     * text 文档直接 embedding，经济模式默认为该模式
+     * Get the client name this strategy is for
+     *
+     * @return Client name
      */
-    text_model,
-
-    /**
-     * parent-child 模式
-     */
-    hierarchical_model,
-
-    /**
-     * Q&A 模式：为分片文档生成 Q&A 对，然后对问题进行 embedding
-     */
-    qa_model;
+    String getClientName();
 }
