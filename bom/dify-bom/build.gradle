@@ -15,6 +15,7 @@ description = "dify bom"
 dependencyManagement {
     dependencies {
         dependency "${APP_GROUP}:dify-core:${APP_VERSION}"
+        dependency "${APP_GROUP}:dify-status:${APP_VERSION}"
         dependency "${APP_GROUP}:dify-client-spring5:${APP_VERSION}"
         dependency "${APP_GROUP}:dify-client-spring6:${APP_VERSION}"
         dependency "${APP_GROUP}:dify-client-spring7:${APP_VERSION}"

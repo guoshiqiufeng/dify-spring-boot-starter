@@ -3,6 +3,7 @@ dependencies {
     implementation project(":dify:dify-support:dify-support-dataset")
     implementation project(":dify:dify-support:dify-support-server")
     implementation project(":dify:dify-support:dify-support-workflow")
+    implementation project(":dify:dify-status")
 
     api project(":dify:dify-client:dify-client-spring5")
 

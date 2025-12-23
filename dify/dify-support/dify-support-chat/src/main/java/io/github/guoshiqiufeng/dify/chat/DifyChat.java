@@ -225,7 +225,6 @@ public interface DifyChat {
      *
      * @param annotationId Annotation ID to identify the annotation to delete
      * @param apiKey       API key for authentication
-     * @return AppAnnotationDeleteResponse Response information for the deletion operation
      * @since 0.10.0
      * @since Dify version 1.2.0 or higher
      */
