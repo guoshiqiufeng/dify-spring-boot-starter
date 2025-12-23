@@ -54,7 +54,7 @@ class DifyStatusServiceImplTest {
     private static final String TEST_API_KEY = "test-api-key";
 
     private static final DifyProperties.StatusConfig statusConfig = DifyProperties.StatusConfig.builder()
-            .enabled(true)
+            .healthIndicatorEnabled(true)
             .apiKey(TEST_API_KEY)
             .build();
 
