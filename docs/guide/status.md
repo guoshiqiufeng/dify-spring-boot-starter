@@ -4,6 +4,10 @@ title: 服务状态监控
 description: Dify 服务状态监控和健康检查
 ---
 
+<script setup>import {inject} from "vue";
+const version = inject('version');
+</script>
+
 # 服务状态监控
 
 `dify-status` 模块提供了对 Dify API 服务的健康检查和状态监控功能，支持与 Spring Boot Actuator 集成。

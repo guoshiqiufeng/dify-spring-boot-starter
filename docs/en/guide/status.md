@@ -4,6 +4,10 @@ title: Service Status Monitoring
 description: Dify service status monitoring and health checks
 ---
 
+<script setup>import {inject} from "vue";
+const version = inject('version');
+</script>
+
 # Service Status Monitoring
 
 The `dify-status` module provides health check and status monitoring capabilities for Dify API services, with integration support for Spring Boot Actuator.
