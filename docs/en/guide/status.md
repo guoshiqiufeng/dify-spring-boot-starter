@@ -27,7 +27,7 @@ The `dify-status` module provides health check and status monitoring capabilitie
 
 Add dependencies to your `build.gradle`:
 
-```gradle
+```gradle:no-line-numbers:no-v-pre
 dependencies {
     implementation 'io.github.guoshiqiufeng:dify-spring-boot-starter:{{version}}'
     implementation 'io.github.guoshiqiufeng:dify-status:{{version}}'
@@ -37,7 +37,7 @@ dependencies {
 
 Or add to your `pom.xml`:
 
-```xml
+```xml:no-line-numbers:no-v-pre
 <dependencies>
     <dependency>
         <groupId>io.github.guoshiqiufeng</groupId>

@@ -27,7 +27,7 @@ const version = inject('version');
 
 在您的 `build.gradle` 中添加依赖：
 
-```gradle
+```gradle:no-line-numbers:no-v-pre
 dependencies {
     implementation 'io.github.guoshiqiufeng:dify-spring-boot-starter:{{version}}'
     implementation 'io.github.guoshiqiufeng:dify-status:{{version}}'
@@ -37,7 +37,7 @@ dependencies {
 
 或在 `pom.xml` 中添加：
 
-```xml
+```xml:no-line-numbers:no-v-pre
 <dependencies>
     <dependency>
         <groupId>io.github.guoshiqiufeng</groupId>
