@@ -25,8 +25,8 @@ description: Dify 服务状态监控和健康检查
 
 ```gradle
 dependencies {
-    implementation 'io.github.guoshiqiufeng:dify-spring-boot-starter:1.7.0'
-    implementation 'io.github.guoshiqiufeng:dify-status:1.7.0'
+    implementation 'io.github.guoshiqiufeng:dify-spring-boot-starter:{{version}}'
+    implementation 'io.github.guoshiqiufeng:dify-status:{{version}}'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 ```
@@ -38,12 +38,12 @@ dependencies {
     <dependency>
         <groupId>io.github.guoshiqiufeng</groupId>
         <artifactId>dify-spring-boot-starter</artifactId>
-        <version>1.7.0</version>
+        <version>{{version}}</version>
     </dependency>
     <dependency>
         <groupId>io.github.guoshiqiufeng</groupId>
         <artifactId>dify-status</artifactId>
-        <version>1.7.0</version>
+        <version>{{version}}</version>
     </dependency>
     <dependency>
         <groupId>org.springframework.boot</groupId>
@@ -150,9 +150,9 @@ curl http://localhost:8080/actuator/health
 | `dify.status.health-indicator-enabled` | Boolean | `false` | 是否启用健康检查指示器 |
 | `dify.status.health-indicator-init-by-server` | Boolean | `true` | 是否使用服务器账号初始化（推荐） |
 | `dify.status.api-key` | String | - | 默认 API Key，用于所有未单独配置的客户端 |
-| `dify.status.chat-api-key` | List<String> | - | Chat 客户端的 API Key 列表 |
+| `dify.status.chat-api-key` | `List<String>` | - | Chat 客户端的 API Key 列表 |
 | `dify.status.dataset-api-key` | String | - | Dataset 客户端的 API Key |
-| `dify.status.workflow-api-key` | List<String> | - | Workflow 客户端的 API Key 列表 |
+| `dify.status.workflow-api-key` | `List<String>` | - | Workflow 客户端的 API Key 列表 |
 
 ### 初始化方式
 

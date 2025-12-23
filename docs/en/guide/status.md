@@ -25,7 +25,8 @@ Add dependencies to your `build.gradle`:
 
 ```gradle
 dependencies {
-    implementation 'io.github.guoshiqiufeng:dify-spring-boot-starter:1.7.0'
+    implementation 'io.github.guoshiqiufeng:dify-spring-boot-starter:{{version}}'
+    implementation 'io.github.guoshiqiufeng:dify-status:{{version}}'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 ```
@@ -37,7 +38,12 @@ Or add to your `pom.xml`:
     <dependency>
         <groupId>io.github.guoshiqiufeng</groupId>
         <artifactId>dify-spring-boot-starter</artifactId>
-        <version>1.7.0</version>
+        <version>{{version}}</version>
+    </dependency>
+    <dependency>
+        <groupId>io.github.guoshiqiufeng</groupId>
+        <artifactId>dify-status</artifactId>
+        <version>{{version}}</version>
     </dependency>
     <dependency>
         <groupId>org.springframework.boot</groupId>
@@ -144,9 +150,9 @@ Example response:
 | `dify.status.health-indicator-enabled` | Boolean | `false` | Enable health indicator |
 | `dify.status.health-indicator-init-by-server` | Boolean | `true` | Initialize using server account (recommended) |
 | `dify.status.api-key` | String | - | Default API Key for all clients without specific configuration |
-| `dify.status.chat-api-key` | List<String> | - | API Key list for Chat client |
+| `dify.status.chat-api-key` | `List<String>` | - | API Key list for Chat client |
 | `dify.status.dataset-api-key` | String | - | API Key for Dataset client |
-| `dify.status.workflow-api-key` | List<String> | - | API Key list for Workflow client |
+| `dify.status.workflow-api-key` | `List<String>` | - | API Key list for Workflow client |
 
 ### Initialization Methods
 
