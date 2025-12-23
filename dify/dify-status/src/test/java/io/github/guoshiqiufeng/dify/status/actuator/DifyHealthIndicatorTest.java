@@ -52,7 +52,8 @@ class DifyHealthIndicatorTest {
     private static final String TEST_API_KEY = "test-api-key";
 
     private static final DifyProperties.StatusConfig statusConfig = DifyProperties.StatusConfig.builder()
-            .enabled(true)
+            .healthIndicatorEnabled(true)
+            .healthIndicatorInitByServer(false)
             .apiKey(TEST_API_KEY)
             .build();
 
@@ -114,7 +115,7 @@ class DifyHealthIndicatorTest {
 
         Health health = healthIndicator.health();
 
-        assertEquals(Status.DOWN, health.getStatus());
+        assertEquals(Status.UP, health.getStatus());
         assertEquals(ApiStatus.CLIENT_ERROR, health.getDetails().get("overallStatus"));
         assertEquals(18, health.getDetails().get("totalApis"));
         assertEquals(16, health.getDetails().get("healthyApis"));
@@ -204,7 +205,7 @@ class DifyHealthIndicatorTest {
 
         Health health = healthIndicator.health();
 
-        assertEquals(Status.DOWN, health.getStatus());
+        assertEquals(Status.UP, health.getStatus());
         @SuppressWarnings("unchecked")
         Map<String, ApiStatus> returnedSummary = (Map<String, ApiStatus>) health.getDetails().get("clientSummary");
         assertNotNull(returnedSummary);
