@@ -47,7 +47,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Slf4j
 @Configuration
-@ConditionalOnClass(DifyStatusService.class)
+@ConditionalOnClass(value = {DifyStatusService.class, DifyHealthIndicator.class})
 public class DifyStatusAutoConfiguration {
 
     @Bean
@@ -96,7 +96,7 @@ public class DifyStatusAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(DifyHealthIndicator.class)
+    @ConditionalOnMissingBean(name = "difyHealthIndicator")
     @ConditionalOnProperty(name = "dify.status.health-indicator-enabled", havingValue = "true")
     @ConditionalOnClass(name = "org.springframework.boot.actuate.health.HealthIndicator")
     public DifyHealthIndicator difyHealthIndicator(

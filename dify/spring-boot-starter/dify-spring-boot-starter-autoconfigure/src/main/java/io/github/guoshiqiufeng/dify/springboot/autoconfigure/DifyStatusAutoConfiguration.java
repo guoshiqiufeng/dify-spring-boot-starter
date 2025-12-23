@@ -47,7 +47,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Slf4j
 @Configuration
-@ConditionalOnClass(DifyStatusService.class)
+@ConditionalOnClass(value = {DifyStatusService.class, DifyHealthIndicator.class})
 public class DifyStatusAutoConfiguration {
 
     @Bean
