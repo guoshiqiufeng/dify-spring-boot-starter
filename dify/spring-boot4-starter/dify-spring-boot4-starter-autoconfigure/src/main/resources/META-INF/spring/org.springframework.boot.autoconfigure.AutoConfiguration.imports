@@ -4,4 +4,4 @@ io.github.guoshiqiufeng.dify.springboot4.autoconfigure.DifyDatasetAutoConfigurat
 io.github.guoshiqiufeng.dify.springboot4.autoconfigure.DifyServerRedisTokenAutoConfiguration
 io.github.guoshiqiufeng.dify.springboot4.autoconfigure.DifyServerAutoConfiguration
 io.github.guoshiqiufeng.dify.springboot4.autoconfigure.DifyWorkflowAutoConfiguration
-io.github.guoshiqiufeng.dify.springboot.autoconfigure.DifyStatusAutoConfiguration
+io.github.guoshiqiufeng.dify.springboot4.autoconfigure.DifyStatusAutoConfiguration

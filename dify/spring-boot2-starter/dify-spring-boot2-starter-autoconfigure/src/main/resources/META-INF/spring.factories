@@ -4,4 +4,4 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   io.github.guoshiqiufeng.dify.springboot2.autoconfigure.DifyDatasetAutoConfiguration,\
   io.github.guoshiqiufeng.dify.springboot2.autoconfigure.DifyServerAutoConfiguration,\
   io.github.guoshiqiufeng.dify.springboot2.autoconfigure.DifyWorkflowAutoConfiguration,\
-  io.github.guoshiqiufeng.dify.springboot.autoconfigure.DifyStatusAutoConfiguration
+  io.github.guoshiqiufeng.dify.springboot2.autoconfigure.DifyStatusAutoConfiguration
