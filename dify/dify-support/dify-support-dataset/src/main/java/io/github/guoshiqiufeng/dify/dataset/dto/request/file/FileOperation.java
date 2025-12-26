@@ -15,7 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.dataset.dto.request.file;
 
-import org.springframework.web.multipart.MultipartFile;
+import io.github.guoshiqiufeng.dify.core.pojo.DifyFile;
 
 /**
  * File Operation Interface
@@ -32,7 +32,7 @@ public interface FileOperation {
     /**
      * Sets a file to be used in a dataset operation
      *
-     * @param file The MultipartFile to be processed as part of a dataset request
+     * @param file The DifyFile to be processed as part of a dataset request
      */
-    public void setFile(MultipartFile file);
+    public void setFile(DifyFile file);
 }

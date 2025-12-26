@@ -21,7 +21,6 @@ import io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendCompletionR
 import io.github.guoshiqiufeng.dify.core.pipeline.PipelineContext;
 import io.github.guoshiqiufeng.dify.core.pipeline.PipelineHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 
 /**
  * @author yanghq
@@ -51,7 +50,8 @@ public class DifyChatPipelineUtils {
             return completionResponse;
         }
         ChatMessagePipelineModel chatMessagePipelineModel = new ChatMessagePipelineModel();
-        BeanUtils.copyProperties(completionResponse, chatMessagePipelineModel);
+        // TODO
+        // BeanUtils.copyProperties(completionResponse, chatMessagePipelineModel);
         PipelineContext<ChatMessagePipelineModel> context = PipelineContext.<ChatMessagePipelineModel>builder()
                 .code(CHAT_CODE)
                 .model(chatMessagePipelineModel)

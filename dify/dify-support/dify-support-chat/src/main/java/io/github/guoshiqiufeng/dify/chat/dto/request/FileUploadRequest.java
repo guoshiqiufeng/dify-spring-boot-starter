@@ -15,12 +15,12 @@
  */
 package io.github.guoshiqiufeng.dify.chat.dto.request;
 
+import io.github.guoshiqiufeng.dify.core.pojo.DifyFile;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
 
@@ -36,5 +36,5 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class FileUploadRequest extends BaseChatRequest implements Serializable {
 
-    private MultipartFile file;
+    private DifyFile file;
 }

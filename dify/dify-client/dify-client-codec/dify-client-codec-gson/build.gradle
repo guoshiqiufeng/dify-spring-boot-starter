@@ -1,0 +1,11 @@
+dependencies {
+    api project(':dify:dify-client:dify-client-core')
+
+    // Gson 依赖
+    api libs.gson
+
+    api libs.jackson.annotations
+
+    testImplementation libs.junit.jupiter
+    testImplementation libs.mockito.core
+}

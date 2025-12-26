@@ -1,0 +1,12 @@
+dependencies {
+    api project(':dify:dify-client:dify-client-core')
+
+    // Jackson 2.x 依赖 (com.fasterxml.jackson)
+    implementation libs.jackson.databind
+
+    // Jackson 3.x 依赖 (tools.jackson)
+    implementation libs.tools.jackson.databind
+
+    testImplementation libs.junit.jupiter
+    testImplementation libs.mockito.core
+}

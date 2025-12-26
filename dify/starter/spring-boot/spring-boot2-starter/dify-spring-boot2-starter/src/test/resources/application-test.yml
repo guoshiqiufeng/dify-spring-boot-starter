@@ -1,0 +1,7 @@
+dify:
+  url: https://1a418f4a19c9.ngrok-free.app
+  server:
+    email: admin@admin.com
+    password: admin123456
+  dataset:
+    api-key: dataset-aaabbbcccdddeeefffggghhh

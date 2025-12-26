@@ -4,7 +4,6 @@ dependencies {
     api libs.hutool.core
 
     implementation "io.projectreactor:reactor-core"
-    implementation libs.spring.webflux
 
     implementation libs.jackson.databind
 

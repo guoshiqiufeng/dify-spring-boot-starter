@@ -1,0 +1,9 @@
+dify:
+  url: http://localhost
+  server:
+    email: admin@admin.com
+    password: YWRtaW4xMjM0NTY=
+  dataset:
+    api-key: dataset-aaabbbcccdddeeefffggghhh
+  client-config:
+    skip-null: false

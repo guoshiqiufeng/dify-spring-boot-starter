@@ -23,7 +23,6 @@ import io.github.guoshiqiufeng.dify.chat.pipeline.DifyChatPipelineUtils;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
@@ -49,8 +48,7 @@ public class DifyChatClientImpl implements DifyChat {
 
     @Override
     public Flux<ChatMessageSendCompletionResponse> sendChatMessageStream(ChatMessageSendRequest sendRequest) {
-        return difyChatClient.streamingChat(sendRequest)
-                .doOnNext(DifyChatPipelineUtils::processChat);
+        return difyChatClient.streamingChat(sendRequest);
     }
 
     @Override
@@ -93,10 +91,13 @@ public class DifyChatClientImpl implements DifyChat {
         return difyChatClient.parameters(apiKey);
     }
 
-    @Override
-    public ResponseEntity<byte[]> textToAudio(TextToAudioRequest request) {
-        return difyChatClient.textToAudio(request);
-    }
+//    @Override
+//    public ResponseEntity<byte[]> textToAudio(TextToAudioRequest request) {
+//        io.github.guoshiqiufeng.dify.client.core.response.HttpResponse<byte[]> httpResponse = difyChatClient.textToAudio(request);
+//        return ResponseEntity.status(httpResponse.getStatusCode())
+//                .headers(h -> httpResponse.getHeaders().forEach((name, values) -> values.forEach(value -> h.add(name, value))))
+//                .body(httpResponse.getBody());
+//    }
 
     @Override
     public DifyTextVO audioToText(AudioToTextRequest request) {
@@ -108,10 +109,13 @@ public class DifyChatClientImpl implements DifyChat {
         return difyChatClient.fileUpload(request);
     }
 
-    @Override
-    public ResponseEntity<byte[]> filePreview(FilePreviewRequest request) {
-        return difyChatClient.filePreview(request);
-    }
+//    @Override
+//    public ResponseEntity<byte[]> filePreview(FilePreviewRequest request) {
+//        io.github.guoshiqiufeng.dify.client.core.response.HttpResponse<byte[]> httpResponse = difyChatClient.filePreview(request);
+//        return ResponseEntity.status(httpResponse.getStatusCode())
+//                .headers(h -> httpResponse.getHeaders().forEach((name, values) -> values.forEach(value -> h.add(name, value))))
+//                .body(httpResponse.getBody());
+//    }
 
     @Override
     public AppInfoResponse info(String apiKey) {

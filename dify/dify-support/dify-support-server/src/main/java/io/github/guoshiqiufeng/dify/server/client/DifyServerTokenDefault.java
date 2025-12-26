@@ -15,10 +15,10 @@
  */
 package io.github.guoshiqiufeng.dify.server.client;
 
+import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
+import io.github.guoshiqiufeng.dify.core.constant.DifyConstant;
 import io.github.guoshiqiufeng.dify.server.dto.response.LoginResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.util.MultiValueMap;
 
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -43,12 +43,12 @@ public class DifyServerTokenDefault extends BaseDifyServerToken {
         if (accessToken == null) {
             obtainToken(difyServerClient);
         }
-        headers.setBearerAuth(accessToken);
+        headers.add(DifyConstant.AUTHORIZATION, DifyConstant.BEARER_KEY + accessToken);
         headers.add("x-csrf-token", csrfToken);
     }
 
     @Override
-    public void addAuthorizationCookies(MultiValueMap<String, String> cookies, DifyServerClient difyServerClient) {
+    public void addAuthorizationCookies(io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap<String, String> cookies, DifyServerClient difyServerClient) {
         if (accessToken == null) {
             obtainToken(difyServerClient);
         }
