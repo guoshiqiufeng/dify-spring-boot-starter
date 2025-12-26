@@ -2,6 +2,7 @@ dependencies {
     api libs.slf4j.api
     api libs.jackson.annotations
     implementation libs.jackson.databind
+    implementation libs.spring.context
 
 
     testImplementation libs.junit.jupiter

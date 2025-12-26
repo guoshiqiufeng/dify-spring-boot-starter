@@ -43,11 +43,13 @@ subprojects {
     if (!onlyPom) {
         dependencyManagement {
             imports {
-                if (project.name.contains("spring5") || project.name.contains("core") || project.name.contains("support") || project.name.contains("status") || project.name.contains("spring-boot2-starter")) {
+                if (project.name.contains("core") || project.name.contains("client")
+                        || project.name.contains("support") || project.name.contains("status")
+                        || project.name.contains("spring-boot2-starter") || project.name.contains("java-starter")) {
                     mavenBom "org.springframework.boot:spring-boot-dependencies:${libs.versions.springBoot2.get()}"
-                } else if (project.name.contains("spring-boot4-starter") || project.name.contains("spring7")) {
+                } else if (project.name.contains("spring-boot4-starter")) {
                     mavenBom "org.springframework.boot:spring-boot-dependencies:${libs.versions.springBoot4.get()}"
-                } else if (project.name.contains("spring-boot-starter") || project.name.contains("spring6")) {
+                } else if (project.name.contains("spring-boot-starter")) {
                     mavenBom "org.springframework.boot:spring-boot-dependencies:${libs.versions.springBoot3.get()}"
                 }
                 mavenBom "org.testcontainers:testcontainers-bom:${libs.versions.testcontainers.get()}"
@@ -62,7 +64,7 @@ subprojects {
         options.encoding = 'UTF-8'
         options.warnings = false
         options.deprecation = true
-        options.compilerArgs += ["-parameters"]
+        options.compilerArgs += ["-Xlint:unchecked", "-parameters"]
     }
 
     tasks.withType(GenerateModuleMetadata) {

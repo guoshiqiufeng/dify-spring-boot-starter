@@ -1,10 +1,11 @@
 dependencies {
     api project(":dify:dify-core")
-    api libs.hutool.core
-    api libs.hutool.extra
+    api project(":dify:dify-client:dify-client-core")
+//    api libs.hutool.core
+//    api libs.hutool.extra
 
     implementation "io.projectreactor:reactor-core"
-    implementation libs.spring.webflux
+//    implementation libs.spring.webflux
     implementation "org.springframework:spring-context"
 
     implementation libs.jackson.databind

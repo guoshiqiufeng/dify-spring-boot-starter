@@ -38,10 +38,11 @@
 
 ### 功能
 
-- 聊天
-- 后台
-- 工作流
-- 知识库
+- 聊天 (Chat)
+- 后台 (Server)
+- 工作流 (Workflow)
+- 知识库 (Dataset)
+- 状态监控 (Status)
 
 ### 使用
 
@@ -102,6 +103,18 @@
 </dependency>
 ```
 
+- 纯 Java 项目
+
+> dify-spring-boot-starter v2.0.0 以上版本可用
+
+```xml
+
+<dependency>
+    <groupId>io.github.guoshiqiufeng.dify</groupId>
+    <artifactId>dify-java-starter</artifactId>
+</dependency>
+```
+
 #### 自动加载
 
 ##### yml 配置
@@ -135,20 +148,56 @@ public class DifyChatService {
 
 #### 构造器
 
-> dify-spring-boot-starter v0.9.0 以上版本可用
+> dify-spring-boot-starter v2.0.0 以上版本可用
+
+**纯 Java 项目**：
 
 ```java
-DifyServer difyServer = DifyServerBuilder.create(
-        DifyServerBuilder.DifyServerClientBuilder
-                .builder()
-                .baseUrl("https://your-dify-api.example.com")
-                .serverProperties(new DifyProperties.Server("admin@example.com", "password"))
-                .serverToken(new DifyServerTokenDefault())
-                .clientConfig(new DifyProperties.ClientConfig())
-                .restClientBuilder(RestClient.builder())
-                .webClientBuilder(WebClient.builder())
-                .build());
+import io.github.guoshiqiufeng.dify.client.integration.okhttp.http.JavaHttpClientFactory;
+import io.github.guoshiqiufeng.dify.client.codec.jackson.JacksonJsonMapper;
+
+// 创建 HTTP 客户端工厂（OkHttp）
+JavaHttpClientFactory httpClientFactory = new JavaHttpClientFactory(new JacksonJsonMapper());
+
+// 创建 DifyServerClient
+DifyServerClient difyServerClient = DifyServerBuilder.builder()
+        .baseUrl("https://your-dify-api.example.com")
+        .httpClientFactory(httpClientFactory)
+        .serverProperties(new DifyProperties.Server("admin@example.com", "password"))
+        .build();
+
+// 创建 DifyServer
+DifyServer difyServer = DifyServerBuilder.create(difyServerClient);
 ```
+
+**Spring 项目**：
+
+```java
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.SpringHttpClientFactory;
+import io.github.guoshiqiufeng.dify.client.codec.jackson.JacksonJsonMapper;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestClient;
+
+// 创建 HTTP 客户端工厂（Spring）
+// SpringHttpClientFactory httpClientFactory = new SpringHttpClientFactory(new JacksonJsonMapper());
+SpringHttpClientFactory httpClientFactory = new SpringHttpClientFactory(
+        WebClient.builder(),
+        RestClient.builder(),  // Spring 6.1+ / Spring Boot 3.2+
+        new JacksonJsonMapper()
+);
+
+// 创建 DifyServerClient
+DifyServerClient difyServerClient = DifyServerBuilder.builder()
+        .baseUrl("https://your-dify-api.example.com")
+        .httpClientFactory(httpClientFactory)
+        .serverProperties(new DifyProperties.Server("admin@example.com", "password"))
+        .build();
+
+// 创建 DifyServer
+DifyServer difyServer = DifyServerBuilder.create(difyServerClient);
+```
+
+> **注意**：Spring Boot 2.x 环境下，RestClient 不可用，传入 `null` 即可。
 
 更多使用参考查看
 

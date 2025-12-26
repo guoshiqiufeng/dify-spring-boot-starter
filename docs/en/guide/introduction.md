@@ -20,6 +20,27 @@ implementation of the Dify API calling framework.
 - Workflow (Workflow Related)
 - Dataset (Knowledge Base)
 - Server (Features without open interfaces)
+- Status (Service Status Monitoring)
+
+## Core Modules
+
+- **dify-core**: Core module with base classes and interfaces
+- **dify-client**: Network request layer encapsulation
+  - dify-client-core: Client core
+  - dify-client-codec: Codec (supports Gson and Jackson)
+  - dify-client-integration: Integration layer (supports OkHttp and Spring)
+- **dify-support**: Dify business logic
+  - dify-support-chat: Chat features
+  - dify-support-dataset: Dataset features
+  - dify-support-workflow: Workflow features
+  - dify-support-server: Server management features
+- **dify-support-impl**: Dify business logic client interface implementation
+- **dify-status**: Service status monitoring module
+- **starter**: Starters
+  - dify-java-starter: Pure Java project starter
+  - dify-spring-boot-starter: Spring Boot 3.1+ starter
+  - dify-spring-boot2-starter: Spring Boot 2.x/3.0.x starter
+  - dify-spring-boot4-starter: Spring Boot 4.x starter
 
 ## Features
 

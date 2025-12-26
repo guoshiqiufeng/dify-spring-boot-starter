@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@ import io.github.guoshiqiufeng.dify.chat.client.DifyChatClient;
 import io.github.guoshiqiufeng.dify.chat.dto.request.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.*;
 import io.github.guoshiqiufeng.dify.chat.pipeline.DifyChatPipelineUtils;
+import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
@@ -49,8 +49,7 @@ public class DifyChatClientImpl implements DifyChat {
 
     @Override
     public Flux<ChatMessageSendCompletionResponse> sendChatMessageStream(ChatMessageSendRequest sendRequest) {
-        return difyChatClient.streamingChat(sendRequest)
-                .doOnNext(DifyChatPipelineUtils::processChat);
+        return difyChatClient.streamingChat(sendRequest);
     }
 
     @Override
@@ -94,7 +93,7 @@ public class DifyChatClientImpl implements DifyChat {
     }
 
     @Override
-    public ResponseEntity<byte[]> textToAudio(TextToAudioRequest request) {
+    public HttpResponse<byte[]> textToAudio(TextToAudioRequest request) {
         return difyChatClient.textToAudio(request);
     }
 
@@ -109,7 +108,7 @@ public class DifyChatClientImpl implements DifyChat {
     }
 
     @Override
-    public ResponseEntity<byte[]> filePreview(FilePreviewRequest request) {
+    public HttpResponse<byte[]> filePreview(FilePreviewRequest request) {
         return difyChatClient.filePreview(request);
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 package io.github.guoshiqiufeng.dify.chat.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.github.guoshiqiufeng.dify.chat.dto.response.jackson.ChatMessageSendCompletionResponseDeserializer;
 import io.github.guoshiqiufeng.dify.chat.dto.response.message.CompletionData;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,7 +31,6 @@ import java.util.Map;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-//@JsonDeserialize(using = ChatMessageSendCompletionResponseDeserializer.class)
 public class ChatMessageSendCompletionResponse extends ChatMessageSendResponse implements Serializable {
 
     private static final long serialVersionUID = 3819274658903174523L;
@@ -41,7 +38,6 @@ public class ChatMessageSendCompletionResponse extends ChatMessageSendResponse i
     @JsonAlias("workflow_run_id")
     private String workflowRunId;
 
-    // @JsonDeserialize(using = CompletionDataDeserializer.class)
     private CompletionData data;
 
     private Integer position;

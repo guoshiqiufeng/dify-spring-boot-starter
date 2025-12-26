@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@ package io.github.guoshiqiufeng.dify.chat.client;
 
 import io.github.guoshiqiufeng.dify.chat.dto.request.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.*;
+import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
-import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
@@ -48,7 +48,7 @@ public interface DifyChatClient {
      * Used for streaming responses from the chat service
      *
      * @param chatRequest The chat message request containing message content and parameters
-     * @return A Flux stream of chat message completion responses
+     * @return A Publisher stream of chat message completion responses
      */
     Flux<ChatMessageSendCompletionResponse> streamingChat(ChatMessageSendRequest chatRequest);
 
@@ -117,9 +117,9 @@ public interface DifyChatClient {
      * Converts text to audio format
      *
      * @param request The text to audio conversion request
-     * @return Response entity containing the audio data as byte array
+     * @return HTTP response containing the audio data as byte array
      */
-    ResponseEntity<byte[]> textToAudio(TextToAudioRequest request);
+    HttpResponse<byte[]> textToAudio(TextToAudioRequest request);
 
     /**
      * Converts audio to text format
@@ -173,7 +173,7 @@ public interface DifyChatClient {
      * @return file content response with appropriate headers for browser display or download
      * @since 1.0.0
      */
-    ResponseEntity<byte[]> filePreview(FilePreviewRequest request);
+    HttpResponse<byte[]> filePreview(FilePreviewRequest request);
 
     /**
      * app info

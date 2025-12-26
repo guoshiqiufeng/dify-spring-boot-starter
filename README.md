@@ -42,6 +42,7 @@ Provide springboot starter for dify to simplify development.
 - server
 - workflow
 - dataset (Knowledge)
+- status (Monitoring)
 
 ### Use
 
@@ -97,6 +98,18 @@ Provide springboot starter for dify to simplify development.
 </dependency>
 ```
 
+- Pure Java Projects
+
+> dify-spring-boot-starter v2.0.0 or above is available.
+
+```xml
+
+<dependency>
+    <groupId>io.github.guoshiqiufeng.dify</groupId>
+    <artifactId>dify-java-starter</artifactId>
+</dependency>
+```
+
 #### autoloading
 
 ##### yml configuration
@@ -130,20 +143,56 @@ public class DifyChatService {
 
 #### Builder
 
-> dify-spring-boot-starter v0.9.0 or above is available.
+> dify-spring-boot-starter v2.0.0 or above is available.
+
+**Pure Java Projects**:
 
 ```java
-DifyServer difyServer = DifyServerBuilder.create(
-        DifyServerBuilder.DifyServerClientBuilder
-                .builder()
-                .baseUrl("https://your-dify-api.example.com")
-                .serverProperties(new DifyProperties.Server("admin@example.com", "password"))
-                .serverToken(new DifyServerTokenDefault())
-                .clientConfig(new DifyProperties.ClientConfig())
-                .restClientBuilder(RestClient.builder())
-                .webClientBuilder(WebClient.builder())
-                .build());
+import io.github.guoshiqiufeng.dify.client.integration.okhttp.http.JavaHttpClientFactory;
+import io.github.guoshiqiufeng.dify.client.codec.jackson.JacksonJsonMapper;
+
+// Create HTTP client factory (OkHttp)
+JavaHttpClientFactory httpClientFactory = new JavaHttpClientFactory(new JacksonJsonMapper());
+
+// Create DifyServerClient
+DifyServerClient difyServerClient = DifyServerBuilder.builder()
+        .baseUrl("https://your-dify-api.example.com")
+        .httpClientFactory(httpClientFactory)
+        .serverProperties(new DifyProperties.Server("admin@example.com", "password"))
+        .build();
+
+// Create DifyServer
+DifyServer difyServer = DifyServerBuilder.create(difyServerClient);
 ```
+
+**Spring Projects**:
+
+```java
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.SpringHttpClientFactory;
+import io.github.guoshiqiufeng.dify.client.codec.jackson.JacksonJsonMapper;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestClient;
+
+// Create HTTP client factory (Spring)
+// SpringHttpClientFactory httpClientFactory = new SpringHttpClientFactory(new JacksonJsonMapper());
+SpringHttpClientFactory httpClientFactory = new SpringHttpClientFactory(
+        WebClient.builder(),
+        RestClient.builder(),  // Spring 6.1+ / Spring Boot 3.2+
+        new JacksonJsonMapper()
+);
+
+// Create DifyServerClient
+DifyServerClient difyServerClient = DifyServerBuilder.builder()
+        .baseUrl("https://your-dify-api.example.com")
+        .httpClientFactory(httpClientFactory)
+        .serverProperties(new DifyProperties.Server("admin@example.com", "password"))
+        .build();
+
+// Create DifyServer
+DifyServer difyServer = DifyServerBuilder.create(difyServerClient);
+```
+
+> **Note**: In Spring Boot 2.x environments, RestClient is not available, pass `null`.
 
 For more usage references check the
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,5 +47,17 @@ public interface ChatUriConstant {
     String V1_CONVERSATIONS_VARIABLES_URI = V1_CONVERSATIONS_URI + "/{conversationId}/variables";
 
     String V1_CONVERSATIONS_VARIABLES_UPDATE_URI = V1_CONVERSATIONS_VARIABLES_URI + "/{variableId}";
+
+    String V1_APP_URI = V1_URL + "/app";
+
+    String V1_FILES_URI = V1_URL + "/files";
+
+    String V1_FILES_UPLOAD_URI = V1_FILES_URI + "/upload";
+
+    String V1_INFO_URI = V1_APP_URI + "/info";
+
+    String V1_META_URI = V1_APP_URI + "/meta";
+
+    String V1_ANNOTATIONS_URI = V1_APP_URI + "/annotations";
 
 }
