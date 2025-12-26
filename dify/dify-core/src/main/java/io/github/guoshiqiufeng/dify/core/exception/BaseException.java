@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,12 @@ public class BaseException extends RuntimeException {
     /**
      * 错误码
      */
-    private Integer code;
+    protected Integer code;
 
     /**
      * 错误消息
      */
-    private String msg;
+    protected String msg;
 
     public BaseException(Integer code, String msg) {
         super(msg);

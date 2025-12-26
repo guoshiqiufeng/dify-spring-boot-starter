@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.server.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -34,7 +35,9 @@ public class DifyLoginRequest implements Serializable {
     private String password;
 
     private String language;
-    @JsonAlias("remember-me")
+
+    @JsonAlias("rememberMe")
+    @JsonProperty("remember-me")
     private Boolean rememberMe;
 
     public static DifyLoginRequest build(String email, String password) {

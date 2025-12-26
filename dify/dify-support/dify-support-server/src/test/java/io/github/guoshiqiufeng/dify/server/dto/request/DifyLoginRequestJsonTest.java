@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ public class DifyLoginRequestJsonTest {
         assertTrue(json.contains("\"email\":\"test@example.com\""));
         assertTrue(json.contains("\"password\":\"password123\""));
         assertTrue(json.contains("\"language\":\"zh-Hans\""));
-        assertTrue(json.contains("\"rememberMe\":true"));
+        assertTrue(json.contains("\"remember-me\":true"));
     }
 
     @Test
@@ -123,6 +123,6 @@ public class DifyLoginRequestJsonTest {
         assertTrue(json.contains("\"email\":\"test@example.com\""));
         assertTrue(json.contains("\"password\":\"password123\""));
         assertTrue(json.contains("\"language\":\"zh-Hans\""));
-        assertTrue(json.contains("\"rememberMe\":true"));
+        assertTrue(json.contains("\"remember-me\":true"));
     }
 }

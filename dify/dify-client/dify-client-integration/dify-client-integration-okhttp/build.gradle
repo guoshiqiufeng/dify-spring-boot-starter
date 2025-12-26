@@ -1,0 +1,12 @@
+compileJava {
+    options.release = 8
+}
+
+dependencies {
+    api project(":dify:dify-client:dify-client-core")
+    api libs.okhttp
+
+    testImplementation libs.junit.jupiter
+    testImplementation libs.mockito.core
+    testImplementation libs.mockito.junit.jupiter
+}

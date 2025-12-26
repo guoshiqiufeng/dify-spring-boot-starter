@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@ package io.github.guoshiqiufeng.dify.chat;
 
 import io.github.guoshiqiufeng.dify.chat.dto.request.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.*;
+import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
-import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
@@ -132,7 +132,7 @@ public interface DifyChat {
      * @param request 文本转语音请求对象，包含文本内容等信息
      * @return 语音文件流
      */
-    ResponseEntity<byte[]> textToAudio(TextToAudioRequest request);
+    HttpResponse<byte[]> textToAudio(TextToAudioRequest request);
 
     /**
      * 语音转文本
@@ -160,7 +160,7 @@ public interface DifyChat {
      * @return ResponseEntity<byte[]> 文件内容响应，包含适当的浏览器显示或下载标头
      * @since 1.0.0
      */
-    ResponseEntity<byte[]> filePreview(FilePreviewRequest request);
+    HttpResponse<byte[]> filePreview(FilePreviewRequest request);
 
     /**
      * app info

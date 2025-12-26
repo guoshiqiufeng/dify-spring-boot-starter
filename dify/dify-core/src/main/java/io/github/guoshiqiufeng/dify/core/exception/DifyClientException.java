@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,5 +24,9 @@ public class DifyClientException extends BaseException {
 
     public DifyClientException(DiftClientExceptionEnum exceptionEnum) {
         super(exceptionEnum.getCode(), exceptionEnum.getMsg());
+    }
+
+    public Boolean noLogin() {
+        return msg.contains("[401]") || code == 401;
     }
 }

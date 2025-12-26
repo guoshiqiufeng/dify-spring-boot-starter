@@ -1,0 +1,14 @@
+dependencies {
+    api project(':dify:dify-client:dify-client-core')
+    implementation ("com.fasterxml.jackson.core:jackson-annotations:2.20")
+
+    // Jackson 2.x 依赖 (com.fasterxml.jackson)
+    implementation libs.jackson.databind
+    implementation libs.jackson.datatype.jsr310
+
+    // Jackson 3.x 依赖 (tools.jackson)
+    implementation libs.tools.jackson.databind
+
+    testImplementation libs.junit.jupiter
+    testImplementation libs.mockito.core
+}

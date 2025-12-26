@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package io.github.guoshiqiufeng.dify.dataset.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.github.guoshiqiufeng.dify.core.pojo.DifyFile;
 import io.github.guoshiqiufeng.dify.dataset.dto.RetrievalModel;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.document.ProcessRule;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.file.FileOperation;
@@ -25,7 +26,6 @@ import io.github.guoshiqiufeng.dify.dataset.enums.document.DocFormEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.document.DocTypeEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
 import java.util.List;
@@ -48,7 +48,7 @@ public class DocumentCreateByFileRequest extends BaseDatasetRequest implements F
     private String originalDocumentId;
 
     @JsonAlias("file")
-    private MultipartFile file;
+    private DifyFile file;
 
     /**
      * 文档类型（选填）

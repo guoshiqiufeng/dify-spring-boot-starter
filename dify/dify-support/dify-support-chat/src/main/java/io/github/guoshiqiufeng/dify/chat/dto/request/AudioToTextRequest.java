@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package io.github.guoshiqiufeng.dify.chat.dto.request;
 
+import io.github.guoshiqiufeng.dify.core.pojo.DifyFile;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
 
@@ -31,5 +31,5 @@ import java.io.Serializable;
 public class AudioToTextRequest extends BaseChatRequest implements Serializable {
     private static final long serialVersionUID = -7700945517933651361L;
 
-    private MultipartFile file;
+    private DifyFile file;
 }

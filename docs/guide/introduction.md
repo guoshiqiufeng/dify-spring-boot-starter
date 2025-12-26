@@ -20,6 +20,27 @@ description:
 - Workflow (工作流相关)
 - Dataset (知识库)
 - Server (未提供开放接口的功能)
+- Status (服务状态监控)
+
+## 核心模块
+
+- **dify-core**: 核心模块，包含基础类和接口
+- **dify-client**: 网络请求层封装
+  - dify-client-core: 客户端核心
+  - dify-client-codec: 编解码器（支持 Gson 和 Jackson）
+  - dify-client-integration: 集成层（支持 OkHttp 和 Spring）
+- **dify-support**: Dify 相关业务逻辑
+  - dify-support-chat: 聊天功能
+  - dify-support-dataset: 知识库功能
+  - dify-support-workflow: 工作流功能
+  - dify-support-server: 服务器管理功能
+- **dify-support-impl**: Dify 相关业务逻辑 client 接口实现
+- **dify-status**: 服务状态监控模块
+- **starter**: 启动器
+  - dify-java-starter: 纯 Java 项目启动器
+  - dify-spring-boot-starter: Spring Boot 3.1+ 启动器
+  - dify-spring-boot2-starter: Spring Boot 2.x/3.0.x 启动器
+  - dify-spring-boot4-starter: Spring Boot 4.x 启动器
 
 ## 功能
 

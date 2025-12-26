@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.chat.pipeline;
 
-import cn.hutool.core.exceptions.UtilException;
-import cn.hutool.extra.spring.SpringUtil;
+import io.github.guoshiqiufeng.dify.core.exception.UtilException;
+import io.github.guoshiqiufeng.dify.core.extra.spring.SpringUtil;
 import io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendCompletionResponse;
 import io.github.guoshiqiufeng.dify.core.pipeline.PipelineContext;
 import io.github.guoshiqiufeng.dify.core.pipeline.PipelineHandler;
