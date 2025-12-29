@@ -64,6 +64,8 @@ public abstract class BaseDifyServerToken {
                 boolean noLogin = false;
                 if(e instanceof DifyClientException) {
                     noLogin = ((DifyClientException) e).noLogin();
+                } else if (e.getMessage() != null && e.getMessage().contains("[401]")) {
+                    noLogin = true;
                 }
                 if (e.getMessage() != null && noLogin && retryCount < MAX_RETRY_ATTEMPTS - 1) {
                     log.warn("Token invalid, attempting to refresh token. Retry count: {}", retryCount + 1);
