@@ -435,6 +435,9 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                 difyServerProperties.getEmail(),
                 difyServerProperties.getPassword()
         );
+        if (difyServerProperties.getPasswordEncryption()) {
+            requestVO.setPassword(Base64.getEncoder().encodeToString(difyServerProperties.getPassword().getBytes()));
+        }
         ResponseEntity<LoginResultResponse> responseEntity = webClient.post()
                 .uri(ServerUriConstant.LOGIN)
                 .bodyValue(requestVO)

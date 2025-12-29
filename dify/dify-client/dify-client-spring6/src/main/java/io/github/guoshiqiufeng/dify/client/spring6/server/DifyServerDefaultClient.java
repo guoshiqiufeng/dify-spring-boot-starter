@@ -415,6 +415,9 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                 difyServerProperties.getEmail(),
                 difyServerProperties.getPassword()
         );
+        if (difyServerProperties.getPasswordEncryption()) {
+            requestVO.setPassword(Base64.getEncoder().encodeToString(difyServerProperties.getPassword().getBytes()));
+        }
         // 发送请求并获取完整 ResponseEntity
         ResponseEntity<LoginResultResponse> responseEntity = restClient.post()
                 .uri(ServerUriConstant.LOGIN)
@@ -503,7 +506,7 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
      * it returns null.
      *
      * @param cookieHeader The raw Cookie header string.
-     * @param key The name of the token to extract.
+     * @param key          The name of the token to extract.
      * @return The token value if present and non-empty; null otherwise.
      */
     private String extractToken(String cookieHeader, String key) {

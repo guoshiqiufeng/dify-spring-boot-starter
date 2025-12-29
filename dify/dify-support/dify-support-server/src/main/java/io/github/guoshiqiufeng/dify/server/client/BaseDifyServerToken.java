@@ -15,6 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.server.client;
 
+import io.github.guoshiqiufeng.dify.core.exception.DifyClientException;
+import io.github.guoshiqiufeng.dify.server.exception.DifyServerException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.MultiValueMap;
@@ -59,7 +61,11 @@ public abstract class BaseDifyServerToken {
             try {
                 return supplier.get();
             } catch (Exception e) {
-                if (e.getMessage() != null && e.getMessage().contains("[401]") && retryCount < MAX_RETRY_ATTEMPTS - 1) {
+                boolean noLogin = false;
+                if(e instanceof DifyClientException) {
+                    noLogin = ((DifyClientException) e).noLogin();
+                }
+                if (e.getMessage() != null && noLogin && retryCount < MAX_RETRY_ATTEMPTS - 1) {
                     log.warn("Token invalid, attempting to refresh token. Retry count: {}", retryCount + 1);
                     refreshOrObtainNewToken(difyServerClient);
                     retryCount++;
