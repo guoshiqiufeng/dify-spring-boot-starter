@@ -3,6 +3,7 @@ dify:
   server:
     email: admin@admin.com
     password: admin123456
+    password-encryption: false
   dataset:
     api-key: dataset-aaabbbcccdddeeefffggghhh
 logging:
