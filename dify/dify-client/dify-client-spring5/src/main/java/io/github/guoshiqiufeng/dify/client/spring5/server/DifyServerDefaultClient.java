@@ -36,6 +36,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.*;
@@ -435,6 +436,9 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                 difyServerProperties.getEmail(),
                 difyServerProperties.getPassword()
         );
+        if (difyServerProperties.getPasswordEncryption() && !ObjectUtils.isEmpty(difyServerProperties.getPassword())) {
+            requestVO.setPassword(Base64.getEncoder().encodeToString(difyServerProperties.getPassword().getBytes()));
+        }
         ResponseEntity<LoginResultResponse> responseEntity = webClient.post()
                 .uri(ServerUriConstant.LOGIN)
                 .bodyValue(requestVO)

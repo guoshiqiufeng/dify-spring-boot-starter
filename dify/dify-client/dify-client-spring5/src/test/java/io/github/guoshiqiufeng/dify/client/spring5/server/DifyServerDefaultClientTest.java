@@ -116,7 +116,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
 
         DifyLoginRequest capturedBody = bodyCaptor.getValue();
         assertEquals("test@example.com", capturedBody.getEmail());
-        assertEquals("password123", capturedBody.getPassword());
+        assertEquals("cGFzc3dvcmQxMjM=", capturedBody.getPassword());
     }
 
     @Test

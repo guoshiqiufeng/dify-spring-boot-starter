@@ -79,6 +79,20 @@ public class DifyProperties implements Serializable {
          * 密码
          */
         private String password;
+
+        /**
+         * 密码加密
+         * <p>dify 1.11.2以下需要关闭</p>
+         *
+         * @version 1.7.1
+         */
+        private Boolean passwordEncryption = true;
+
+        public Server(String email, String password) {
+            this.email = email;
+            this.password = password;
+            this.passwordEncryption = false;
+        }
     }
 
     @Data

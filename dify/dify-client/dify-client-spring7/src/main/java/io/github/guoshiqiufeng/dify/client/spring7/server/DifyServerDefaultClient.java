@@ -33,6 +33,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -446,6 +447,9 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                 difyServerProperties.getEmail(),
                 difyServerProperties.getPassword()
         );
+        if (difyServerProperties.getPasswordEncryption() && !ObjectUtils.isEmpty(difyServerProperties.getPassword())) {
+            requestVO.setPassword(Base64.getEncoder().encodeToString(difyServerProperties.getPassword().getBytes()));
+        }
         // 发送请求并获取完整 ResponseEntity
         ResponseEntity<LoginResultResponse> responseEntity = restClient.post()
                 .uri(ServerUriConstant.LOGIN)
