@@ -54,7 +54,7 @@ Provide springboot starter for dify to simplify development.
         <dependency>
             <groupId>io.github.guoshiqiufeng.dify</groupId>
             <artifactId>dify-bom</artifactId>
-            <version>1.7.0</version>
+            <version>1.7.1</version>
             <type>import</type>
         </dependency>
     </dependencies>
@@ -107,7 +107,7 @@ dify:
   server:
     email: admin@admin.com # Please replace the actual Dify service mailbox, if you do not need to call the server-related interfaces can not be filled in!
     password: admin123456 # Please replace the password with the actual Dify service password, if you don't need to call the server-related interfaces can not be filled in!
-    password-encryption: true # 密码加密开关，默认为 true。Dify 1.11.2 及以上版本需要开启（或者密码直接使用 Base64密文可不开启），1.11.2 以下版本需要设置为 false；
+    password-encryption: false # Password encryption switch, default is true, need to be enabled for Dify 1.11.2 and above (or unenabled for Base64 cipher), need to be set to false for versions below 1.11.2;
   dataset:
     api-key: dataset-aaabbbcccdddeeefffggghhh # Please replace with the actual Dify dataset API key, if you don't need to call the dataset-related interfaces can not be filled in!
 ```

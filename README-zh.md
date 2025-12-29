@@ -59,7 +59,7 @@
         <dependency>
             <groupId>io.github.guoshiqiufeng.dify</groupId>
             <artifactId>dify-bom</artifactId>
-            <version>1.7.0</version>
+            <version>1.7.1</version>
             <type>import</type>
         </dependency>
     </dependencies>
@@ -112,7 +112,7 @@ dify:
   server:
     email: admin@admin.com # 请替换为实际的 Dify 服务邮箱，若不需要调用 server相关接口可不填
     password: admin123456 # 请替换为实际的 Dify 服务密码，若不需要调用 server相关接口可不填
-    password-encryption: true # 密码加密开关，默认为 true。Dify 1.11.2 及以上版本需要开启（或者密码直接使用 Base64密文可不开启），1.11.2 以下版本需要设置为 false；
+    password-encryption: false # 密码加密开关，默认为 true。Dify 1.11.2 及以上版本需要开启（或者密码直接使用 Base64密文可不开启），1.11.2 以下版本需要设置为 false；
   dataset:
     api-key: dataset-aaabbbcccdddeeefffggghhh # 请替换为实际的知识库api-key, 若不需要调用知识库可不填
 ```
