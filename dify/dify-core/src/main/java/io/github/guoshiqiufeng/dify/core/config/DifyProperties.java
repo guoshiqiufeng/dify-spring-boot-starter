@@ -87,6 +87,12 @@ public class DifyProperties implements Serializable {
          * @version 1.7.1
          */
         private Boolean passwordEncryption = true;
+
+        public Server(String email, String password) {
+            this.email = email;
+            this.password = password;
+            this.passwordEncryption = false;
+        }
     }
 
     @Data
