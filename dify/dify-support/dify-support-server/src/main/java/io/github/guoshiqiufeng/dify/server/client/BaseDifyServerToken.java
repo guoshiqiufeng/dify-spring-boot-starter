@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.server.client;
 
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
+import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -39,7 +40,7 @@ public abstract class BaseDifyServerToken {
      */
     public abstract void addAuthorizationHeader(HttpHeaders headers, DifyServerClient difyServerClient);
 
-    public abstract void addAuthorizationCookies(io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap<String, String> cookies, DifyServerClient difyServerClient);
+    public abstract void addAuthorizationCookies(MultiValueMap<String, String> cookies, DifyServerClient difyServerClient);
 
     /**
      * Executes the given request supplier with automatic retry mechanism.

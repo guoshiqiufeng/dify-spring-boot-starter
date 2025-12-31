@@ -6,7 +6,7 @@ dependencies {
     implementation "io.projectreactor:reactor-core"
 //    implementation libs.spring.webflux
     implementation libs.jackson.databind
-//    implementation libs.spring.boot.starter.data.redis
+    implementation libs.spring.boot.starter.data.redis
 
     testImplementation libs.junit.jupiter
     testImplementation 'org.springframework:spring-test'

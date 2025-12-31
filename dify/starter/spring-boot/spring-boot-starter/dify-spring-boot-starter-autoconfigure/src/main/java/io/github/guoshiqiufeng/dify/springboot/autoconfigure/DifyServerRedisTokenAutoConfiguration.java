@@ -15,11 +15,17 @@
  */
 package io.github.guoshiqiufeng.dify.springboot.autoconfigure;
 
+import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
+import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
+import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenRedis;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 
@@ -34,13 +40,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 @ConditionalOnClass({DifyServerClient.class})
 public class DifyServerRedisTokenAutoConfiguration {
 
-//    @Bean
-//    @ConditionalOnMissingBean(BaseDifyServerToken.class)
-//    public BaseDifyServerToken difyServerToken(ObjectProvider<RedisTemplate<String, String>> redisTemplateProvider) {
-//        RedisTemplate<String, String> redisTemplate = redisTemplateProvider.getIfAvailable();
-//        if (redisTemplate != null) {
-//            return new DifyServerTokenRedis(redisTemplate);
-//        }
-//        return new DifyServerTokenDefault();
-//    }
+    @Bean
+    @ConditionalOnMissingBean(BaseDifyServerToken.class)
+    public BaseDifyServerToken difyServerToken(ObjectProvider<RedisTemplate<String, String>> redisTemplateProvider) {
+        RedisTemplate<String, String> redisTemplate = redisTemplateProvider.getIfAvailable();
+        if (redisTemplate != null) {
+            return new DifyServerTokenRedis(redisTemplate);
+        }
+        return new DifyServerTokenDefault();
+    }
 }
