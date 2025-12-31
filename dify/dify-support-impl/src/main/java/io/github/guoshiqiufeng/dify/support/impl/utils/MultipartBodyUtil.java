@@ -62,9 +62,8 @@ public class MultipartBodyUtil {
                         "form-data; name=\"file\"; filename=\"" + file.getFilename() + "\"")
                 .header("Content-Type", contentType);
         request.setFile(null);
-        // TODO Add JSON data part
-//        builder.part("data", toJson(request))
-//                .header("Content-Type", MediaType.APPLICATION_JSON);
+        builder.part("data", request)
+                .header("Content-Type", MediaType.APPLICATION_JSON);
 
         return builder;
     }

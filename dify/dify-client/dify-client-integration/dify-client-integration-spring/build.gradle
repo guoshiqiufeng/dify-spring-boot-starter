@@ -15,6 +15,7 @@ dependencies {
     // For testing with different Spring versions
     testImplementation libs.spring.webflux
     testImplementation libs.spring.boot.starter.reactor.netty
+    testImplementation 'org.springframework:spring-test'
     testImplementation libs.junit.jupiter
     testImplementation libs.mockito.core
     testImplementation libs.mockito.junit.jupiter

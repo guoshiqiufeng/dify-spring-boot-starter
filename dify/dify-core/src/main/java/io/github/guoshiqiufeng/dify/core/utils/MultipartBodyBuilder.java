@@ -15,6 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.core.utils;
 
+import lombok.Getter;
+
 import java.util.*;
 
 /**
@@ -110,7 +112,21 @@ public class MultipartBodyBuilder {
      * Represents a single part in a multipart request.
      */
     public static class Part {
+        /**
+         * -- GETTER --
+         *  Gets the name of this part.
+         *
+         * @return the part name
+         */
+        @Getter
         private final String name;
+        /**
+         * -- GETTER --
+         *  Gets the value of this part.
+         *
+         * @return the part value
+         */
+        @Getter
         private final Object value;
         private final Map<String, List<String>> headers = new LinkedHashMap<>();
 
@@ -127,24 +143,6 @@ public class MultipartBodyBuilder {
          */
         public void addHeader(String headerName, String headerValue) {
             headers.computeIfAbsent(headerName, k -> new ArrayList<>()).add(headerValue);
-        }
-
-        /**
-         * Gets the name of this part.
-         *
-         * @return the part name
-         */
-        public String getName() {
-            return name;
-        }
-
-        /**
-         * Gets the value of this part.
-         *
-         * @return the part value
-         */
-        public Object getValue() {
-            return value;
         }
 
         /**

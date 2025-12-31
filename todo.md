@@ -2,8 +2,8 @@
 1. client相关
    1.1 网络请求序列化相关调整
    1.2 网络请求日志支持
-2. DifyFile 支持 MultipartFile 类型
-3. DifyServerTokenRedis
+2. DifyFile 支持 MultipartFile 类型 [x]
+3. DifyServerTokenRedis [x]
 4. starter
    4.1 springboot
    4.2 java
