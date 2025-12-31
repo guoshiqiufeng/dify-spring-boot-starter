@@ -15,6 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.server.client;
 
+import io.github.guoshiqiufeng.dify.core.exception.DiftClientExceptionEnum;
+import io.github.guoshiqiufeng.dify.core.exception.DifyClientException;
 import io.github.guoshiqiufeng.dify.server.dto.response.LoginResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -191,6 +193,67 @@ class DifyServerTokenDefaultTest {
         refreshTokenField.setAccessible(true);
         String storedRefreshToken = (String) refreshTokenField.get(tokenDefault);
         assertEquals("new-refresh-token", storedRefreshToken);
+    }
+
+    @Test
+    @DisplayName("Test refreshOrObtainNewToken with exception thrown during refresh - should fallback to login")
+    void testRefreshOrObtainNewTokenWithExceptionDuringRefresh() throws Exception {
+        // Setup - first set initial tokens
+        LoginResponse initialLoginResponse = new LoginResponse();
+        initialLoginResponse.setAccessToken("initial-access-token");
+        initialLoginResponse.setRefreshToken("initial-refresh-token");
+        initialLoginResponse.setCsrfToken("initial-csrf-token");
+        when(difyServerClient.login()).thenReturn(initialLoginResponse);
+
+        // Initialize token with initial values
+        HttpHeaders initialHeaders = mock(HttpHeaders.class);
+        tokenDefault.addAuthorizationHeader(initialHeaders, difyServerClient);
+
+        // Verify initial setup
+        verify(difyServerClient).login();
+        verify(initialHeaders).setBearerAuth("initial-access-token");
+
+        // Reset mocks and prepare for refresh
+        reset(difyServerClient);
+
+        // Setup refresh to throw exception (simulating 401 Unauthorized)
+        when(difyServerClient.refreshToken("initial-refresh-token"))
+            .thenThrow(new DifyClientException(DiftClientExceptionEnum.UNAUTHORIZED));
+
+        // Setup new login response
+        LoginResponse newLoginResponse = new LoginResponse();
+        newLoginResponse.setAccessToken("new-access-token-after-exception");
+        newLoginResponse.setRefreshToken("new-refresh-token-after-exception");
+        newLoginResponse.setCsrfToken("new-csrf-token-after-exception");
+        when(difyServerClient.login()).thenReturn(newLoginResponse);
+
+        // Execute - should catch exception and fallback to login
+        tokenDefault.refreshOrObtainNewToken(difyServerClient);
+
+        // Verify that refreshToken was called and threw exception
+        verify(difyServerClient).refreshToken("initial-refresh-token");
+
+        // Verify that login was called as fallback
+        verify(difyServerClient).login();
+
+        // Use reflection to check internal token state - should have new tokens from login
+        Field accessTokenField = DifyServerTokenDefault.class.getDeclaredField("accessToken");
+        accessTokenField.setAccessible(true);
+        String accessToken = (String) accessTokenField.get(tokenDefault);
+        assertEquals("new-access-token-after-exception", accessToken,
+            "Access token should be updated with new token from login after refresh exception");
+
+        Field refreshTokenField = DifyServerTokenDefault.class.getDeclaredField("refreshToken");
+        refreshTokenField.setAccessible(true);
+        String storedRefreshToken = (String) refreshTokenField.get(tokenDefault);
+        assertEquals("new-refresh-token-after-exception", storedRefreshToken,
+            "Refresh token should be updated with new token from login after refresh exception");
+
+        Field csrfTokenField = DifyServerTokenDefault.class.getDeclaredField("csrfToken");
+        csrfTokenField.setAccessible(true);
+        String csrfToken = (String) csrfTokenField.get(tokenDefault);
+        assertEquals("new-csrf-token-after-exception", csrfToken,
+            "CSRF token should be updated with new token from login after refresh exception");
     }
 
     @Test
