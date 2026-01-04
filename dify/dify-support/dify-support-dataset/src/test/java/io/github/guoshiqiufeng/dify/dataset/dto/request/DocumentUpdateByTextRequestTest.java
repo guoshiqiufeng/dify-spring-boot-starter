@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @version 0.10.0
  * @since 2025/4/28
  */
+@SuppressWarnings("deprecation")
 public class DocumentUpdateByTextRequestTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();

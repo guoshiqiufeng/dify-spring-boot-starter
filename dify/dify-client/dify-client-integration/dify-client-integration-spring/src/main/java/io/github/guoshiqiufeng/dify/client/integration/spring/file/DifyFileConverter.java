@@ -45,10 +45,9 @@ public class DifyFileConverter {
      *
      * @param multipartFile Spring MultipartFile to convert
      * @return DifyFile instance
-     * @throws IOException if file reading fails
      * @throws IllegalArgumentException if multipartFile is null or empty
      */
-    public static DifyFile from(MultipartFile multipartFile) throws IOException {
+    public static DifyFile from(MultipartFile multipartFile) {
         if (multipartFile == null) {
             throw new IllegalArgumentException("MultipartFile cannot be null");
         }
@@ -58,7 +57,12 @@ public class DifyFileConverter {
 
         String filename = multipartFile.getOriginalFilename();
         String contentType = multipartFile.getContentType();
-        byte[] content = multipartFile.getBytes();
+        byte[] content = null;
+        try {
+            content = multipartFile.getBytes();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         return new DifyFile(filename, contentType, content);
     }

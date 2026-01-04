@@ -15,12 +15,12 @@
  */
 package io.github.guoshiqiufeng.dify.springboot4.autoconfigure;
 
-import io.github.guoshiqiufeng.dify.client.spring7.server.DifyServerDefaultClient;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
 import io.github.guoshiqiufeng.dify.server.impl.DifyServerClientImpl;
+import io.github.guoshiqiufeng.dify.support.impl.server.DifyServerDefaultClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.FilteredClassLoader;

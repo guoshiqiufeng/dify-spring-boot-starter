@@ -15,10 +15,10 @@
  */
 package io.github.guoshiqiufeng.dify.springboot4.autoconfigure;
 
-import io.github.guoshiqiufeng.dify.client.spring7.dataset.DifyDatasetDefaultClient;
 import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
 import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;
 import io.github.guoshiqiufeng.dify.dataset.impl.DifyDatasetClientImpl;
+import io.github.guoshiqiufeng.dify.support.impl.dataset.DifyDatasetDefaultClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.FilteredClassLoader;

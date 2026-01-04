@@ -15,13 +15,16 @@
  */
 package io.github.guoshiqiufeng.dify.springboot4.autoconfigure;
 
-import io.github.guoshiqiufeng.dify.client.spring7.server.DifyServerDefaultClient;
+import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
+import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.SpringHttpClientFactory;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
 import io.github.guoshiqiufeng.dify.server.impl.DifyServerClientImpl;
+import io.github.guoshiqiufeng.dify.support.impl.server.DifyServerDefaultClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -49,18 +52,19 @@ public class DifyServerAutoConfiguration {
         return new DifyServerTokenDefault();
     }
 
-    @Bean
+        @Bean
     @ConditionalOnMissingBean(DifyServerClient.class)
     public DifyServerClient difyServerClient(DifyProperties properties,
                                              BaseDifyServerToken difyServerToken,
-                                             ObjectProvider<RestClient.Builder> restClientBuilderProvider,
-                                             ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
-        return new DifyServerDefaultClient(properties.getServer(),
-                difyServerToken,
-                properties.getUrl(),
-                properties.getClientConfig(),
+                                             JsonMapper jsonMapper,
+                                             ObjectProvider<WebClient.Builder> webClientBuilderProvider,
+                                             ObjectProvider<RestClient.Builder> restClientBuilderProvider) {
+        SpringHttpClientFactory httpClientFactory = new SpringHttpClientFactory(
+                webClientBuilderProvider.getIfAvailable(WebClient::builder),
                 restClientBuilderProvider.getIfAvailable(RestClient::builder),
-                webClientBuilderProvider.getIfAvailable(WebClient::builder));
+                jsonMapper);
+        HttpClient httpClient = httpClientFactory.createClient(properties.getUrl(), properties.getClientConfig());
+        return new DifyServerDefaultClient(httpClient, properties.getServer(), difyServerToken);
     }
 
     @Bean

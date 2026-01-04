@@ -15,8 +15,11 @@
  */
 package io.github.guoshiqiufeng.dify.springboot4.autoconfigure;
 
-import io.github.guoshiqiufeng.dify.client.spring7.workflow.DifyWorkflowDefaultClient;
+import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
+import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.SpringHttpClientFactory;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
+import io.github.guoshiqiufeng.dify.support.impl.workflow.DifyWorkflowDefaultClient;
 import io.github.guoshiqiufeng.dify.workflow.DifyWorkflow;
 import io.github.guoshiqiufeng.dify.workflow.client.DifyWorkflowClient;
 import io.github.guoshiqiufeng.dify.workflow.impl.DifyWorkflowClientImpl;
@@ -42,12 +45,15 @@ public class DifyWorkflowAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(DifyWorkflowClient.class)
     public DifyWorkflowClient difyWorkflowClient(DifyProperties properties,
-                                                 ObjectProvider<RestClient.Builder> restClientBuilderProvider,
-                                                 ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
-        return new DifyWorkflowDefaultClient(properties.getUrl(),
-                properties.getClientConfig(),
+                                                 JsonMapper jsonMapper,
+                                                 ObjectProvider<WebClient.Builder> webClientBuilderProvider,
+                                                 ObjectProvider<RestClient.Builder> restClientBuilderProvider) {
+        SpringHttpClientFactory httpClientFactory = new SpringHttpClientFactory(
+                webClientBuilderProvider.getIfAvailable(WebClient::builder),
                 restClientBuilderProvider.getIfAvailable(RestClient::builder),
-                webClientBuilderProvider.getIfAvailable(WebClient::builder));
+                jsonMapper);
+        HttpClient httpClient = httpClientFactory.createClient(properties.getUrl(), properties.getClientConfig());
+        return new DifyWorkflowDefaultClient(httpClient);
     }
 
     @Bean

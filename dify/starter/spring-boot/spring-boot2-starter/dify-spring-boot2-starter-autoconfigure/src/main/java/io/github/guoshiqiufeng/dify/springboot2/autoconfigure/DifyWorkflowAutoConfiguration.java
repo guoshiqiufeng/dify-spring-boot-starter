@@ -15,7 +15,9 @@
  */
 package io.github.guoshiqiufeng.dify.springboot2.autoconfigure;
 
-import io.github.guoshiqiufeng.dify.client.spring5.workflow.DifyWorkflowDefaultClient;
+import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
+import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.SpringHttpClientFactory;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.workflow.DifyWorkflow;
 import io.github.guoshiqiufeng.dify.workflow.client.DifyWorkflowClient;
@@ -41,10 +43,14 @@ public class DifyWorkflowAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(DifyWorkflowClient.class)
     public DifyWorkflowClient difyWorkflowClient(DifyProperties properties,
+                                                 JsonMapper jsonMapper,
                                                  ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
-        return new DifyWorkflowDefaultClient(properties.getUrl(),
-                properties.getClientConfig(),
-                webClientBuilderProvider.getIfAvailable(WebClient::builder));
+        SpringHttpClientFactory httpClientFactory = new SpringHttpClientFactory(
+                webClientBuilderProvider.getIfAvailable(WebClient::builder),
+                null,
+                jsonMapper);
+        HttpClient httpClient = httpClientFactory.createClient(properties.getUrl(), properties.getClientConfig());
+        return new io.github.guoshiqiufeng.dify.support.impl.workflow.DifyWorkflowDefaultClient(httpClient);
     }
 
     @Bean

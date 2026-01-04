@@ -21,13 +21,16 @@ import io.github.guoshiqiufeng.dify.chat.dto.request.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.parameter.Enabled;
 import io.github.guoshiqiufeng.dify.chat.enums.AnnotationReplyActionEnum;
-import io.github.guoshiqiufeng.dify.client.spring7.builder.DifyDatasetBuilder;
+import io.github.guoshiqiufeng.dify.client.codec.jackson.JacksonJsonMapper;
+import io.github.guoshiqiufeng.dify.client.integration.spring.file.DifyFileConverter;
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.SpringHttpClientFactory;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
 import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.TextEmbeddingListResponse;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.textembedding.TextEmbedding;
 import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponse;
+import io.github.guoshiqiufeng.dify.support.impl.builder.DifyDatasetBuilder;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
@@ -36,6 +39,7 @@ import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
@@ -240,7 +244,7 @@ public class ChatTest extends BaseChatContainerTest {
     @DisplayName("Test file upload")
     public void testFileUpload() throws IOException {
         MultipartFile testFile = DatasetTest.createTestFile("chat.txt", MediaType.TEXT_PLAIN_VALUE);
-        FileUploadRequest request = new FileUploadRequest(testFile);
+        FileUploadRequest request = new FileUploadRequest(DifyFileConverter.from(testFile));
         request.setApiKey(apiKey);
         request.setUserId(userId);
         difyChat.fileUpload(request);
@@ -323,9 +327,15 @@ public class ChatTest extends BaseChatContainerTest {
             datasetApiKeys = difyServer.initDatasetApiKey();
         }
         String token = datasetApiKeys.getFirst().getToken();
+        SpringHttpClientFactory httpClientFactory = new SpringHttpClientFactory(
+                WebClient.builder().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token),
+                null,
+                new JacksonJsonMapper()
+        );
+
         DifyDataset difyDataset = DifyDatasetBuilder.create(DifyDatasetBuilder.DifyDatasetClientBuilder.builder()
                 .baseUrl(difyProperties.getUrl())
-                .restClientBuilder(RestClient.builder().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .httpClientFactory(httpClientFactory)
                 .build()
         );
         TextEmbeddingListResponse textEmbeddingListResponse = difyDataset.listTextEmbedding();

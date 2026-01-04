@@ -32,10 +32,6 @@ include 'dify:dify-client:dify-client-integration'
 include 'dify:dify-client:dify-client-integration:dify-client-integration-okhttp'
 include 'dify:dify-client:dify-client-integration:dify-client-integration-spring'
 
-//include 'dify:dify-client:dify-client-spring5'
-//include 'dify:dify-client:dify-client-spring6'
-//include 'dify:dify-client:dify-client-spring7'
-
 //include 'dify:dify-status'
 
 include 'dify:dify-support'
@@ -56,22 +52,22 @@ include 'dify:starter:spring-boot:spring-boot-starter:dify-spring-boot-starter-d
 include 'dify:starter:spring-boot:spring-boot-starter:dify-spring-boot-starter-server'
 include 'dify:starter:spring-boot:spring-boot-starter:dify-spring-boot-starter-workflow'
 include 'dify:starter:spring-boot:spring-boot-starter:dify-spring-boot-starter'
-//
-//include 'dify:spring-boot2-starter'
-//include 'dify:spring-boot2-starter:dify-spring-boot2-starter-autoconfigure'
-//include 'dify:spring-boot2-starter:dify-spring-boot2-starter-chat'
-//include 'dify:spring-boot2-starter:dify-spring-boot2-starter-dataset'
-//include 'dify:spring-boot2-starter:dify-spring-boot2-starter-server'
-//include 'dify:spring-boot2-starter:dify-spring-boot2-starter-workflow'
-//include 'dify:spring-boot2-starter:dify-spring-boot2-starter'
-//
-//include 'dify:spring-boot4-starter'
-//include 'dify:spring-boot4-starter:dify-spring-boot4-starter-autoconfigure'
-//include 'dify:spring-boot4-starter:dify-spring-boot4-starter-chat'
-//include 'dify:spring-boot4-starter:dify-spring-boot4-starter-dataset'
-//include 'dify:spring-boot4-starter:dify-spring-boot4-starter-server'
-//include 'dify:spring-boot4-starter:dify-spring-boot4-starter-workflow'
-//include 'dify:spring-boot4-starter:dify-spring-boot4-starter'
+
+include 'dify:starter:spring-boot:spring-boot2-starter'
+include 'dify:starter:spring-boot:spring-boot2-starter:dify-spring-boot2-starter-autoconfigure'
+include 'dify:starter:spring-boot:spring-boot2-starter:dify-spring-boot2-starter-chat'
+include 'dify:starter:spring-boot:spring-boot2-starter:dify-spring-boot2-starter-dataset'
+include 'dify:starter:spring-boot:spring-boot2-starter:dify-spring-boot2-starter-server'
+include 'dify:starter:spring-boot:spring-boot2-starter:dify-spring-boot2-starter-workflow'
+include 'dify:starter:spring-boot:spring-boot2-starter:dify-spring-boot2-starter'
+
+include 'dify:starter:spring-boot:spring-boot4-starter'
+include 'dify:starter:spring-boot:spring-boot4-starter:dify-spring-boot4-starter-autoconfigure'
+include 'dify:starter:spring-boot:spring-boot4-starter:dify-spring-boot4-starter-chat'
+include 'dify:starter:spring-boot:spring-boot4-starter:dify-spring-boot4-starter-dataset'
+include 'dify:starter:spring-boot:spring-boot4-starter:dify-spring-boot4-starter-server'
+include 'dify:starter:spring-boot:spring-boot4-starter:dify-spring-boot4-starter-workflow'
+include 'dify:starter:spring-boot:spring-boot4-starter:dify-spring-boot4-starter'
 
 
 

@@ -18,7 +18,7 @@ package io.github.guoshiqiufeng.dify.springboot4.autoconfigure;
 import io.github.guoshiqiufeng.dify.chat.DifyChat;
 import io.github.guoshiqiufeng.dify.chat.client.DifyChatClient;
 import io.github.guoshiqiufeng.dify.chat.impl.DifyChatClientImpl;
-import io.github.guoshiqiufeng.dify.client.spring7.chat.DifyChatDefaultClient;
+import io.github.guoshiqiufeng.dify.support.impl.chat.DifyChatDefaultClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.FilteredClassLoader;

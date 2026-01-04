@@ -15,8 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.springboot2.autoconfigure;
 
-import io.github.guoshiqiufeng.dify.client.spring5.workflow.DifyWorkflowDefaultClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
+import io.github.guoshiqiufeng.dify.support.impl.workflow.DifyWorkflowDefaultClient;
 import io.github.guoshiqiufeng.dify.workflow.DifyWorkflow;
 import io.github.guoshiqiufeng.dify.workflow.client.DifyWorkflowClient;
 import io.github.guoshiqiufeng.dify.workflow.impl.DifyWorkflowClientImpl;
@@ -108,13 +108,8 @@ public class DifyWorkflowAutoConfigurationTest {
     @Configuration
     static class CustomDifyWorkflowHandlerConfiguration {
         @Bean
-        DifyWorkflowClient difyWorkflowClient(DifyProperties properties) {
-            return new DifyWorkflowDefaultClient(properties.getUrl(), properties.getClientConfig(), WebClient.builder());
-        }
-
-        @Bean
-        DifyWorkflow customDifyWorkflowHandler() {
-            return mock(DifyWorkflow.class);
+        DifyWorkflowClient customDifyWorkflowClient() {
+            return mock(DifyWorkflowClient.class);
         }
     }
 }

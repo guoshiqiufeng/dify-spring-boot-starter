@@ -15,11 +15,11 @@
  */
 package io.github.guoshiqiufeng.dify.springboot2.autoconfigure;
 
-import io.github.guoshiqiufeng.dify.client.spring5.dataset.DifyDatasetDefaultClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
 import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;
 import io.github.guoshiqiufeng.dify.dataset.impl.DifyDatasetClientImpl;
+import io.github.guoshiqiufeng.dify.support.impl.dataset.DifyDatasetDefaultClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.FilteredClassLoader;
@@ -113,12 +113,6 @@ public class DifyDatasetAutoConfigurationTest {
 
     @Configuration
     static class CustomDifyDatasetHandlerConfiguration {
-        @Bean
-        DifyDatasetClient difyDatasetClient(DifyProperties properties) {
-            return new DifyDatasetDefaultClient(properties.getUrl(), properties.getClientConfig(),
-                    WebClient.builder().defaultHeader("Authorization", "Bearer " + properties.getDataset().getApiKey()));
-        }
-
         @Bean
         DifyDataset customDifyDatasetHandler() {
             return mock(DifyDataset.class);

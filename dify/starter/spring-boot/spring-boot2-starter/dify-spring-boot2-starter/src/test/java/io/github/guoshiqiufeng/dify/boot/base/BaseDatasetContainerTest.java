@@ -15,13 +15,16 @@
  */
 package io.github.guoshiqiufeng.dify.boot.base;
 
-import io.github.guoshiqiufeng.dify.client.spring5.dataset.DifyDatasetDefaultClient;
+import io.github.guoshiqiufeng.dify.client.codec.jackson.JacksonJsonMapper;
+import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.SpringHttpClientFactory;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
 import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;
 import io.github.guoshiqiufeng.dify.dataset.impl.DifyDatasetClientImpl;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponse;
+import io.github.guoshiqiufeng.dify.support.impl.dataset.DifyDatasetDefaultClient;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -60,9 +63,14 @@ public abstract class BaseDatasetContainerTest implements RedisContainerTest {
     public void setUp() {
         String apiKey = initializeApiKeyWithCache();
 
-        DifyDatasetClient difyDatasetClient = new DifyDatasetDefaultClient(difyProperties.getUrl(),
-                difyProperties.getClientConfig(),
-                WebClient.builder().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey));
+        HttpClient client = new SpringHttpClientFactory(
+                WebClient.builder().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey),
+                null,
+                new JacksonJsonMapper()
+        ).createClient(difyProperties.getUrl(),
+                difyProperties.getClientConfig());
+
+        DifyDatasetClient difyDatasetClient = new DifyDatasetDefaultClient(client);
 
         this.difyDataset = new DifyDatasetClientImpl(difyDatasetClient);
     }

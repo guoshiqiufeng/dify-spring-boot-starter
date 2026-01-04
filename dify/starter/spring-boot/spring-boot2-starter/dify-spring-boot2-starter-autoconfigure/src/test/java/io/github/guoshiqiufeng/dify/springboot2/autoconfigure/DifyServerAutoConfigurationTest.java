@@ -15,13 +15,13 @@
  */
 package io.github.guoshiqiufeng.dify.springboot2.autoconfigure;
 
-import io.github.guoshiqiufeng.dify.client.spring5.server.DifyServerDefaultClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
 import io.github.guoshiqiufeng.dify.server.impl.DifyServerClientImpl;
+import io.github.guoshiqiufeng.dify.support.impl.server.DifyServerDefaultClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.FilteredClassLoader;
@@ -124,19 +124,8 @@ public class DifyServerAutoConfigurationTest {
     @Configuration
     static class CustomDifyServerHandlerConfiguration {
         @Bean
-        BaseDifyServerToken difyServerToken() {
-            return new DifyServerTokenDefault();
-        }
-
-        @Bean
-        DifyServerClient difyServerClient(DifyProperties properties, BaseDifyServerToken difyServerToken) {
-            return new DifyServerDefaultClient(properties.getServer(), difyServerToken, properties.getUrl(),
-                    properties.getClientConfig(), WebClient.builder());
-        }
-
-        @Bean
-        DifyServer customDifyServerHandler() {
-            return mock(DifyServer.class);
+        BaseDifyServerToken customBaseDifyServerToken() {
+            return mock(BaseDifyServerToken.class);
         }
     }
 }

@@ -15,11 +15,14 @@
  */
 package io.github.guoshiqiufeng.dify.springboot2.autoconfigure;
 
-import io.github.guoshiqiufeng.dify.client.spring5.dataset.DifyDatasetDefaultClient;
+import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
+import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.SpringHttpClientFactory;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
 import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;
 import io.github.guoshiqiufeng.dify.dataset.impl.DifyDatasetClientImpl;
+import io.github.guoshiqiufeng.dify.support.impl.dataset.DifyDatasetDefaultClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -42,12 +45,16 @@ public class DifyDatasetAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(DifyDatasetClient.class)
     public DifyDatasetClient difyDatasetClient(DifyProperties properties,
+                                               JsonMapper jsonMapper,
                                                ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
         String apikey = "Bearer " + properties.getDataset().getApiKey();
-        return new DifyDatasetDefaultClient(properties.getUrl(),
-                properties.getClientConfig(),
+        SpringHttpClientFactory httpClientFactory = new SpringHttpClientFactory(
                 webClientBuilderProvider.getIfAvailable(WebClient::builder)
-                        .defaultHeader(HttpHeaders.AUTHORIZATION, apikey));
+                        .defaultHeader(HttpHeaders.AUTHORIZATION, apikey),
+                null,
+                jsonMapper);
+        HttpClient httpClient = httpClientFactory.createClient(properties.getUrl(), properties.getClientConfig());
+        return new DifyDatasetDefaultClient(httpClient);
     }
 
     @Bean

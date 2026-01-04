@@ -19,12 +19,15 @@ import io.github.guoshiqiufeng.dify.chat.DifyChat;
 import io.github.guoshiqiufeng.dify.chat.client.DifyChatClient;
 import io.github.guoshiqiufeng.dify.chat.impl.DifyChatClientImpl;
 import io.github.guoshiqiufeng.dify.chat.pipeline.ChatMessagePipelineModel;
-import io.github.guoshiqiufeng.dify.client.spring5.chat.DifyChatDefaultClient;
+import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
+import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.SpringHttpClientFactory;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pipeline.PipelineHandler;
 import io.github.guoshiqiufeng.dify.core.pipeline.PipelineModel;
 import io.github.guoshiqiufeng.dify.core.pipeline.PipelineProcess;
 import io.github.guoshiqiufeng.dify.core.pipeline.PipelineTemplate;
+import io.github.guoshiqiufeng.dify.support.impl.chat.DifyChatDefaultClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -50,10 +53,14 @@ public class DifyChatAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(DifyChatClient.class)
     public DifyChatClient difyChatClient(DifyProperties properties,
+                                         JsonMapper jsonMapper,
                                          ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
-        return new DifyChatDefaultClient(properties.getUrl(),
-                properties.getClientConfig(),
-                webClientBuilderProvider.getIfAvailable(WebClient::builder));
+        SpringHttpClientFactory httpClientFactory = new SpringHttpClientFactory(
+                webClientBuilderProvider.getIfAvailable(WebClient::builder),
+                null,
+                jsonMapper);
+        HttpClient httpClient = httpClientFactory.createClient(properties.getUrl(), properties.getClientConfig());
+        return new DifyChatDefaultClient(httpClient);
     }
 
     @Bean

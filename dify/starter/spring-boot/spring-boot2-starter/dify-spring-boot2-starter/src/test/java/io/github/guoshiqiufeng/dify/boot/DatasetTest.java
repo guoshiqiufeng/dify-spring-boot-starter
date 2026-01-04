@@ -17,6 +17,7 @@ package io.github.guoshiqiufeng.dify.boot;
 
 import cn.hutool.json.JSONUtil;
 import io.github.guoshiqiufeng.dify.boot.base.BaseDatasetContainerTest;
+import io.github.guoshiqiufeng.dify.client.integration.spring.file.DifyFileConverter;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.dataset.dto.RetrievalModel;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.*;
@@ -155,7 +156,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
 
         DocumentCreateByFileRequest request = new DocumentCreateByFileRequest();
         request.setDatasetId(datasetId);
-        request.setFile(testFile);
+        request.setFile(DifyFileConverter.from(testFile));
         request.setDocType(DocTypeEnum.others);
         // request.setDocMetadata(Map.of("source", "file", "type", "text-file"));
         request.setIndexingTechnique(IndexingTechniqueEnum.HIGH_QUALITY);
@@ -254,7 +255,7 @@ public class DatasetTest extends BaseDatasetContainerTest {
         DocumentUpdateByFileRequest request = new DocumentUpdateByFileRequest();
         request.setDatasetId(datasetId);
         request.setDocumentId(documentFileId);
-        request.setFile(testFile);
+        request.setFile(DifyFileConverter.from(testFile));
 
         request.setDocForm(DocFormEnum.hierarchical_model);
         request.setDocLanguage("English");

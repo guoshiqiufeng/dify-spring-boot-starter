@@ -18,8 +18,8 @@ package io.github.guoshiqiufeng.dify.springboot2.autoconfigure;
 import io.github.guoshiqiufeng.dify.chat.DifyChat;
 import io.github.guoshiqiufeng.dify.chat.client.DifyChatClient;
 import io.github.guoshiqiufeng.dify.chat.impl.DifyChatClientImpl;
-import io.github.guoshiqiufeng.dify.client.spring5.chat.DifyChatDefaultClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
+import io.github.guoshiqiufeng.dify.support.impl.chat.DifyChatDefaultClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.FilteredClassLoader;
@@ -108,13 +108,8 @@ public class DifyChatAutoConfigurationTest {
     @Configuration
     static class CustomDifyChatHandlerConfiguration {
         @Bean
-        DifyChatClient difyChatClient(DifyProperties properties) {
-            return new DifyChatDefaultClient(properties.getUrl(), properties.getClientConfig(), WebClient.builder());
-        }
-
-        @Bean
-        DifyChat customDifyChatHandler() {
-            return mock(DifyChat.class);
+        DifyChatClient customDifyChatClient() {
+            return mock(DifyChatClient.class);
         }
     }
 }

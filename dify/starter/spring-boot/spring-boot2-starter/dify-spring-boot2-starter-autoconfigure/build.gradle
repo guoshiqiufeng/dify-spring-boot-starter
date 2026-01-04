@@ -3,9 +3,12 @@ dependencies {
     implementation project(":dify:dify-support:dify-support-dataset")
     implementation project(":dify:dify-support:dify-support-server")
     implementation project(":dify:dify-support:dify-support-workflow")
-    implementation project(":dify:dify-status")
+    // implementation project(":dify:dify-status")
 
-    api project(":dify:dify-client:dify-client-spring5")
+    api project(":dify:dify-support-impl")
+    api project(":dify:dify-client:dify-client-integration:dify-client-integration-spring")
+    api project(":dify:dify-client:dify-client-codec:dify-client-codec-jackson")
+    api libs.jackson.databind
 
     api libs.spring.boot.starter.reactor.netty
 
