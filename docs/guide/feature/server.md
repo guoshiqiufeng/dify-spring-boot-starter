@@ -382,6 +382,231 @@ public void testDeleteDatasetApiKey() {
 }
 ```
 
+### 2.4 获取知识库索引状态
+
+#### 方法
+
+```java
+DocumentIndexingStatusResponse getDatasetIndexingStatus(String datasetId);
+```
+
+#### 请求参数
+
+| 参数名       | 类型     | 是否必须 | 描述     |
+|-----------|--------|------|--------|
+| datasetId | String | 是    | 知识库ID |
+
+#### 响应参数
+
+DocumentIndexingStatusResponse
+
+| 参数名  | 类型                          | 描述         |
+|------|-----------------------------|-----------|
+| data | `List<ProcessingStatus>`    | 文档索引状态列表  |
+
+ProcessingStatus
+
+| 参数名             | 类型      | 描述                                                    |
+|-----------------|---------|-------------------------------------------------------|
+| id              | String  | 文档ID                                                  |
+| indexingStatus  | String  | 索引状态：waiting、parsing、cleaning、splitting、indexing、completed、error、paused |
+| processingStartedAt | Long | 处理开始时间（时间戳）                                           |
+| parsingCompletedAt | Long | 解析完成时间（时间戳）                                           |
+| cleaningCompletedAt | Long | 清理完成时间（时间戳）                                           |
+| splittingCompletedAt | Long | 分割完成时间（时间戳）                                           |
+| completedAt     | Long    | 完成时间（时间戳）                                             |
+| pausedAt        | Long    | 暂停时间（时间戳）                                             |
+| error           | String  | 错误信息                                                  |
+| stoppedAt       | Long    | 停止时间（时间戳）                                             |
+| completedSegments | Integer | 已完成的分段数                                               |
+| totalSegments   | Integer | 总分段数                                                  |
+
+#### 请求示例
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testGetDatasetIndexingStatus() {
+    String datasetId = "dataset-123456789";
+
+    // 获取知识库索引状态
+    DocumentIndexingStatusResponse indexingStatus = difyServer.getDatasetIndexingStatus(datasetId);
+
+    if (indexingStatus.getData() != null && !indexingStatus.getData().isEmpty()) {
+        for (DocumentIndexingStatusResponse.ProcessingStatus doc : indexingStatus.getData()) {
+            System.out.println("文档ID: " + doc.getId());
+            System.out.println("索引状态: " + doc.getIndexingStatus());
+            System.out.println("已完成分段: " + doc.getCompletedSegments() + "/" + doc.getTotalSegments());
+        }
+    }
+}
+```
+
+### 2.5 获取文档索引状态
+
+#### 方法
+
+```java
+DocumentIndexingStatusResponse.ProcessingStatus getDocumentIndexingStatus(String datasetId, String documentId);
+```
+
+#### 请求参数
+
+| 参数名        | 类型     | 是否必须 | 描述     |
+|------------|--------|------|--------|
+| datasetId  | String | 是    | 知识库ID |
+| documentId | String | 是    | 文档ID  |
+
+#### 响应参数
+
+ProcessingStatus（结构与 2.4 节中定义的相同）
+
+#### 请求示例
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testGetDocumentIndexingStatus() {
+    String datasetId = "dataset-123456789";
+    String documentId = "doc-987654321";
+
+    // 获取文档索引状态
+    DocumentIndexingStatusResponse.ProcessingStatus documentStatus =
+        difyServer.getDocumentIndexingStatus(datasetId, documentId);
+
+    System.out.println("文档ID: " + documentStatus.getId());
+    System.out.println("索引状态: " + documentStatus.getIndexingStatus());
+    System.out.println("已完成分段: " + documentStatus.getCompletedSegments() + "/" + documentStatus.getTotalSegments());
+
+    if (documentStatus.getError() != null) {
+        System.out.println("错误信息: " + documentStatus.getError());
+    }
+}
+```
+
+### 2.6 获取知识库错误文档
+
+#### 方法
+
+```java
+DatasetErrorDocumentsResponse getDatasetErrorDocuments(String datasetId);
+```
+
+#### 请求参数
+
+| 参数名       | 类型     | 是否必须 | 描述     |
+|-----------|--------|------|--------|
+| datasetId | String | 是    | 知识库ID |
+
+#### 响应参数
+
+DatasetErrorDocumentsResponse
+
+| 参数名   | 类型                      | 描述       |
+|-------|-------------------------|----------|
+| data  | `List<ErrorDocument>`   | 错误文档列表   |
+| total | Integer                 | 错误文档总数   |
+
+ErrorDocument
+
+| 参数名             | 类型     | 描述                |
+|-----------------|--------|-------------------|
+| id              | String | 文档ID              |
+| name            | String | 文档名称              |
+| error           | String | 错误信息              |
+| indexingStatus  | String | 索引状态（通常为 error）  |
+| createdAt       | Long   | 创建时间（时间戳）         |
+| updatedAt       | Long   | 更新时间（时间戳）         |
+
+#### 请求示例
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testGetDatasetErrorDocuments() {
+    String datasetId = "dataset-123456789";
+
+    // 获取知识库错误文档
+    DatasetErrorDocumentsResponse errorDocuments = difyServer.getDatasetErrorDocuments(datasetId);
+
+    System.out.println("错误文档总数: " + errorDocuments.getTotal());
+
+    if (errorDocuments.getData() != null && !errorDocuments.getData().isEmpty()) {
+        for (DatasetErrorDocumentsResponse.ErrorDocument doc : errorDocuments.getData()) {
+            System.out.println("文档ID: " + doc.getId());
+            System.out.println("文档名称: " + doc.getName());
+            System.out.println("错误信息: " + doc.getError());
+        }
+    } else {
+        System.out.println("没有错误文档");
+    }
+}
+```
+
+### 2.7 重试文档索引
+
+#### 方法
+
+```java
+void retryDocumentIndexing(DocumentRetryRequest request);
+```
+
+#### 请求参数
+
+DocumentRetryRequest
+
+| 参数名         | 类型             | 是否必须 | 描述           |
+|-------------|----------------|------|--------------|
+| datasetId   | String         | 是    | 知识库ID       |
+| documentIds | `List<String>` | 是    | 需要重试的文档ID列表 |
+
+#### 响应参数
+
+该方法不返回值，成功时返回204 No Content。
+
+#### 请求示例
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testRetryDocumentIndexing() {
+    String datasetId = "dataset-123456789";
+
+    // 先获取错误文档
+    DatasetErrorDocumentsResponse errorDocuments = difyServer.getDatasetErrorDocuments(datasetId);
+
+    if (errorDocuments.getData() != null && !errorDocuments.getData().isEmpty()) {
+        // 提取错误文档ID
+        List<String> errorDocIds = errorDocuments.getData().stream()
+            .map(DatasetErrorDocumentsResponse.ErrorDocument::getId)
+            .collect(Collectors.toList());
+
+        // 创建重试请求
+        DocumentRetryRequest request = new DocumentRetryRequest();
+        request.setDatasetId(datasetId);
+        request.setDocumentIds(errorDocIds);
+
+        // 重试文档索引
+        difyServer.retryDocumentIndexing(request);
+        System.out.println("已触发 " + errorDocIds.size() + " 个文档的索引重试");
+    } else {
+        System.out.println("没有需要重试的错误文档");
+    }
+}
+```
+
 ## 3. 聊天会话管理
 
 ### 3.1 获取应用的聊天会话列表
