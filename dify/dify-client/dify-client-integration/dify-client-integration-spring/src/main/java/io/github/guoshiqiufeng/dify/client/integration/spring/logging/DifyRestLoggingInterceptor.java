@@ -82,11 +82,31 @@ public class DifyRestLoggingInterceptor implements ClientHttpRequestInterceptor 
             REQUEST_TIME_CACHE.remove(requestId);
 
             String bodyContent = body.length > 0 ? new String(body, StandardCharsets.UTF_8) : "";
+            // Use reflection to get status code to support both Spring 5 (HttpStatus) and Spring 6+ (HttpStatusCode)
+            Object statusCode = getStatusCodeSafely(response);
             log.debug("logResponse，requestId：{}，status：{}，headers：{}，executionTime：{}ms，body：{}",
-                    requestId, response.getStatusCode(), response.getHeaders(), executionTime, bodyContent);
+                    requestId, statusCode, response.getHeaders(), executionTime, bodyContent);
         }
 
         return body;
+    }
+
+    /**
+     * Safely get status code from response to support both Spring 5 and Spring 6+.
+     * In Spring 5, getStatusCode() returns HttpStatus.
+     * In Spring 6+, getStatusCode() returns HttpStatusCode.
+     *
+     * @param response the client http response
+     * @return the status code as an object
+     */
+    private Object getStatusCodeSafely(ClientHttpResponse response) {
+        try {
+            Method method = response.getClass().getMethod("getStatusCode");
+            return method.invoke(response);
+        } catch (Exception e) {
+            log.warn("Failed to get status code from response", e);
+            return "UNKNOWN";
+        }
     }
 
     /**
