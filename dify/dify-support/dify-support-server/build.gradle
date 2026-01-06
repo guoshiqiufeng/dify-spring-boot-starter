@@ -1,5 +1,6 @@
 dependencies {
     api project(":dify:dify-core")
+    api project(":dify:dify-support:dify-support-dataset")
     api libs.hutool.core
 
     implementation "io.projectreactor:reactor-core"

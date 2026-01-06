@@ -167,7 +167,9 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         AppMetaResponse expectedResponse = new AppMetaResponse();
         Map<String, Object> maps = new HashMap<>(1);
         maps.put("tools", "tools icon url");
-        maps.put("api", Map.of("background", "#252525"));
+        Map<String, String> apiMap = new HashMap<>();
+        apiMap.put("background", "#252525");
+        maps.put("api", apiMap);
         expectedResponse.setToolIcons(maps);
 
         // Set up the response mock to return our expected response

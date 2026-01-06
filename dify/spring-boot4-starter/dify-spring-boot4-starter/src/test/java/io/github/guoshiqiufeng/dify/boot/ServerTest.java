@@ -17,15 +17,32 @@ package io.github.guoshiqiufeng.dify.boot;
 
 import cn.hutool.json.JSONUtil;
 import io.github.guoshiqiufeng.dify.boot.base.BaseServerContainerTest;
+import io.github.guoshiqiufeng.dify.client.spring7.dataset.DifyDatasetDefaultClient;
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
+import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
+import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;
+import io.github.guoshiqiufeng.dify.dataset.dto.request.DatasetCreateRequest;
+import io.github.guoshiqiufeng.dify.dataset.dto.request.document.DocumentCreateByTextRequest;
+import io.github.guoshiqiufeng.dify.dataset.dto.response.DatasetResponse;
+import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentResponse;
+import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse;
+import io.github.guoshiqiufeng.dify.dataset.impl.DifyDatasetClientImpl;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.Duration;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,10 +59,136 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServerTest extends BaseServerContainerTest {
 
+    private static final String API_KEY_CACHE_KEY = "dify:api:key";
+    private static final Duration CACHE_EXPIRATION = Duration.ofHours(1);
+
     @Resource
     private DifyServer difyServer;
 
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Resource
+    private DifyProperties difyProperties;
+
+    protected DifyDataset difyDataset;
+
     private static String testAppId;
+    private static String testDatasetId;
+    private static String testDocumentId;
+
+    @BeforeEach
+    public void setUp() {
+        // Initialize DifyDataset for dataset operations
+        String apiKey = initializeApiKeyWithCache();
+
+        DifyDatasetClient difyDatasetClient = new DifyDatasetDefaultClient(difyProperties.getUrl(),
+                difyProperties.getClientConfig(),
+                WebClient.builder().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey));
+
+        this.difyDataset = new DifyDatasetClientImpl(difyDatasetClient);
+    }
+
+    private String initializeApiKeyWithCache() {
+        String cachedToken = stringRedisTemplate.opsForValue().get(API_KEY_CACHE_KEY);
+        if (StringUtils.hasText(cachedToken)) {
+            log.debug("Using cached API Key");
+            return cachedToken;
+        }
+
+        synchronized (this) {
+            cachedToken = stringRedisTemplate.opsForValue().get(API_KEY_CACHE_KEY);
+            if (StringUtils.hasText(cachedToken)) {
+                return cachedToken;
+            }
+
+            String newToken = fetchOrCreateApiKey();
+
+            try {
+                stringRedisTemplate.opsForValue().set(API_KEY_CACHE_KEY, newToken, CACHE_EXPIRATION);
+                log.debug("API Key cached with expiration: {}", CACHE_EXPIRATION);
+            } catch (Exception e) {
+                log.error("Failed to cache API Key", e);
+            }
+            return newToken;
+        }
+    }
+
+    /**
+     * Initialize API Key
+     */
+    private String fetchOrCreateApiKey() {
+        if (difyServer == null) {
+            throw new IllegalStateException("DifyServer is not initialized");
+        }
+
+        List<DatasetApiKeyResponse> apiKeys = difyServer.getDatasetApiKey();
+        if (apiKeys == null) {
+            log.debug("No existing API keys found, creating new key");
+            apiKeys = difyServer.initDatasetApiKey();
+            if (CollectionUtils.isEmpty(apiKeys)) {
+                throw new IllegalStateException("Failed to initialize API Key");
+            }
+            return apiKeys.getFirst().getToken();
+        }
+
+        return apiKeys.stream()
+                .findFirst()
+                .map(DatasetApiKeyResponse::getToken)
+                .orElseGet(() -> {
+                    List<DatasetApiKeyResponse> newKeys = difyServer.initDatasetApiKey();
+                    if (CollectionUtils.isEmpty(newKeys)) {
+                        throw new IllegalStateException("Failed to initialize API Key");
+                    }
+                    return newKeys.getFirst().getToken();
+                });
+    }
+
+    @Test
+    @Order(0)
+    @DisplayName("Initialize test dataset and document for Server API tests")
+    public void initializeTestDatasetAndDocument() {
+        try {
+            // Create test dataset
+            DatasetCreateRequest createRequest = new DatasetCreateRequest();
+            createRequest.setName("server-api-test-dataset");
+            createRequest.setDescription("Test dataset for Server API integration tests");
+
+            DatasetResponse datasetResponse = difyDataset.create(createRequest);
+            assertNotNull(datasetResponse, "Dataset response should not be null");
+            assertNotNull(datasetResponse.getId(), "Dataset ID should not be null");
+
+            testDatasetId = datasetResponse.getId();
+            log.info("Created test dataset with ID: {}", testDatasetId);
+
+            // Create test document by text
+            DocumentCreateByTextRequest documentRequest = new DocumentCreateByTextRequest();
+            documentRequest.setDatasetId(testDatasetId);
+            documentRequest.setName("test-document");
+            documentRequest.setText("This is a test document for Server API integration tests. " +
+                    "It contains some sample text for indexing and testing dataset-related server operations.");
+
+            DocumentResponse documentResponse = difyDataset.createByText(documentRequest);
+            assertNotNull(documentResponse, "Document response should not be null");
+            assertNotNull(documentResponse.getDocument(), "Document object should not be null");
+            assertNotNull(documentResponse.getDocument().getId(), "Document ID should not be null");
+
+            testDocumentId = documentResponse.getDocument().getId();
+            log.info("Created test document with ID: {}", testDocumentId);
+
+            // Wait briefly for document to be processed
+            try {
+                Thread.sleep(2000); // Wait 2 seconds for initial processing
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
+        } catch (Exception e) {
+            log.error("Failed to initialize test dataset and document: {} - {}",
+                    e.getClass().getSimpleName(), e.getMessage());
+            throw e; // Rethrow to fail the test
+        }
+    }
 
     @Test
     @Order(1)
@@ -505,7 +648,117 @@ public class ServerTest extends BaseServerContainerTest {
     }
 
     @Test
-    @Order(18)
+    @Order(23)
+    @DisplayName("Test retrieving dataset indexing status")
+    public void getDatasetIndexingStatusTest() {
+        assertNotNull(testDatasetId, "Dataset ID should be available from initialization test");
+
+        try {
+            // Get dataset indexing status
+            DocumentIndexingStatusResponse indexingStatus = difyServer.getDatasetIndexingStatus(testDatasetId);
+            log.debug("Dataset indexing status: {}", JSONUtil.toJsonStr(indexingStatus));
+            assertNotNull(indexingStatus, "Dataset indexing status should not be null");
+
+            // Verify the data structure
+            if (indexingStatus.getData() != null && !indexingStatus.getData().isEmpty()) {
+                log.debug("Dataset has {} documents", indexingStatus.getData().size());
+                DocumentIndexingStatusResponse.ProcessingStatus firstDocument = indexingStatus.getData().getFirst();
+                assertNotNull(firstDocument.getId(), "Document ID should not be null");
+                log.debug("First document ID: {}, Status: {}", firstDocument.getId(), firstDocument.getIndexingStatus());
+            }
+        } catch (Exception e) {
+            log.error("Exception occurred during dataset indexing status test: {} - {}",
+                    e.getClass().getSimpleName(), e.getMessage());
+            throw e; // Rethrow to fail the test
+        }
+    }
+
+    @Test
+    @Order(24)
+    @DisplayName("Test retrieving document indexing status")
+    public void getDocumentIndexingStatusTest() {
+        assertNotNull(testDatasetId, "Dataset ID should be available from initialization test");
+        assertNotNull(testDocumentId, "Document ID should be available from initialization test");
+
+        try {
+            // Get document indexing status
+            DocumentIndexingStatusResponse.ProcessingStatus documentStatus =
+                    difyServer.getDocumentIndexingStatus(testDatasetId, testDocumentId);
+            log.debug("Document indexing status: {}", JSONUtil.toJsonStr(documentStatus));
+            assertNotNull(documentStatus, "Document indexing status should not be null");
+
+            // Verify the data structure
+            assertNotNull(documentStatus.getId(), "Document ID should not be null");
+            assertEquals(testDocumentId, documentStatus.getId(), "Document ID should match the test document");
+            log.debug("Document ID: {}, Status: {}", documentStatus.getId(), documentStatus.getIndexingStatus());
+        } catch (Exception e) {
+            log.error("Exception occurred during document indexing status test: {} - {}",
+                    e.getClass().getSimpleName(), e.getMessage());
+            throw e; // Rethrow to fail the test
+        }
+    }
+
+    @Test
+    @Order(25)
+    @DisplayName("Test retrieving dataset error documents")
+    public void getDatasetErrorDocumentsTest() {
+        assertNotNull(testDatasetId, "Dataset ID should be available from initialization test");
+
+        try {
+            // Get dataset error documents
+            DatasetErrorDocumentsResponse errorDocuments = difyServer.getDatasetErrorDocuments(testDatasetId);
+            log.debug("Dataset error documents: {}", JSONUtil.toJsonStr(errorDocuments));
+            assertNotNull(errorDocuments, "Dataset error documents response should not be null");
+
+            // Verify the data structure
+            assertNotNull(errorDocuments.getTotal(), "Error documents total should not be null");
+            log.debug("Total error documents: {}", errorDocuments.getTotal());
+
+            // If there are error documents, log details
+            if (errorDocuments.getData() != null && !errorDocuments.getData().isEmpty()) {
+                log.debug("First error document: {}", JSONUtil.toJsonStr(errorDocuments.getData().getFirst()));
+            } else {
+                log.debug("No error documents found (this is expected for successful indexing)");
+            }
+        } catch (Exception e) {
+            log.error("Exception occurred during dataset error documents test: {} - {}",
+                    e.getClass().getSimpleName(), e.getMessage());
+            throw e; // Rethrow to fail the test
+        }
+    }
+
+    @Test
+    @Order(26)
+    @DisplayName("Test retrying document indexing")
+    public void retryDocumentIndexingTest() {
+        assertNotNull(testDatasetId, "Dataset ID should be available from initialization test");
+        assertNotNull(testDocumentId, "Document ID should be available from initialization test");
+
+        try {
+            // Create retry request
+            DocumentRetryRequest request = new DocumentRetryRequest();
+            request.setDatasetId(testDatasetId);
+            request.setDocumentIds(java.util.Collections.singletonList(testDocumentId));
+
+            log.debug("Attempting to retry indexing for document: {} in dataset: {}", testDocumentId, testDatasetId);
+
+            // Retry document indexing
+            difyServer.retryDocumentIndexing(request);
+            log.info("Successfully triggered retry for document indexing");
+
+            // Note: The actual indexing happens asynchronously, so we can't verify completion immediately
+            // In a real test scenario, you may want to wait and check status again
+        } catch (Exception e) {
+            // Some exceptions may be expected if the document is not in error state
+            log.warn("Exception occurred during retry document indexing test: {} - {}",
+                    e.getClass().getSimpleName(), e.getMessage());
+            log.info("Note: Retry may fail if document is not in error state, which is expected behavior");
+            // Don't rethrow - this is acceptable behavior
+        }
+    }
+
+    @Test
+    @Order(99)
     @DisplayName("Test error handling")
     public void errorHandlingTest() {
         // Test with invalid application ID

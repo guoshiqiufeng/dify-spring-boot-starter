@@ -22,9 +22,11 @@ import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
 import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
 import io.github.guoshiqiufeng.dify.server.constant.ServerUriConstant;
+import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DifyLoginRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -1554,6 +1556,126 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(restClient).delete();
         verify(requestHeadersUriSpec).uri(eq(ServerUriConstant.DATASET_API_KEYS), eq(apiKeyId));
         verify(requestHeadersSpec).headers(any());
+        verify(responseSpec).body(Void.class);
+    }
+
+    @Test
+    @DisplayName("Test getDatasetIndexingStatus method")
+    public void testGetDatasetIndexingStatus() {
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+
+        // Prepare test data
+        String datasetId = "dataset-123456";
+
+        // Create mock response
+        DocumentIndexingStatusResponse mockResponse = new DocumentIndexingStatusResponse();
+
+        // Set up the response mock
+        when(responseSpec.body(DocumentIndexingStatusResponse.class)).thenReturn(mockResponse);
+
+        // Execute the method
+        DocumentIndexingStatusResponse actualResponse = client.getDatasetIndexingStatus(datasetId);
+
+        // Verify the result
+        assertNotNull(actualResponse);
+        assertEquals(mockResponse, actualResponse);
+
+        // Verify RestClient interactions
+        verify(restClient).get();
+        verify(requestHeadersUriSpec).uri(eq(ServerUriConstant.DATASET_INDEXING_STATUS), eq(datasetId));
+        verify(requestHeadersSpec).headers(any());
+        verify(responseSpec).body(DocumentIndexingStatusResponse.class);
+    }
+
+    @Test
+    @DisplayName("Test getDocumentIndexingStatus method")
+    public void testGetDocumentIndexingStatus() {
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+
+        // Prepare test data
+        String datasetId = "dataset-123456";
+        String documentId = "document-789012";
+
+        // Create mock response
+        DocumentIndexingStatusResponse.ProcessingStatus mockResponse = new DocumentIndexingStatusResponse.ProcessingStatus();
+
+        // Set up the response mock
+        when(responseSpec.body(DocumentIndexingStatusResponse.ProcessingStatus.class)).thenReturn(mockResponse);
+
+        // Execute the method
+        DocumentIndexingStatusResponse.ProcessingStatus actualResponse = client.getDocumentIndexingStatus(datasetId, documentId);
+
+        // Verify the result
+        assertNotNull(actualResponse);
+        assertEquals(mockResponse, actualResponse);
+
+        // Verify RestClient interactions
+        verify(restClient).get();
+        verify(requestHeadersUriSpec).uri(eq(ServerUriConstant.DOCUMENT_INDEXING_STATUS), eq(Map.of("datasetId", datasetId, "documentId", documentId)));
+        verify(requestHeadersSpec).headers(any());
+        verify(responseSpec).body(DocumentIndexingStatusResponse.ProcessingStatus.class);
+    }
+
+    @Test
+    @DisplayName("Test getDatasetErrorDocuments method")
+    public void testGetDatasetErrorDocuments() {
+        RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = restClientMock.getRequestHeadersUriSpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+
+        // Prepare test data
+        String datasetId = "dataset-123456";
+
+        // Create mock response
+        DatasetErrorDocumentsResponse mockResponse = new DatasetErrorDocumentsResponse();
+        mockResponse.setTotal(5);
+
+        // Set up the response mock
+        when(responseSpec.body(DatasetErrorDocumentsResponse.class)).thenReturn(mockResponse);
+
+        // Execute the method
+        DatasetErrorDocumentsResponse actualResponse = client.getDatasetErrorDocuments(datasetId);
+
+        // Verify the result
+        assertNotNull(actualResponse);
+        assertEquals(mockResponse, actualResponse);
+        assertEquals(5, actualResponse.getTotal());
+
+        // Verify RestClient interactions
+        verify(restClient).get();
+        verify(requestHeadersUriSpec).uri(eq(ServerUriConstant.DATASET_ERROR_DOCUMENTS), eq(datasetId));
+        verify(requestHeadersSpec).headers(any());
+        verify(responseSpec).body(DatasetErrorDocumentsResponse.class);
+    }
+
+    @Test
+    @DisplayName("Test retryDocumentIndexing method")
+    public void testRetryDocumentIndexing() {
+        RestClient.RequestBodyUriSpec requestBodyUriSpec = restClientMock.getRequestBodyUriSpec();
+        RestClient.RequestBodySpec requestBodySpec = restClientMock.getRequestBodySpec();
+        RestClient.RequestHeadersSpec<?> requestHeadersSpec = restClientMock.getRequestHeadersSpec();
+        RestClient.ResponseSpec responseSpec = restClientMock.getResponseSpec();
+
+        // Prepare test data
+        DocumentRetryRequest request = new DocumentRetryRequest();
+        request.setDatasetId("dataset-123456");
+        request.setDocumentIds(List.of("doc-1", "doc-2", "doc-3"));
+
+        // Set up the response mock to return void
+        when(responseSpec.body(Void.class)).thenReturn(null);
+
+        // Execute the method
+        client.retryDocumentIndexing(request);
+
+        // Verify RestClient interactions
+        verify(restClient).post();
+        verify(requestBodyUriSpec).uri(eq(ServerUriConstant.DOCUMENT_RETRY), eq(request.getDatasetId()));
+        verify(requestHeadersSpec).headers(any());
+        verify(requestBodySpec).body(any(Map.class));
         verify(responseSpec).body(Void.class);
     }
 }
