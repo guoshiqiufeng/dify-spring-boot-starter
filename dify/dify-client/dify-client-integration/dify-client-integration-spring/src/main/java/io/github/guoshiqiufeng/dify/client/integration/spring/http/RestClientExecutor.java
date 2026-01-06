@@ -268,9 +268,32 @@ class RestClientExecutor {
 
         // Since we called toEntity(String.class), we can safely cast to ResponseEntity<String>
         ResponseEntity<?> rawEntity = (ResponseEntity<?>) result;
-        return ResponseEntity.status(rawEntity.getStatusCode())
+        // Use int status code to avoid Spring version compatibility issues
+        return ResponseEntity.status(getStatusCodeValue(rawEntity))
                 .headers(rawEntity.getHeaders())
                 .body((String) rawEntity.getBody());
+    }
+
+    /**
+     * Get status code value from ResponseEntity in a Spring version-agnostic way.
+     * Uses reflection to avoid method signature binding at compile time.
+     *
+     * @param responseEntity the response entity
+     * @return status code value
+     */
+    private int getStatusCodeValue(ResponseEntity<?> responseEntity) {
+        try {
+            // Call getStatusCode() using reflection to avoid compile-time method signature binding
+            java.lang.reflect.Method getStatusCodeMethod = ResponseEntity.class.getMethod("getStatusCode");
+            Object statusCode = getStatusCodeMethod.invoke(responseEntity);
+
+            // Call value() on the result (works for both HttpStatus and HttpStatusCode)
+            java.lang.reflect.Method valueMethod = statusCode.getClass().getMethod("value");
+            return (int) valueMethod.invoke(statusCode);
+        } catch (Exception e) {
+            // Fallback: try direct call (this works if compiled with Spring 6+)
+            return responseEntity.getStatusCode().value();
+        }
     }
 
     /**
