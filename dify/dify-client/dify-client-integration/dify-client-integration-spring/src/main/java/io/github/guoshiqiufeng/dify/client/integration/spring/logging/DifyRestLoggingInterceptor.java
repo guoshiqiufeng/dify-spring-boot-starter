@@ -101,7 +101,7 @@ public class DifyRestLoggingInterceptor implements ClientHttpRequestInterceptor 
      */
     private Object getStatusCodeSafely(ClientHttpResponse response) {
         try {
-            Method method = response.getClass().getMethod("getStatusCode");
+            Method method = ClientHttpResponse.class.getMethod("getStatusCode");
             return method.invoke(response);
         } catch (Exception e) {
             log.warn("Failed to get status code from response", e);
