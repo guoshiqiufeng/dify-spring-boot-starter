@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.boot;
 
 import cn.hutool.json.JSONUtil;
+import io.github.guoshiqiufeng.dify.boot.base.BaseDatasetContainerTest;
 import io.github.guoshiqiufeng.dify.boot.base.BaseServerContainerTest;
 import io.github.guoshiqiufeng.dify.client.spring5.dataset.DifyDatasetDefaultClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
@@ -66,21 +67,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ServerTest extends BaseServerContainerTest {
-
-    private static final String API_KEY_CACHE_KEY = "dify:api:key";
-    private static final Duration CACHE_EXPIRATION = Duration.ofHours(1);
-
-    @Resource
-    private DifyServer difyServer;
-
-    @Resource
-    private StringRedisTemplate stringRedisTemplate;
-
-    @Resource
-    private DifyProperties difyProperties;
-
-    protected DifyDataset difyDataset;
+public class ServerTest extends BaseDatasetContainerTest {
 
     private static String testAppId;
     private static String testDatasetId;
@@ -90,12 +77,6 @@ public class ServerTest extends BaseServerContainerTest {
     @BeforeAll
     public void initializeTestData() {
         try {
-            // 初始化 DifyDataset（使用动态获取的 API Key）
-            String apiKey = initializeApiKeyWithCache();
-            DifyDatasetClient difyDatasetClient = new DifyDatasetDefaultClient(difyProperties.getUrl(),
-                    difyProperties.getClientConfig(),
-                    WebClient.builder().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey));
-            this.difyDataset = new DifyDatasetClientImpl(difyDatasetClient);
 
             // 创建测试知识库
             DatasetCreateRequest createRequest = new DatasetCreateRequest();
@@ -182,58 +163,6 @@ public class ServerTest extends BaseServerContainerTest {
                 log.warn("Failed to delete test dataset: {}", e.getMessage());
             }
         }
-    }
-
-    private String initializeApiKeyWithCache() {
-        String cachedToken = stringRedisTemplate.opsForValue().get(API_KEY_CACHE_KEY);
-        if (StringUtils.hasText(cachedToken)) {
-            log.debug("Using cached API Key");
-            return cachedToken;
-        }
-
-        synchronized (this) {
-            cachedToken = stringRedisTemplate.opsForValue().get(API_KEY_CACHE_KEY);
-            if (StringUtils.hasText(cachedToken)) {
-                return cachedToken;
-            }
-
-            String newToken = fetchOrCreateApiKey();
-
-            try {
-                stringRedisTemplate.opsForValue().set(API_KEY_CACHE_KEY, newToken, CACHE_EXPIRATION);
-                log.debug("API Key cached with expiration: {}", CACHE_EXPIRATION);
-            } catch (Exception e) {
-                log.error("Failed to cache API Key", e);
-            }
-            return newToken;
-        }
-    }
-
-    private String fetchOrCreateApiKey() {
-        if (difyServer == null) {
-            throw new IllegalStateException("DifyServer is not initialized");
-        }
-
-        List<DatasetApiKeyResponse> apiKeys = difyServer.getDatasetApiKey();
-        if (apiKeys == null) {
-            log.debug("No existing API keys found, creating new key");
-            apiKeys = difyServer.initDatasetApiKey();
-            if (CollectionUtils.isEmpty(apiKeys)) {
-                throw new IllegalStateException("Failed to initialize API Key");
-            }
-            return apiKeys.getFirst().getToken();
-        }
-
-        return apiKeys.stream()
-                .findFirst()
-                .map(DatasetApiKeyResponse::getToken)
-                .orElseGet(() -> {
-                    List<DatasetApiKeyResponse> newKeys = difyServer.initDatasetApiKey();
-                    if (CollectionUtils.isEmpty(newKeys)) {
-                        throw new IllegalStateException("Failed to initialize API Key");
-                    }
-                    return newKeys.getFirst().getToken();
-                });
     }
 
     /**
