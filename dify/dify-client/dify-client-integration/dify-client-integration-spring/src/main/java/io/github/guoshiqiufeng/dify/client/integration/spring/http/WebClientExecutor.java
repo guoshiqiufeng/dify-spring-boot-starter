@@ -19,11 +19,13 @@ import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -37,6 +39,7 @@ import java.util.Map;
  * @version 2.0.0
  * @since 2025-12-31
  */
+@Slf4j
 class WebClientExecutor {
 
     private final WebClient webClient;
@@ -123,17 +126,49 @@ class WebClientExecutor {
                                          Object body, Class<T> responseType) {
         WebClient.RequestBodySpec requestSpec = buildRequest(method, uri, headers, cookies, queryParams, body);
 
-        Mono<ResponseEntity<String>> responseMono = requestSpec
-                .retrieve()
-                .toEntity(String.class);
+        try {
+            Mono<ResponseEntity<String>> responseMono = requestSpec
+                    .retrieve()
+                    .toEntity(String.class);
 
-        ResponseEntity<String> responseEntity = responseMono.block();
+            ResponseEntity<String> responseEntity = responseMono.block();
 
-        if (responseEntity == null) {
-            throw new HttpClientException("Response entity is null");
+            if (responseEntity == null) {
+                throw new HttpClientException("Response entity is null");
+            }
+
+            // For success responses (2xx), deserialize normally
+            int statusCode = responseEntity.getStatusCode().value();
+            if (statusCode >= 200 && statusCode < 300) {
+                return responseConverter.convert(responseEntity, responseType);
+            } else {
+                // For error responses, return raw error message as body
+                // The error handler will receive this and can process it
+                @SuppressWarnings("unchecked")
+                T errorBody = (T) responseEntity.getBody();
+                return HttpResponse.<T>builder()
+                        .statusCode(statusCode)
+                        .headers(convertHeaders(responseEntity.getHeaders()))
+                        .body(errorBody)
+                        .build();
+            }
+        } catch (WebClientResponseException e) {
+            // Handle HTTP error responses (4xx, 5xx) thrown by WebClient
+            int statusCode = e.getStatusCode().value();
+            String errorBody = e.getResponseBodyAsString();
+
+            log.debug("WebClient error response: status={}, body={}", statusCode, errorBody);
+
+            // Return error response without throwing exception
+            // Let the upper layer handleErrors() process it
+            @SuppressWarnings("unchecked")
+            T typedErrorBody = (T) errorBody;
+            return HttpResponse.<T>builder()
+                    .statusCode(statusCode)
+                    .headers(convertHeaders(e.getHeaders()))
+                    .body(typedErrorBody)
+                    .build();
         }
-
-        return responseConverter.convert(responseEntity, responseType);
     }
 
     /**
@@ -154,17 +189,64 @@ class WebClientExecutor {
                                          Object body, TypeReference<T> typeReference) {
         WebClient.RequestBodySpec requestSpec = buildRequest(method, uri, headers, cookies, queryParams, body);
 
-        Mono<ResponseEntity<String>> responseMono = requestSpec
-                .retrieve()
-                .toEntity(String.class);
+        try {
+            Mono<ResponseEntity<String>> responseMono = requestSpec
+                    .retrieve()
+                    .toEntity(String.class);
 
-        ResponseEntity<String> responseEntity = responseMono.block();
+            ResponseEntity<String> responseEntity = responseMono.block();
 
-        if (responseEntity == null) {
-            throw new HttpClientException("Response entity is null");
+            if (responseEntity == null) {
+                throw new HttpClientException("Response entity is null");
+            }
+
+            // For success responses (2xx), deserialize normally
+            int statusCode = responseEntity.getStatusCode().value();
+            if (statusCode >= 200 && statusCode < 300) {
+                return responseConverter.convert(responseEntity, typeReference);
+            } else {
+                // For error responses, return raw error message as body
+                // The error handler will receive this and can process it
+                @SuppressWarnings("unchecked")
+                T errorBody = (T) responseEntity.getBody();
+                return HttpResponse.<T>builder()
+                        .statusCode(statusCode)
+                        .headers(convertHeaders(responseEntity.getHeaders()))
+                        .body(errorBody)
+                        .build();
+            }
+        } catch (WebClientResponseException e) {
+            // Handle HTTP error responses (4xx, 5xx) thrown by WebClient
+            int statusCode = e.getStatusCode().value();
+            String errorBody = e.getResponseBodyAsString();
+
+            log.debug("WebClient error response: status={}, body={}", statusCode, errorBody);
+
+            // Return error response without throwing exception
+            // Let the upper layer handleErrors() process it
+            @SuppressWarnings("unchecked")
+            T typedErrorBody = (T) errorBody;
+            return HttpResponse.<T>builder()
+                    .statusCode(statusCode)
+                    .headers(convertHeaders(e.getHeaders()))
+                    .body(typedErrorBody)
+                    .build();
         }
+    }
 
-        return responseConverter.convert(responseEntity, typeReference);
+    /**
+     * Convert Spring HttpHeaders to our HttpHeaders format.
+     */
+    private io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders convertHeaders(org.springframework.http.HttpHeaders springHeaders) {
+        io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders headers = new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders();
+        if (springHeaders != null) {
+            springHeaders.forEach((key, values) -> {
+                for (String value : values) {
+                    headers.add(key, value);
+                }
+            });
+        }
+        return headers;
     }
 
     /**

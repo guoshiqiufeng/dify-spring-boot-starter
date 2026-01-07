@@ -25,8 +25,13 @@ import io.github.guoshiqiufeng.dify.client.integration.spring.logging.DifyLoggin
 import io.github.guoshiqiufeng.dify.client.integration.spring.logging.DifyRestLoggingInterceptor;
 import io.github.guoshiqiufeng.dify.client.integration.spring.version.SpringVersionDetector;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
+import io.github.guoshiqiufeng.dify.core.exception.DiftClientExceptionEnum;
+import io.github.guoshiqiufeng.dify.core.exception.DifyClientException;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +46,7 @@ import java.util.Set;
  * @version 2.0.0
  * @since 2025-12-26
  */
+@Slf4j
 public class SpringHttpClient implements HttpClient {
 
     private final String baseUrl;
