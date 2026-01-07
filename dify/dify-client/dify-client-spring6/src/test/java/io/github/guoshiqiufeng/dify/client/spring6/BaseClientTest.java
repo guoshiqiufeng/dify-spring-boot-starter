@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -124,6 +125,7 @@ public abstract class BaseClientTest {
             when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
             when(requestHeadersUriSpec.uri(anyString(), any(Object[].class))).thenReturn(requestHeadersSpec);
             when(requestHeadersUriSpec.uri(anyString(), any(Object.class))).thenReturn(requestHeadersSpec);
+            when(requestHeadersUriSpec.uri(anyString(), any(Map.class))).thenReturn(requestHeadersSpec);
             when(requestHeadersUriSpec.uri(any(Function.class))).thenReturn(requestHeadersSpec);
 
             // Fix for RequestHeadersSpec methods
@@ -151,6 +153,8 @@ public abstract class BaseClientTest {
             // These will be overridden in specific tests as needed with actual ResponseEntity objects
             when(responseSpec.toEntity(any(Class.class))).thenAnswer(invocation -> null);
             when(responseSpec.toEntity(any(ParameterizedTypeReference.class))).thenAnswer(invocation -> null); // For generic types
+            // Mock toBodilessEntity for void responses
+            when(responseSpec.toBodilessEntity()).thenReturn(ResponseEntity.ok().build());
         }
     }
 

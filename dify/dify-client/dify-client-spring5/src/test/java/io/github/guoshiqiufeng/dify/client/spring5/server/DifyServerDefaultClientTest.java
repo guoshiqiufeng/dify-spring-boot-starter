@@ -1707,7 +1707,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(webClientMock).post();
         verify(requestBodyUriSpecMock).uri(eq(ServerUriConstant.DOCUMENT_RETRY), eq(request.getDatasetId()));
-        verify(requestHeadersSpecMock).headers(any());
+        verify(requestBodySpecMock).headers(any());
         verify(requestBodySpecMock).bodyValue(any(Map.class));
         verify(responseSpecMock).bodyToMono(eq(Void.class));
     }

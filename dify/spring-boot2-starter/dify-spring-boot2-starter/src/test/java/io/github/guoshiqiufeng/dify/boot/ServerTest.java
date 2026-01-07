@@ -99,7 +99,7 @@ public class ServerTest extends BaseServerContainerTest {
 
             // 创建测试知识库
             DatasetCreateRequest createRequest = new DatasetCreateRequest();
-            createRequest.setName("server-api-test-dataset");
+            createRequest.setName("server-api-test-dataset-spring6");
             createRequest.setDescription("Test dataset for Server API integration tests");
 
             DatasetResponse datasetResponse = difyDataset.create(createRequest);

@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -93,6 +94,7 @@ public abstract class BaseClientTest {
         when(requestHeadersUriSpecMock.uri(anyString())).thenReturn(requestHeadersSpecMock);
         when(requestHeadersUriSpecMock.uri(anyString(), any(Object[].class))).thenReturn(requestHeadersSpecMock);
         when(requestHeadersUriSpecMock.uri(anyString(), any(Object.class))).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersUriSpecMock.uri(anyString(), any(Map.class))).thenReturn(requestHeadersSpecMock);
         // Add mock for uri function builder
         when(requestHeadersUriSpecMock.uri(any(Function.class))).thenReturn(requestHeadersSpecMock);
 

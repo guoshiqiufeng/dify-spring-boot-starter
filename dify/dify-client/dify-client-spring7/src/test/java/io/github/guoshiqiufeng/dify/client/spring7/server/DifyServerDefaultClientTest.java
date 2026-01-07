@@ -1666,7 +1666,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         request.setDocumentIds(List.of("doc-1", "doc-2", "doc-3"));
 
         // Set up the response mock to return void
-        when(responseSpec.body(Void.class)).thenReturn(null);
+        when(responseSpec.toBodilessEntity()).thenReturn(ResponseEntity.ok().build());
 
         // Execute the method
         client.retryDocumentIndexing(request);
@@ -1674,8 +1674,8 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         // Verify RestClient interactions
         verify(restClient).post();
         verify(requestBodyUriSpec).uri(eq(ServerUriConstant.DOCUMENT_RETRY), eq(request.getDatasetId()));
-        verify(requestHeadersSpec).headers(any());
+        verify(requestBodySpec).headers(any());
         verify(requestBodySpec).body(any(Map.class));
-        verify(responseSpec).body(Void.class);
+        verify(responseSpec).toBodilessEntity();
     }
 }
