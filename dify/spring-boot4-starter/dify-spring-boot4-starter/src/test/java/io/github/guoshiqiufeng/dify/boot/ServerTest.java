@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.boot;
 
 import cn.hutool.json.JSONUtil;
+import io.github.guoshiqiufeng.dify.boot.base.BaseDatasetContainerTest;
 import io.github.guoshiqiufeng.dify.boot.base.BaseServerContainerTest;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
@@ -55,13 +56,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ServerTest extends BaseServerContainerTest {
-
-    @Resource
-    private DifyServer difyServer;
-
-    @Resource
-    private DifyDataset difyDataset;
+public class ServerTest extends BaseDatasetContainerTest {
 
     private static String testAppId;
     private static String testDatasetId;
@@ -71,6 +66,7 @@ public class ServerTest extends BaseServerContainerTest {
     @BeforeAll
     public void initializeTestData() {
         try {
+            setUp();
             // 创建测试知识库
             DatasetCreateRequest createRequest = new DatasetCreateRequest();
             createRequest.setName("server-api-test-dataset-spring7");
