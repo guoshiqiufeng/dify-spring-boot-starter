@@ -47,7 +47,7 @@ public class DifyLoginRequestJsonTest {
         assertTrue(json.contains("\"email\":\"test@example.com\""));
         assertTrue(json.contains("\"password\":\"password123\""));
         assertTrue(json.contains("\"language\":\"zh-Hans\""));
-        assertTrue(json.contains("\"rememberMe\":true"));
+        assertTrue(json.contains("\"remember-me\":true"));
     }
 
     @Test
@@ -123,6 +123,6 @@ public class DifyLoginRequestJsonTest {
         assertTrue(json.contains("\"email\":\"test@example.com\""));
         assertTrue(json.contains("\"password\":\"password123\""));
         assertTrue(json.contains("\"language\":\"zh-Hans\""));
-        assertTrue(json.contains("\"rememberMe\":true"));
+        assertTrue(json.contains("\"remember-me\":true"));
     }
 }
