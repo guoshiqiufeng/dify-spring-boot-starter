@@ -66,6 +66,7 @@ public class ServerTest extends BaseDatasetContainerTest {
     @BeforeAll
     public void initializeTestData() {
         try {
+            setUp();
             // 创建测试知识库
             DatasetCreateRequest createRequest = new DatasetCreateRequest();
             createRequest.setName("server-api-test-dataset-spring7");
