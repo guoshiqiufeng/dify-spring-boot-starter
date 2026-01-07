@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.server.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -34,6 +35,8 @@ public class DifyLoginRequest implements Serializable {
     private String password;
 
     private String language;
+
+    @JsonAlias("rememberMe")
     @JsonProperty("remember-me")
     private Boolean rememberMe;
 
