@@ -16,8 +16,10 @@
 package io.github.guoshiqiufeng.dify.server.client;
 
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
+import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 
 import java.time.LocalDateTime;
@@ -201,4 +203,49 @@ public interface DifyServerClient {
      * @return List of daily messages statistics, each encapsulated in {@link DailyMessagesResponse} object
      */
     List<DailyMessagesResponse> dailyMessages(String appId, LocalDateTime start, LocalDateTime end);
+
+    /**
+     * Retrieves indexing status for all documents in a dataset
+     * Calls Dify's console API to return indexing status information for all documents within the specified dataset
+     *
+     * @param datasetId The unique identifier of the dataset, must not be null
+     * @return {@link DocumentIndexingStatusResponse} object containing indexing status of all documents,
+     *         including lists of documents that are indexing, completed, or failed, along with detailed information
+     * @throws NullPointerException if datasetId is null
+     */
+    DocumentIndexingStatusResponse getDatasetIndexingStatus(String datasetId);
+
+    /**
+     * Retrieves indexing status for a specific document in a dataset
+     * Calls Dify's console API to return detailed indexing processing status of a particular document
+     *
+     * @param datasetId  The unique identifier of the dataset, must not be null
+     * @param documentId The unique identifier of the document, must not be null
+     * @return {@link DocumentIndexingStatusResponse.ProcessingStatus} object containing document indexing status,
+     *         including indexing progress, status, error information (if any), and other detailed information
+     * @throws NullPointerException if datasetId or documentId is null
+     */
+    DocumentIndexingStatusResponse.ProcessingStatus getDocumentIndexingStatus(String datasetId, String documentId);
+
+    /**
+     * Retrieves list of failed documents in a dataset
+     * Calls Dify's console API to return all documents that failed indexing processing in the specified dataset
+     * along with their error information
+     *
+     * @param datasetId The unique identifier of the dataset, must not be null
+     * @return {@link DatasetErrorDocumentsResponse} object containing list of error documents,
+     *         including details of failed documents, error reasons, total count, etc.
+     * @throws NullPointerException if datasetId is null
+     */
+    DatasetErrorDocumentsResponse getDatasetErrorDocuments(String datasetId);
+
+    /**
+     * Retries indexing processing for specified documents in a dataset
+     * For documents that failed indexing, this method can re-trigger the indexing processing workflow
+     *
+     * @param request Document retry request encapsulating dataset ID and list of document IDs to retry, must not be null
+     * @throws NullPointerException if request is null
+     * @throws IllegalArgumentException if datasetId or documentIds in the request is empty
+     */
+    void retryDocumentIndexing(DocumentRetryRequest request);
 }

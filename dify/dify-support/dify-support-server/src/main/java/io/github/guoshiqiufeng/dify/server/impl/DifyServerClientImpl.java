@@ -16,10 +16,12 @@
 package io.github.guoshiqiufeng.dify.server.impl;
 
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
+import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -123,5 +125,26 @@ public class DifyServerClientImpl implements DifyServer {
     @Override
     public List<DailyMessagesResponse> dailyMessages(String appId, LocalDateTime start, LocalDateTime end) {
         return difyServerClient.dailyMessages(appId, start, end);
+    }
+
+    @Override
+    public DocumentIndexingStatusResponse getDatasetIndexingStatus(String datasetId) {
+        return difyServerClient.getDatasetIndexingStatus(datasetId);
+    }
+
+    @Override
+    public DocumentIndexingStatusResponse.ProcessingStatus getDocumentIndexingStatus(String datasetId, String documentId) {
+        return difyServerClient.getDocumentIndexingStatus(datasetId,documentId);
+    }
+
+    @Override
+    public DatasetErrorDocumentsResponse getDatasetErrorDocuments(String datasetId) {
+        return difyServerClient.getDatasetErrorDocuments(datasetId);
+    }
+
+    @Override
+    public void retryDocumentIndexing(DocumentRetryRequest request) {
+        difyServerClient.retryDocumentIndexing(request);
+
     }
 }

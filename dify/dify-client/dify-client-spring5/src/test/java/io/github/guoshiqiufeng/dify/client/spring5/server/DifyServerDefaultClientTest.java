@@ -1594,4 +1594,121 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(requestHeadersSpecMock).headers(any());
         verify(responseSpecMock).bodyToMono(eq(Void.class));
     }
+
+    @Test
+    @DisplayName("Test getDatasetIndexingStatus method")
+    public void testGetDatasetIndexingStatus() {
+        // Prepare test data
+        String datasetId = "dataset-123456";
+
+        // Create mock response
+        io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse mockResponse =
+                new io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse();
+
+        // Set up the response mock
+        when(responseSpecMock.bodyToMono(eq(io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse.class)))
+                .thenReturn(Mono.just(mockResponse));
+
+        // Execute the method
+        io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse actualResponse =
+                client.getDatasetIndexingStatus(datasetId);
+
+        // Verify the result
+        assertNotNull(actualResponse);
+        assertEquals(mockResponse, actualResponse);
+
+        // Verify WebClient interactions
+        verify(webClientMock).get();
+        verify(requestHeadersUriSpecMock).uri(eq(ServerUriConstant.DATASET_INDEXING_STATUS), eq(datasetId));
+        verify(requestHeadersSpecMock).headers(any());
+        verify(responseSpecMock).bodyToMono(eq(io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse.class));
+    }
+
+    @Test
+    @DisplayName("Test getDocumentIndexingStatus method")
+    public void testGetDocumentIndexingStatus() {
+        // Prepare test data
+        String datasetId = "dataset-123456";
+        String documentId = "document-789012";
+
+        // Create mock response
+        io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse.ProcessingStatus mockResponse =
+                new io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse.ProcessingStatus();
+
+        // Set up the response mock
+        when(responseSpecMock.bodyToMono(eq(io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse.ProcessingStatus.class)))
+                .thenReturn(Mono.just(mockResponse));
+
+        // Execute the method
+        io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse.ProcessingStatus actualResponse =
+                client.getDocumentIndexingStatus(datasetId, documentId);
+
+        // Verify the result
+        assertNotNull(actualResponse);
+        assertEquals(mockResponse, actualResponse);
+
+        // Verify WebClient interactions
+        verify(webClientMock).get();
+        ArgumentCaptor<Map> mapCaptor = ArgumentCaptor.forClass(Map.class);
+        verify(requestHeadersUriSpecMock).uri(eq(ServerUriConstant.DOCUMENT_INDEXING_STATUS), mapCaptor.capture());
+        Map<String, String> capturedMap = mapCaptor.getValue();
+        assertEquals(datasetId, capturedMap.get("datasetId"));
+        assertEquals(documentId, capturedMap.get("documentId"));
+        verify(requestHeadersSpecMock).headers(any());
+        verify(responseSpecMock).bodyToMono(eq(io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse.ProcessingStatus.class));
+    }
+
+    @Test
+    @DisplayName("Test getDatasetErrorDocuments method")
+    public void testGetDatasetErrorDocuments() {
+        // Prepare test data
+        String datasetId = "dataset-123456";
+
+        // Create mock response
+        io.github.guoshiqiufeng.dify.server.dto.response.DatasetErrorDocumentsResponse mockResponse =
+                new io.github.guoshiqiufeng.dify.server.dto.response.DatasetErrorDocumentsResponse();
+        mockResponse.setTotal(5);
+
+        // Set up the response mock
+        when(responseSpecMock.bodyToMono(eq(io.github.guoshiqiufeng.dify.server.dto.response.DatasetErrorDocumentsResponse.class)))
+                .thenReturn(Mono.just(mockResponse));
+
+        // Execute the method
+        io.github.guoshiqiufeng.dify.server.dto.response.DatasetErrorDocumentsResponse actualResponse =
+                client.getDatasetErrorDocuments(datasetId);
+
+        // Verify the result
+        assertNotNull(actualResponse);
+        assertEquals(mockResponse, actualResponse);
+        assertEquals(5, actualResponse.getTotal());
+
+        // Verify WebClient interactions
+        verify(webClientMock).get();
+        verify(requestHeadersUriSpecMock).uri(eq(ServerUriConstant.DATASET_ERROR_DOCUMENTS), eq(datasetId));
+        verify(requestHeadersSpecMock).headers(any());
+        verify(responseSpecMock).bodyToMono(eq(io.github.guoshiqiufeng.dify.server.dto.response.DatasetErrorDocumentsResponse.class));
+    }
+
+    @Test
+    @DisplayName("Test retryDocumentIndexing method")
+    public void testRetryDocumentIndexing() {
+        // Prepare test data
+        io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest request =
+                new io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest();
+        request.setDatasetId("dataset-123456");
+        request.setDocumentIds(List.of("doc-1", "doc-2", "doc-3"));
+
+        // Set up the response mock to return void
+        when(responseSpecMock.bodyToMono(eq(Void.class))).thenReturn(Mono.empty());
+
+        // Execute the method
+        client.retryDocumentIndexing(request);
+
+        // Verify WebClient interactions
+        verify(webClientMock).post();
+        verify(requestBodyUriSpecMock).uri(eq(ServerUriConstant.DOCUMENT_RETRY), eq(request.getDatasetId()));
+        verify(requestBodySpecMock).headers(any());
+        verify(requestBodySpecMock).bodyValue(any(Map.class));
+        verify(responseSpecMock).bodyToMono(eq(Void.class));
+    }
 }

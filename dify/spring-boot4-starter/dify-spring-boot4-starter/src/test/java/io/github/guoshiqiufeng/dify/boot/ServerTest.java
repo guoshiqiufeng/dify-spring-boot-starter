@@ -18,9 +18,23 @@ package io.github.guoshiqiufeng.dify.boot;
 import cn.hutool.json.JSONUtil;
 import io.github.guoshiqiufeng.dify.boot.base.BaseServerContainerTest;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
+import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
+import io.github.guoshiqiufeng.dify.dataset.dto.RetrievalModel;
+import io.github.guoshiqiufeng.dify.dataset.dto.request.DatasetCreateRequest;
+import io.github.guoshiqiufeng.dify.dataset.dto.request.DocumentCreateByTextRequest;
+import io.github.guoshiqiufeng.dify.dataset.dto.request.DocumentIndexingStatusRequest;
+import io.github.guoshiqiufeng.dify.dataset.dto.request.document.*;
+import io.github.guoshiqiufeng.dify.dataset.dto.response.DatasetResponse;
+import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentCreateResponse;
+import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse;
+import io.github.guoshiqiufeng.dify.dataset.enums.IndexingTechniqueEnum;
+import io.github.guoshiqiufeng.dify.dataset.enums.RerankingModeEnum;
+import io.github.guoshiqiufeng.dify.dataset.enums.SearchMethodEnum;
+import io.github.guoshiqiufeng.dify.dataset.enums.document.*;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -39,13 +53,170 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @since 2025/3/31 09:55
  */
 @Slf4j
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServerTest extends BaseServerContainerTest {
 
     @Resource
     private DifyServer difyServer;
 
+    @Resource
+    private DifyDataset difyDataset;
+
     private static String testAppId;
+    private static String testDatasetId;
+    private static String testDocumentId;
+    private static String testDocumentBatch;
+
+    @BeforeAll
+    public void initializeTestData() {
+        try {
+            // 创建测试知识库
+            DatasetCreateRequest createRequest = new DatasetCreateRequest();
+            createRequest.setName("server-api-test-dataset-spring7");
+            createRequest.setDescription("Test dataset for Server API integration tests");
+
+            DatasetResponse datasetResponse = difyDataset.create(createRequest);
+            assertNotNull(datasetResponse, "Dataset response should not be null");
+            assertNotNull(datasetResponse.getId(), "Dataset ID should not be null");
+
+            testDatasetId = datasetResponse.getId();
+            log.info("Created test dataset with ID: {}", testDatasetId);
+
+            // 创建测试文档（带完整配置）
+            DocumentCreateByTextRequest documentRequest = new DocumentCreateByTextRequest();
+            documentRequest.setDatasetId(testDatasetId);
+            documentRequest.setName("test-document");
+            documentRequest.setText("This is a test document for Server API integration tests. " +
+                    "It contains some sample text for indexing and testing dataset-related server operations.");
+            documentRequest.setDocType(DocTypeEnum.others);
+
+            // 设置索引技术
+            documentRequest.setIndexingTechnique(IndexingTechniqueEnum.HIGH_QUALITY);
+            documentRequest.setDocForm(DocFormEnum.hierarchical_model);
+            documentRequest.setDocLanguage("English");
+
+            // 配置处理规则
+            ProcessRule processRule = new ProcessRule();
+            processRule.setMode(ModeEnum.hierarchical);
+            CustomRule rule = new CustomRule();
+            rule.setPreProcessingRules(List.of(
+                    new PreProcessingRule(PreProcessingRuleTypeEnum.remove_urls_emails, true),
+                    new PreProcessingRule(PreProcessingRuleTypeEnum.remove_extra_spaces, false)));
+            rule.setSegmentation(new Segmentation());
+            rule.setParentMode(ParentModeEnum.PARAGRAPH);
+            rule.setSubChunkSegmentation(new SubChunkSegmentation());
+            processRule.setRules(rule);
+            documentRequest.setProcessRule(processRule);
+
+            // 配置检索模型
+            documentRequest.setRetrievalModel(createRetrievalModel());
+
+            // 配置嵌入模型
+            documentRequest.setEmbeddingModel("bge-m3:latest");
+            documentRequest.setEmbeddingModelProvider("langgenius/ollama/ollama");
+
+            // 创建文档
+            DocumentCreateResponse documentResponse = difyDataset.createDocumentByText(documentRequest);
+            assertNotNull(documentResponse, "Document response should not be null");
+            assertNotNull(documentResponse.getDocument(), "Document object should not be null");
+            assertNotNull(documentResponse.getDocument().getId(), "Document ID should not be null");
+
+            testDocumentId = documentResponse.getDocument().getId();
+            testDocumentBatch = documentResponse.getBatch();
+            log.info("Created test document with ID: {}, batch: {}", testDocumentId, testDocumentBatch);
+
+            // 等待文档索引完成
+            waitForDocumentIndexingComplete();
+
+        } catch (Exception e) {
+            log.error("Failed to initialize test dataset and document: {} - {}",
+                    e.getClass().getSimpleName(), e.getMessage());
+            throw new RuntimeException("Test data initialization failed", e);
+        }
+    }
+
+    @AfterAll
+    public void cleanup() {
+        // 删除测试文档
+        if (testDocumentId != null && testDatasetId != null) {
+            try {
+                difyDataset.deleteDocument(testDatasetId, testDocumentId);
+                log.info("Deleted test document: {}", testDocumentId);
+            } catch (Exception e) {
+                log.warn("Failed to delete test document: {}", e.getMessage());
+            }
+        }
+        // 删除测试知识库
+        if (testDatasetId != null) {
+            try {
+                difyDataset.delete(testDatasetId);
+                log.info("Deleted test dataset: {}", testDatasetId);
+            } catch (Exception e) {
+                log.warn("Failed to delete test dataset: {}", e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * 创建检索模型配置
+     */
+    private RetrievalModel createRetrievalModel() {
+        RetrievalModel model = new RetrievalModel();
+        model.setSearchMethod(SearchMethodEnum.hybrid_search);
+        model.setRerankingEnable(false);
+        model.setRerankingMode(RerankingModeEnum.weighted_score);
+
+        RetrievalModel.RerankingModelWeight weights = new RetrievalModel.RerankingModelWeight();
+
+        RetrievalModel.VectorSetting vectorSetting = new RetrievalModel.VectorSetting();
+        vectorSetting.setVectorWeight(0.7f);
+        vectorSetting.setEmbeddingModelName("bge-m3:latest");
+        vectorSetting.setEmbeddingProviderName("langgenius/ollama/ollama");
+        weights.setVectorSetting(vectorSetting);
+
+        RetrievalModel.KeywordSetting keywordSetting = new RetrievalModel.KeywordSetting();
+        keywordSetting.setKeywordWeight(0.3f);
+        weights.setKeywordSetting(keywordSetting);
+
+        model.setWeights(weights);
+        model.setTopK(2);
+        model.setScoreThresholdEnabled(true);
+        model.setScoreThreshold(0.3f);
+
+        return model;
+    }
+
+    /**
+     * 等待文档索引完成
+     */
+    private void waitForDocumentIndexingComplete() throws InterruptedException {
+        assertNotNull(testDatasetId, "Dataset ID should be available");
+        assertNotNull(testDocumentBatch, "Document batch should be available");
+
+        DocumentIndexingStatusRequest statusRequest = new DocumentIndexingStatusRequest();
+        statusRequest.setDatasetId(testDatasetId);
+        statusRequest.setBatch(testDocumentBatch);
+
+        DocumentIndexingStatusResponse statusResponse = difyDataset.indexingStatus(statusRequest);
+        log.info("Initial indexing status: {}", JSONUtil.toJsonStr(statusResponse));
+
+        int attempts = 0;
+        int maxAttempts = 60;  // 最多等待 30 秒
+
+        while (statusResponse.getData() != null
+                && !statusResponse.getData().isEmpty()
+                && !statusResponse.getData().getFirst().getIndexingStatus().equals("completed")
+                && attempts < maxAttempts) {
+            attempts++;
+            Thread.sleep(500);
+            statusResponse = difyDataset.indexingStatus(statusRequest);
+            log.debug("Indexing status check #{}: {}",
+                    attempts, statusResponse.getData().getFirst().getIndexingStatus());
+        }
+
+        log.info("Final indexing status after {} attempts: {}", attempts, JSONUtil.toJsonStr(statusResponse));
+    }
 
     @Test
     @Order(1)
@@ -530,4 +701,70 @@ public class ServerTest extends BaseServerContainerTest {
                     e.getClass().getSimpleName(), e.getMessage());
         }
     }
+
+    @Test
+    @Order(23)
+    @DisplayName("Test retrieving dataset indexing status")
+    public void getDatasetIndexingStatusTest() {
+        assertNotNull(testDatasetId, "Dataset ID should be available from initialization");
+
+        DocumentIndexingStatusResponse indexingStatus = difyServer.getDatasetIndexingStatus(testDatasetId);
+        assertNotNull(indexingStatus, "Dataset indexing status should not be null");
+
+        if (indexingStatus.getData() != null && !indexingStatus.getData().isEmpty()) {
+            DocumentIndexingStatusResponse.ProcessingStatus firstDocument = indexingStatus.getData().getFirst();
+            assertNotNull(firstDocument.getId(), "Document ID should not be null");
+            log.info("Dataset has {} documents, first document status: {}",
+                    indexingStatus.getData().size(), firstDocument.getIndexingStatus());
+        }
+    }
+
+    @Test
+    @Order(24)
+    @DisplayName("Test retrieving document indexing status")
+    public void getDocumentIndexingStatusTest() {
+        assertNotNull(testDatasetId, "Dataset ID should be available from initialization");
+        assertNotNull(testDocumentId, "Document ID should be available from initialization");
+
+        DocumentIndexingStatusResponse.ProcessingStatus documentStatus =
+                difyServer.getDocumentIndexingStatus(testDatasetId, testDocumentId);
+        assertNotNull(documentStatus, "Document indexing status should not be null");
+        assertNotNull(documentStatus.getId(), "Document ID should not be null");
+        assertEquals(testDocumentId, documentStatus.getId(), "Document ID should match");
+
+        log.info("Document indexing status: {}", documentStatus.getIndexingStatus());
+    }
+
+    @Test
+    @Order(25)
+    @DisplayName("Test retrieving dataset error documents")
+    public void getDatasetErrorDocumentsTest() {
+        assertNotNull(testDatasetId, "Dataset ID should be available from initialization");
+
+        DatasetErrorDocumentsResponse errorDocuments = difyServer.getDatasetErrorDocuments(testDatasetId);
+        assertNotNull(errorDocuments, "Dataset error documents response should not be null");
+        assertNotNull(errorDocuments.getTotal(), "Error documents total should not be null");
+
+        if (errorDocuments.getData() != null && !errorDocuments.getData().isEmpty()) {
+            log.info("Found {} error documents", errorDocuments.getTotal());
+        } else {
+            log.info("No error documents found (expected for successful indexing)");
+        }
+    }
+
+    @Test
+    @Order(26)
+    @DisplayName("Test retrying document indexing")
+    public void retryDocumentIndexingTest() {
+        assertNotNull(testDatasetId, "Dataset ID should be available from initialization");
+        assertNotNull(testDocumentId, "Document ID should be available from initialization");
+
+        DocumentRetryRequest request = new DocumentRetryRequest();
+        request.setDatasetId(testDatasetId);
+        request.setDocumentIds(java.util.Collections.singletonList(testDocumentId));
+
+        difyServer.retryDocumentIndexing(request);
+        log.info("Successfully triggered document indexing retry");
+    }
+
 }

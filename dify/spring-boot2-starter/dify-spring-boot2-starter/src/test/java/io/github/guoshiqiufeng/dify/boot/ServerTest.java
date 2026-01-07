@@ -17,15 +17,40 @@ package io.github.guoshiqiufeng.dify.boot;
 
 import cn.hutool.json.JSONUtil;
 import io.github.guoshiqiufeng.dify.boot.base.BaseServerContainerTest;
+import io.github.guoshiqiufeng.dify.client.spring5.dataset.DifyDatasetDefaultClient;
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
+import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
+import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;
+import io.github.guoshiqiufeng.dify.dataset.dto.RetrievalModel;
+import io.github.guoshiqiufeng.dify.dataset.dto.request.DatasetCreateRequest;
+import io.github.guoshiqiufeng.dify.dataset.dto.request.DocumentCreateByTextRequest;
+import io.github.guoshiqiufeng.dify.dataset.dto.request.DocumentIndexingStatusRequest;
+import io.github.guoshiqiufeng.dify.dataset.dto.request.document.*;
+import io.github.guoshiqiufeng.dify.dataset.dto.response.DatasetResponse;
+import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentCreateResponse;
+import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse;
+import io.github.guoshiqiufeng.dify.dataset.enums.IndexingTechniqueEnum;
+import io.github.guoshiqiufeng.dify.dataset.enums.RerankingModeEnum;
+import io.github.guoshiqiufeng.dify.dataset.enums.SearchMethodEnum;
+import io.github.guoshiqiufeng.dify.dataset.enums.document.*;
+import io.github.guoshiqiufeng.dify.dataset.impl.DifyDatasetClientImpl;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.annotation.Resource;
+import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,13 +64,237 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @since 2025/3/31 09:55
  */
 @Slf4j
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServerTest extends BaseServerContainerTest {
+
+    private static final String API_KEY_CACHE_KEY = "dify:api:key";
+    private static final Duration CACHE_EXPIRATION = Duration.ofHours(1);
 
     @Resource
     private DifyServer difyServer;
 
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Resource
+    private DifyProperties difyProperties;
+
+    protected DifyDataset difyDataset;
+
     private static String testAppId;
+    private static String testDatasetId;
+    private static String testDocumentId;
+    private static String testDocumentBatch;
+
+    @BeforeAll
+    public void initializeTestData() {
+        try {
+            // 初始化 DifyDataset（使用动态获取的 API Key）
+            String apiKey = initializeApiKeyWithCache();
+            DifyDatasetClient difyDatasetClient = new DifyDatasetDefaultClient(difyProperties.getUrl(),
+                    difyProperties.getClientConfig(),
+                    WebClient.builder().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey));
+            this.difyDataset = new DifyDatasetClientImpl(difyDatasetClient);
+
+            // 创建测试知识库
+            DatasetCreateRequest createRequest = new DatasetCreateRequest();
+            createRequest.setName("server-api-test-dataset-spring6");
+            createRequest.setDescription("Test dataset for Server API integration tests");
+
+            DatasetResponse datasetResponse = difyDataset.create(createRequest);
+            assertNotNull(datasetResponse, "Dataset response should not be null");
+            assertNotNull(datasetResponse.getId(), "Dataset ID should not be null");
+
+            testDatasetId = datasetResponse.getId();
+            log.info("Created test dataset with ID: {}", testDatasetId);
+
+            // 创建测试文档（带完整配置）
+            DocumentCreateByTextRequest documentRequest = new DocumentCreateByTextRequest();
+            documentRequest.setDatasetId(testDatasetId);
+            documentRequest.setName("test-document");
+            documentRequest.setText("This is a test document for Server API integration tests. " +
+                    "It contains some sample text for indexing and testing dataset-related server operations.");
+            documentRequest.setDocType(DocTypeEnum.others);
+
+            // 设置索引技术
+            documentRequest.setIndexingTechnique(IndexingTechniqueEnum.HIGH_QUALITY);
+            documentRequest.setDocForm(DocFormEnum.hierarchical_model);
+            documentRequest.setDocLanguage("English");
+
+            // 配置处理规则
+            ProcessRule processRule = new ProcessRule();
+            processRule.setMode(ModeEnum.hierarchical);
+            CustomRule rule = new CustomRule();
+            rule.setPreProcessingRules(Arrays.asList(
+                    new PreProcessingRule(PreProcessingRuleTypeEnum.remove_urls_emails, true),
+                    new PreProcessingRule(PreProcessingRuleTypeEnum.remove_extra_spaces, false)));
+            rule.setSegmentation(new Segmentation());
+            rule.setParentMode(ParentModeEnum.PARAGRAPH);
+            rule.setSubChunkSegmentation(new SubChunkSegmentation());
+            processRule.setRules(rule);
+            documentRequest.setProcessRule(processRule);
+
+            // 配置检索模型
+            documentRequest.setRetrievalModel(createRetrievalModel());
+
+            // 配置嵌入模型
+            documentRequest.setEmbeddingModel("bge-m3:latest");
+            documentRequest.setEmbeddingModelProvider("langgenius/ollama/ollama");
+
+            // 创建文档
+            DocumentCreateResponse documentResponse = difyDataset.createDocumentByText(documentRequest);
+            assertNotNull(documentResponse, "Document response should not be null");
+            assertNotNull(documentResponse.getDocument(), "Document object should not be null");
+            assertNotNull(documentResponse.getDocument().getId(), "Document ID should not be null");
+
+            testDocumentId = documentResponse.getDocument().getId();
+            testDocumentBatch = documentResponse.getBatch();
+            log.info("Created test document with ID: {}, batch: {}", testDocumentId, testDocumentBatch);
+
+            // 等待文档索引完成
+            waitForDocumentIndexingComplete();
+
+        } catch (Exception e) {
+            log.error("Failed to initialize test dataset and document: {} - {}",
+                    e.getClass().getSimpleName(), e.getMessage());
+            throw new RuntimeException("Test data initialization failed", e);
+        }
+    }
+
+    @AfterAll
+    public void cleanup() {
+        // 删除测试文档
+        if (testDocumentId != null && testDatasetId != null) {
+            try {
+                difyDataset.deleteDocument(testDatasetId, testDocumentId);
+                log.info("Deleted test document: {}", testDocumentId);
+            } catch (Exception e) {
+                log.warn("Failed to delete test document: {}", e.getMessage());
+            }
+        }
+        // 删除测试知识库
+        if (testDatasetId != null) {
+            try {
+                difyDataset.delete(testDatasetId);
+                log.info("Deleted test dataset: {}", testDatasetId);
+            } catch (Exception e) {
+                log.warn("Failed to delete test dataset: {}", e.getMessage());
+            }
+        }
+    }
+
+    private String initializeApiKeyWithCache() {
+        String cachedToken = stringRedisTemplate.opsForValue().get(API_KEY_CACHE_KEY);
+        if (StringUtils.hasText(cachedToken)) {
+            log.debug("Using cached API Key");
+            return cachedToken;
+        }
+
+        synchronized (this) {
+            cachedToken = stringRedisTemplate.opsForValue().get(API_KEY_CACHE_KEY);
+            if (StringUtils.hasText(cachedToken)) {
+                return cachedToken;
+            }
+
+            String newToken = fetchOrCreateApiKey();
+
+            try {
+                stringRedisTemplate.opsForValue().set(API_KEY_CACHE_KEY, newToken, CACHE_EXPIRATION);
+                log.debug("API Key cached with expiration: {}", CACHE_EXPIRATION);
+            } catch (Exception e) {
+                log.error("Failed to cache API Key", e);
+            }
+            return newToken;
+        }
+    }
+
+    private String fetchOrCreateApiKey() {
+        if (difyServer == null) {
+            throw new IllegalStateException("DifyServer is not initialized");
+        }
+
+        List<DatasetApiKeyResponse> apiKeys = difyServer.getDatasetApiKey();
+        if (apiKeys == null) {
+            log.debug("No existing API keys found, creating new key");
+            apiKeys = difyServer.initDatasetApiKey();
+            if (CollectionUtils.isEmpty(apiKeys)) {
+                throw new IllegalStateException("Failed to initialize API Key");
+            }
+            return apiKeys.getFirst().getToken();
+        }
+
+        return apiKeys.stream()
+                .findFirst()
+                .map(DatasetApiKeyResponse::getToken)
+                .orElseGet(() -> {
+                    List<DatasetApiKeyResponse> newKeys = difyServer.initDatasetApiKey();
+                    if (CollectionUtils.isEmpty(newKeys)) {
+                        throw new IllegalStateException("Failed to initialize API Key");
+                    }
+                    return newKeys.getFirst().getToken();
+                });
+    }
+
+    /**
+     * 创建检索模型配置
+     */
+    private RetrievalModel createRetrievalModel() {
+        RetrievalModel model = new RetrievalModel();
+        model.setSearchMethod(SearchMethodEnum.hybrid_search);
+        model.setRerankingEnable(false);
+        model.setRerankingMode(RerankingModeEnum.weighted_score);
+
+        RetrievalModel.RerankingModelWeight weights = new RetrievalModel.RerankingModelWeight();
+
+        RetrievalModel.VectorSetting vectorSetting = new RetrievalModel.VectorSetting();
+        vectorSetting.setVectorWeight(0.7f);
+        vectorSetting.setEmbeddingModelName("bge-m3:latest");
+        vectorSetting.setEmbeddingProviderName("langgenius/ollama/ollama");
+        weights.setVectorSetting(vectorSetting);
+
+        RetrievalModel.KeywordSetting keywordSetting = new RetrievalModel.KeywordSetting();
+        keywordSetting.setKeywordWeight(0.3f);
+        weights.setKeywordSetting(keywordSetting);
+
+        model.setWeights(weights);
+        model.setTopK(2);
+        model.setScoreThresholdEnabled(true);
+        model.setScoreThreshold(0.3f);
+
+        return model;
+    }
+
+    /**
+     * 等待文档索引完成
+     */
+    private void waitForDocumentIndexingComplete() throws InterruptedException {
+        assertNotNull(testDatasetId, "Dataset ID should be available");
+        assertNotNull(testDocumentBatch, "Document batch should be available");
+
+        DocumentIndexingStatusRequest statusRequest = new DocumentIndexingStatusRequest();
+        statusRequest.setDatasetId(testDatasetId);
+        statusRequest.setBatch(testDocumentBatch);
+
+        DocumentIndexingStatusResponse statusResponse = difyDataset.indexingStatus(statusRequest);
+        log.info("Initial indexing status: {}", JSONUtil.toJsonStr(statusResponse));
+
+        int attempts = 0;
+        int maxAttempts = 60;  // 最多等待 30 秒
+
+        while (statusResponse.getData() != null
+                && !statusResponse.getData().isEmpty()
+                && !statusResponse.getData().getFirst().getIndexingStatus().equals("completed")
+                && attempts < maxAttempts) {
+            attempts++;
+            Thread.sleep(500);
+            statusResponse = difyDataset.indexingStatus(statusRequest);
+            log.debug("Indexing status check #{}: {}",
+                    attempts, statusResponse.getData().getFirst().getIndexingStatus());
+        }
+
+        log.info("Final indexing status after {} attempts: {}", attempts, JSONUtil.toJsonStr(statusResponse));
+    }
 
     @Test
     @Order(1)
@@ -147,7 +396,7 @@ public class ServerTest extends BaseServerContainerTest {
         if (testAppId == null) {
             List<AppsResponse> apps = difyServer.apps("", "");
             if (!apps.isEmpty()) {
-                testAppId = apps.get(0).getId(); // Use get(0) instead of getFirst() for Java 8 compatibility
+                testAppId = apps.getFirst().getId();
             } else {
                 log.warn("No applications available, skipping API Key test");
                 return;
@@ -173,7 +422,7 @@ public class ServerTest extends BaseServerContainerTest {
         if (testAppId == null) {
             List<AppsResponse> apps = difyServer.apps("", "");
             if (!apps.isEmpty()) {
-                testAppId = apps.get(0).getId(); // Use get(0) instead of getFirst() for Java 8 compatibility
+                testAppId = apps.getFirst().getId();
             } else {
                 log.warn("No applications available, skipping delete API Key test");
                 return;
@@ -183,10 +432,10 @@ public class ServerTest extends BaseServerContainerTest {
         // First, initialize an API key to ensure we have one to delete
         List<ApiKeyResponse> initializedKeys = difyServer.initAppApiKey(testAppId);
         log.debug("Initialized API Keys for deletion test: {}", JSONUtil.toJsonStr(initializedKeys));
-        
+
         // Verify we have keys to work with
         if (initializedKeys != null && !initializedKeys.isEmpty()) {
-            ApiKeyResponse keyToDelete = initializedKeys.get(0); // Use get(0) instead of getFirst() for Java 8 compatibility
+            ApiKeyResponse keyToDelete = initializedKeys.getFirst();
             String apiKeyId = keyToDelete.getId();
             log.debug("Attempting to delete API Key with ID: {}", apiKeyId);
 
@@ -200,7 +449,7 @@ public class ServerTest extends BaseServerContainerTest {
                 log.debug("Remaining API Keys after deletion: {}", JSONUtil.toJsonStr(remainingKeys));
 
             } catch (Exception e) {
-                log.warn("Exception occurred during API Key deletion: {} - {}", 
+                log.warn("Exception occurred during API Key deletion: {} - {}",
                         e.getClass().getSimpleName(), e.getMessage());
                 // Log but don't fail the test since this might depend on the actual API behavior
             }
@@ -231,7 +480,7 @@ public class ServerTest extends BaseServerContainerTest {
         if (testAppId == null) {
             List<AppsResponse> apps = difyServer.apps("", "");
             if (!apps.isEmpty()) {
-                testAppId = apps.get(0).getId(); // Use get(0) instead of getFirst() for Java 8 compatibility
+                testAppId = apps.getFirst().getId();
             } else {
                 log.warn("No applications available, skipping chat conversations test");
                 return;
@@ -258,7 +507,7 @@ public class ServerTest extends BaseServerContainerTest {
 
         // Verify the data structure if conversations exist
         if (conversations.getData() != null && !conversations.getData().isEmpty()) {
-            ChatConversationResponse firstConversation = conversations.getData().get(0); // Use get(0) instead of getFirst() for Java 8 compatibility
+            ChatConversationResponse firstConversation = conversations.getData().getFirst();
             log.debug("First conversation: {}", JSONUtil.toJsonStr(firstConversation));
             assertNotNull(firstConversation.getId(), "Conversation ID should not be null");
             assertNotNull(firstConversation.getName(), "Conversation name should not be null");
@@ -273,7 +522,7 @@ public class ServerTest extends BaseServerContainerTest {
         if (testAppId == null) {
             List<AppsResponse> apps = difyServer.apps("", "");
             if (!apps.isEmpty()) {
-                testAppId = apps.get(0).getId(); // Use get(0) instead of getFirst() for Java 8 compatibility
+                testAppId = apps.getFirst().getId();
             } else {
                 log.warn("No applications available, skipping daily conversations test");
                 return;
@@ -285,14 +534,13 @@ public class ServerTest extends BaseServerContainerTest {
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
 
         // Get daily conversation statistics
-        List<io.github.guoshiqiufeng.dify.server.dto.response.DailyConversationsResponse> dailyStats =
-                difyServer.dailyConversations(testAppId, start, end);
+        List<DailyConversationsResponse> dailyStats = difyServer.dailyConversations(testAppId, start, end);
         log.debug("Daily conversations statistics: {}", JSONUtil.toJsonStr(dailyStats));
         assertNotNull(dailyStats, "Daily conversations statistics should not be null");
 
         // If statistics exist, verify the data structure
         if (dailyStats != null && !dailyStats.isEmpty()) {
-            io.github.guoshiqiufeng.dify.server.dto.response.DailyConversationsResponse firstStat = dailyStats.get(0);
+            DailyConversationsResponse firstStat = dailyStats.getFirst();
             log.debug("First daily statistic: {}", JSONUtil.toJsonStr(firstStat));
             assertNotNull(firstStat.getDate(), "Daily statistic date should not be null");
             assertNotNull(firstStat.getConversationCount(), "Daily statistic conversation count should not be null");
@@ -307,7 +555,7 @@ public class ServerTest extends BaseServerContainerTest {
         if (testAppId == null) {
             List<AppsResponse> apps = difyServer.apps("", "");
             if (!apps.isEmpty()) {
-                testAppId = apps.get(0).getId(); // Use get(0) instead of getFirst() for Java 8 compatibility
+                testAppId = apps.getFirst().getId();
             } else {
                 log.warn("No applications available, skipping daily end users test");
                 return;
@@ -319,14 +567,13 @@ public class ServerTest extends BaseServerContainerTest {
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
 
         // Get daily end users statistics
-        List<io.github.guoshiqiufeng.dify.server.dto.response.DailyEndUsersResponse> dailyEndUsersStats =
-                difyServer.dailyEndUsers(testAppId, start, end);
+        List<DailyEndUsersResponse> dailyEndUsersStats = difyServer.dailyEndUsers(testAppId, start, end);
         log.debug("Daily end users statistics: {}", JSONUtil.toJsonStr(dailyEndUsersStats));
         assertNotNull(dailyEndUsersStats, "Daily end users statistics should not be null");
 
         // If statistics exist, verify the data structure
         if (dailyEndUsersStats != null && !dailyEndUsersStats.isEmpty()) {
-            io.github.guoshiqiufeng.dify.server.dto.response.DailyEndUsersResponse firstStat = dailyEndUsersStats.get(0);
+            DailyEndUsersResponse firstStat = dailyEndUsersStats.getFirst();
             log.debug("First daily end users statistic: {}", JSONUtil.toJsonStr(firstStat));
             assertNotNull(firstStat.getDate(), "Daily end users statistic date should not be null");
             assertNotNull(firstStat.getTerminalCount(), "Daily end users statistic terminal count should not be null");
@@ -341,7 +588,7 @@ public class ServerTest extends BaseServerContainerTest {
         if (testAppId == null) {
             List<AppsResponse> apps = difyServer.apps("", "");
             if (!apps.isEmpty()) {
-                testAppId = apps.get(0).getId(); // Use get(0) instead of getFirst() for Java 8 compatibility
+                testAppId = apps.getFirst().getId();
             } else {
                 log.warn("No applications available, skipping average session interactions test");
                 return;
@@ -353,14 +600,13 @@ public class ServerTest extends BaseServerContainerTest {
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
 
         // Get average session interactions statistics
-        List<io.github.guoshiqiufeng.dify.server.dto.response.AverageSessionInteractionsResponse> averageSessionInteractionsStats =
-                difyServer.averageSessionInteractions(testAppId, start, end);
+        List<AverageSessionInteractionsResponse> averageSessionInteractionsStats = difyServer.averageSessionInteractions(testAppId, start, end);
         log.debug("Average session interactions statistics: {}", JSONUtil.toJsonStr(averageSessionInteractionsStats));
         assertNotNull(averageSessionInteractionsStats, "Average session interactions statistics should not be null");
 
         // If statistics exist, verify the data structure
         if (averageSessionInteractionsStats != null && !averageSessionInteractionsStats.isEmpty()) {
-            io.github.guoshiqiufeng.dify.server.dto.response.AverageSessionInteractionsResponse firstStat = averageSessionInteractionsStats.get(0);
+            AverageSessionInteractionsResponse firstStat = averageSessionInteractionsStats.getFirst();
             log.debug("First average session interactions statistic: {}", JSONUtil.toJsonStr(firstStat));
             assertNotNull(firstStat.getDate(), "Average session interactions statistic date should not be null");
             assertNotNull(firstStat.getInteractions(), "Average session interactions statistic should not be null");
@@ -375,7 +621,7 @@ public class ServerTest extends BaseServerContainerTest {
         if (testAppId == null) {
             List<AppsResponse> apps = difyServer.apps("", "");
             if (!apps.isEmpty()) {
-                testAppId = apps.get(0).getId(); // Use get(0) instead of getFirst() for Java 8 compatibility
+                testAppId = apps.getFirst().getId();
             } else {
                 log.warn("No applications available, skipping tokens per second test");
                 return;
@@ -387,14 +633,13 @@ public class ServerTest extends BaseServerContainerTest {
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
 
         // Get tokens per second statistics
-        List<io.github.guoshiqiufeng.dify.server.dto.response.TokensPerSecondResponse> tokensPerSecondStats =
-                difyServer.tokensPerSecond(testAppId, start, end);
+        List<TokensPerSecondResponse> tokensPerSecondStats = difyServer.tokensPerSecond(testAppId, start, end);
         log.debug("Tokens per second statistics: {}", JSONUtil.toJsonStr(tokensPerSecondStats));
         assertNotNull(tokensPerSecondStats, "Tokens per second statistics should not be null");
 
         // If statistics exist, verify the data structure
         if (tokensPerSecondStats != null && !tokensPerSecondStats.isEmpty()) {
-            io.github.guoshiqiufeng.dify.server.dto.response.TokensPerSecondResponse firstStat = tokensPerSecondStats.get(0);
+            TokensPerSecondResponse firstStat = tokensPerSecondStats.getFirst();
             log.debug("First tokens per second statistic: {}", JSONUtil.toJsonStr(firstStat));
             assertNotNull(firstStat.getDate(), "Tokens per second statistic date should not be null");
             assertNotNull(firstStat.getTps(), "Tokens per second statistic should not be null");
@@ -409,7 +654,7 @@ public class ServerTest extends BaseServerContainerTest {
         if (testAppId == null) {
             List<AppsResponse> apps = difyServer.apps("", "");
             if (!apps.isEmpty()) {
-                testAppId = apps.get(0).getId(); // Use get(0) instead of getFirst() for Java 8 compatibility
+                testAppId = apps.getFirst().getId();
             } else {
                 log.warn("No applications available, skipping user satisfaction rate test");
                 return;
@@ -421,14 +666,13 @@ public class ServerTest extends BaseServerContainerTest {
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
 
         // Get user satisfaction rate statistics
-        List<io.github.guoshiqiufeng.dify.server.dto.response.UserSatisfactionRateResponse> userSatisfactionRateStats =
-                difyServer.userSatisfactionRate(testAppId, start, end);
+        List<UserSatisfactionRateResponse> userSatisfactionRateStats = difyServer.userSatisfactionRate(testAppId, start, end);
         log.debug("User satisfaction rate statistics: {}", JSONUtil.toJsonStr(userSatisfactionRateStats));
         assertNotNull(userSatisfactionRateStats, "User satisfaction rate statistics should not be null");
 
         // If statistics exist, verify the data structure
         if (userSatisfactionRateStats != null && !userSatisfactionRateStats.isEmpty()) {
-            io.github.guoshiqiufeng.dify.server.dto.response.UserSatisfactionRateResponse firstStat = userSatisfactionRateStats.get(0);
+            UserSatisfactionRateResponse firstStat = userSatisfactionRateStats.getFirst();
             log.debug("First user satisfaction rate statistic: {}", JSONUtil.toJsonStr(firstStat));
             assertNotNull(firstStat.getDate(), "User satisfaction rate statistic date should not be null");
             assertNotNull(firstStat.getRate(), "User satisfaction rate statistic should not be null");
@@ -443,7 +687,7 @@ public class ServerTest extends BaseServerContainerTest {
         if (testAppId == null) {
             List<AppsResponse> apps = difyServer.apps("", "");
             if (!apps.isEmpty()) {
-                testAppId = apps.get(0).getId(); // Use get(0) instead of getFirst() for Java 8 compatibility
+                testAppId = apps.getFirst().getId();
             } else {
                 log.warn("No applications available, skipping token costs test");
                 return;
@@ -455,14 +699,13 @@ public class ServerTest extends BaseServerContainerTest {
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
 
         // Get token costs statistics
-        List<io.github.guoshiqiufeng.dify.server.dto.response.TokenCostsResponse> tokenCostsStats =
-                difyServer.tokenCosts(testAppId, start, end);
+        List<TokenCostsResponse> tokenCostsStats = difyServer.tokenCosts(testAppId, start, end);
         log.debug("Token costs statistics: {}", JSONUtil.toJsonStr(tokenCostsStats));
         assertNotNull(tokenCostsStats, "Token costs statistics should not be null");
 
         // If statistics exist, verify the data structure
         if (tokenCostsStats != null && !tokenCostsStats.isEmpty()) {
-            io.github.guoshiqiufeng.dify.server.dto.response.TokenCostsResponse firstStat = tokenCostsStats.get(0);
+            TokenCostsResponse firstStat = tokenCostsStats.getFirst();
             log.debug("First token costs statistic: {}", JSONUtil.toJsonStr(firstStat));
             assertNotNull(firstStat.getDate(), "Token costs statistic date should not be null");
             assertNotNull(firstStat.getTokenCount(), "Token costs statistic token count should not be null");
@@ -479,7 +722,7 @@ public class ServerTest extends BaseServerContainerTest {
         if (testAppId == null) {
             List<AppsResponse> apps = difyServer.apps("", "");
             if (!apps.isEmpty()) {
-                testAppId = apps.get(0).getId(); // Use get(0) instead of getFirst() for Java 8 compatibility
+                testAppId = apps.getFirst().getId();
             } else {
                 log.warn("No applications available, skipping daily messages test");
                 return;
@@ -491,14 +734,14 @@ public class ServerTest extends BaseServerContainerTest {
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
 
         // Get daily messages statistics
-        List<io.github.guoshiqiufeng.dify.server.dto.response.DailyMessagesResponse> dailyMessagesStats =
+        List<DailyMessagesResponse> dailyMessagesStats =
                 difyServer.dailyMessages(testAppId, start, end);
         log.debug("Daily messages statistics: {}", JSONUtil.toJsonStr(dailyMessagesStats));
         assertNotNull(dailyMessagesStats, "Daily messages statistics should not be null");
 
         // If statistics exist, verify the data structure
         if (dailyMessagesStats != null && !dailyMessagesStats.isEmpty()) {
-            io.github.guoshiqiufeng.dify.server.dto.response.DailyMessagesResponse firstStat = dailyMessagesStats.get(0);
+            DailyMessagesResponse firstStat = dailyMessagesStats.getFirst();
             log.debug("First daily messages statistic: {}", JSONUtil.toJsonStr(firstStat));
             assertNotNull(firstStat.getDate(), "Daily messages statistic date should not be null");
             assertNotNull(firstStat.getMessageCount(), "Daily messages statistic message count should not be null");
@@ -530,5 +773,70 @@ public class ServerTest extends BaseServerContainerTest {
             log.info("Expected exception when retrieving API keys with invalid ID: {} - {}",
                     e.getClass().getSimpleName(), e.getMessage());
         }
+    }
+
+    @Test
+    @Order(23)
+    @DisplayName("Test retrieving dataset indexing status")
+    public void getDatasetIndexingStatusTest() {
+        assertNotNull(testDatasetId, "Dataset ID should be available from initialization");
+
+        DocumentIndexingStatusResponse indexingStatus = difyServer.getDatasetIndexingStatus(testDatasetId);
+        assertNotNull(indexingStatus, "Dataset indexing status should not be null");
+
+        if (indexingStatus.getData() != null && !indexingStatus.getData().isEmpty()) {
+            DocumentIndexingStatusResponse.ProcessingStatus firstDocument = indexingStatus.getData().getFirst();
+            assertNotNull(firstDocument.getId(), "Document ID should not be null");
+            log.info("Dataset has {} documents, first document status: {}",
+                    indexingStatus.getData().size(), firstDocument.getIndexingStatus());
+        }
+    }
+
+    @Test
+    @Order(24)
+    @DisplayName("Test retrieving document indexing status")
+    public void getDocumentIndexingStatusTest() {
+        assertNotNull(testDatasetId, "Dataset ID should be available from initialization");
+        assertNotNull(testDocumentId, "Document ID should be available from initialization");
+
+        DocumentIndexingStatusResponse.ProcessingStatus documentStatus =
+                difyServer.getDocumentIndexingStatus(testDatasetId, testDocumentId);
+        assertNotNull(documentStatus, "Document indexing status should not be null");
+        assertNotNull(documentStatus.getId(), "Document ID should not be null");
+        assertEquals(testDocumentId, documentStatus.getId(), "Document ID should match");
+
+        log.info("Document indexing status: {}", documentStatus.getIndexingStatus());
+    }
+
+    @Test
+    @Order(25)
+    @DisplayName("Test retrieving dataset error documents")
+    public void getDatasetErrorDocumentsTest() {
+        assertNotNull(testDatasetId, "Dataset ID should be available from initialization");
+
+        DatasetErrorDocumentsResponse errorDocuments = difyServer.getDatasetErrorDocuments(testDatasetId);
+        assertNotNull(errorDocuments, "Dataset error documents response should not be null");
+        assertNotNull(errorDocuments.getTotal(), "Error documents total should not be null");
+
+        if (errorDocuments.getData() != null && !errorDocuments.getData().isEmpty()) {
+            log.info("Found {} error documents", errorDocuments.getTotal());
+        } else {
+            log.info("No error documents found (expected for successful indexing)");
+        }
+    }
+
+    @Test
+    @Order(26)
+    @DisplayName("Test retrying document indexing")
+    public void retryDocumentIndexingTest() {
+        assertNotNull(testDatasetId, "Dataset ID should be available from initialization");
+        assertNotNull(testDocumentId, "Document ID should be available from initialization");
+
+        DocumentRetryRequest request = new DocumentRetryRequest();
+        request.setDatasetId(testDatasetId);
+        request.setDocumentIds(java.util.Collections.singletonList(testDocumentId));
+
+        difyServer.retryDocumentIndexing(request);
+        log.info("Successfully triggered document indexing retry");
     }
 }

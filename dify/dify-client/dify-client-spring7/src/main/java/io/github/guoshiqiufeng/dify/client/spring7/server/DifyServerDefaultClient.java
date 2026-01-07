@@ -19,6 +19,7 @@ import io.github.guoshiqiufeng.dify.client.spring7.base.BaseDifyDefaultClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
+import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse;
 import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
@@ -27,6 +28,7 @@ import io.github.guoshiqiufeng.dify.server.constant.ServerUriConstant;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DifyLoginRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -393,6 +395,74 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                     return response != null ? response.getData() : Collections.emptyList();
                 }
         );
+    }
+
+    @Override
+    public DocumentIndexingStatusResponse getDatasetIndexingStatus(String datasetId) {
+        return executeWithRetry(() -> {
+            RestClient.RequestHeadersSpec<?> uri = restClient
+                    .get()
+                    .uri(ServerUriConstant.DATASET_INDEXING_STATUS, datasetId);
+            uri.headers(this::addAuthorizationHeader);
+            return uri
+                    .cookies(this::addAuthorizationCookies)
+                    .retrieve()
+                    .onStatus(responseErrorHandler)
+                    .body(DocumentIndexingStatusResponse.class);
+        });
+    }
+
+    @Override
+    public DocumentIndexingStatusResponse.ProcessingStatus getDocumentIndexingStatus(String datasetId, String documentId) {
+        return executeWithRetry(() -> {
+            Map<String, Object> uriVariables = new HashMap<>();
+            uriVariables.put("datasetId", datasetId);
+            uriVariables.put("documentId", documentId);
+            RestClient.RequestHeadersSpec<?> uri = restClient
+                    .get()
+                    .uri(ServerUriConstant.DOCUMENT_INDEXING_STATUS, uriVariables);
+            uri.headers(this::addAuthorizationHeader);
+            return uri
+                    .cookies(this::addAuthorizationCookies)
+                    .retrieve()
+                    .onStatus(responseErrorHandler)
+                    .body(DocumentIndexingStatusResponse.ProcessingStatus.class);
+        });
+    }
+
+    @Override
+    public DatasetErrorDocumentsResponse getDatasetErrorDocuments(String datasetId) {
+        return executeWithRetry(() -> {
+            RestClient.RequestHeadersSpec<?> uri = restClient
+                    .get()
+                    .uri(ServerUriConstant.DATASET_ERROR_DOCUMENTS, datasetId);
+            uri.headers(this::addAuthorizationHeader);
+            return uri
+                    .cookies(this::addAuthorizationCookies)
+                    .retrieve()
+                    .onStatus(responseErrorHandler)
+                    .body(DatasetErrorDocumentsResponse.class);
+        });
+    }
+
+    @Override
+    public void retryDocumentIndexing(DocumentRetryRequest request) {
+        // 创建只包含document_ids的请求体
+        Map<String, List<String>> requestBody = new HashMap<>();
+        requestBody.put("document_ids", request.getDocumentIds());
+
+        executeWithRetry(() -> {
+            RestClient.RequestBodySpec uri = restClient
+                    .post()
+                    .uri(ServerUriConstant.DOCUMENT_RETRY, request.getDatasetId());
+            uri.headers(this::addAuthorizationHeader);
+            return uri
+                    .cookies(this::addAuthorizationCookies)
+                    .body(requestBody)
+                    .retrieve()
+                    .onStatus(responseErrorHandler)
+                    .toBodilessEntity();
+        });
     }
 
     private void appPages(String mode, String name, int page, List<AppsResponse> result) {

@@ -20,6 +20,7 @@ import io.github.guoshiqiufeng.dify.client.spring5.utils.WebClientUtil;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
+import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse;
 import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
@@ -28,6 +29,7 @@ import io.github.guoshiqiufeng.dify.server.constant.ServerUriConstant;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DifyLoginRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -374,6 +376,71 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                         .map(DailyMessagesResultResponse::getData)
                         .block()
         );
+    }
+
+    @Override
+    public DocumentIndexingStatusResponse getDatasetIndexingStatus(String datasetId) {
+        return executeWithRetry(() ->
+                webClient
+                        .get()
+                        .uri(ServerUriConstant.DATASET_INDEXING_STATUS, datasetId)
+                        .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
+                        .retrieve()
+                        .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                        .bodyToMono(DocumentIndexingStatusResponse.class)
+                        .block());
+    }
+
+    @Override
+    public DocumentIndexingStatusResponse.ProcessingStatus getDocumentIndexingStatus(String datasetId, String documentId) {
+        return executeWithRetry(() -> {
+            Map<String, Object> uriVariables = new HashMap<>();
+            uriVariables.put("datasetId", datasetId);
+            uriVariables.put("documentId", documentId);
+            return webClient
+                    .get()
+                    .uri(ServerUriConstant.DOCUMENT_INDEXING_STATUS, uriVariables)
+                    .headers(this::addAuthorizationHeader)
+                    .cookies(this::addAuthorizationCookies)
+                    .retrieve()
+                    .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                    .bodyToMono(DocumentIndexingStatusResponse.ProcessingStatus.class)
+                    .block();
+        });
+    }
+
+    @Override
+    public DatasetErrorDocumentsResponse getDatasetErrorDocuments(String datasetId) {
+        return executeWithRetry(() ->
+                webClient
+                        .get()
+                        .uri(ServerUriConstant.DATASET_ERROR_DOCUMENTS, datasetId)
+                        .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
+                        .retrieve()
+                        .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                        .bodyToMono(DatasetErrorDocumentsResponse.class)
+                        .block());
+    }
+
+    @Override
+    public void retryDocumentIndexing(DocumentRetryRequest request) {
+        // 创建只包含document_ids的请求体
+        Map<String, List<String>> requestBody = new HashMap<>();
+        requestBody.put("document_ids", request.getDocumentIds());
+
+        executeWithRetry(() ->
+                webClient
+                        .post()
+                        .uri(ServerUriConstant.DOCUMENT_RETRY, request.getDatasetId())
+                        .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
+                        .bodyValue(requestBody)
+                        .retrieve()
+                        .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                        .bodyToMono(Void.class)
+                        .block());
     }
 
     private void appPages(String mode, String name, int page, List<AppsResponse> result) {
