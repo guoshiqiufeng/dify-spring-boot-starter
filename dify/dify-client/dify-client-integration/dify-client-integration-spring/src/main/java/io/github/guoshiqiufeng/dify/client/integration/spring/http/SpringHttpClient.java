@@ -254,16 +254,32 @@ public class SpringHttpClient implements HttpClient {
                 int readTimeout = (clientConfig != null && clientConfig.getReadTimeout() != null)
                         ? clientConfig.getReadTimeout() : 30;
 
-                // Create SimpleClientHttpRequestFactory with timeouts
-                Class<?> factoryClass = Class.forName("org.springframework.http.client.SimpleClientHttpRequestFactory");
-                Object factory = factoryClass.getDeclaredConstructor().newInstance();
-                factoryClass.getMethod("setConnectTimeout", int.class).invoke(factory, connectTimeout * 1000);
-                factoryClass.getMethod("setReadTimeout", int.class).invoke(factory, readTimeout * 1000);
+                // Try to use JdkClientHttpRequestFactory (Spring 6.1+) which properly handles error response bodies
+                try {
+                    Class<?> jdkFactoryClass = Class.forName("org.springframework.http.client.JdkClientHttpRequestFactory");
+                    Object factory = jdkFactoryClass.getDeclaredConstructor().newInstance();
 
-                // Set the request factory
-                Class<?> clientHttpRequestFactoryClass = Class.forName("org.springframework.http.client.ClientHttpRequestFactory");
-                restClientBuilder = builderClass.getMethod("requestFactory", clientHttpRequestFactoryClass)
-                        .invoke(restClientBuilder, factory);
+                    // Set timeouts
+                    jdkFactoryClass.getMethod("setConnectTimeout", int.class).invoke(factory, connectTimeout * 1000);
+                    jdkFactoryClass.getMethod("setReadTimeout", int.class).invoke(factory, readTimeout * 1000);
+
+                    // Set the request factory
+                    Class<?> clientHttpRequestFactoryClass = Class.forName("org.springframework.http.client.ClientHttpRequestFactory");
+                    restClientBuilder = builderClass.getMethod("requestFactory", clientHttpRequestFactoryClass)
+                            .invoke(restClientBuilder, factory);
+                } catch (ClassNotFoundException e) {
+                    // JdkClientHttpRequestFactory not available, fall back to SimpleClientHttpRequestFactory
+                    // Note: SimpleClientHttpRequestFactory may not properly read error response bodies
+                    Class<?> factoryClass = Class.forName("org.springframework.http.client.SimpleClientHttpRequestFactory");
+                    Object factory = factoryClass.getDeclaredConstructor().newInstance();
+                    factoryClass.getMethod("setConnectTimeout", int.class).invoke(factory, connectTimeout * 1000);
+                    factoryClass.getMethod("setReadTimeout", int.class).invoke(factory, readTimeout * 1000);
+
+                    // Set the request factory
+                    Class<?> clientHttpRequestFactoryClass = Class.forName("org.springframework.http.client.ClientHttpRequestFactory");
+                    restClientBuilder = builderClass.getMethod("requestFactory", clientHttpRequestFactoryClass)
+                            .invoke(restClientBuilder, factory);
+                }
             } catch (Exception e) {
                 // If timeout configuration fails, continue without it
             }

@@ -250,20 +250,28 @@ public class SpringHttpRequestBuilder implements HttpRequestBuilder {
 
         @Override
         public <T> HttpResponse<T> toEntity(Class<T> responseType) {
+            HttpResponse<T> response;
             if (restClientExecutor != null) {
-                return restClientExecutor.executeForEntity(method, uri, headers, cookies, body, responseType);
+                response = restClientExecutor.executeForEntity(method, uri, headers, cookies, body, responseType);
             } else {
-                return webClientExecutor.executeForEntity(method, uri, headers, cookies, queryParams, body, responseType);
+                response = webClientExecutor.executeForEntity(method, uri, headers, cookies, queryParams, body, responseType);
             }
+            // Handle errors before returning the response
+            handleErrors(response);
+            return response;
         }
 
         @Override
         public <T> HttpResponse<T> toEntity(TypeReference<T> typeReference) {
+            HttpResponse<T> response;
             if (restClientExecutor != null) {
-                return restClientExecutor.executeForEntity(method, uri, headers, cookies, body, typeReference);
+                response = restClientExecutor.executeForEntity(method, uri, headers, cookies, body, typeReference);
             } else {
-                return webClientExecutor.executeForEntity(method, uri, headers, cookies, queryParams, body, typeReference);
+                response = webClientExecutor.executeForEntity(method, uri, headers, cookies, queryParams, body, typeReference);
             }
+            // Handle errors before returning the response
+            handleErrors(response);
+            return response;
         }
 
         @Override

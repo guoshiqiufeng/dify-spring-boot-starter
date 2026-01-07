@@ -34,7 +34,7 @@ public class SpringVersionDetector {
 
     static {
         DETECTED_VERSION = detectVersion();
-        log.info("【Dify】Detected Spring version: {}", DETECTED_VERSION);
+        // log.debug("【Dify】Detected Spring version: {}", DETECTED_VERSION);
     }
 
     /**
