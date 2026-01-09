@@ -61,7 +61,7 @@ public class BaseDifyDefaultClient implements BaseDifyClient {
 
         @Override
         public Predicate<Integer> getStatusPredicate() {
-            return status -> status != 200;
+            return status -> (status < 200 || status >= 300);
         }
 
         @Override
