@@ -89,7 +89,7 @@ public class DefaultUriBuilder implements UriBuilder {
             }
             uri.append(UriUtils.encodeQueryParam(entry.getKey()))
                     .append("=")
-                    .append(UriUtils.encodeQueryParam(entry.getValue()));
+                    .append(entry.getValue());
             first = false;
         }
 
