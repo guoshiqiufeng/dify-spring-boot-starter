@@ -310,4 +310,8 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
     public void setContentDisposition(ContentDisposition contentDisposition) {
         set(CONTENT_DISPOSITION, contentDisposition.toString());
     }
+
+    public void setBearerAuth(String apiKey) {
+        set(AUTHORIZATION, AUTHORIZATION_BEARER_KEY + apiKey);
+    }
 }

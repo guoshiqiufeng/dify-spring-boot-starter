@@ -34,7 +34,7 @@ public class DatasetHeaderUtils {
     public static Consumer<HttpHeaders> getHttpHeadersConsumer(BaseDatasetRequest request) {
         return headers -> {
             if (StrUtil.isNotEmpty(request.getApiKey())) {
-                headers.add("", request.getApiKey());
+                headers.setBearerAuth(request.getApiKey());
             }
         };
     }
@@ -42,8 +42,7 @@ public class DatasetHeaderUtils {
     public static Consumer<HttpHeaders> getHttpHeadersConsumer(String apikey) {
         return headers -> {
             if (StrUtil.isNotEmpty(apikey)) {
-                // headers.setBearerAuth(apikey);
-                headers.add("", apikey);
+                headers.setBearerAuth(apikey);
             }
         };
     }

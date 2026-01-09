@@ -30,6 +30,7 @@ public class DefaultUriBuilder implements UriBuilder {
 
     private String path;
     private final Map<String, String> queryParams = new LinkedHashMap<>();
+    private Object[] uriVariables;
 
     @Override
     public UriBuilder path(String path) {
@@ -53,19 +54,25 @@ public class DefaultUriBuilder implements UriBuilder {
 
     @Override
     public String build() {
-        return build(new Object[0]);
+        return build(uriVariables != null ? uriVariables : new Object[0]);
     }
 
     @Override
     public String build(Object... uriVariables) {
+        // Store the variables for later use if build() is called without parameters
+        if (uriVariables != null && uriVariables.length > 0) {
+            this.uriVariables = uriVariables;
+        }
+
         String processedPath = path;
         if (processedPath == null) {
             processedPath = "";
         }
 
         // Replace path variables if any using UriUtils
-        if (uriVariables != null && uriVariables.length > 0) {
-            processedPath = UriUtils.replacePlaceholders(processedPath, uriVariables);
+        Object[] varsToUse = (uriVariables != null && uriVariables.length > 0) ? uriVariables : this.uriVariables;
+        if (varsToUse != null && varsToUse.length > 0) {
+            processedPath = UriUtils.replacePlaceholders(processedPath, varsToUse);
         }
 
         if (queryParams.isEmpty()) {
