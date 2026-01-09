@@ -17,7 +17,6 @@ package io.github.guoshiqiufeng.dify.server.client;
 
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
 import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
-import io.github.guoshiqiufeng.dify.core.constant.DifyConstant;
 import io.github.guoshiqiufeng.dify.server.dto.response.LoginResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -67,7 +66,7 @@ class DifyServerTokenDefaultTest {
 
         // Verify
         verify(difyServerClient).login();
-        verify(httpHeaders).add(DifyConstant.AUTHORIZATION, DifyConstant.BEARER_KEY + "test-access-token");
+        verify(httpHeaders).setBearerAuth("test-access-token");
     }
 
     @Test
@@ -85,7 +84,7 @@ class DifyServerTokenDefaultTest {
 
         // Verify first call
         verify(difyServerClient).login();
-        verify(firstHeaders).add(DifyConstant.AUTHORIZATION, DifyConstant.BEARER_KEY + "test-access-token");
+        verify(firstHeaders).setBearerAuth("test-access-token");
 
         // Reset difyServerClient mock
         reset(difyServerClient);
@@ -98,7 +97,7 @@ class DifyServerTokenDefaultTest {
 
         // Verify
         verify(difyServerClient, never()).login(); // Should not call login again
-        verify(secondHeaders).add(DifyConstant.AUTHORIZATION, DifyConstant.BEARER_KEY + "test-access-token");
+        verify(secondHeaders).setBearerAuth("test-access-token");
     }
 
     @Test
@@ -116,7 +115,7 @@ class DifyServerTokenDefaultTest {
 
         // Verify initial setup
         verify(difyServerClient).login();
-        verify(initialHeaders).add(DifyConstant.AUTHORIZATION, DifyConstant.BEARER_KEY + "initial-access-token");
+        verify(initialHeaders).setBearerAuth("initial-access-token");
 
         // Reset mocks and prepare for refresh
         reset(difyServerClient);
@@ -161,7 +160,7 @@ class DifyServerTokenDefaultTest {
 
         // Verify initial setup
         verify(difyServerClient).login();
-        verify(initialHeaders).add(DifyConstant.AUTHORIZATION, DifyConstant.BEARER_KEY + "initial-access-token");
+        verify(initialHeaders).setBearerAuth("initial-access-token");
 
         // Reset mocks and prepare for refresh
         reset(difyServerClient);

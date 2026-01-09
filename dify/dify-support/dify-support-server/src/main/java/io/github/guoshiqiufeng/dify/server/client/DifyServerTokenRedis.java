@@ -17,7 +17,6 @@ package io.github.guoshiqiufeng.dify.server.client;
 
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
 import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
-import io.github.guoshiqiufeng.dify.core.constant.DifyConstant;
 import io.github.guoshiqiufeng.dify.core.utils.StrUtil;
 import io.github.guoshiqiufeng.dify.server.cache.DifyRedisKey;
 import io.github.guoshiqiufeng.dify.server.dto.response.LoginResponse;
@@ -48,7 +47,7 @@ public class DifyServerTokenRedis extends BaseDifyServerToken {
         if (StrUtil.isEmpty(accessToken)) {
             accessToken = obtainToken(difyServerClient);
         }
-        headers.add(DifyConstant.AUTHORIZATION, DifyConstant.BEARER_KEY + accessToken);
+        headers.setBearerAuth(accessToken);
         String csrfToken = redisTemplate.opsForValue().get(DifyRedisKey.CSRF_TOKEN);
         headers.add("x-csrf-token", csrfToken);
     }

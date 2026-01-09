@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.function.Consumer;
 
+import static io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders.AUTHORIZATION;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -46,7 +47,7 @@ class DatasetHeaderUtilsTest {
         // Assert
         assertNotNull(consumer);
         // The header is added with empty key, which is unusual but matches the implementation
-        assertTrue(headers.containsKey(""));
+        assertTrue(headers.containsKey(AUTHORIZATION));
     }
 
     @Test
@@ -93,7 +94,7 @@ class DatasetHeaderUtilsTest {
 
         // Assert
         assertNotNull(consumer);
-        assertTrue(headers.containsKey(""));
+        assertTrue(headers.containsKey(AUTHORIZATION));
     }
 
     @Test
@@ -150,8 +151,8 @@ class DatasetHeaderUtilsTest {
         consumer.accept(headers2);
 
         // Assert
-        assertTrue(headers1.containsKey(""));
-        assertTrue(headers2.containsKey(""));
+        assertTrue(headers1.containsKey(AUTHORIZATION));
+        assertTrue(headers2.containsKey(AUTHORIZATION));
     }
 
     @Test
@@ -171,7 +172,7 @@ class DatasetHeaderUtilsTest {
         consumer2.accept(headers2);
 
         // Assert
-        assertTrue(headers1.containsKey(""));
-        assertTrue(headers2.containsKey(""));
+        assertTrue(headers1.containsKey(AUTHORIZATION));
+        assertTrue(headers2.containsKey(AUTHORIZATION));
     }
 }

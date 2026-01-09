@@ -16,7 +16,6 @@
 package io.github.guoshiqiufeng.dify.server.client;
 
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
-import io.github.guoshiqiufeng.dify.core.constant.DifyConstant;
 import io.github.guoshiqiufeng.dify.server.dto.response.LoginResponse;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,7 +43,7 @@ public class DifyServerTokenDefault extends BaseDifyServerToken {
             obtainToken(difyServerClient);
         }
         if (accessToken != null) {
-            headers.add(DifyConstant.AUTHORIZATION, DifyConstant.BEARER_KEY + accessToken);
+            headers.setBearerAuth(accessToken);
         }
         if (csrfToken != null) {
             headers.add("x-csrf-token", csrfToken);
