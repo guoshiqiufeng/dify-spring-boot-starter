@@ -30,6 +30,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Executor for Spring WebClient.
@@ -329,6 +330,13 @@ class WebClientExecutor {
             }
         } else {
             bodySpec = requestSpec.uri("");
+        }
+
+        if (!cookies.isEmpty()) {
+            String cookieHeader = cookies.entrySet().stream()
+                    .map(entry -> entry.getKey() + "=" + entry.getValue())
+                    .collect(Collectors.joining("; "));
+            headers.put("Cookie", cookieHeader);
         }
 
         // Set headers

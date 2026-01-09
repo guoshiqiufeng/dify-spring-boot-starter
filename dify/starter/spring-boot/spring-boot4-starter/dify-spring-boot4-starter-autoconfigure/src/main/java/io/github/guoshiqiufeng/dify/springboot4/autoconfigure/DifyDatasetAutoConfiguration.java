@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.springboot4.autoconfigure;
 
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
+import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
 import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
 import io.github.guoshiqiufeng.dify.client.integration.spring.http.SpringHttpClientFactory;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
@@ -50,12 +51,10 @@ public class DifyDatasetAutoConfiguration {
                                                ObjectProvider<WebClient.Builder> webClientBuilderProvider,
                                                ObjectProvider<RestClient.Builder> restClientBuilderProvider) {
         String apikey = "Bearer " + properties.getDataset().getApiKey();
-        SpringHttpClientFactory httpClientFactory = new SpringHttpClientFactory(
-                webClientBuilderProvider.getIfAvailable(WebClient::builder)
-                        .defaultHeader(HttpHeaders.AUTHORIZATION, apikey),
-                restClientBuilderProvider.getIfAvailable(RestClient::builder)
-                        .defaultHeader(HttpHeaders.AUTHORIZATION, apikey),
-                jsonMapper);
+        HttpClientFactory httpClientFactory = new SpringHttpClientFactory(
+                webClientBuilderProvider.getIfAvailable(WebClient::builder),
+                restClientBuilderProvider.getIfAvailable(RestClient::builder),
+                jsonMapper).defaultHeader(HttpHeaders.AUTHORIZATION, apikey);
         HttpClient httpClient = httpClientFactory.createClient(properties.getUrl(), properties.getClientConfig());
         return new DifyDatasetDefaultClient(httpClient);
     }

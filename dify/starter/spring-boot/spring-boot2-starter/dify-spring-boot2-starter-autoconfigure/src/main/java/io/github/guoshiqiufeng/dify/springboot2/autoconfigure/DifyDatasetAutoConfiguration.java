@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.springboot2.autoconfigure;
 
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
+import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
 import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
 import io.github.guoshiqiufeng.dify.client.integration.spring.http.SpringHttpClientFactory;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
@@ -48,11 +49,10 @@ public class DifyDatasetAutoConfiguration {
                                                JsonMapper jsonMapper,
                                                ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
         String apikey = "Bearer " + properties.getDataset().getApiKey();
-        SpringHttpClientFactory httpClientFactory = new SpringHttpClientFactory(
-                webClientBuilderProvider.getIfAvailable(WebClient::builder)
-                        .defaultHeader(HttpHeaders.AUTHORIZATION, apikey),
+        HttpClientFactory httpClientFactory = new SpringHttpClientFactory(
+                webClientBuilderProvider.getIfAvailable(WebClient::builder),
                 null,
-                jsonMapper);
+                jsonMapper).defaultHeader(HttpHeaders.AUTHORIZATION, apikey);
         HttpClient httpClient = httpClientFactory.createClient(properties.getUrl(), properties.getClientConfig());
         return new DifyDatasetDefaultClient(httpClient);
     }

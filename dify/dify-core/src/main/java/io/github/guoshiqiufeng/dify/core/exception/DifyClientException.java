@@ -25,4 +25,8 @@ public class DifyClientException extends BaseException {
     public DifyClientException(DiftClientExceptionEnum exceptionEnum) {
         super(exceptionEnum.getCode(), exceptionEnum.getMsg());
     }
+
+    public Boolean noLogin() {
+        return msg.contains("[401]") || code == 401;
+    }
 }

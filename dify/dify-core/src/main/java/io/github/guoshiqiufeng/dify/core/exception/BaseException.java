@@ -25,12 +25,12 @@ public class BaseException extends RuntimeException {
     /**
      * 错误码
      */
-    private Integer code;
+    protected Integer code;
 
     /**
      * 错误消息
      */
-    private String msg;
+    protected String msg;
 
     public BaseException(Integer code, String msg) {
         super(msg);
