@@ -358,49 +358,49 @@ public class SpringHttpClient implements HttpClient {
     @Override
     public RequestHeadersUriSpec<?> get() {
         return new io.github.guoshiqiufeng.dify.client.core.http.DefaultRequestHeadersUriSpec(
-                new SpringHttpRequestBuilder(this, "GET", jsonMapper));
+                new SpringHttpRequestBuilder(this, "GET", jsonMapper, defaultHeaders));
     }
 
     @Override
     public RequestBodyUriSpec post() {
         return new io.github.guoshiqiufeng.dify.client.core.http.DefaultRequestBodyUriSpec(
-                new SpringHttpRequestBuilder(this, "POST", jsonMapper));
+                new SpringHttpRequestBuilder(this, "POST", jsonMapper, defaultHeaders));
     }
 
     @Override
     public RequestBodyUriSpec put() {
         return new io.github.guoshiqiufeng.dify.client.core.http.DefaultRequestBodyUriSpec(
-                new SpringHttpRequestBuilder(this, "PUT", jsonMapper));
+                new SpringHttpRequestBuilder(this, "PUT", jsonMapper, defaultHeaders));
     }
 
     @Override
     public RequestHeadersUriSpec<?> delete() {
         return new io.github.guoshiqiufeng.dify.client.core.http.DefaultRequestHeadersUriSpec(
-                new SpringHttpRequestBuilder(this, "DELETE", jsonMapper));
+                new SpringHttpRequestBuilder(this, "DELETE", jsonMapper, defaultHeaders));
     }
 
     @Override
     public RequestBodyUriSpec patch() {
         return new io.github.guoshiqiufeng.dify.client.core.http.DefaultRequestBodyUriSpec(
-                new SpringHttpRequestBuilder(this, "PATCH", jsonMapper));
+                new SpringHttpRequestBuilder(this, "PATCH", jsonMapper, defaultHeaders));
     }
 
     @Override
     public RequestHeadersUriSpec<?> head() {
         return new io.github.guoshiqiufeng.dify.client.core.http.DefaultRequestHeadersUriSpec(
-                new SpringHttpRequestBuilder(this, "HEAD", jsonMapper));
+                new SpringHttpRequestBuilder(this, "HEAD", jsonMapper, defaultHeaders));
     }
 
     @Override
     public RequestHeadersUriSpec<?> options() {
         return new io.github.guoshiqiufeng.dify.client.core.http.DefaultRequestHeadersUriSpec(
-                new SpringHttpRequestBuilder(this, "OPTIONS", jsonMapper));
+                new SpringHttpRequestBuilder(this, "OPTIONS", jsonMapper, defaultHeaders));
     }
 
     @Override
     public RequestBodyUriSpec method(io.github.guoshiqiufeng.dify.client.core.enums.HttpMethod httpMethod) {
         return new io.github.guoshiqiufeng.dify.client.core.http.DefaultRequestBodyUriSpec(
-                new SpringHttpRequestBuilder(this, httpMethod.name(), jsonMapper));
+                new SpringHttpRequestBuilder(this, httpMethod.name(), jsonMapper, defaultHeaders));
     }
 
     /**

@@ -68,14 +68,24 @@ public class SpringHttpRequestBuilder implements HttpRequestBuilder {
     /**
      * Constructor.
      *
-     * @param client     the Spring HTTP client
-     * @param method     the HTTP method
-     * @param jsonMapper the JSON mapper
+     * @param client         the Spring HTTP client
+     * @param method         the HTTP method
+     * @param jsonMapper     the JSON mapper
+     * @param defaultHeaders default headers to add to all requests
      */
-    public SpringHttpRequestBuilder(SpringHttpClient client, String method, JsonMapper jsonMapper) {
+    public SpringHttpRequestBuilder(SpringHttpClient client, String method, JsonMapper jsonMapper, HttpHeaders defaultHeaders) {
         this.client = client;
         this.method = method;
         this.jsonMapper = jsonMapper;
+
+        // Add default headers if not empty
+        if (defaultHeaders != null && !defaultHeaders.isEmpty()) {
+            defaultHeaders.forEach((key, values) -> {
+                if (values != null && !values.isEmpty()) {
+                    this.headers.put(key, values.get(0));
+                }
+            });
+        }
 
         // Initialize executors
         this.restClientExecutor = client.hasRestClient()
