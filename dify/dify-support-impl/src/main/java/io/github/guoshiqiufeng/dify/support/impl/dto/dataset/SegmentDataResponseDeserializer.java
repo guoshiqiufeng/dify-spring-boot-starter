@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.support.impl.dto.deserializer;
+package io.github.guoshiqiufeng.dify.support.impl.dto.dataset;
 
+import io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserializer;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonNode;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.SegmentData;
+import io.github.guoshiqiufeng.dify.support.impl.dto.chat.ChatMessageSendCompletionResponseDto;
 
 /**
  * SegmentData 通用反序列化器
@@ -29,7 +31,7 @@ import io.github.guoshiqiufeng.dify.dataset.dto.response.SegmentData;
  * @version 2.0.0
  * @since 2025/12/30
  */
-public class SegmentDataResponseDeserializer {
+public class SegmentDataResponseDeserializer implements JsonDeserializer<SegmentDataResponseDto> {
 
     private static final String CONSTANT_DATA = "data";
 
@@ -40,11 +42,12 @@ public class SegmentDataResponseDeserializer {
      * @param jsonMapper JSON 映射器
      * @return 反序列化后的对象
      */
-    public static SegmentData deserialize(JsonNode root, JsonMapper jsonMapper) {
+    @Override
+    public SegmentDataResponseDto deserialize(JsonNode root, JsonMapper jsonMapper) {
         JsonNode dataNode = root.get(CONSTANT_DATA);
         if (dataNode == null || dataNode.isNull()) {
-            return jsonMapper.treeToValue(root, SegmentData.class);
+            return new SegmentDataResponseDto(jsonMapper.treeToValue(root, SegmentData.class));
         }
-        return jsonMapper.treeToValue(dataNode, SegmentData.class);
+        return new SegmentDataResponseDto(jsonMapper.treeToValue(dataNode, SegmentData.class));
     }
 }

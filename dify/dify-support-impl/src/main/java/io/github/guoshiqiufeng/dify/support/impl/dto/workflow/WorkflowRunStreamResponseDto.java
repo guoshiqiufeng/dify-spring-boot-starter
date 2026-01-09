@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.support.impl.dto.workflow;
 
+import io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserialize;
 import io.github.guoshiqiufeng.dify.workflow.dto.response.WorkflowRunStreamResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,7 +29,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-// @JsonDeserialize(using = WorkflowRunStreamResponseDtoDeserializer.class)
+@JsonDeserialize(using = WorkflowRunStreamResponseDeserializer.class)
 public class WorkflowRunStreamResponseDto {
 
     private WorkflowRunStreamResponse data;

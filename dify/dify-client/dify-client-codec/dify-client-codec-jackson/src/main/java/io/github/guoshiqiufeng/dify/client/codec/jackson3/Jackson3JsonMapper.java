@@ -15,6 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.client.codec.jackson3;
 
+import io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserialize;
+import io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserializer;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonException;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 import tools.jackson.databind.JsonNode;
@@ -64,7 +66,21 @@ public class Jackson3JsonMapper implements io.github.guoshiqiufeng.dify.client.c
     @Override
     public <T> T fromJson(String json, Class<T> clazz) throws JsonException {
         try {
+            // Check if the class has @JsonDeserialize annotation
+            JsonDeserialize annotation = clazz.getAnnotation(JsonDeserialize.class);
+
+            if (annotation != null) {
+                // Use custom deserializer
+                Class<? extends JsonDeserializer<?>> deserializerClass = annotation.using();
+                JsonDeserializer<T> deserializer = (JsonDeserializer<T>) deserializerClass.getDeclaredConstructor().newInstance();
+
+                io.github.guoshiqiufeng.dify.client.core.codec.JsonNode node = parseTree(json);
+                return deserializer.deserialize(node, this);
+            }
+
             return JSON_MAPPER.readValue(json, clazz);
+        } catch (JsonException e) {
+            throw e;
         } catch (Exception e) {
             throw new JsonException("Failed to deserialize JSON to " + clazz.getName(), e);
         }

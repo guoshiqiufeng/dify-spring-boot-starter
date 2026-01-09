@@ -268,14 +268,21 @@ class WebClientExecutor {
                               Object body, Class<T> responseType) {
         WebClient.RequestBodySpec requestSpec = buildRequest(method, uri, headers, cookies, queryParams, body);
 
-        // For SSE streaming, we need to read the response as String and parse the SSE format
+        // For SSE streaming, use Spring's ServerSentEvent support
+        ParameterizedTypeReference<org.springframework.http.codec.ServerSentEvent<String>> sseType =
+                new ParameterizedTypeReference<org.springframework.http.codec.ServerSentEvent<String>>() {};
+
         return requestSpec
                 .accept(MediaType.TEXT_EVENT_STREAM)
                 .retrieve()
-                .bodyToFlux(String.class)
-                .filter(line -> line.startsWith("data: "))
-                .map(line -> line.substring(6))
-                .filter(this::isCompleteJson)
+                .bodyToFlux(sseType)
+                .doOnNext(sse -> log.debug("Received SSE event: id={}, event={}, data={}", sse.id(), sse.event(), sse.data()))
+                .doOnComplete(() -> log.debug("SSE stream completed"))
+                .doOnError(e -> log.error("SSE stream error", e))
+                .mapNotNull(sse -> sse.data())
+                .doOnNext(data -> log.debug("Extracted data: {}", data))
+                .filter(data -> data != null && !data.isEmpty() && isCompleteJson(data))
+                .doOnNext(json -> log.debug("Filtered JSON: {}", json))
                 .mapNotNull(json -> {
                     try {
                         return responseConverter.deserialize(json, responseType);
@@ -304,14 +311,16 @@ class WebClientExecutor {
                               Object body, TypeReference<T> typeReference) {
         WebClient.RequestBodySpec requestSpec = buildRequest(method, uri, headers, cookies, queryParams, body);
 
-        // For SSE streaming, we need to read the response as String and parse the SSE format
+        // For SSE streaming, use Spring's ServerSentEvent support
+        ParameterizedTypeReference<org.springframework.http.codec.ServerSentEvent<String>> sseType =
+                new ParameterizedTypeReference<org.springframework.http.codec.ServerSentEvent<String>>() {};
+
         return requestSpec
                 .accept(MediaType.TEXT_EVENT_STREAM)
                 .retrieve()
-                .bodyToFlux(String.class)
-                .filter(line -> line.startsWith("data: "))
-                .map(line -> line.substring(6)) // Remove "data: " prefix
-                .filter(this::isCompleteJson)
+                .bodyToFlux(sseType)
+                .mapNotNull(sse -> sse.data())
+                .filter(data -> data != null && !data.isEmpty() && isCompleteJson(data))
                 .mapNotNull(json -> {
                     try {
                         return responseConverter.deserialize(json, typeReference);

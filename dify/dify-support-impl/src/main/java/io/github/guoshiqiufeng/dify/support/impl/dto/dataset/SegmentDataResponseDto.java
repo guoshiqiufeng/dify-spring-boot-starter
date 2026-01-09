@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.support.impl.dto.dataset;
 
+import io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserialize;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.SegmentData;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,7 +31,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-// @JsonDeserialize(using = SegmentDataResponseDtoDeserializer.class)
+@JsonDeserialize(using = SegmentDataResponseDeserializer.class)
 public class SegmentDataResponseDto implements Serializable {
 
     private SegmentData data;

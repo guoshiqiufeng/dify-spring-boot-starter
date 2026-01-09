@@ -71,7 +71,24 @@ public class GsonJsonMapper implements JsonMapper {
     @Override
     public <T> T fromJson(String json, Class<T> clazz) throws JsonException {
         try {
+            // Check if the class has @JsonDeserialize annotation
+            io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserialize annotation =
+                    clazz.getAnnotation(io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserialize.class);
+
+            if (annotation != null) {
+                // Use custom deserializer
+                Class<? extends io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserializer<?>> deserializerClass =
+                        annotation.using();
+                io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserializer<T> deserializer =
+                        (io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserializer<T>) deserializerClass.getDeclaredConstructor().newInstance();
+
+                io.github.guoshiqiufeng.dify.client.core.codec.JsonNode node = parseTree(json);
+                return deserializer.deserialize(node, this);
+            }
+
             return GSON.fromJson(json, clazz);
+        } catch (JsonException e) {
+            throw e;
         } catch (Exception e) {
             throw new JsonException("Failed to deserialize JSON to " + clazz.getName(), e);
         }

@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.support.impl.dto.deserializer;
+package io.github.guoshiqiufeng.dify.support.impl.dto.chat;
 
 import io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendCompletionResponse;
 import io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendResponse;
 import io.github.guoshiqiufeng.dify.chat.dto.response.message.CompletionData;
 import io.github.guoshiqiufeng.dify.chat.enums.StreamEventEnum;
+import io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserializer;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonNode;
 import io.github.guoshiqiufeng.dify.core.bean.BeanUtils;
@@ -41,7 +42,7 @@ import java.util.Map;
  * @since 2025/12/30
  */
 @Slf4j
-public class ChatMessageSendCompletionResponseDeserializer {
+public class ChatMessageSendCompletionResponseDeserializer implements JsonDeserializer<ChatMessageSendCompletionResponseDto> {
 
     private static final String CONSTANT_EVENT = "event";
     private static final String CONSTANT_WORKFLOW_RUN_ID = "workflow_run_id";
@@ -60,16 +61,17 @@ public class ChatMessageSendCompletionResponseDeserializer {
     public static final String MESSAGE_FILES = "message_files";
 
     /**
-     * 反序列化 JSON 节点为 ChatMessageSendCompletionResponse
+     * 反序列化 JSON 节点为 ChatMessageSendCompletionResponseDto
      *
      * @param root       JSON 根节点
      * @param jsonMapper JSON 映射器
      * @return 反序列化后的对象
      */
-    public static ChatMessageSendCompletionResponse deserialize(JsonNode root, JsonMapper jsonMapper) {
+    @Override
+    public ChatMessageSendCompletionResponseDto deserialize(JsonNode root, JsonMapper jsonMapper) {
         JsonNode eventNode = root.get(CONSTANT_EVENT);
         if (eventNode == null || !eventNode.isTextual()) {
-            return builderResponse(root, jsonMapper);
+            return new ChatMessageSendCompletionResponseDto(builderResponse(root, jsonMapper));
         }
 
         StreamEventEnum event;
@@ -79,7 +81,7 @@ public class ChatMessageSendCompletionResponseDeserializer {
             dataClass = event.getClazz();
         } catch (IllegalArgumentException e) {
             log.warn("Unknown event type: {}", eventNode.asText());
-            return builderResponse(root, jsonMapper);
+            return new ChatMessageSendCompletionResponseDto(builderResponse(root, jsonMapper));
         }
 
         ChatMessageSendCompletionResponse response = builderResponse(root, jsonMapper);
@@ -91,7 +93,7 @@ public class ChatMessageSendCompletionResponseDeserializer {
                 response.setData(data);
             }
         }
-        return response;
+        return new ChatMessageSendCompletionResponseDto(response);
     }
 
     private static ChatMessageSendCompletionResponse builderResponse(JsonNode root, JsonMapper jsonMapper) {

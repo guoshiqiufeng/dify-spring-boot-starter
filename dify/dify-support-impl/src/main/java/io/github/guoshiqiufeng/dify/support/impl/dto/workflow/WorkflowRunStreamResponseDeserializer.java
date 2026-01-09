@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.support.impl.dto.deserializer;
+package io.github.guoshiqiufeng.dify.support.impl.dto.workflow;
 
+import io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserializer;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonNode;
 import io.github.guoshiqiufeng.dify.workflow.dto.response.WorkflowRunStreamResponse;
@@ -35,7 +36,7 @@ import java.util.Map;
  * @since 2025/12/30
  */
 @Slf4j
-public class WorkflowRunStreamResponseDeserializer {
+public class WorkflowRunStreamResponseDeserializer implements JsonDeserializer<WorkflowRunStreamResponseDto> {
 
     private static final String CONSTANT_EVENT = "event";
     private static final String CONSTANT_TASK_ID = "task_id";
@@ -49,10 +50,11 @@ public class WorkflowRunStreamResponseDeserializer {
      * @param jsonMapper JSON 映射器
      * @return 反序列化后的对象
      */
-    public static WorkflowRunStreamResponse deserialize(JsonNode root, JsonMapper jsonMapper) {
+    @Override
+    public WorkflowRunStreamResponseDto deserialize(JsonNode root, JsonMapper jsonMapper) {
         JsonNode eventNode = root.get(CONSTANT_EVENT);
         if (eventNode == null || !eventNode.isTextual()) {
-            return builderResponse(root, jsonMapper);
+            return new WorkflowRunStreamResponseDto(builderResponse(root, jsonMapper));
         }
 
         StreamEventEnum event;
@@ -62,7 +64,7 @@ public class WorkflowRunStreamResponseDeserializer {
             dataClass = event.getClazz();
         } catch (IllegalArgumentException e) {
             log.warn("Unknown event type: {}", eventNode.asText());
-            return builderResponse(root, jsonMapper);
+            return new WorkflowRunStreamResponseDto(builderResponse(root, jsonMapper));
         }
 
         WorkflowRunStreamResponse response = builderResponse(root, jsonMapper);
@@ -79,7 +81,7 @@ public class WorkflowRunStreamResponseDeserializer {
                 response.setData(data);
             }
         }
-        return response;
+        return new WorkflowRunStreamResponseDto(response);
     }
 
     private static WorkflowRunStreamResponse builderResponse(JsonNode root, JsonMapper jsonMapper) {

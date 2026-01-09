@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.support.impl.dto.chat;
 
 import io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendCompletionResponse;
+import io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserialize;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,7 +29,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-// @JsonDeserialize(using = ChatMessageSendCompletionResponseDtoDeserializer.class)
+@JsonDeserialize(using = ChatMessageSendCompletionResponseDeserializer.class)
 public class ChatMessageSendCompletionResponseDto {
 
     private ChatMessageSendCompletionResponse data;
