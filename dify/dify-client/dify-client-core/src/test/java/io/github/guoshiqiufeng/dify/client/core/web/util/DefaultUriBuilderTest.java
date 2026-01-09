@@ -99,8 +99,8 @@ class DefaultUriBuilderTest {
                 .queryParam("q", "hello world")
                 .queryParam("email", "test@example.com")
                 .build();
-        assertTrue(uri.contains("q=hello+world"));
-        assertTrue(uri.contains("email=test%40example.com"));
+        assertTrue(uri.contains("q=hello world"));
+        assertTrue(uri.contains("email=test@example.com"));
     }
 
     @Test
