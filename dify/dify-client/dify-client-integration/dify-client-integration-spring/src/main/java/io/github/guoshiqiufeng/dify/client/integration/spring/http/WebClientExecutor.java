@@ -268,9 +268,22 @@ class WebClientExecutor {
                               Object body, Class<T> responseType) {
         WebClient.RequestBodySpec requestSpec = buildRequest(method, uri, headers, cookies, queryParams, body);
 
+        // For SSE streaming, we need to read the response as String and parse the SSE format
         return requestSpec
+                .accept(MediaType.TEXT_EVENT_STREAM)
                 .retrieve()
-                .bodyToFlux(responseType);
+                .bodyToFlux(String.class)
+                .filter(line -> line.startsWith("data: "))
+                .map(line -> line.substring(6))
+                .filter(this::isCompleteJson)
+                .mapNotNull(json -> {
+                    try {
+                        return responseConverter.deserialize(json, responseType);
+                    } catch (Exception e) {
+                        log.warn("Failed to parse SSE event: {}", json, e);
+                        return null;
+                    }
+                });
     }
 
     /**
@@ -290,11 +303,64 @@ class WebClientExecutor {
                               Map<String, String> cookies, Map<String, String> queryParams,
                               Object body, TypeReference<T> typeReference) {
         WebClient.RequestBodySpec requestSpec = buildRequest(method, uri, headers, cookies, queryParams, body);
-        ParameterizedTypeReference<T> springTypeRef = ParameterizedTypeReference.forType(typeReference.getType());
 
+        // For SSE streaming, we need to read the response as String and parse the SSE format
         return requestSpec
+                .accept(MediaType.TEXT_EVENT_STREAM)
                 .retrieve()
-                .bodyToFlux(springTypeRef);
+                .bodyToFlux(String.class)
+                .filter(line -> line.startsWith("data: "))
+                .map(line -> line.substring(6)) // Remove "data: " prefix
+                .filter(this::isCompleteJson)
+                .mapNotNull(json -> {
+                    try {
+                        return responseConverter.deserialize(json, typeReference);
+                    } catch (Exception e) {
+                        log.warn("Failed to parse SSE event: {}", json, e);
+                        return null;
+                    }
+                });
+    }
+
+    /**
+     * Check if a string is complete JSON (simple heuristic).
+     *
+     * @param data JSON string
+     * @return true if appears to be complete JSON
+     */
+    private boolean isCompleteJson(String data) {
+        if (data == null || data.isEmpty()) {
+            return false;
+        }
+
+        data = data.trim();
+
+        // Check for complete JSON object
+        if (data.startsWith("{") && data.endsWith("}")) {
+            return true;
+        }
+
+        // Check for complete JSON array
+        if (data.startsWith("[") && data.endsWith("]")) {
+            return true;
+        }
+
+        // Check for JSON primitives
+        if (data.startsWith("\"") && data.endsWith("\"")) {
+            return true;
+        }
+
+        if ("true".equals(data) || "false".equals(data) || "null".equals(data)) {
+            return true;
+        }
+
+        // Check for numbers
+        try {
+            Double.parseDouble(data);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     /**
