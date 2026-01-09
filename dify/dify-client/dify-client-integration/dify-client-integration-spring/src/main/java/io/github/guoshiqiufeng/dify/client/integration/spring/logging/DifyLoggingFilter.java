@@ -16,13 +16,17 @@
 package io.github.guoshiqiufeng.dify.client.integration.spring.logging;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferFactory;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.ExchangeFunction;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -39,6 +43,7 @@ import java.util.concurrent.ConcurrentMap;
 public class DifyLoggingFilter implements ExchangeFilterFunction {
 
     private static final ConcurrentMap<String, Long> REQUEST_TIME_CACHE = new ConcurrentHashMap<>();
+    private static final DataBufferFactory DATA_BUFFER_FACTORY = new DefaultDataBufferFactory();
 
     @Override
     public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
@@ -50,11 +55,12 @@ public class DifyLoggingFilter implements ExchangeFilterFunction {
         logRequest(requestId, request);
 
         return next.exchange(request)
-                .doOnNext(response -> {
-                    try {
-                        logResponse(requestId, response);
-                    } catch (IOException e) {
-                        log.error("logResponse error", e);
+                .flatMap(response -> {
+                    if (log.isDebugEnabled()) {
+                        return logResponseWithBody(requestId, response);
+                    } else {
+                        REQUEST_TIME_CACHE.remove(requestId);
+                        return Mono.just(response);
                     }
                 });
     }
@@ -66,13 +72,30 @@ public class DifyLoggingFilter implements ExchangeFilterFunction {
         }
     }
 
-    private void logResponse(String requestId, ClientResponse response) throws IOException {
-        if (log.isDebugEnabled()) {
-            long executionTime = System.currentTimeMillis() - REQUEST_TIME_CACHE.getOrDefault(requestId, 0L);
-            REQUEST_TIME_CACHE.remove(requestId);
+    private Mono<ClientResponse> logResponseWithBody(String requestId, ClientResponse response) {
+        long executionTime = System.currentTimeMillis() - REQUEST_TIME_CACHE.getOrDefault(requestId, 0L);
+        REQUEST_TIME_CACHE.remove(requestId);
 
-            log.debug("logResponse，requestId：{}，status：{}，headers：{}，executionTime：{}ms",
-                    requestId, response.statusCode(), response.headers().asHttpHeaders(), executionTime);
-        }
+        // Extract body as string
+        return response.bodyToMono(String.class)
+                .defaultIfEmpty("")
+                .flatMap(body -> {
+                    log.debug("logResponse，requestId：{}，status：{}，headers：{}，executionTime：{}ms，body：{}",
+                            requestId, response.statusCode(), response.headers().asHttpHeaders(), executionTime, body);
+
+                    // Recreate the response with the body we just read
+                    ClientResponse newResponse = ClientResponse.create(response.statusCode())
+                            .headers(headers -> headers.addAll(response.headers().asHttpHeaders()))
+                            .cookies(cookies -> cookies.addAll(response.cookies()))
+                            .body(Flux.just(body).map(s -> {
+                                byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
+                                DataBuffer buffer = DATA_BUFFER_FACTORY.allocateBuffer(bytes.length);
+                                buffer.write(bytes);
+                                return buffer;
+                            }))
+                            .build();
+
+                    return Mono.just(newResponse);
+                });
     }
 }
