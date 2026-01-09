@@ -64,6 +64,7 @@ public class Jackson3JsonMapper implements io.github.guoshiqiufeng.dify.client.c
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T fromJson(String json, Class<T> clazz) throws JsonException {
         try {
             // Check if the class has @JsonDeserialize annotation

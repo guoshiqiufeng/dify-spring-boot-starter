@@ -4,6 +4,7 @@ dependencies {
 
     // Jackson 2.x 依赖 (com.fasterxml.jackson)
     implementation libs.jackson.databind
+    implementation libs.jackson.datatype.jsr310
 
     // Jackson 3.x 依赖 (tools.jackson)
     implementation libs.tools.jackson.databind

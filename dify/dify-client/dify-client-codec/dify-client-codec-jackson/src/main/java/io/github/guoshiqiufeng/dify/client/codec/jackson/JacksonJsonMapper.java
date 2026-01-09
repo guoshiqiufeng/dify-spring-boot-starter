@@ -18,6 +18,7 @@ package io.github.guoshiqiufeng.dify.client.codec.jackson;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserialize;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserializer;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonException;
@@ -40,7 +41,9 @@ import java.lang.reflect.Type;
  */
 public class JacksonJsonMapper implements JsonMapper {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .registerModule(new JavaTimeModule());
     private static final JacksonJsonMapper INSTANCE = new JacksonJsonMapper();
 
     public static JacksonJsonMapper getInstance() {
@@ -66,6 +69,7 @@ public class JacksonJsonMapper implements JsonMapper {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T fromJson(String json, Class<T> clazz) throws JsonException {
         try {
             // Check if the class has @JsonDeserialize annotation

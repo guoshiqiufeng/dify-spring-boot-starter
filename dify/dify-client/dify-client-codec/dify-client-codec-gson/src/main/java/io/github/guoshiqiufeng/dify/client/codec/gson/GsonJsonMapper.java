@@ -18,12 +18,11 @@ package io.github.guoshiqiufeng.dify.client.codec.gson;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
+import io.github.guoshiqiufeng.dify.client.core.codec.*;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
-import io.github.guoshiqiufeng.dify.client.core.codec.JsonException;
-import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
-import io.github.guoshiqiufeng.dify.client.core.codec.JsonNode;
 
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
 
 /**
  * Gson JSON 实现
@@ -42,6 +41,7 @@ public class GsonJsonMapper implements JsonMapper {
     private static final Gson GSON = new GsonBuilder()
             .serializeNulls()
             .registerTypeAdapterFactory(new JacksonAnnotationTypeAdapterFactory())
+            .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
             .create();
 
     private static final GsonJsonMapper INSTANCE = new GsonJsonMapper();
@@ -69,18 +69,16 @@ public class GsonJsonMapper implements JsonMapper {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T fromJson(String json, Class<T> clazz) throws JsonException {
         try {
             // Check if the class has @JsonDeserialize annotation
-            io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserialize annotation =
-                    clazz.getAnnotation(io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserialize.class);
+            JsonDeserialize annotation = clazz.getAnnotation(JsonDeserialize.class);
 
             if (annotation != null) {
                 // Use custom deserializer
-                Class<? extends io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserializer<?>> deserializerClass =
-                        annotation.using();
-                io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserializer<T> deserializer =
-                        (io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserializer<T>) deserializerClass.getDeclaredConstructor().newInstance();
+                Class<? extends JsonDeserializer<?>> deserializerClass = annotation.using();
+                JsonDeserializer<T> deserializer = (JsonDeserializer<T>) deserializerClass.getDeclaredConstructor().newInstance();
 
                 io.github.guoshiqiufeng.dify.client.core.codec.JsonNode node = parseTree(json);
                 return deserializer.deserialize(node, this);
