@@ -40,6 +40,15 @@ public interface JsonMapper {
     String toJson(Object object) throws JsonException;
 
     /**
+     * 将对象序列化为 JSON 字符串,忽略值为 null 的字段
+     *
+     * @param object 要序列化的对象
+     * @return JSON 字符串(不包含 null 值字段)
+     * @throws JsonException 序列化失败时抛出
+     */
+    String toJsonIgnoreNull(Object object) throws JsonException;
+
+    /**
      * 将 JSON 字符串反序列化为指定类型的对象
      *
      * @param json  JSON 字符串

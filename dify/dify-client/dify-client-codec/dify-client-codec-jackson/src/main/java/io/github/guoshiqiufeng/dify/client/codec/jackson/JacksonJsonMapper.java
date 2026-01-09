@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.client.codec.jackson;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,6 +45,10 @@ public class JacksonJsonMapper implements JsonMapper {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .registerModule(new JavaTimeModule());
+    private static final ObjectMapper OBJECT_MAPPER_IGNORE_NULL = new ObjectMapper()
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .registerModule(new JavaTimeModule());
     private static final JacksonJsonMapper INSTANCE = new JacksonJsonMapper();
 
     public static JacksonJsonMapper getInstance() {
@@ -65,6 +70,15 @@ public class JacksonJsonMapper implements JsonMapper {
             return OBJECT_MAPPER.writeValueAsString(object);
         } catch (Exception e) {
             throw new JsonException("Failed to serialize object to JSON", e);
+        }
+    }
+
+    @Override
+    public String toJsonIgnoreNull(Object object) throws JsonException {
+        try {
+            return OBJECT_MAPPER_IGNORE_NULL.writeValueAsString(object);
+        } catch (Exception e) {
+            throw new JsonException("Failed to serialize object to JSON (ignoring null)", e);
         }
     }
 

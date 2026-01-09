@@ -44,6 +44,11 @@ public class GsonJsonMapper implements JsonMapper {
             .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
             .create();
 
+    private static final Gson GSON_IGNORE_NULL = new GsonBuilder()
+            .registerTypeAdapterFactory(new JacksonAnnotationTypeAdapterFactory())
+            .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
+            .create();
+
     private static final GsonJsonMapper INSTANCE = new GsonJsonMapper();
 
     public static GsonJsonMapper getInstance() {
@@ -65,6 +70,15 @@ public class GsonJsonMapper implements JsonMapper {
             return GSON.toJson(object);
         } catch (Exception e) {
             throw new JsonException("Failed to serialize object to JSON", e);
+        }
+    }
+
+    @Override
+    public String toJsonIgnoreNull(Object object) throws JsonException {
+        try {
+            return GSON_IGNORE_NULL.toJson(object);
+        } catch (Exception e) {
+            throw new JsonException("Failed to serialize object to JSON (ignoring null)", e);
         }
     }
 

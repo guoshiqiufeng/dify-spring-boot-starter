@@ -15,6 +15,10 @@
  */
 package io.github.guoshiqiufeng.dify.client.codec.jackson3;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserialize;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserializer;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonException;
@@ -39,6 +43,10 @@ import java.lang.reflect.Type;
 public class Jackson3JsonMapper implements io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper {
 
     private static final JsonMapper JSON_MAPPER = JsonMapper.builder().build();
+    private static final JsonMapper JSON_MAPPER_IGNORE_NULL = JsonMapper.builder()
+            .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
+            .changeDefaultPropertyInclusion(incl -> incl.withContentInclusion(JsonInclude.Include.NON_NULL))
+            .build();
     private static final Jackson3JsonMapper INSTANCE = new Jackson3JsonMapper();
 
     public static Jackson3JsonMapper getInstance() {
@@ -58,6 +66,15 @@ public class Jackson3JsonMapper implements io.github.guoshiqiufeng.dify.client.c
     public String toJson(Object object) throws JsonException {
         try {
             return JSON_MAPPER.writeValueAsString(object);
+        } catch (Exception e) {
+            throw new JsonException("Failed to serialize object to JSON", e);
+        }
+    }
+
+    @Override
+    public String toJsonIgnoreNull(Object object) throws JsonException {
+        try {
+            return JSON_MAPPER_IGNORE_NULL.writeValueAsString(object);
         } catch (Exception e) {
             throw new JsonException("Failed to serialize object to JSON", e);
         }

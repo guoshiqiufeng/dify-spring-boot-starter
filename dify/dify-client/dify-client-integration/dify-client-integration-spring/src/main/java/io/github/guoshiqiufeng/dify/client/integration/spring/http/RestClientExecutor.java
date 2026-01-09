@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
@@ -39,6 +40,7 @@ class RestClientExecutor {
     private final Object restClient;
     private final JsonMapper jsonMapper;
     private final ResponseConverter responseConverter;
+    private final Boolean skipNull;
 
     /**
      * Constructor.
@@ -47,8 +49,13 @@ class RestClientExecutor {
      * @param jsonMapper JSON mapper
      */
     RestClientExecutor(Object restClient, JsonMapper jsonMapper) {
+        this(restClient, jsonMapper, true);
+    }
+
+    RestClientExecutor(Object restClient, JsonMapper jsonMapper, Boolean skipNull) {
         this.restClient = restClient;
         this.jsonMapper = jsonMapper;
+        this.skipNull = skipNull == null || skipNull;
         this.responseConverter = new ResponseConverter(jsonMapper);
     }
 
@@ -205,7 +212,7 @@ class RestClientExecutor {
      * @throws Exception if reflection fails
      */
     private Object buildRequest(String method, String uri, Map<String, String> headers,
-                                 Map<String, String> cookies, Object body) throws Exception {
+                                Map<String, String> cookies, Object body) throws Exception {
         // Use interface methods instead of concrete class to avoid module access issues
         java.lang.reflect.Method methodMethod = findMethod(restClient.getClass(), "method", HttpMethod.class);
         methodMethod.setAccessible(true);
@@ -234,8 +241,14 @@ class RestClientExecutor {
 
         // Set body - serialize to JSON string using JsonMapper
         if (body != null) {
-            String jsonBody = jsonMapper.toJson(body);
-            java.lang.reflect.Method bodyMethod = findMethod(requestSpec.getClass(), "body", Object.class);
+            String jsonBody = "";
+            if (skipNull) {
+                jsonBody = jsonMapper.toJsonIgnoreNull(body);
+            } else {
+                jsonBody = jsonMapper.toJson(body);
+            }
+
+            Method bodyMethod = findMethod(requestSpec.getClass(), "body", Object.class);
             bodyMethod.setAccessible(true);
             requestSpec = bodyMethod.invoke(requestSpec, jsonBody);
         }
@@ -405,9 +418,9 @@ class RestClientExecutor {
 
             // Handle Spring HTTP exceptions (works for Spring 5, 6, and 7)
             if (className.contains("RestClientResponseException") ||
-                className.contains("HttpClientErrorException") ||
-                className.contains("HttpServerErrorException") ||
-                className.contains("HttpStatusCodeException")) {
+                    className.contains("HttpClientErrorException") ||
+                    className.contains("HttpServerErrorException") ||
+                    className.contains("HttpStatusCodeException")) {
 
                 // Extract status code using reflection only (to avoid Spring version compatibility issues)
                 int statusCode = extractStatusCodeViaReflection(throwable, exceptionClass);
@@ -422,8 +435,8 @@ class RestClientExecutor {
 
                 // Build ResponseEntity
                 return ResponseEntity.status(statusCode)
-                        .headers(headers != null ? headers : new org.springframework.http.HttpHeaders())
-                        .body(responseBody != null ? responseBody : "");
+                        .headers(headers)
+                        .body(responseBody);
             }
         } catch (Exception e) {
             // If extraction fails, return null to let the original exception propagate
@@ -496,7 +509,7 @@ class RestClientExecutor {
             log.debug("Method getResponseBodyAsString() not found");
         } catch (Exception e) {
             log.debug("Failed to extract via getResponseBodyAsString(): {} - {}",
-                e.getClass().getSimpleName(), e.getMessage());
+                    e.getClass().getSimpleName(), e.getMessage());
         }
 
         // Try getResponseBodyAsByteArray()
@@ -520,7 +533,7 @@ class RestClientExecutor {
             log.debug("Method getResponseBodyAsByteArray() not found");
         } catch (Exception e) {
             log.debug("Failed to extract via getResponseBodyAsByteArray(): {} - {}",
-                e.getClass().getSimpleName(), e.getMessage());
+                    e.getClass().getSimpleName(), e.getMessage());
         }
 
         // If body is empty or null, use exception message as fallback

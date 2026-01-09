@@ -46,6 +46,7 @@ class WebClientExecutor {
     private final WebClient webClient;
     private final JsonMapper jsonMapper;
     private final ResponseConverter responseConverter;
+    private final Boolean skipNull;
 
     /**
      * Constructor.
@@ -54,8 +55,19 @@ class WebClientExecutor {
      * @param jsonMapper JSON mapper
      */
     WebClientExecutor(WebClient webClient, JsonMapper jsonMapper) {
+        this(webClient, jsonMapper, true);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param webClient  WebClient instance
+     * @param jsonMapper JSON mapper
+     */
+    WebClientExecutor(WebClient webClient, JsonMapper jsonMapper, Boolean skipNull) {
         this.webClient = webClient;
         this.jsonMapper = jsonMapper;
+        this.skipNull = skipNull;
         this.responseConverter = new ResponseConverter(jsonMapper);
     }
 
@@ -270,7 +282,8 @@ class WebClientExecutor {
 
         // For SSE streaming, use Spring's ServerSentEvent support
         ParameterizedTypeReference<org.springframework.http.codec.ServerSentEvent<String>> sseType =
-                new ParameterizedTypeReference<org.springframework.http.codec.ServerSentEvent<String>>() {};
+                new ParameterizedTypeReference<org.springframework.http.codec.ServerSentEvent<String>>() {
+                };
 
         return requestSpec
                 .accept(MediaType.TEXT_EVENT_STREAM)
@@ -313,7 +326,8 @@ class WebClientExecutor {
 
         // For SSE streaming, use Spring's ServerSentEvent support
         ParameterizedTypeReference<org.springframework.http.codec.ServerSentEvent<String>> sseType =
-                new ParameterizedTypeReference<org.springframework.http.codec.ServerSentEvent<String>>() {};
+                new ParameterizedTypeReference<org.springframework.http.codec.ServerSentEvent<String>>() {
+                };
 
         return requestSpec
                 .accept(MediaType.TEXT_EVENT_STREAM)
@@ -427,7 +441,13 @@ class WebClientExecutor {
         // Set body - serialize to JSON string using JsonMapper
         if (body != null) {
             try {
-                String jsonBody = jsonMapper.toJson(body);
+                String jsonBody = "";
+                if (skipNull) {
+                    jsonBody = jsonMapper.toJsonIgnoreNull(body);
+                } else {
+                    jsonBody = jsonMapper.toJson(body);
+                }
+
                 bodySpec.contentType(MediaType.APPLICATION_JSON);
                 bodySpec.bodyValue(jsonBody);
             } catch (Exception e) {
