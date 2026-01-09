@@ -438,23 +438,93 @@ class WebClientExecutor {
             bodySpec.cookie(entry.getKey(), entry.getValue());
         }
 
-        // Set body - serialize to JSON string using JsonMapper
+        // Set body - handle multipart or JSON based on Content-Type header
         if (body != null) {
             try {
-                String jsonBody = "";
-                if (skipNull) {
-                    jsonBody = jsonMapper.toJsonIgnoreNull(body);
-                } else {
-                    jsonBody = jsonMapper.toJson(body);
+                // Check if Content-Type is multipart/form-data
+                String contentType = headers.get("Content-Type");
+                boolean isMultipart = contentType != null && contentType.toLowerCase().contains("multipart/form-data");
+
+                if (isMultipart && body instanceof Map) {
+                    Map<?, ?> bodyMap = (Map<?, ?>) body;
+                    // Check if it's a multipart body by inspecting the first value
+                    if (!bodyMap.isEmpty()) {
+                        Object firstValue = bodyMap.values().iterator().next();
+                        if (firstValue instanceof io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part) {
+                            // Handle multipart data
+                            org.springframework.util.LinkedMultiValueMap<String, Object> multipartData =
+                                new org.springframework.util.LinkedMultiValueMap<>();
+
+                            @SuppressWarnings("unchecked")
+                            Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> parts =
+                                (Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part>) bodyMap;
+
+                            for (Map.Entry<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> entry : parts.entrySet()) {
+                                io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part part = entry.getValue();
+                                Object partValue = part.getValue();
+
+                                // Convert byte[] to Spring's ByteArrayResource for file uploads
+                                if (partValue instanceof byte[]) {
+                                    byte[] bytes = (byte[]) partValue;
+                                    String filename = extractFilename(part.getHeader("Content-Disposition"));
+
+                                    org.springframework.core.io.ByteArrayResource resource =
+                                        new org.springframework.core.io.ByteArrayResource(bytes) {
+                                            @Override
+                                            public String getFilename() {
+                                                return filename;
+                                            }
+                                        };
+
+                                    multipartData.add(entry.getKey(), resource);
+                                } else if (partValue instanceof String || partValue instanceof Number || partValue instanceof Boolean) {
+                                    // For simple types, add directly
+                                    multipartData.add(entry.getKey(), partValue);
+                                } else {
+                                    // For complex objects, serialize to JSON
+                                    String jsonValue = skipNull ? jsonMapper.toJsonIgnoreNull(partValue) : jsonMapper.toJson(partValue);
+                                    multipartData.add(entry.getKey(), jsonValue);
+                                }
+                            }
+
+                            bodySpec.body(org.springframework.web.reactive.function.BodyInserters.fromMultipartData(multipartData));
+                            return bodySpec;
+                        }
+                    }
                 }
 
+                // Default: serialize to JSON
                 bodySpec.contentType(MediaType.APPLICATION_JSON);
-                bodySpec.bodyValue(jsonBody);
+                bodySpec.bodyValue(skipNull ? jsonMapper.toJsonIgnoreNull(body) : jsonMapper.toJson(body));
             } catch (Exception e) {
                 throw new HttpClientException("Failed to serialize request body", e);
             }
         }
 
         return bodySpec;
+    }
+
+    /**
+     * Extract filename from Content-Disposition header.
+     *
+     * @param contentDisposition Content-Disposition header value
+     * @return filename, or "file" if not found
+     */
+    private String extractFilename(String contentDisposition) {
+        if (contentDisposition == null) {
+            return "file";
+        }
+
+        // Parse: form-data; name="file"; filename="test.txt"
+        int filenameIndex = contentDisposition.indexOf("filename=\"");
+        if (filenameIndex != -1) {
+            int start = filenameIndex + 10; // length of "filename=\""
+            int end = contentDisposition.indexOf("\"", start);
+            if (end != -1) {
+                return contentDisposition.substring(start, end);
+            }
+        }
+
+        return "file";
     }
 }

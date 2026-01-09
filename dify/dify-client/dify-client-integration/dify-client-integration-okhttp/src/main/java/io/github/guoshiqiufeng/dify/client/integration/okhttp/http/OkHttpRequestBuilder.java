@@ -372,6 +372,21 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
      * @return RequestBody or null
      */
     private RequestBody buildRequestBody() {
+        // Check if Content-Type is multipart/form-data
+        String contentType = headers.get("Content-Type");
+        boolean isMultipart = contentType != null && contentType.toLowerCase().contains("multipart/form-data");
+
+        if (isMultipart && body instanceof Map) {
+            // Handle multipart data from MultipartBodyBuilder
+            Map<?, ?> bodyMap = (Map<?, ?>) body;
+            if (!bodyMap.isEmpty()) {
+                Object firstValue = bodyMap.values().iterator().next();
+                if (firstValue instanceof io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part) {
+                    return buildMultipartBodyFromParts(bodyMap);
+                }
+            }
+        }
+
         if (multipartData != null) {
             return buildMultipartBody();
         } else if (body != null) {
@@ -382,6 +397,76 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
             return RequestBody.create("", null);
         }
         return null;
+    }
+
+    /**
+     * Build multipart body from MultipartBodyBuilder.Part map.
+     *
+     * @param bodyMap map of parts
+     * @return RequestBody
+     */
+    private RequestBody buildMultipartBodyFromParts(Map<?, ?> bodyMap) {
+        MultipartBody.Builder builder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM);
+
+        @SuppressWarnings("unchecked")
+        Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> parts =
+            (Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part>) bodyMap;
+
+        for (Map.Entry<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> entry : parts.entrySet()) {
+            io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part part = entry.getValue();
+            Object partValue = part.getValue();
+
+            if (partValue instanceof byte[]) {
+                // Handle file upload
+                byte[] bytes = (byte[]) partValue;
+                String filename = extractFilename(part.getHeader("Content-Disposition"));
+                String partContentType = part.getHeader("Content-Type");
+                MediaType mediaType = partContentType != null ?
+                    MediaType.parse(partContentType) : MediaType.parse("application/octet-stream");
+
+                builder.addFormDataPart(entry.getKey(), filename,
+                    RequestBody.create(bytes, mediaType));
+            } else if (partValue instanceof String) {
+                builder.addFormDataPart(entry.getKey(), (String) partValue);
+            } else if (partValue instanceof Number || partValue instanceof Boolean) {
+                builder.addFormDataPart(entry.getKey(), String.valueOf(partValue));
+            } else {
+                // For complex objects, serialize to JSON
+                try {
+                    String json = jsonMapper.toJson(partValue);
+                    builder.addFormDataPart(entry.getKey(), json);
+                } catch (Exception e) {
+                    throw new HttpClientException("Failed to serialize multipart field to JSON: " + entry.getKey(), e);
+                }
+            }
+        }
+
+        return builder.build();
+    }
+
+    /**
+     * Extract filename from Content-Disposition header.
+     *
+     * @param contentDisposition Content-Disposition header value
+     * @return filename, or "file" if not found
+     */
+    private String extractFilename(String contentDisposition) {
+        if (contentDisposition == null) {
+            return "file";
+        }
+
+        // Parse: form-data; name="file"; filename="test.txt"
+        int filenameIndex = contentDisposition.indexOf("filename=\"");
+        if (filenameIndex != -1) {
+            int start = filenameIndex + 10; // length of "filename=\""
+            int end = contentDisposition.indexOf("\"", start);
+            if (end != -1) {
+                return contentDisposition.substring(start, end);
+            }
+        }
+
+        return "file";
     }
 
     /**
