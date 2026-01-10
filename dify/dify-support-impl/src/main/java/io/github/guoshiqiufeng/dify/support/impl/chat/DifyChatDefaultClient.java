@@ -69,6 +69,7 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
 
         return this.httpClient.post()
                 .uri(ChatUriConstant.V1_CHAT_MESSAGES_URI)
+                .contentType(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + chatRequest.getApiKey())
                 .body(chatMessage)
                 .retrieve()
@@ -84,6 +85,7 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
 
         return this.httpClient.post()
                 .uri(ChatUriConstant.V1_CHAT_MESSAGES_URI)
+                .contentType(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + chatRequest.getApiKey())
                 .body(chatMessage)
                 .retrieve()
