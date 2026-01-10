@@ -52,8 +52,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
     private static final Logger log = LoggerFactory.getLogger(OkHttpRequestBuilder.class);
     private static final MediaType JSON_MEDIA_TYPE = MediaType.parse("application/json; charset=utf-8");
 
-    private final OkHttpClient client;
-    private final String baseUrl;
+    private final JavaHttpClient client;
     private final JsonMapper jsonMapper;
     private final String method;
 
@@ -67,14 +66,12 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
     /**
      * Constructor.
      *
-     * @param client     OkHttp client
-     * @param baseUrl    base URL
+     * @param client     Java HTTP client
      * @param jsonMapper JSON mapper
      * @param method     HTTP method
      */
-    public OkHttpRequestBuilder(OkHttpClient client, String baseUrl, JsonMapper jsonMapper, String method) {
+    public OkHttpRequestBuilder(JavaHttpClient client, JsonMapper jsonMapper, String method) {
         this.client = client;
-        this.baseUrl = baseUrl;
         this.jsonMapper = jsonMapper;
         this.method = method;
     }
@@ -164,7 +161,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
     @Override
     public <T> T execute(Class<T> responseType) {
         Request request = buildRequest();
-        try (Response response = client.newCall(request).execute()) {
+        try (Response response = client.getOkHttpClient().newCall(request).execute()) {
             return handleResponse(response, responseType);
         } catch (IOException e) {
             throw new HttpClientException("HTTP request failed: " + e.getMessage(), e);
@@ -174,7 +171,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
     @Override
     public <T> T execute(io.github.guoshiqiufeng.dify.client.core.http.TypeReference<T> typeReference) {
         Request request = buildRequest();
-        try (Response response = client.newCall(request).execute()) {
+        try (Response response = client.getOkHttpClient().newCall(request).execute()) {
             return handleResponse(response, typeReference);
         } catch (IOException e) {
             throw new HttpClientException("HTTP request failed: " + e.getMessage(), e);
@@ -184,7 +181,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
     @Override
     public <T> HttpResponse<T> executeForResponse(Class<T> responseType) {
         Request request = buildRequest();
-        try (Response response = client.newCall(request).execute()) {
+        try (Response response = client.getOkHttpClient().newCall(request).execute()) {
             T responseBody = handleResponse(response, responseType);
             return buildHttpResponse(response, responseBody);
         } catch (IOException e) {
@@ -195,7 +192,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
     @Override
     public <T> HttpResponse<T> executeForResponse(io.github.guoshiqiufeng.dify.client.core.http.TypeReference<T> typeReference) {
         Request request = buildRequest();
-        try (Response response = client.newCall(request).execute()) {
+        try (Response response = client.getOkHttpClient().newCall(request).execute()) {
             T responseBody = handleResponse(response, typeReference);
             return buildHttpResponse(response, responseBody);
         } catch (IOException e) {
@@ -206,7 +203,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
     @Override
     public <T> Flux<T> stream(Class<T> responseType) {
         Request request = buildRequest();
-        OkHttpStreamPublisher<T> publisher = new OkHttpStreamPublisher<>(client, request, jsonMapper, responseType);
+        OkHttpStreamPublisher<T> publisher = new OkHttpStreamPublisher<>(client.getOkHttpClient(), request, jsonMapper, responseType);
 
         return Flux.create(publisher::stream);
     }
@@ -214,7 +211,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
     @Override
     public int executeForStatus() {
         Request request = buildRequest();
-        try (Response response = client.newCall(request).execute()) {
+        try (Response response = client.getOkHttpClient().newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 handleError(response);
             }
@@ -259,7 +256,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
         @Override
         public <T> HttpResponse<T> toEntity(Class<T> responseType) {
             Request request = buildRequest();
-            try (Response response = client.newCall(request).execute()) {
+            try (Response response = client.getOkHttpClient().newCall(request).execute()) {
                 T responseBody = handleResponse(response, responseType, false);
                 HttpResponse<T> httpResponse = buildHttpResponse(response, responseBody);
                 handleErrors(httpResponse);
@@ -272,7 +269,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
         @Override
         public <T> HttpResponse<T> toEntity(io.github.guoshiqiufeng.dify.client.core.http.TypeReference<T> typeReference) {
             Request request = buildRequest();
-            try (Response response = client.newCall(request).execute()) {
+            try (Response response = client.getOkHttpClient().newCall(request).execute()) {
                 T responseBody = handleResponse(response, typeReference, false);
                 HttpResponse<T> httpResponse = buildHttpResponse(response, responseBody);
                 handleErrors(httpResponse);
@@ -292,7 +289,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
         @Override
         public <T> Flux<T> bodyToFlux(Class<T> responseType) {
             Request request = buildRequest();
-            OkHttpStreamPublisher<T> publisher = new OkHttpStreamPublisher<>(client, request, jsonMapper, responseType);
+            OkHttpStreamPublisher<T> publisher = new OkHttpStreamPublisher<>(client.getOkHttpClient(), request, jsonMapper, responseType);
             return Flux.create(publisher::stream);
         }
 
@@ -331,7 +328,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
      */
     private Request buildRequest() {
         // Build URL
-        HttpUrl.Builder urlBuilder = HttpUrl.parse(baseUrl + (uri != null ? uri : "")).newBuilder();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(client.getBaseUrl() + (uri != null ? uri : "")).newBuilder();
         for (Map.Entry<String, String> entry : queryParams.entrySet()) {
             urlBuilder.addQueryParameter(entry.getKey(), entry.getValue());
         }
@@ -434,7 +431,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
             } else {
                 // For complex objects, serialize to JSON
                 try {
-                    String json = jsonMapper.toJson(partValue);
+                    String json = client.getSkipNull() ? jsonMapper.toJsonIgnoreNull(partValue) : jsonMapper.toJson(partValue);
                     builder.addFormDataPart(entry.getKey(), json);
                 } catch (Exception e) {
                     throw new HttpClientException("Failed to serialize multipart field to JSON: " + entry.getKey(), e);
@@ -476,7 +473,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
      */
     private RequestBody buildJsonBody() {
         try {
-            String json = jsonMapper.toJson(body);
+            String json = client.getSkipNull() ? jsonMapper.toJsonIgnoreNull(body) : jsonMapper.toJson(body);
             return RequestBody.create(json, JSON_MEDIA_TYPE);
         } catch (Exception e) {
             throw new HttpClientException("Failed to serialize request body to JSON", e);
@@ -503,7 +500,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
             } else {
                 // Convert to JSON string
                 try {
-                    String json = jsonMapper.toJson(value);
+                    String json = client.getSkipNull() ? jsonMapper.toJsonIgnoreNull(value) : jsonMapper.toJson(value);
                     builder.addFormDataPart(key, json);
                 } catch (Exception e) {
                     throw new HttpClientException("Failed to serialize multipart field to JSON: " + key, e);

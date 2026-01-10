@@ -22,6 +22,7 @@ import io.github.guoshiqiufeng.dify.client.core.web.client.RequestBodyUriSpec;
 import io.github.guoshiqiufeng.dify.client.core.web.client.RequestHeadersUriSpec;
 import io.github.guoshiqiufeng.dify.client.integration.okhttp.logging.LoggingInterceptor;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
+import lombok.Getter;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 
@@ -39,10 +40,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class JavaHttpClient implements HttpClient {
 
+    @Getter
     private final OkHttpClient okHttpClient;
+    @Getter
     private final String baseUrl;
     private final HttpHeaders defaultHeaders;
     private final JsonMapper jsonMapper;
+    @Getter
+    private final Boolean skipNull;
 
     /**
      * Constructor with base URL and client configuration.
@@ -55,6 +60,7 @@ public class JavaHttpClient implements HttpClient {
         this.baseUrl = baseUrl;
         this.jsonMapper = jsonMapper;
         this.defaultHeaders = new HttpHeaders();
+        this.skipNull = clientConfig != null ? clientConfig.getSkipNull() : true;
         this.okHttpClient = createOkHttpClient(clientConfig, new HttpHeaders(), new ArrayList<>());
     }
 
@@ -62,6 +68,7 @@ public class JavaHttpClient implements HttpClient {
         this.baseUrl = baseUrl;
         this.jsonMapper = jsonMapper;
         this.defaultHeaders = defaultHeaders;
+        this.skipNull = clientConfig != null ? clientConfig.getSkipNull() : true;
         this.okHttpClient = createOkHttpClient(clientConfig, defaultHeaders, new ArrayList<>());
     }
 
@@ -79,6 +86,7 @@ public class JavaHttpClient implements HttpClient {
         this.baseUrl = baseUrl;
         this.jsonMapper = jsonMapper;
         this.defaultHeaders = defaultHeaders;
+        this.skipNull = clientConfig != null ? clientConfig.getSkipNull() : true;
         this.okHttpClient = createOkHttpClient(clientConfig, defaultHeaders, interceptors);
     }
 
@@ -148,48 +156,48 @@ public class JavaHttpClient implements HttpClient {
     @Override
     public RequestHeadersUriSpec<?> get() {
         return new io.github.guoshiqiufeng.dify.client.core.http.DefaultRequestHeadersUriSpec(
-                new io.github.guoshiqiufeng.dify.client.integration.okhttp.http.OkHttpRequestBuilder(okHttpClient, baseUrl, jsonMapper, "GET"));
+                new io.github.guoshiqiufeng.dify.client.integration.okhttp.http.OkHttpRequestBuilder(this, jsonMapper, "GET"));
     }
 
     @Override
     public RequestBodyUriSpec post() {
         return new io.github.guoshiqiufeng.dify.client.core.http.DefaultRequestBodyUriSpec(
-                new io.github.guoshiqiufeng.dify.client.integration.okhttp.http.OkHttpRequestBuilder(okHttpClient, baseUrl, jsonMapper, "POST"));
+                new io.github.guoshiqiufeng.dify.client.integration.okhttp.http.OkHttpRequestBuilder(this, jsonMapper, "POST"));
     }
 
     @Override
     public RequestBodyUriSpec put() {
         return new io.github.guoshiqiufeng.dify.client.core.http.DefaultRequestBodyUriSpec(
-                new io.github.guoshiqiufeng.dify.client.integration.okhttp.http.OkHttpRequestBuilder(okHttpClient, baseUrl, jsonMapper, "PUT"));
+                new io.github.guoshiqiufeng.dify.client.integration.okhttp.http.OkHttpRequestBuilder(this, jsonMapper, "PUT"));
     }
 
     @Override
     public RequestHeadersUriSpec<?> delete() {
         return new io.github.guoshiqiufeng.dify.client.core.http.DefaultRequestHeadersUriSpec(
-                new io.github.guoshiqiufeng.dify.client.integration.okhttp.http.OkHttpRequestBuilder(okHttpClient, baseUrl, jsonMapper, "DELETE"));
+                new io.github.guoshiqiufeng.dify.client.integration.okhttp.http.OkHttpRequestBuilder(this, jsonMapper, "DELETE"));
     }
 
     @Override
     public RequestBodyUriSpec patch() {
         return new io.github.guoshiqiufeng.dify.client.core.http.DefaultRequestBodyUriSpec(
-                new io.github.guoshiqiufeng.dify.client.integration.okhttp.http.OkHttpRequestBuilder(okHttpClient, baseUrl, jsonMapper, "PATCH"));
+                new io.github.guoshiqiufeng.dify.client.integration.okhttp.http.OkHttpRequestBuilder(this, jsonMapper, "PATCH"));
     }
 
     @Override
     public RequestHeadersUriSpec<?> head() {
         return new io.github.guoshiqiufeng.dify.client.core.http.DefaultRequestHeadersUriSpec(
-                new io.github.guoshiqiufeng.dify.client.integration.okhttp.http.OkHttpRequestBuilder(okHttpClient, baseUrl, jsonMapper, "HEAD"));
+                new io.github.guoshiqiufeng.dify.client.integration.okhttp.http.OkHttpRequestBuilder(this, jsonMapper, "HEAD"));
     }
 
     @Override
     public RequestHeadersUriSpec<?> options() {
         return new io.github.guoshiqiufeng.dify.client.core.http.DefaultRequestHeadersUriSpec(
-                new io.github.guoshiqiufeng.dify.client.integration.okhttp.http.OkHttpRequestBuilder(okHttpClient, baseUrl, jsonMapper, "OPTIONS"));
+                new io.github.guoshiqiufeng.dify.client.integration.okhttp.http.OkHttpRequestBuilder(this, jsonMapper, "OPTIONS"));
     }
 
     @Override
     public RequestBodyUriSpec method(io.github.guoshiqiufeng.dify.client.core.enums.HttpMethod httpMethod) {
         return new io.github.guoshiqiufeng.dify.client.core.http.DefaultRequestBodyUriSpec(
-                new io.github.guoshiqiufeng.dify.client.integration.okhttp.http.OkHttpRequestBuilder(okHttpClient, baseUrl, jsonMapper, httpMethod.name()));
+                new io.github.guoshiqiufeng.dify.client.integration.okhttp.http.OkHttpRequestBuilder(this, jsonMapper, httpMethod.name()));
     }
 }
