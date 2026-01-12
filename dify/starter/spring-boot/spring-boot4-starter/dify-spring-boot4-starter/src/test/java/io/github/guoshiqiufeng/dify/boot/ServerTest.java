@@ -17,9 +17,7 @@ package io.github.guoshiqiufeng.dify.boot;
 
 import cn.hutool.json.JSONUtil;
 import io.github.guoshiqiufeng.dify.boot.base.BaseDatasetContainerTest;
-import io.github.guoshiqiufeng.dify.boot.base.BaseServerContainerTest;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
-import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
 import io.github.guoshiqiufeng.dify.dataset.dto.RetrievalModel;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.DatasetCreateRequest;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.DocumentCreateByTextRequest;
@@ -32,12 +30,10 @@ import io.github.guoshiqiufeng.dify.dataset.enums.IndexingTechniqueEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.RerankingModeEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.SearchMethodEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.document.*;
-import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 

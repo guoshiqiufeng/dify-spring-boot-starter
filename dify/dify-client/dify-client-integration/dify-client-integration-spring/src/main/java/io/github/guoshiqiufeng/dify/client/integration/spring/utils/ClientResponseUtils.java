@@ -37,7 +37,9 @@ public class ClientResponseUtils {
             Method statusCodeMethod = ClientResponse.class.getMethod("statusCode");
             Object statusCode = statusCodeMethod.invoke(response);
 
-            Method createMethod = ClientResponse.class.getMethod("create", statusCode.getClass(), ExchangeStrategies.class);
+            // Use HttpStatusCode interface for Spring 6+
+            Class<?> httpStatusCodeClass = Class.forName("org.springframework.http.HttpStatusCode");
+            Method createMethod = ClientResponse.class.getMethod("create", httpStatusCodeClass, ExchangeStrategies.class);
             ClientResponse.Builder builder = (ClientResponse.Builder) createMethod.invoke(null, statusCode, ExchangeStrategies.withDefaults());
 
             return builder

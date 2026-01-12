@@ -19,7 +19,7 @@ import io.github.guoshiqiufeng.dify.chat.DifyChat;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
-import io.github.guoshiqiufeng.dify.springboot4.autoconfigure.actuator.DifyHealthIndicator;
+import io.github.guoshiqiufeng.dify.status.actuator.DifyHealthIndicator;
 import io.github.guoshiqiufeng.dify.status.cache.StatusCacheService;
 import io.github.guoshiqiufeng.dify.status.cache.impl.InMemoryStatusCacheService;
 import io.github.guoshiqiufeng.dify.status.checker.DifyChatStatusChecker;

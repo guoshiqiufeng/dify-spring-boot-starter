@@ -15,16 +15,16 @@
  */
 package io.github.guoshiqiufeng.dify.support.impl.server;
 
-import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
 import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
-import io.github.guoshiqiufeng.dify.core.utils.Assert;
-import io.github.guoshiqiufeng.dify.support.impl.base.BaseDifyDefaultClient;
+import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
+import io.github.guoshiqiufeng.dify.core.utils.Assert;
+import io.github.guoshiqiufeng.dify.core.utils.StrUtil;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse;
 import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
@@ -36,14 +36,8 @@ import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DifyLoginRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
+import io.github.guoshiqiufeng.dify.support.impl.base.BaseDifyDefaultClient;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.Assert;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.ObjectUtils;
-import org.springframework.web.client.RestClient;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.*;
 
@@ -425,7 +419,7 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
     @Override
     public DocumentIndexingStatusResponse getDatasetIndexingStatus(String datasetId) {
         return executeWithRetry(() ->
-                restClient
+                httpClient
                         .get()
                         .uri(ServerUriConstant.DATASET_INDEXING_STATUS, datasetId)
                         .headers(this::addAuthorizationHeader)
@@ -441,7 +435,7 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
             Map<String, Object> uriVariables = new HashMap<>();
             uriVariables.put("datasetId", datasetId);
             uriVariables.put("documentId", documentId);
-            return restClient
+            return httpClient
                     .get()
                     .uri(ServerUriConstant.DOCUMENT_INDEXING_STATUS, uriVariables)
                     .headers(this::addAuthorizationHeader)
@@ -455,7 +449,7 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
     @Override
     public DatasetErrorDocumentsResponse getDatasetErrorDocuments(String datasetId) {
         return executeWithRetry(() ->
-                restClient
+                httpClient
                         .get()
                         .uri(ServerUriConstant.DATASET_ERROR_DOCUMENTS, datasetId)
                         .headers(this::addAuthorizationHeader)
@@ -472,7 +466,7 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
         requestBody.put("document_ids", request.getDocumentIds());
 
         executeWithRetry(() ->
-                restClient
+                httpClient
                         .post()
                         .uri(ServerUriConstant.DOCUMENT_RETRY, request.getDatasetId())
                         .headers(this::addAuthorizationHeader)
@@ -532,7 +526,7 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                 difyServerProperties.getEmail(),
                 difyServerProperties.getPassword()
         );
-        if (difyServerProperties.getPasswordEncryption() && !ObjectUtils.isEmpty(difyServerProperties.getPassword())) {
+        if (difyServerProperties.getPasswordEncryption() && !StrUtil.isEmpty(difyServerProperties.getPassword())) {
             requestVO.setPassword(Base64.getEncoder().encodeToString(difyServerProperties.getPassword().getBytes()));
         }
         // 发送请求并获取完整 ResponseEntity
