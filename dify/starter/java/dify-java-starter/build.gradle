@@ -12,6 +12,9 @@ dependencies {
 
     testImplementation libs.mockito.core
     testImplementation libs.mockito.junit.jupiter
+    testImplementation libs.junit.jupiter
+    testImplementation libs.reactor.test
+    testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation "org.junit.platform:junit-platform-launcher"
     testImplementation libs.bytebuddy
     testImplementation libs.bytebuddy.agent
