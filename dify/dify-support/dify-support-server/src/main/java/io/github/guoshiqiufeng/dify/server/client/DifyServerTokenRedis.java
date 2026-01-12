@@ -89,16 +89,20 @@ public class DifyServerTokenRedis extends BaseDifyServerToken {
     public void refreshOrObtainNewToken(DifyServerClient difyServerClient) {
         String refreshToken = redisTemplate.opsForValue().get(DifyRedisKey.REFRESH_TOKEN);
         if (refreshToken != null) {
-            LoginResponse response = difyServerClient.refreshToken(refreshToken);
-            if (response != null) {
-                String accessToken = response.getAccessToken();
-                redisTemplate.opsForValue().set(DifyRedisKey.ACCESS_TOKEN, accessToken);
-                redisTemplate.expire(DifyRedisKey.ACCESS_TOKEN, TOKEN_EXPIRE_MINUTES, TimeUnit.MINUTES);
-                redisTemplate.opsForValue().set(DifyRedisKey.REFRESH_TOKEN, response.getRefreshToken());
-                if (StrUtil.isNotEmpty(response.getCsrfToken())) {
-                    redisTemplate.opsForValue().set(DifyRedisKey.CSRF_TOKEN, response.getCsrfToken());
+            try {
+                LoginResponse response = difyServerClient.refreshToken(refreshToken);
+                if (response != null) {
+                    String accessToken = response.getAccessToken();
+                    redisTemplate.opsForValue().set(DifyRedisKey.ACCESS_TOKEN, accessToken);
+                    redisTemplate.expire(DifyRedisKey.ACCESS_TOKEN, TOKEN_EXPIRE_MINUTES, TimeUnit.MINUTES);
+                    redisTemplate.opsForValue().set(DifyRedisKey.REFRESH_TOKEN, response.getRefreshToken());
+                    if (StrUtil.isNotEmpty(response.getCsrfToken())) {
+                        redisTemplate.opsForValue().set(DifyRedisKey.CSRF_TOKEN, response.getCsrfToken());
+                    }
+                    return;
                 }
-                return;
+            } catch (Exception e) {
+                log.warn("Failed to refresh token:{}, will attempt to login", e.getMessage());
             }
         }
         // 如果刷新token失败或没有刷新token，则重新登录

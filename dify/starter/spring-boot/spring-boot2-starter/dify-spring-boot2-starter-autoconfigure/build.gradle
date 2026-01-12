@@ -15,6 +15,7 @@ dependencies {
     implementation libs.spring.boot.starter.data.redis
 
     implementation libs.spring.boot.autoconfigure
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
     annotationProcessor "org.springframework.boot:spring-boot-starter-actuator"
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 

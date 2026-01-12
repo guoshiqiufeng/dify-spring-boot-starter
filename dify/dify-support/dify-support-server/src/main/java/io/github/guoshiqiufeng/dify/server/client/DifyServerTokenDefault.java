@@ -91,12 +91,16 @@ public class DifyServerTokenDefault extends BaseDifyServerToken {
         tokenLock.lock();
         try {
             if (refreshToken != null) {
-                LoginResponse response = difyServerClient.refreshToken(refreshToken);
-                if (response != null) {
-                    this.accessToken = response.getAccessToken();
-                    this.refreshToken = response.getRefreshToken();
-                    this.csrfToken = response.getCsrfToken();
-                    return;
+                try {
+                    LoginResponse response = difyServerClient.refreshToken(refreshToken);
+                    if (response != null) {
+                        this.accessToken = response.getAccessToken();
+                        this.refreshToken = response.getRefreshToken();
+                        this.csrfToken = response.getCsrfToken();
+                        return;
+                    }
+                } catch (Exception e) {
+                    log.warn("Failed to refresh token:{}, will attempt to login", e.getMessage());
                 }
             }
             // 如果刷新token失败或没有刷新token，则重新登录

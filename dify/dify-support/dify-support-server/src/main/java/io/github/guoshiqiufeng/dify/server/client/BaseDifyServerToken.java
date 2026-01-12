@@ -18,6 +18,8 @@ package io.github.guoshiqiufeng.dify.server.client;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
 import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
 import io.github.guoshiqiufeng.dify.core.exception.DifyClientException;
+import io.github.guoshiqiufeng.dify.core.exception.DifyClientException;
+import io.github.guoshiqiufeng.dify.server.exception.DifyServerException;
 import lombok.extern.slf4j.Slf4j;
 
 /**

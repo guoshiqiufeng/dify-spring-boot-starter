@@ -25,6 +25,7 @@ import io.github.guoshiqiufeng.dify.support.impl.base.BaseDifyDefaultClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
+import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse;
 import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
@@ -33,8 +34,16 @@ import io.github.guoshiqiufeng.dify.server.constant.ServerUriConstant;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DifyLoginRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.Assert;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.ObjectUtils;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.*;
 
@@ -413,6 +422,67 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
         );
     }
 
+    @Override
+    public DocumentIndexingStatusResponse getDatasetIndexingStatus(String datasetId) {
+        return executeWithRetry(() ->
+                restClient
+                        .get()
+                        .uri(ServerUriConstant.DATASET_INDEXING_STATUS, datasetId)
+                        .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
+                        .retrieve()
+                        .onStatus(responseErrorHandler)
+                        .body(DocumentIndexingStatusResponse.class));
+    }
+
+    @Override
+    public DocumentIndexingStatusResponse.ProcessingStatus getDocumentIndexingStatus(String datasetId, String documentId) {
+        return executeWithRetry(() -> {
+            Map<String, Object> uriVariables = new HashMap<>();
+            uriVariables.put("datasetId", datasetId);
+            uriVariables.put("documentId", documentId);
+            return restClient
+                    .get()
+                    .uri(ServerUriConstant.DOCUMENT_INDEXING_STATUS, uriVariables)
+                    .headers(this::addAuthorizationHeader)
+                    .cookies(this::addAuthorizationCookies)
+                    .retrieve()
+                    .onStatus(responseErrorHandler)
+                    .body(DocumentIndexingStatusResponse.ProcessingStatus.class);
+        });
+    }
+
+    @Override
+    public DatasetErrorDocumentsResponse getDatasetErrorDocuments(String datasetId) {
+        return executeWithRetry(() ->
+                restClient
+                        .get()
+                        .uri(ServerUriConstant.DATASET_ERROR_DOCUMENTS, datasetId)
+                        .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
+                        .retrieve()
+                        .onStatus(responseErrorHandler)
+                        .body(DatasetErrorDocumentsResponse.class));
+    }
+
+    @Override
+    public void retryDocumentIndexing(DocumentRetryRequest request) {
+        // 创建只包含document_ids的请求体
+        Map<String, List<String>> requestBody = new HashMap<>();
+        requestBody.put("document_ids", request.getDocumentIds());
+
+        executeWithRetry(() ->
+                restClient
+                        .post()
+                        .uri(ServerUriConstant.DOCUMENT_RETRY, request.getDatasetId())
+                        .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
+                        .body(requestBody)
+                        .retrieve()
+                        .onStatus(responseErrorHandler)
+                        .toBodilessEntity());
+    }
+
     private void appPages(String mode, String name, int page, List<AppsResponse> result) {
         AppsResponseResult response = executeWithRetry(
                 () -> httpClient.get()
@@ -462,6 +532,9 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                 difyServerProperties.getEmail(),
                 difyServerProperties.getPassword()
         );
+        if (difyServerProperties.getPasswordEncryption() && !ObjectUtils.isEmpty(difyServerProperties.getPassword())) {
+            requestVO.setPassword(Base64.getEncoder().encodeToString(difyServerProperties.getPassword().getBytes()));
+        }
         // 发送请求并获取完整 ResponseEntity
         HttpResponse<LoginResultResponse> responseEntity = httpClient.post()
                 .uri(ServerUriConstant.LOGIN)

@@ -384,6 +384,231 @@ public void testDeleteDatasetApiKey() {
 }
 ```
 
+### 2.4 Get Dataset Indexing Status
+
+#### Method
+
+```java
+DocumentIndexingStatusResponse getDatasetIndexingStatus(String datasetId);
+```
+
+#### Request Parameters
+
+| Parameter name | Type   | Required | Description |
+|----------------|--------|----------|-------------|
+| datasetId      | String | Yes      | Dataset ID  |
+
+#### Response Parameters
+
+DocumentIndexingStatusResponse
+
+| Parameter name | Type                       | Description                  |
+|----------------|----------------------------|------------------------------|
+| data           | `List<ProcessingStatus>`   | Document indexing status list |
+
+ProcessingStatus
+
+| Parameter name       | Type    | Description                                                                                      |
+|---------------------|---------|--------------------------------------------------------------------------------------------------|
+| id                  | String  | Document ID                                                                                      |
+| indexingStatus      | String  | Indexing status: waiting, parsing, cleaning, splitting, indexing, completed, error, paused       |
+| processingStartedAt | Long    | Processing start time (timestamp)                                                                |
+| parsingCompletedAt  | Long    | Parsing completion time (timestamp)                                                              |
+| cleaningCompletedAt | Long    | Cleaning completion time (timestamp)                                                             |
+| splittingCompletedAt| Long    | Splitting completion time (timestamp)                                                            |
+| completedAt         | Long    | Completion time (timestamp)                                                                      |
+| pausedAt            | Long    | Pause time (timestamp)                                                                           |
+| error               | String  | Error message                                                                                    |
+| stoppedAt           | Long    | Stop time (timestamp)                                                                            |
+| completedSegments   | Integer | Number of completed segments                                                                     |
+| totalSegments       | Integer | Total number of segments                                                                         |
+
+#### Request Example
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testGetDatasetIndexingStatus() {
+    String datasetId = "dataset-123456789";
+
+    // Get dataset indexing status
+    DocumentIndexingStatusResponse indexingStatus = difyServer.getDatasetIndexingStatus(datasetId);
+
+    if (indexingStatus.getData() != null && !indexingStatus.getData().isEmpty()) {
+        for (DocumentIndexingStatusResponse.ProcessingStatus doc : indexingStatus.getData()) {
+            System.out.println("Document ID: " + doc.getId());
+            System.out.println("Indexing Status: " + doc.getIndexingStatus());
+            System.out.println("Completed Segments: " + doc.getCompletedSegments() + "/" + doc.getTotalSegments());
+        }
+    }
+}
+```
+
+### 2.5 Get Document Indexing Status
+
+#### Method
+
+```java
+DocumentIndexingStatusResponse.ProcessingStatus getDocumentIndexingStatus(String datasetId, String documentId);
+```
+
+#### Request Parameters
+
+| Parameter name | Type   | Required | Description |
+|----------------|--------|----------|-------------|
+| datasetId      | String | Yes      | Dataset ID  |
+| documentId     | String | Yes      | Document ID |
+
+#### Response Parameters
+
+ProcessingStatus (same structure as defined in section 2.4)
+
+#### Request Example
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testGetDocumentIndexingStatus() {
+    String datasetId = "dataset-123456789";
+    String documentId = "doc-987654321";
+
+    // Get document indexing status
+    DocumentIndexingStatusResponse.ProcessingStatus documentStatus =
+        difyServer.getDocumentIndexingStatus(datasetId, documentId);
+
+    System.out.println("Document ID: " + documentStatus.getId());
+    System.out.println("Indexing Status: " + documentStatus.getIndexingStatus());
+    System.out.println("Completed Segments: " + documentStatus.getCompletedSegments() + "/" + documentStatus.getTotalSegments());
+
+    if (documentStatus.getError() != null) {
+        System.out.println("Error Message: " + documentStatus.getError());
+    }
+}
+```
+
+### 2.6 Get Dataset Error Documents
+
+#### Method
+
+```java
+DatasetErrorDocumentsResponse getDatasetErrorDocuments(String datasetId);
+```
+
+#### Request Parameters
+
+| Parameter name | Type   | Required | Description |
+|----------------|--------|----------|-------------|
+| datasetId      | String | Yes      | Dataset ID  |
+
+#### Response Parameters
+
+DatasetErrorDocumentsResponse
+
+| Parameter name | Type                    | Description              |
+|----------------|-------------------------|--------------------------|
+| data           | `List<ErrorDocument>`   | Error document list      |
+| total          | Integer                 | Total number of errors   |
+
+ErrorDocument
+
+| Parameter name  | Type   | Description                        |
+|----------------|--------|------------------------------------|
+| id             | String | Document ID                        |
+| name           | String | Document name                      |
+| error          | String | Error message                      |
+| indexingStatus | String | Indexing status (usually "error")  |
+| createdAt      | Long   | Creation time (timestamp)          |
+| updatedAt      | Long   | Update time (timestamp)            |
+
+#### Request Example
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testGetDatasetErrorDocuments() {
+    String datasetId = "dataset-123456789";
+
+    // Get dataset error documents
+    DatasetErrorDocumentsResponse errorDocuments = difyServer.getDatasetErrorDocuments(datasetId);
+
+    System.out.println("Total Error Documents: " + errorDocuments.getTotal());
+
+    if (errorDocuments.getData() != null && !errorDocuments.getData().isEmpty()) {
+        for (DatasetErrorDocumentsResponse.ErrorDocument doc : errorDocuments.getData()) {
+            System.out.println("Document ID: " + doc.getId());
+            System.out.println("Document Name: " + doc.getName());
+            System.out.println("Error Message: " + doc.getError());
+        }
+    } else {
+        System.out.println("No error documents found");
+    }
+}
+```
+
+### 2.7 Retry Document Indexing
+
+#### Method
+
+```java
+void retryDocumentIndexing(DocumentRetryRequest request);
+```
+
+#### Request Parameters
+
+DocumentRetryRequest
+
+| Parameter name | Type           | Required | Description                      |
+|----------------|----------------|----------|----------------------------------|
+| datasetId      | String         | Yes      | Dataset ID                       |
+| documentIds    | `List<String>` | Yes      | List of document IDs to retry    |
+
+#### Response Parameters
+
+This method does not return a value. It returns 204 No Content on success.
+
+#### Request Example
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testRetryDocumentIndexing() {
+    String datasetId = "dataset-123456789";
+
+    // First, get error documents
+    DatasetErrorDocumentsResponse errorDocuments = difyServer.getDatasetErrorDocuments(datasetId);
+
+    if (errorDocuments.getData() != null && !errorDocuments.getData().isEmpty()) {
+        // Extract error document IDs
+        List<String> errorDocIds = errorDocuments.getData().stream()
+            .map(DatasetErrorDocumentsResponse.ErrorDocument::getId)
+            .collect(Collectors.toList());
+
+        // Create retry request
+        DocumentRetryRequest request = new DocumentRetryRequest();
+        request.setDatasetId(datasetId);
+        request.setDocumentIds(errorDocIds);
+
+        // Retry document indexing
+        difyServer.retryDocumentIndexing(request);
+        System.out.println("Triggered indexing retry for " + errorDocIds.size() + " documents");
+    } else {
+        System.out.println("No error documents to retry");
+    }
+}
+```
+
 ## 3. Chat Conversation Management
 
 ### 3.1 Get Application Chat Conversation List

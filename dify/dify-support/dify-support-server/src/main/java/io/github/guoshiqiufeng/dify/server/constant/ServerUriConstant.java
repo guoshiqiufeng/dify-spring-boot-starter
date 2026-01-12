@@ -32,6 +32,14 @@ public interface ServerUriConstant {
 
     String DATASETS = API + "/datasets";
 
+    String DATASET_INDEXING_STATUS = DATASETS + "/{datasetId}/indexing-status";
+
+    String DOCUMENT_INDEXING_STATUS = DATASETS + "/{datasetId}/documents/{documentId}/indexing-status";
+
+    String DATASET_ERROR_DOCUMENTS = DATASETS + "/{datasetId}/error-docs";
+
+    String DOCUMENT_RETRY = DATASETS + "/{datasetId}/retry";
+
     String APP_API_KEYS = APPS + "/{appId}/api-keys";
 
     String DATASET_API_KEYS = DATASETS + "/api-keys/{apiKeyId}";
