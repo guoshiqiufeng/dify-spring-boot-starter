@@ -12,9 +12,13 @@ actions:
     type: secondary
 features:
   - title: 统一规范
-    details: 基于Dify 接口 规范开发
+    details: 基于 Dify 接口规范开发
   - title: 快速集成
-    details: 基于Spring Boot 快速集成。
+    details: 基于 Spring Boot 快速集成，支持纯 Java 项目
+  - title: 模块化架构
+    details: 框架无关的核心抽象，灵活的 HTTP 客户端和编解码器选项
+  - title: 多版本支持
+    details: 支持 Spring Boot 2.x/3.x/4.x 和纯 Java 项目
 footer: Apache License 2.0 | Copyright © 2024-present fubluesky
 ---
 

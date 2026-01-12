@@ -1,20 +1,31 @@
 ---
 lang: zh-CN
 title: 使用配置
-description: 
+description:
 ---
 
-## Spring Boot 2/3
+## Spring Boot 配置
+
+适用于 Spring Boot 2.x/3.x/4.x 项目。
 
 ```yaml
 dify:
-  url: http://192.168.1.10 # 请替换为实际的 Dify 服务地址
+  url: http://192.168.1.10 # Dify 服务地址
   server:
-    email: admin@admin.com # 请替换为实际的 Dify 服务邮箱，若不需要调用 server相关接口可不填
-    password: admin123456 # 请替换为实际的 Dify 服务密码，若不需要调用 server相关接口可不填
-    password-encryption: false # 密码加密开关，默认为 true。Dify 1.11.2 及以上版本需要开启（或者密码直接使用 Base64密文可不开启），1.11.2 以下版本需要设置为 false；
+    email: admin@admin.com # Dify 服务邮箱（调用 Server API 时需要）
+    password: admin123456 # Dify 服务密码（调用 Server API 时需要）
+    password-encryption: true # 密码加密开关，默认 true
   dataset:
-    api-key: dataset-aaabbbcccdddeeefffggghhh # 请替换为实际的知识库api-key, 若不需要调用知识库可不填
+    api-key: dataset-aaabbbcccdddeeefffggghhh # 知识库 API Key
+  client-config:
+    skip-null: true # 是否跳过 null 字段，默认 true
+    logging: true # 是否打印请求日志，默认 true
+    connect-timeout: 30 # 连接超时时间（秒），默认 30
+    read-timeout: 30 # 读取超时时间（秒），默认 30
+    write-timeout: 30 # 写入超时时间（秒），默认 30
+  status:
+    health-indicator-enabled: false # 是否启用健康指示器，默认 false
+    health-indicator-init-by-server: true # 是否通过 Server 初始化，默认 true
 ```
 
 ### dify
@@ -67,12 +78,79 @@ dify:
 - 类型：`Boolean`
 - 默认值：`true`
 - 非必填
-- 描述：是否跳过null字段，默认提交数据时，会过滤掉null字段
+- 描述：是否跳过 null 字段，默认提交数据时会过滤掉 null 字段
 
 ##### logging
 
 - 类型：`Boolean`
 - 默认值：`true`
 - 非必填
-- 描述：是否打印请求日志，开启此参数并配置`io.github.guoshiqiufeng.dify.client`日志级别为 debug则打印请求、响应日志
+- 描述：是否打印请求日志，开启此参数并配置 `io.github.guoshiqiufeng.dify.client` 日志级别为 debug 则打印请求、响应日志
+
+##### connectTimeout
+
+- 类型：`Integer`
+- 默认值：`30`
+- 非必填
+- 描述：连接超时时间（秒），默认 30 秒
+
+##### readTimeout
+
+- 类型：`Integer`
+- 默认值：`30`
+- 非必填
+- 描述：读取超时时间（秒），默认 30 秒
+
+##### writeTimeout
+
+- 类型：`Integer`
+- 默认值：`30`
+- 非必填
+- 描述：写入超时时间（秒），默认 30 秒
+
+#### status
+
+> 状态监控相关配置
+
+##### healthIndicatorEnabled
+
+- 类型：`Boolean`
+- 默认值：`false`
+- 非必填
+- 描述：是否启用健康指示器，用于 Spring Boot Actuator 健康检查
+
+##### healthIndicatorInitByServer
+
+- 类型：`Boolean`
+- 默认值：`true`
+- 非必填
+- 描述：是否通过 Server API 初始化健康指示器
+
+##### apiKey
+
+- 类型：`String`
+- 默认值：``
+- 非必填
+- 描述：通用 API Key，用于状态监控
+
+##### datasetApiKey
+
+- 类型：`String`
+- 默认值：``
+- 非必填
+- 描述：Dataset API Key，用于 Dataset 客户端状态监控
+
+##### chatApiKey
+
+- 类型：`List<String>`
+- 默认值：`null`
+- 非必填
+- 描述：Chat API Key 列表，用于 Chat 客户端状态监控
+
+##### workflowApiKey
+
+- 类型：`List<String>`
+- 默认值：`null`
+- 非必填
+- 描述：Workflow API Key 列表，用于 Workflow 客户端状态监控
 

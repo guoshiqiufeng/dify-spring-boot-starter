@@ -14,7 +14,11 @@ features:
   - title: Standardize
     details: Developed based on the Dify interface specification
   - title: Rapid Integration
-    details: Fast integration based on Spring Boot.
+    details: Fast integration based on Spring Boot, supports pure Java projects
+  - title: Modular Architecture
+    details: Framework-agnostic core abstractions with flexible HTTP clients and codec options
+  - title: Multi-Version Support
+    details: Supports Spring Boot 2.x/3.x/4.x and pure Java projects
 footer: Apache License 2.0 | Copyright © 2024-present fubluesky
 ---
 
