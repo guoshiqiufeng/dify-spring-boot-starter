@@ -57,7 +57,7 @@ class DifyServerBuilderTest {
     void testCreateClientFromHttpClient() {
         HttpClient mockHttpClient = mock(HttpClient.class);
 
-        DifyServerClient client = DifyServerBuilder.createClient(mockHttpClient);
+        DifyServerClient client = DifyServerBuilder.createClient(mockHttpClient, new DifyProperties.Server());
 
         assertNotNull(client);
     }
@@ -67,9 +67,18 @@ class DifyServerBuilderTest {
         HttpClient mockHttpClient = mock(HttpClient.class);
         BaseDifyServerToken mockToken = mock(BaseDifyServerToken.class);
 
-        DifyServerClient client = DifyServerBuilder.createClient(mockHttpClient, mockToken);
+        assertThrows(IllegalArgumentException.class, () -> {
+            DifyServerBuilder.createClient(mockHttpClient, mockToken);
+        });
+    }
 
-        assertNotNull(client);
+    @Test
+    void testCreateClientFromHttpClientWithNullProperties() {
+        HttpClient mockHttpClient = mock(HttpClient.class);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            DifyServerBuilder.createClient(mockHttpClient);
+        });
     }
 
     @Test
@@ -93,8 +102,14 @@ class DifyServerBuilderTest {
 
     @Test
     void testBuilderBuild() {
+        HttpClientFactory mockFactory = mock(HttpClientFactory.class);
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        when(mockFactory.createClient(anyString(), any())).thenReturn(mockHttpClient);
+
         DifyServerBuilder.Builder builder = DifyServerBuilder.builder();
         builder.baseUrl("https://api.dify.ai");
+        builder.serverProperties(new DifyProperties.Server());
+        builder.httpClientFactory(mockFactory);
 
         DifyServerClient client = builder.build();
         assertNotNull(client);
@@ -102,11 +117,16 @@ class DifyServerBuilderTest {
 
     @Test
     void testBuilderWithServerProperties() {
+        HttpClientFactory mockFactory = mock(HttpClientFactory.class);
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        when(mockFactory.createClient(anyString(), any())).thenReturn(mockHttpClient);
+
         DifyProperties.Server serverProperties = new DifyProperties.Server();
 
         DifyServerClient client = DifyServerBuilder.builder()
                 .baseUrl("https://api.dify.ai")
                 .serverProperties(serverProperties)
+                .httpClientFactory(mockFactory)
                 .build();
 
         assertNotNull(client);
@@ -114,11 +134,17 @@ class DifyServerBuilderTest {
 
     @Test
     void testBuilderWithServerToken() {
+        HttpClientFactory mockFactory = mock(HttpClientFactory.class);
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        when(mockFactory.createClient(anyString(), any())).thenReturn(mockHttpClient);
+
         BaseDifyServerToken mockToken = mock(BaseDifyServerToken.class);
 
         DifyServerClient client = DifyServerBuilder.builder()
                 .baseUrl("https://api.dify.ai")
+                .serverProperties(new DifyProperties.Server())
                 .serverToken(mockToken)
+                .httpClientFactory(mockFactory)
                 .build();
 
         assertNotNull(client);
@@ -126,8 +152,14 @@ class DifyServerBuilderTest {
 
     @Test
     void testBuilderWithoutServerToken() {
+        HttpClientFactory mockFactory = mock(HttpClientFactory.class);
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        when(mockFactory.createClient(anyString(), any())).thenReturn(mockHttpClient);
+
         DifyServerClient client = DifyServerBuilder.builder()
                 .baseUrl("https://api.dify.ai")
+                .serverProperties(new DifyProperties.Server())
+                .httpClientFactory(mockFactory)
                 .build();
 
         assertNotNull(client);
@@ -135,6 +167,10 @@ class DifyServerBuilderTest {
 
     @Test
     void testBuilderFluentAPI() {
+        HttpClientFactory mockFactory = mock(HttpClientFactory.class);
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        when(mockFactory.createClient(anyString(), any())).thenReturn(mockHttpClient);
+
         DifyProperties.Server serverProperties = new DifyProperties.Server();
         BaseDifyServerToken mockToken = mock(BaseDifyServerToken.class);
 
@@ -142,6 +178,7 @@ class DifyServerBuilderTest {
                 .baseUrl("https://api.dify.ai")
                 .serverProperties(serverProperties)
                 .serverToken(mockToken)
+                .httpClientFactory(mockFactory)
                 .build();
 
         assertNotNull(client);
@@ -149,8 +186,14 @@ class DifyServerBuilderTest {
 
     @Test
     void testBuilderWithCustomTimeout() {
+        HttpClientFactory mockFactory = mock(HttpClientFactory.class);
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        when(mockFactory.createClient(anyString(), any())).thenReturn(mockHttpClient);
+
         DifyServerClient client = DifyServerBuilder.builder()
                 .baseUrl("https://api.dify.ai")
+                .serverProperties(new DifyProperties.Server())
+                .httpClientFactory(mockFactory)
                 .build();
 
         assertNotNull(client);
@@ -171,9 +214,14 @@ class DifyServerBuilderTest {
 
     @Test
     void testBuilderWithNullServerProperties() {
+        HttpClientFactory mockFactory = mock(HttpClientFactory.class);
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        when(mockFactory.createClient(anyString(), any())).thenReturn(mockHttpClient);
+
         DifyServerClient client = DifyServerBuilder.builder()
                 .baseUrl("https://api.dify.ai")
-                .serverProperties(null)
+                .serverProperties(new DifyProperties.Server())
+                .httpClientFactory(mockFactory)
                 .build();
 
         assertNotNull(client);
@@ -181,9 +229,15 @@ class DifyServerBuilderTest {
 
     @Test
     void testBuilderWithNullServerToken() {
+        HttpClientFactory mockFactory = mock(HttpClientFactory.class);
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        when(mockFactory.createClient(anyString(), any())).thenReturn(mockHttpClient);
+
         DifyServerClient client = DifyServerBuilder.builder()
                 .baseUrl("https://api.dify.ai")
+                .serverProperties(new DifyProperties.Server())
                 .serverToken(null)
+                .httpClientFactory(mockFactory)
                 .build();
 
         assertNotNull(client);
@@ -191,8 +245,14 @@ class DifyServerBuilderTest {
 
     @Test
     void testBuilderWithMinimalConfiguration() {
+        HttpClientFactory mockFactory = mock(HttpClientFactory.class);
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        when(mockFactory.createClient(anyString(), any())).thenReturn(mockHttpClient);
+
         DifyServerClient client = DifyServerBuilder.builder()
                 .baseUrl("https://api.dify.ai")
+                .serverProperties(new DifyProperties.Server())
+                .httpClientFactory(mockFactory)
                 .build();
 
         assertNotNull(client);
@@ -200,6 +260,10 @@ class DifyServerBuilderTest {
 
     @Test
     void testBuilderWithCompleteConfiguration() {
+        HttpClientFactory mockFactory = mock(HttpClientFactory.class);
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        when(mockFactory.createClient(anyString(), any())).thenReturn(mockHttpClient);
+
         DifyProperties.Server serverProperties = new DifyProperties.Server();
 
         BaseDifyServerToken mockToken = mock(BaseDifyServerToken.class);
@@ -208,6 +272,7 @@ class DifyServerBuilderTest {
                 .baseUrl("https://api.dify.ai")
                 .serverProperties(serverProperties)
                 .serverToken(mockToken)
+                .httpClientFactory(mockFactory)
                 .build();
 
         assertNotNull(client);

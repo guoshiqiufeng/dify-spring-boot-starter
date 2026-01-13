@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.support.impl.builder;
 
+import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
 import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
 import io.github.guoshiqiufeng.dify.workflow.DifyWorkflow;
 import io.github.guoshiqiufeng.dify.workflow.client.DifyWorkflowClient;
@@ -56,8 +57,13 @@ class DifyWorkflowBuilderTest {
 
     @Test
     void testBuilderBuild() {
+        HttpClientFactory mockFactory = mock(HttpClientFactory.class);
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        when(mockFactory.createClient(anyString(), any())).thenReturn(mockHttpClient);
+
         DifyWorkflowBuilder.Builder builder = DifyWorkflowBuilder.builder();
         builder.baseUrl("https://api.dify.ai");
+        builder.httpClientFactory(mockFactory);
 
         DifyWorkflowClient client = builder.build();
         assertNotNull(client);
@@ -65,8 +71,13 @@ class DifyWorkflowBuilderTest {
 
     @Test
     void testBuilderWithCustomTimeout() {
+        HttpClientFactory mockFactory = mock(HttpClientFactory.class);
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        when(mockFactory.createClient(anyString(), any())).thenReturn(mockHttpClient);
+
         DifyWorkflowBuilder.Builder builder = DifyWorkflowBuilder.builder();
         builder.baseUrl("https://api.dify.ai");
+        builder.httpClientFactory(mockFactory);
 
         DifyWorkflowClient client = builder.build();
         assertNotNull(client);
@@ -74,8 +85,13 @@ class DifyWorkflowBuilderTest {
 
     @Test
     void testBuilderFluentAPI() {
+        HttpClientFactory mockFactory = mock(HttpClientFactory.class);
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        when(mockFactory.createClient(anyString(), any())).thenReturn(mockHttpClient);
+
         DifyWorkflowClient client = DifyWorkflowBuilder.builder()
                 .baseUrl("https://api.dify.ai")
+                .httpClientFactory(mockFactory)
                 .build();
 
         assertNotNull(client);
@@ -83,8 +99,13 @@ class DifyWorkflowBuilderTest {
 
     @Test
     void testBuilderWithMinimalConfiguration() {
+        HttpClientFactory mockFactory = mock(HttpClientFactory.class);
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        when(mockFactory.createClient(anyString(), any())).thenReturn(mockHttpClient);
+
         DifyWorkflowClient client = DifyWorkflowBuilder.builder()
                 .baseUrl("https://api.dify.ai")
+                .httpClientFactory(mockFactory)
                 .build();
 
         assertNotNull(client);

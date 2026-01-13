@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.support.impl.builder;
 
+import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
 import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
 import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
 import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;
@@ -56,9 +57,15 @@ class DifyDatasetBuilderTest {
 
     @Test
     void testBuilderBuild() {
+        HttpClientFactory mockFactory = mock(HttpClientFactory.class);
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        when(mockFactory.defaultHeader(anyString(), anyString())).thenReturn(mockFactory);
+        when(mockFactory.createClient(anyString(), any())).thenReturn(mockHttpClient);
+
         DifyDatasetBuilder.Builder builder = DifyDatasetBuilder.builder();
         builder.baseUrl("https://api.dify.ai");
         builder.apiKey("test-api-key");
+        builder.httpClientFactory(mockFactory);
 
         DifyDatasetClient client = builder.build();
         assertNotNull(client);
@@ -66,9 +73,15 @@ class DifyDatasetBuilderTest {
 
     @Test
     void testBuilderWithApiKey() {
+        HttpClientFactory mockFactory = mock(HttpClientFactory.class);
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        when(mockFactory.defaultHeader(anyString(), anyString())).thenReturn(mockFactory);
+        when(mockFactory.createClient(anyString(), any())).thenReturn(mockHttpClient);
+
         DifyDatasetBuilder.Builder builder = DifyDatasetBuilder.builder();
         builder.baseUrl("https://api.dify.ai");
         builder.apiKey("dataset-api-key");
+        builder.httpClientFactory(mockFactory);
 
         DifyDatasetClient client = builder.build();
         assertNotNull(client);
@@ -76,8 +89,13 @@ class DifyDatasetBuilderTest {
 
     @Test
     void testBuilderWithoutApiKey() {
+        HttpClientFactory mockFactory = mock(HttpClientFactory.class);
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        when(mockFactory.createClient(anyString(), any())).thenReturn(mockHttpClient);
+
         DifyDatasetBuilder.Builder builder = DifyDatasetBuilder.builder();
         builder.baseUrl("https://api.dify.ai");
+        builder.httpClientFactory(mockFactory);
 
         DifyDatasetClient client = builder.build();
         assertNotNull(client);
@@ -85,9 +103,14 @@ class DifyDatasetBuilderTest {
 
     @Test
     void testBuilderWithEmptyApiKey() {
+        HttpClientFactory mockFactory = mock(HttpClientFactory.class);
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        when(mockFactory.createClient(anyString(), any())).thenReturn(mockHttpClient);
+
         DifyDatasetBuilder.Builder builder = DifyDatasetBuilder.builder();
         builder.baseUrl("https://api.dify.ai");
         builder.apiKey("");
+        builder.httpClientFactory(mockFactory);
 
         DifyDatasetClient client = builder.build();
         assertNotNull(client);
@@ -95,9 +118,14 @@ class DifyDatasetBuilderTest {
 
     @Test
     void testBuilderWithNullApiKey() {
+        HttpClientFactory mockFactory = mock(HttpClientFactory.class);
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        when(mockFactory.createClient(anyString(), any())).thenReturn(mockHttpClient);
+
         DifyDatasetBuilder.Builder builder = DifyDatasetBuilder.builder();
         builder.baseUrl("https://api.dify.ai");
         builder.apiKey(null);
+        builder.httpClientFactory(mockFactory);
 
         DifyDatasetClient client = builder.build();
         assertNotNull(client);
@@ -105,9 +133,15 @@ class DifyDatasetBuilderTest {
 
     @Test
     void testBuilderFluentAPI() {
+        HttpClientFactory mockFactory = mock(HttpClientFactory.class);
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        when(mockFactory.defaultHeader(anyString(), anyString())).thenReturn(mockFactory);
+        when(mockFactory.createClient(anyString(), any())).thenReturn(mockHttpClient);
+
         DifyDatasetClient client = DifyDatasetBuilder.builder()
                 .baseUrl("https://api.dify.ai")
                 .apiKey("test-api-key")
+                .httpClientFactory(mockFactory)
                 .build();
 
         assertNotNull(client);
@@ -115,9 +149,15 @@ class DifyDatasetBuilderTest {
 
     @Test
     void testBuilderWithCustomTimeout() {
+        HttpClientFactory mockFactory = mock(HttpClientFactory.class);
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        when(mockFactory.defaultHeader(anyString(), anyString())).thenReturn(mockFactory);
+        when(mockFactory.createClient(anyString(), any())).thenReturn(mockHttpClient);
+
         DifyDatasetClient client = DifyDatasetBuilder.builder()
                 .baseUrl("https://api.dify.ai")
                 .apiKey("test-api-key")
+                .httpClientFactory(mockFactory)
                 .build();
 
         assertNotNull(client);
