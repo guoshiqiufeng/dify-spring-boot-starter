@@ -45,6 +45,7 @@ public class JavaHttpClient implements HttpClient {
     @Getter
     private final String baseUrl;
     private final HttpHeaders defaultHeaders;
+    private final OkHttpClient.Builder builder;
     private final JsonMapper jsonMapper;
     @Getter
     private final Boolean skipNull;
@@ -56,20 +57,22 @@ public class JavaHttpClient implements HttpClient {
      * @param clientConfig the client configuration
      * @param jsonMapper   the JSON mapper
      */
-    public JavaHttpClient(String baseUrl, DifyProperties.ClientConfig clientConfig, JsonMapper jsonMapper) {
+    public JavaHttpClient(String baseUrl, DifyProperties.ClientConfig clientConfig, OkHttpClient.Builder builder, JsonMapper jsonMapper) {
         this.baseUrl = baseUrl;
         this.jsonMapper = jsonMapper;
+        this.builder = builder;
         this.defaultHeaders = new HttpHeaders();
         this.skipNull = clientConfig != null ? clientConfig.getSkipNull() : true;
-        this.okHttpClient = createOkHttpClient(clientConfig, new HttpHeaders(), new ArrayList<>());
+        this.okHttpClient = createOkHttpClient(clientConfig, builder, new HttpHeaders(), new ArrayList<>());
     }
 
-    public JavaHttpClient(String baseUrl, DifyProperties.ClientConfig clientConfig, JsonMapper jsonMapper, HttpHeaders defaultHeaders) {
+    public JavaHttpClient(String baseUrl, DifyProperties.ClientConfig clientConfig, OkHttpClient.Builder builder, JsonMapper jsonMapper, HttpHeaders defaultHeaders) {
         this.baseUrl = baseUrl;
         this.jsonMapper = jsonMapper;
+        this.builder = builder;
         this.defaultHeaders = defaultHeaders;
         this.skipNull = clientConfig != null ? clientConfig.getSkipNull() : true;
-        this.okHttpClient = createOkHttpClient(clientConfig, defaultHeaders, new ArrayList<>());
+        this.okHttpClient = createOkHttpClient(clientConfig, builder, defaultHeaders, new ArrayList<>());
     }
 
     /**
@@ -81,13 +84,14 @@ public class JavaHttpClient implements HttpClient {
      * @param defaultHeaders the default headers to add to all requests
      * @param interceptors   the list of custom interceptors
      */
-    public JavaHttpClient(String baseUrl, DifyProperties.ClientConfig clientConfig, JsonMapper jsonMapper,
-                         HttpHeaders defaultHeaders, List<Interceptor> interceptors) {
+    public JavaHttpClient(String baseUrl, DifyProperties.ClientConfig clientConfig, OkHttpClient.Builder builder, JsonMapper jsonMapper,
+                          HttpHeaders defaultHeaders, List<Interceptor> interceptors) {
         this.baseUrl = baseUrl;
         this.jsonMapper = jsonMapper;
+        this.builder = builder;
         this.defaultHeaders = defaultHeaders;
         this.skipNull = clientConfig != null ? clientConfig.getSkipNull() : true;
-        this.okHttpClient = createOkHttpClient(clientConfig, defaultHeaders, interceptors);
+        this.okHttpClient = createOkHttpClient(clientConfig, builder, defaultHeaders, interceptors);
     }
 
     /**
@@ -97,7 +101,16 @@ public class JavaHttpClient implements HttpClient {
      * @param jsonMapper the JSON mapper
      */
     public JavaHttpClient(String baseUrl, JsonMapper jsonMapper) {
-        this(baseUrl, new DifyProperties.ClientConfig(), jsonMapper);
+        this(baseUrl, new DifyProperties.ClientConfig(), new OkHttpClient.Builder(), jsonMapper);
+    }
+
+    public JavaHttpClient(String baseUrl, DifyProperties.ClientConfig clientConfig, JsonMapper jsonMapper) {
+        this(baseUrl, clientConfig, new OkHttpClient.Builder(), jsonMapper);
+    }
+
+    public JavaHttpClient(String baseUrl, DifyProperties.ClientConfig clientConfig, JsonMapper jsonMapper,
+                          HttpHeaders defaultHeaders, List<Interceptor> interceptors) {
+        this(baseUrl, clientConfig, new OkHttpClient.Builder(), jsonMapper, defaultHeaders, interceptors);
     }
 
     /**
@@ -108,10 +121,12 @@ public class JavaHttpClient implements HttpClient {
      * @param interceptors   the list of custom interceptors
      * @return configured OkHttpClient
      */
-    private OkHttpClient createOkHttpClient(DifyProperties.ClientConfig clientConfig,
-                                           HttpHeaders defaultHeaders,
-                                           List<Interceptor> interceptors) {
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+    private OkHttpClient createOkHttpClient(DifyProperties.ClientConfig clientConfig, OkHttpClient.Builder builder,
+                                            HttpHeaders defaultHeaders,
+                                            List<Interceptor> interceptors) {
+        if (builder == null) {
+            builder = new OkHttpClient.Builder();
+        }
 
         // Set timeouts from configuration (default 30 seconds)
         int connectTimeout = (clientConfig != null && clientConfig.getConnectTimeout() != null)

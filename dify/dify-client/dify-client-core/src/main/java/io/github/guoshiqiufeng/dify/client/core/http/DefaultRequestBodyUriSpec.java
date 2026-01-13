@@ -22,6 +22,7 @@ import io.github.guoshiqiufeng.dify.client.core.web.client.ResponseSpec;
 import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
 import io.github.guoshiqiufeng.dify.client.core.web.util.UriUtils;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,15 @@ public class DefaultRequestBodyUriSpec implements RequestBodyUriSpec {
             throw new IllegalArgumentException("HttpRequestBuilder must not be null");
         }
         this.requestBuilder = requestBuilder;
+    }
+
+    @Override
+    public RequestBodySpec uri(URI uri) {
+        if (uri == null) {
+            throw new IllegalArgumentException("URI must not be null");
+        }
+        requestBuilder.uri(uri.toString());
+        return this;
     }
 
     @Override
@@ -93,7 +103,7 @@ public class DefaultRequestBodyUriSpec implements RequestBodyUriSpec {
     }
 
     @Override
-    public RequestBodySpec uri(String uri, Object[] uriVariables, Function<UriBuilder, String> uriFunction) {
+    public RequestBodySpec uri(String uri, Object[] uriVariables, Function<UriBuilder, URI> uriFunction) {
         if (uri == null) {
             throw new IllegalArgumentException("URI must not be null");
         }
@@ -120,15 +130,13 @@ public class DefaultRequestBodyUriSpec implements RequestBodyUriSpec {
     }
 
     @Override
-    public RequestBodySpec uri(Function<UriBuilder, String> uriFunction) {
+    public RequestBodySpec uri(Function<UriBuilder, URI> uriFunction) {
         if (uriFunction == null) {
             throw new IllegalArgumentException("URI function must not be null");
         }
 
-        requestBuilder.uri(uriBuilder -> {
-            // Apply the function and let it build the complete URI
-            uriFunction.apply(uriBuilder);
-        });
+        // Apply the function and let it build the complete URI
+        requestBuilder.uri(uriFunction::apply);
         return this;
     }
 
@@ -137,7 +145,7 @@ public class DefaultRequestBodyUriSpec implements RequestBodyUriSpec {
         if (headerName == null || headerName.trim().isEmpty()) {
             throw new IllegalArgumentException("Header name must not be null or empty");
         }
-        if (headerValues != null && headerValues.length > 0) {
+        if (headerValues != null) {
             // Add all header values
             for (String headerValue : headerValues) {
                 if (headerValue != null) {

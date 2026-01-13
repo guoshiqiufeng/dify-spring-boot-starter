@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +57,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
     private final JsonMapper jsonMapper;
     private final String method;
 
-    private String uri;
+    private URI uri;
     private final Map<String, String> headers = new HashMap<>();
     private final Map<String, String> cookies = new HashMap<>();
     private final Map<String, String> queryParams = new HashMap<>();
@@ -78,13 +79,13 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
 
     @Override
     public HttpRequestBuilder uri(String uri) {
-        this.uri = uri;
+        this.uri = new DefaultUriBuilder().path(uri).build();
         return this;
     }
 
     @Override
     public HttpRequestBuilder uri(String uri, Object... uriParams) {
-        this.uri = replaceUriVariables(uri, uriParams);
+        this.uri = new DefaultUriBuilder().path(uri).build(uriParams);
         return this;
     }
 
@@ -327,8 +328,13 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
      * @return OkHttp Request
      */
     private Request buildRequest() {
-        // Build URL
-        HttpUrl.Builder urlBuilder = HttpUrl.parse(client.getBaseUrl() + (uri != null ? uri : "")).newBuilder();
+        // Build URL - handle potential double slash when baseUrl ends with / and uri starts with /
+        String baseUrl = client.getBaseUrl();
+        String path = uri != null ? uri.toString() : "";
+        String fullUrl = baseUrl.endsWith("/") && path.startsWith("/")
+            ? baseUrl + path.substring(1)
+            : baseUrl + path;
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(fullUrl).newBuilder();
         for (Map.Entry<String, String> entry : queryParams.entrySet()) {
             urlBuilder.addQueryParameter(entry.getKey(), entry.getValue());
         }

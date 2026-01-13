@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.client.core.web.util;
 
+import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -53,12 +54,12 @@ public class DefaultUriBuilder implements UriBuilder {
     }
 
     @Override
-    public String build() {
+    public URI build() {
         return build(uriVariables != null ? uriVariables : new Object[0]);
     }
 
     @Override
-    public String build(Object... uriVariables) {
+    public URI build(Object... uriVariables) {
         // Store the variables for later use if build() is called without parameters
         if (uriVariables != null && uriVariables.length > 0) {
             this.uriVariables = uriVariables;
@@ -71,12 +72,11 @@ public class DefaultUriBuilder implements UriBuilder {
 
         // Replace path variables if any using UriUtils
         Object[] varsToUse = (uriVariables != null && uriVariables.length > 0) ? uriVariables : this.uriVariables;
-        if (varsToUse != null && varsToUse.length > 0) {
-            processedPath = UriUtils.replacePlaceholders(processedPath, varsToUse);
-        }
+        processedPath = UriUtils.replacePlaceholders(processedPath, varsToUse);
+
 
         if (queryParams.isEmpty()) {
-            return processedPath;
+            return URI.create(processedPath);
         }
 
         StringBuilder uri = new StringBuilder(processedPath);
@@ -89,10 +89,10 @@ public class DefaultUriBuilder implements UriBuilder {
             }
             uri.append(UriUtils.encodeQueryParam(entry.getKey()))
                     .append("=")
-                    .append(entry.getValue());
+                    .append(UriUtils.encodeQueryParam(entry.getValue()));
             first = false;
         }
 
-        return uri.toString();
+        return URI.create(uri.toString());
     }
 }

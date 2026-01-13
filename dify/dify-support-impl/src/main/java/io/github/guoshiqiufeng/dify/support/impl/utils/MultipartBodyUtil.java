@@ -40,11 +40,10 @@ public class MultipartBodyUtil {
      * Creates a MultipartBodyBuilder with file and request data
      *
      * @param file    The file to upload
-     * @param request The request object containing metadata
      * @return Configured MultipartBodyBuilder instance
      * @throws DiftDatasetException if file processing fails
      */
-    public static MultipartBodyBuilder getMultipartBodyBuilder(DifyFile file, FileOperation request) {
+    public static MultipartBodyBuilder getMultipartBodyBuilder(DifyFile file) {
         if (file == null) {
             throw new DiftDatasetException(DiftDatasetExceptionEnum.DIFY_DATA_PARSING_FAILURE);
         }
@@ -61,6 +60,26 @@ public class MultipartBodyUtil {
                 .header("Content-Disposition",
                         "form-data; name=\"file\"; filename=\"" + file.getFilename() + "\"")
                 .header("Content-Type", contentType);
+
+        return builder;
+    }
+
+    public static MultipartBodyBuilder getMultipartBodyBuilderByUser(DifyFile file, String userId) {
+        MultipartBodyBuilder builder = getMultipartBodyBuilder(file);
+        builder.part("user", userId);
+        return builder;
+    }
+
+    /**
+     * Creates a MultipartBodyBuilder with file and request data
+     *
+     * @param file    The file to upload
+     * @param request The request object containing metadata
+     * @return Configured MultipartBodyBuilder instance
+     * @throws DiftDatasetException if file processing fails
+     */
+    public static MultipartBodyBuilder getMultipartBodyBuilder(DifyFile file, FileOperation request) {
+        MultipartBodyBuilder builder = getMultipartBodyBuilder(file);
         request.setFile(null);
         builder.part("data", request)
                 .header("Content-Type", MediaType.APPLICATION_JSON);

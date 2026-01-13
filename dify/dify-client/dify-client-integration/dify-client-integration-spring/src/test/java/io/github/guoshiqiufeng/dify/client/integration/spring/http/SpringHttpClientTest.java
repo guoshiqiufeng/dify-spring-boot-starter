@@ -161,4 +161,32 @@ class SpringHttpClientTest {
         // Just verify the method works without throwing exception
         assertTrue(restClient == null || restClient != null);
     }
+
+    @Test
+    void testConstructorWithNullConfig() {
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", null, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNull(client.getClientConfig());
+    }
+
+    @Test
+    void testConstructorWithEmptyBaseUrl() {
+        // Act
+        SpringHttpClient client = new SpringHttpClient("", clientConfig, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+    }
+
+    @Test
+    void testConstructorWithBaseUrlWithTrailingSlash() {
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://example.com/", clientConfig, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+    }
 }

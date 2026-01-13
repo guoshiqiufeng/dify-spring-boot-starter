@@ -78,6 +78,7 @@ class ResponseConverterTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testConvertWithTypeReference() {
         // Arrange
         String jsonBody = "[{\"name\":\"test1\"},{\"name\":\"test2\"}]";
@@ -156,6 +157,7 @@ class ResponseConverterTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testDeserializeWithTypeReference() {
         // Arrange
         String jsonBody = "{\"key\":\"value\"}";
@@ -195,6 +197,7 @@ class ResponseConverterTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testDeserializeWithTypeReferenceThrowsException() {
         // Arrange
         String invalidJson = "invalid";

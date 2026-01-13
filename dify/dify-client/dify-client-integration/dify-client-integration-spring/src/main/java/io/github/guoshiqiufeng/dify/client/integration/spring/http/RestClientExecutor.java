@@ -24,6 +24,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.util.Map;
 
 /**
@@ -71,7 +72,7 @@ class RestClientExecutor {
      * @param <T>          response type
      * @return response body
      */
-    <T> T execute(String method, String uri, Map<String, String> headers,
+    <T> T execute(String method, URI uri, Map<String, String> headers,
                   Map<String, String> cookies, Object body, Class<T> responseType) {
         try {
             Object requestSpec = buildRequest(method, uri, headers, cookies, body);
@@ -94,7 +95,7 @@ class RestClientExecutor {
      * @param <T>           response type
      * @return response body
      */
-    <T> T execute(String method, String uri, Map<String, String> headers,
+    <T> T execute(String method, URI uri, Map<String, String> headers,
                   Map<String, String> cookies, Object body, TypeReference<T> typeReference) {
         try {
             Object requestSpec = buildRequest(method, uri, headers, cookies, body);
@@ -117,7 +118,7 @@ class RestClientExecutor {
      * @param <T>          response type
      * @return HttpResponse with status, headers, and body
      */
-    <T> HttpResponse<T> executeForEntity(String method, String uri, Map<String, String> headers,
+    <T> HttpResponse<T> executeForEntity(String method, URI uri, Map<String, String> headers,
                                          Map<String, String> cookies, Object body, Class<T> responseType) {
         try {
             Object requestSpec = buildRequest(method, uri, headers, cookies, body);
@@ -158,7 +159,7 @@ class RestClientExecutor {
      * @param <T>           response type
      * @return HttpResponse with status, headers, and body
      */
-    <T> HttpResponse<T> executeForEntity(String method, String uri, Map<String, String> headers,
+    <T> HttpResponse<T> executeForEntity(String method, URI uri, Map<String, String> headers,
                                          Map<String, String> cookies, Object body, TypeReference<T> typeReference) {
         try {
             Object requestSpec = buildRequest(method, uri, headers, cookies, body);
@@ -211,7 +212,7 @@ class RestClientExecutor {
      * @return request spec object
      * @throws Exception if reflection fails
      */
-    private Object buildRequest(String method, String uri, Map<String, String> headers,
+    private Object buildRequest(String method, URI uri, Map<String, String> headers,
                                 Map<String, String> cookies, Object body) throws Exception {
         // Use interface methods instead of concrete class to avoid module access issues
         java.lang.reflect.Method methodMethod = findMethod(restClient.getClass(), "method", HttpMethod.class);
@@ -220,9 +221,9 @@ class RestClientExecutor {
 
         // Set URI
         if (uri != null) {
-            java.lang.reflect.Method uriMethod = findMethod(requestSpec.getClass(), "uri", String.class, Object[].class);
+            java.lang.reflect.Method uriMethod = findMethod(requestSpec.getClass(), "uri", URI.class);
             uriMethod.setAccessible(true);
-            requestSpec = uriMethod.invoke(requestSpec, uri, new Object[0]);
+            requestSpec = uriMethod.invoke(requestSpec, uri);
         }
 
         // Set headers

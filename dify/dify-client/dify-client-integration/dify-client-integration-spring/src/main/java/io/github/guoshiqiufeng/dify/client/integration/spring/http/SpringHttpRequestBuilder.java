@@ -35,6 +35,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,7 +59,7 @@ public class SpringHttpRequestBuilder implements HttpRequestBuilder {
     private final RestClientExecutor restClientExecutor;
     private final WebClientExecutor webClientExecutor;
 
-    private String uri;
+    private URI uri;
     private final Map<String, String> headers = new HashMap<>();
     private final Map<String, String> cookies = new HashMap<>();
     private final Map<String, String> queryParams = new HashMap<>();
@@ -97,13 +98,13 @@ public class SpringHttpRequestBuilder implements HttpRequestBuilder {
 
     @Override
     public HttpRequestBuilder uri(String uri) {
-        this.uri = uri;
+        this.uri = new DefaultUriBuilder().path(uri).build();
         return this;
     }
 
     @Override
     public HttpRequestBuilder uri(String uri, Object... uriParams) {
-        this.uri = replaceUriVariables(uri, uriParams);
+        this.uri = new DefaultUriBuilder().path(uri).build(uriParams);
         return this;
     }
 

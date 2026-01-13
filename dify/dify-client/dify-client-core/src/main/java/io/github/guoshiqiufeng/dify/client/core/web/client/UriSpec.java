@@ -17,6 +17,7 @@ package io.github.guoshiqiufeng.dify.client.core.web.client;
 
 import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -30,6 +31,22 @@ import java.util.function.Function;
  * @since 2025-12-30
  */
 public interface UriSpec<S extends RequestHeadersSpec<S>> {
+
+    /**
+     * Specify the URI for the request directly.
+     * <p>For example:
+     * <pre class="code">
+     * URI uri = URI.create("/users/123");
+     * client.get()
+     *     .uri(uri)
+     *     .retrieve()
+     *     .body(User.class);
+     * </pre>
+     *
+     * @param uri the URI
+     * @return the next stage of the request specification
+     */
+    S uri(URI uri);
 
     /**
      * Specify the URI for the request using a URI template and URI variables.
@@ -85,7 +102,7 @@ public interface UriSpec<S extends RequestHeadersSpec<S>> {
      * @param uriFunction function to further customize the URI
      * @return the next stage of the request specification
      */
-    S uri(String uri, Object[] uriVariables, Function<UriBuilder, String> uriFunction);
+    S uri(String uri, Object[] uriVariables, Function<UriBuilder, URI> uriFunction);
 
     /**
      * Specify the URI by through a {@link UriBuilder}.
@@ -103,5 +120,5 @@ public interface UriSpec<S extends RequestHeadersSpec<S>> {
      * @param uriFunction function to build the URI
      * @return the next stage of the request specification
      */
-    S uri(Function<UriBuilder, String> uriFunction);
+    S uri(Function<UriBuilder, URI> uriFunction);
 }

@@ -21,6 +21,7 @@ import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +37,8 @@ import java.util.Map;
  */
 public class JavaHttpClientFactory implements HttpClientFactory {
 
+    private final OkHttpClient.Builder builder;
+
     private final JsonMapper jsonMapper;
 
     private final HttpHeaders defaultHeaders;
@@ -48,10 +51,20 @@ public class JavaHttpClientFactory implements HttpClientFactory {
      * @param jsonMapper the JSON mapper
      */
     public JavaHttpClientFactory(JsonMapper jsonMapper) {
-        this(jsonMapper, new HttpHeaders(), new ArrayList<>());
+        this(new OkHttpClient.Builder(), jsonMapper, new HttpHeaders(), new ArrayList<>());
     }
 
-    private JavaHttpClientFactory(JsonMapper jsonMapper, HttpHeaders defaultHeaders, List<Interceptor> interceptors) {
+    /**
+     * Constructor with JsonMapper.
+     *
+     * @param jsonMapper the JSON mapper
+     */
+    public JavaHttpClientFactory(OkHttpClient.Builder builder, JsonMapper jsonMapper) {
+        this(builder, jsonMapper, new HttpHeaders(), new ArrayList<>());
+    }
+
+    private JavaHttpClientFactory(OkHttpClient.Builder builder, JsonMapper jsonMapper, HttpHeaders defaultHeaders, List<Interceptor> interceptors) {
+        this.builder = builder;
         this.jsonMapper = jsonMapper;
         this.defaultHeaders = defaultHeaders;
         this.interceptors = interceptors;
@@ -69,7 +82,7 @@ public class JavaHttpClientFactory implements HttpClientFactory {
     public HttpClientFactory defaultHeader(String key, String value) {
         HttpHeaders newHeaders = new HttpHeaders(this.defaultHeaders);
         newHeaders.add(key, value);
-        return new JavaHttpClientFactory(jsonMapper, newHeaders, interceptors);
+        return new JavaHttpClientFactory(builder, jsonMapper, newHeaders, interceptors);
     }
 
     @Override
@@ -79,6 +92,6 @@ public class JavaHttpClientFactory implements HttpClientFactory {
         }
         List<Interceptor> newInterceptors = new ArrayList<>(this.interceptors);
         newInterceptors.add((Interceptor) interceptor);
-        return new JavaHttpClientFactory(jsonMapper, defaultHeaders, newInterceptors);
+        return new JavaHttpClientFactory(builder, jsonMapper, defaultHeaders, newInterceptors);
     }
 }

@@ -52,15 +52,17 @@ class UriUtilsTest {
     @Test
     void testReplacePlaceholdersWithNullVariables() {
         String path = "/users/{id}";
-        String result = UriUtils.replacePlaceholders(path, (Object[]) null);
-        assertEquals("/users/{id}", result);
+        assertThrows(IllegalArgumentException.class, () -> {
+            UriUtils.replacePlaceholders(path, (Object[]) null);
+        });
     }
 
     @Test
     void testReplacePlaceholdersWithEmptyArray() {
         String path = "/users/{id}";
-        String result = UriUtils.replacePlaceholders(path, new Object[0]);
-        assertEquals("/users/{id}", result);
+        assertThrows(IllegalArgumentException.class, () -> {
+            UriUtils.replacePlaceholders(path, new Object[0]);
+        });
     }
 
     @Test
@@ -87,8 +89,9 @@ class UriUtilsTest {
     @Test
     void testReplacePlaceholdersWithNullValue() {
         String path = "/users/{id}/posts/{postId}";
-        String result = UriUtils.replacePlaceholders(path, 123, null);
-        assertEquals("/users/123/posts/{postId}", result);
+        assertThrows(IllegalArgumentException.class, () -> {
+            UriUtils.replacePlaceholders(path, 123, null);
+        });
     }
 
     @Test
@@ -210,7 +213,8 @@ class UriUtilsTest {
     @Test
     void testReplacePlaceholdersWithFewerVariablesThanPlaceholders() {
         String path = "/users/{id}/posts/{postId}/comments/{commentId}";
-        String result = UriUtils.replacePlaceholders(path, 123);
-        assertEquals("/users/123/posts/{postId}/comments/{commentId}", result);
+        assertThrows(IllegalArgumentException.class, () -> {
+            UriUtils.replacePlaceholders(path, 123);
+        });
     }
 }

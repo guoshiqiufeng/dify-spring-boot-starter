@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.client.core.web.util;
 
+import java.net.URI;
 import java.util.Optional;
 
 /**
@@ -53,20 +54,20 @@ public interface UriBuilder {
     UriBuilder queryParamIfPresent(String name, Optional<?> value);
 
     /**
-     * Build the URI string with path and query parameters.
+     * Build the URI with path and query parameters.
      *
-     * @return the constructed URI string
+     * @return the constructed URI
      */
-    String build();
+    URI build();
 
     /**
-     * Build the URI string with path variables and query parameters.
+     * Build the URI with path variables and query parameters.
      * Path variables are replaced in the order they appear in the path template.
      * For example, path "/users/{userId}/posts/{postId}" with uriVariables ["123", "456"]
      * will result in "/users/123/posts/456".
      *
      * @param uriVariables the values to replace path variables (in order)
-     * @return the constructed URI string
+     * @return the constructed URI
      */
-    String build(Object... uriVariables);
+    URI build(Object... uriVariables);
 }

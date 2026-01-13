@@ -51,7 +51,7 @@ public final class UriUtils {
      * @param path         the path with placeholders (e.g., "/users/{id}/posts/{postId}")
      * @param uriVariables the values to replace placeholders with
      * @return the path with placeholders replaced
-     * @throws IllegalArgumentException if path is null
+     * @throws IllegalArgumentException if path is null or not enough variables provided to expand all placeholders
      */
     public static String replacePlaceholders(String path, Object... uriVariables) {
         if (path == null) {
@@ -59,6 +59,7 @@ public final class UriUtils {
         }
 
         if (uriVariables == null || uriVariables.length == 0) {
+            variablePath(path);
             return path;
         }
 
@@ -68,7 +69,23 @@ public final class UriUtils {
                 result = result.replaceFirst(URI_PLACEHOLDER_REGEX, String.valueOf(param));
             }
         }
+
+        // After replacement, check if there are still placeholders left
+        variablePath(result);
+
         return result;
+    }
+
+    public static void variablePath(String path) {
+        // Check if there are any placeholders that need to be replaced
+        if (hasPlaceholders(path)) {
+            // Extract the first placeholder name
+            java.util.regex.Matcher matcher = URI_VARIABLE_PATTERN.matcher(path);
+            if (matcher.find()) {
+                String placeholderName = matcher.group(1);
+                throw new IllegalArgumentException("Not enough variable values available to expand '" + placeholderName + "'");
+            }
+        }
     }
 
     /**

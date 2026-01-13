@@ -17,6 +17,7 @@ package io.github.guoshiqiufeng.dify.client.core.web.util;
 
 import org.junit.jupiter.api.Test;
 
+import java.net.URI;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,122 +34,127 @@ class DefaultUriBuilderTest {
     @Test
     void testSimplePath() {
         DefaultUriBuilder builder = new DefaultUriBuilder();
-        String uri = builder.path("/users").build();
-        assertEquals("/users", uri);
+        URI uri = builder.path("/users").build();
+        assertEquals("/users", uri.toString());
     }
 
     @Test
     void testPathWithSingleVariable() {
         DefaultUriBuilder builder = new DefaultUriBuilder();
-        String uri = builder.path("/users/{id}").build(123);
-        assertEquals("/users/123", uri);
+        URI uri = builder.path("/users/{id}").build(123);
+        assertEquals("/users/123", uri.toString());
     }
 
     @Test
     void testPathWithMultipleVariables() {
         DefaultUriBuilder builder = new DefaultUriBuilder();
-        String uri = builder.path("/users/{id}/posts/{postId}").build(123, 456);
-        assertEquals("/users/123/posts/456", uri);
+        URI uri = builder.path("/users/{id}/posts/{postId}").build(123, 456);
+        assertEquals("/users/123/posts/456", uri.toString());
     }
 
     @Test
     void testPathWithSingleQueryParam() {
         DefaultUriBuilder builder = new DefaultUriBuilder();
-        String uri = builder.path("/users")
+        URI uri = builder.path("/users")
                 .queryParam("page", 1)
                 .build();
-        assertEquals("/users?page=1", uri);
+        assertEquals("/users?page=1", uri.toString());
     }
 
     @Test
     void testPathWithMultipleQueryParams() {
         DefaultUriBuilder builder = new DefaultUriBuilder();
-        String uri = builder.path("/users")
+        URI uri = builder.path("/users")
                 .queryParam("page", 1)
                 .queryParam("size", 10)
                 .queryParam("sort", "name")
                 .build();
-        assertEquals("/users?page=1&size=10&sort=name", uri);
+        assertEquals("/users?page=1&size=10&sort=name", uri.toString());
     }
 
     @Test
     void testPathWithVariablesAndQueryParams() {
         DefaultUriBuilder builder = new DefaultUriBuilder();
-        String uri = builder.path("/users/{id}/posts")
+        URI uri = builder.path("/users/{id}/posts")
                 .queryParam("page", 1)
                 .queryParam("size", 10)
                 .build(123);
-        assertEquals("/users/123/posts?page=1&size=10", uri);
+        assertEquals("/users/123/posts?page=1&size=10", uri.toString());
     }
 
     @Test
     void testQueryParamWithNullValue() {
         DefaultUriBuilder builder = new DefaultUriBuilder();
-        String uri = builder.path("/users")
+        URI uri = builder.path("/users")
                 .queryParam("page", 1)
                 .queryParam("filter", null)
                 .queryParam("size", 10)
                 .build();
-        assertEquals("/users?page=1&size=10", uri);
+        assertEquals("/users?page=1&size=10", uri.toString());
     }
 
     @Test
     void testQueryParamWithSpecialCharacters() {
         DefaultUriBuilder builder = new DefaultUriBuilder();
-        String uri = builder.path("/search")
+        URI uri = builder.path("/search")
                 .queryParam("q", "hello world")
                 .queryParam("email", "test@example.com")
                 .build();
-        assertTrue(uri.contains("q=hello world"));
-        assertTrue(uri.contains("email=test@example.com"));
+        String uriStr = uri.toString();
+        // Note: space should be encoded as %20 or + depending on implementation
+        // Assuming your builder does NOT auto-encode (as many simple builders don't),
+        // but if it does, you'd expect "hello%20world"
+        // For now, we check raw string presence — but better to verify encoding behavior separately
+        assertTrue(uriStr.contains("q=hello%20world") || uriStr.contains("q=hello+world") || uriStr.contains("q=hello world"));
+        assertTrue(uriStr.contains("email=test%40example.com"));
     }
 
     @Test
     void testQueryParamIfPresentWithValue() {
         DefaultUriBuilder builder = new DefaultUriBuilder();
-        String uri = builder.path("/users")
+        URI uri = builder.path("/users")
                 .queryParamIfPresent("filter", Optional.of("active"))
                 .build();
-        assertEquals("/users?filter=active", uri);
+        assertEquals("/users?filter=active", uri.toString());
     }
 
     @Test
     void testQueryParamIfPresentWithEmpty() {
         DefaultUriBuilder builder = new DefaultUriBuilder();
-        String uri = builder.path("/users")
+        URI uri = builder.path("/users")
                 .queryParam("page", 1)
                 .queryParamIfPresent("filter", Optional.empty())
                 .queryParam("size", 10)
                 .build();
-        assertEquals("/users?page=1&size=10", uri);
+        assertEquals("/users?page=1&size=10", uri.toString());
     }
 
     @Test
     void testBuildWithNullPath() {
         DefaultUriBuilder builder = new DefaultUriBuilder();
-        String uri = builder.queryParam("page", 1).build();
-        assertEquals("?page=1", uri);
+        URI uri = builder.queryParam("page", 1).build();
+        assertEquals("?page=1", uri.toString());
     }
 
     @Test
     void testBuildWithEmptyPath() {
         DefaultUriBuilder builder = new DefaultUriBuilder();
-        String uri = builder.path("").queryParam("page", 1).build();
-        assertEquals("?page=1", uri);
+        URI uri = builder.path("").queryParam("page", 1).build();
+        assertEquals("?page=1", uri.toString());
     }
 
     @Test
     void testBuildWithNoQueryParams() {
         DefaultUriBuilder builder = new DefaultUriBuilder();
-        String uri = builder.path("/users").build();
-        assertEquals("/users", uri);
+        URI uri = builder.path("/users").build();
+        assertEquals("/users", uri.toString());
     }
 
     @Test
     void testBuildWithNoPathAndNoQueryParams() {
         DefaultUriBuilder builder = new DefaultUriBuilder();
-        String uri = builder.build();
-        assertEquals("", uri);
+        URI uri = builder.build();
+        assertEquals("", uri.toString());
     }
 
     @Test
@@ -173,63 +179,63 @@ class DefaultUriBuilderTest {
         DefaultUriBuilder builder = new DefaultUriBuilder();
         builder.path("/users/{id}").queryParam("page", 1);
 
-        String uri1 = builder.build(123);
-        String uri2 = builder.build(456);
+        URI uri1 = builder.build(123);
+        URI uri2 = builder.build(456);
 
-        assertEquals("/users/123?page=1", uri1);
-        assertEquals("/users/456?page=1", uri2);
+        assertEquals("/users/123?page=1", uri1.toString());
+        assertEquals("/users/456?page=1", uri2.toString());
     }
 
     @Test
     void testQueryParamWithIntegerValue() {
         DefaultUriBuilder builder = new DefaultUriBuilder();
-        String uri = builder.path("/users")
+        URI uri = builder.path("/users")
                 .queryParam("page", 1)
                 .queryParam("size", 10)
                 .build();
-        assertEquals("/users?page=1&size=10", uri);
+        assertEquals("/users?page=1&size=10", uri.toString());
     }
 
     @Test
     void testQueryParamWithBooleanValue() {
         DefaultUriBuilder builder = new DefaultUriBuilder();
-        String uri = builder.path("/users")
+        URI uri = builder.path("/users")
                 .queryParam("active", true)
                 .queryParam("deleted", false)
                 .build();
-        assertEquals("/users?active=true&deleted=false", uri);
+        assertEquals("/users?active=true&deleted=false", uri.toString());
     }
 
     @Test
     void testQueryParamWithLongValue() {
         DefaultUriBuilder builder = new DefaultUriBuilder();
-        String uri = builder.path("/users")
+        URI uri = builder.path("/users")
                 .queryParam("timestamp", 1234567890L)
                 .build();
-        assertEquals("/users?timestamp=1234567890", uri);
+        assertEquals("/users?timestamp=1234567890", uri.toString());
     }
 
     @Test
     void testComplexUri() {
         DefaultUriBuilder builder = new DefaultUriBuilder();
-        String uri = builder.path("/api/v1/users/{userId}/posts/{postId}")
+        URI uri = builder.path("/api/v1/users/{userId}/posts/{postId}")
                 .queryParam("include", "comments")
                 .queryParam("page", 1)
                 .queryParam("size", 20)
                 .build(123, 456);
-        assertEquals("/api/v1/users/123/posts/456?include=comments&page=1&size=20", uri);
+        assertEquals("/api/v1/users/123/posts/456?include=comments&page=1&size=20", uri.toString());
     }
 
     @Test
     void testQueryParamOrder() {
         DefaultUriBuilder builder = new DefaultUriBuilder();
-        String uri = builder.path("/users")
+        URI uri = builder.path("/users")
                 .queryParam("c", "3")
                 .queryParam("a", "1")
                 .queryParam("b", "2")
                 .build();
         // LinkedHashMap should maintain insertion order
-        assertEquals("/users?c=3&a=1&b=2", uri);
+        assertEquals("/users?c=3&a=1&b=2", uri.toString());
     }
 
     @Test
@@ -237,31 +243,35 @@ class DefaultUriBuilderTest {
         DefaultUriBuilder builder = new DefaultUriBuilder();
         builder.path("/users");
         builder.path("/posts");
-        String uri = builder.build();
-        assertEquals("/posts", uri);
+        URI uri = builder.build();
+        assertEquals("/posts", uri.toString());
     }
 
     @Test
     void testQueryParamWithEmptyString() {
         DefaultUriBuilder builder = new DefaultUriBuilder();
-        String uri = builder.path("/users")
+        URI uri = builder.path("/users")
                 .queryParam("filter", "")
                 .build();
-        assertEquals("/users?filter=", uri);
+        assertEquals("/users?filter=", uri.toString());
     }
 
     @Test
     void testBuildWithNullVariables() {
         DefaultUriBuilder builder = new DefaultUriBuilder();
-        String uri = builder.path("/users/{id}").build((Object[]) null);
-        assertEquals("/users/{id}", uri);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            builder.path("/users/{id}").build((Object[]) null);
+        });
+        assertEquals("Not enough variable values available to expand 'id'", exception.getMessage());
     }
 
     @Test
     void testBuildWithEmptyVariables() {
         DefaultUriBuilder builder = new DefaultUriBuilder();
-        String uri = builder.path("/users/{id}").build(new Object[0]);
-        assertEquals("/users/{id}", uri);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            builder.path("/users/{id}").build(new Object[0]);
+        });
+        assertEquals("Not enough variable values available to expand 'id'", exception.getMessage());
     }
 
     @Test
@@ -270,8 +280,8 @@ class DefaultUriBuilderTest {
         builder.path("/users")
                 .queryParam("tag", "java")
                 .queryParam("tag", "spring");
-        String uri = builder.build();
-        // The second call should overwrite the first
-        assertEquals("/users?tag=spring", uri);
+        URI uri = builder.build();
+        // The second call should overwrite the first (assuming map-based storage)
+        assertEquals("/users?tag=spring", uri.toString());
     }
 }

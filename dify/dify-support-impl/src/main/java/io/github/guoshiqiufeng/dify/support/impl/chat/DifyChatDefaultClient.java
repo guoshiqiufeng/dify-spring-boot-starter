@@ -15,9 +15,13 @@
  */
 package io.github.guoshiqiufeng.dify.support.impl.chat;
 
+import io.github.guoshiqiufeng.dify.chat.exception.DiftChatException;
+import io.github.guoshiqiufeng.dify.chat.exception.DiftChatExceptionEnum;
+import io.github.guoshiqiufeng.dify.client.core.map.LinkedMultiValueMap;
 import io.github.guoshiqiufeng.dify.core.bean.BeanUtils;
 import io.github.guoshiqiufeng.dify.core.utils.Assert;
 import io.github.guoshiqiufeng.dify.core.utils.CollUtil;
+import io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder;
 import io.github.guoshiqiufeng.dify.core.utils.StrUtil;
 import io.github.guoshiqiufeng.dify.chat.client.DifyChatClient;
 import io.github.guoshiqiufeng.dify.chat.constant.ChatUriConstant;
@@ -41,8 +45,10 @@ import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
 import io.github.guoshiqiufeng.dify.core.pojo.request.ChatMessageVO;
 import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
 import io.github.guoshiqiufeng.dify.dataset.constant.DatasetUriConstant;
+import io.github.guoshiqiufeng.dify.support.impl.utils.MultipartBodyUtil;
 import reactor.core.publisher.Flux;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -233,29 +239,17 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
 
     @Override
     public DifyTextVO audioToText(AudioToTextRequest request) {
-//        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
-//        MultipartFile file = request.getFile();
-//        BodyInserters.MultipartInserter fromMultipartData = BodyInserters.fromMultipartData(
-//                new LinkedMultiValueMap<>() {{
-//                    try {
-//                        add("file", new MultipartInputStreamFileResource(
-//                                file.getInputStream(),
-//                                file.getOriginalFilename()
-//                        ));
-//                    } catch (IOException e) {
-//                        throw new RuntimeException("file getInputStream error", e);
-//                    }
-//                }}
-//        );
-//        return this.httpClient.post()
-//                .uri(ChatUriConstant.V1_AUDIO_TO_TEXT_URI)
-//                .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
-//                .contentType(MediaType.MULTIPART_FORM_DATA)
-//                .body(fromMultipartData)
-//                .retrieve()
-//                .onStatus(responseErrorHandler)
-//                .body(DifyTextVO.class);
-        return null;
+        Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
+        MultipartBodyBuilder builder = MultipartBodyUtil.getMultipartBodyBuilder(request.getFile());
+
+        return this.httpClient.post()
+                .uri(ChatUriConstant.V1_AUDIO_TO_TEXT_URI)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(builder.build())
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(DifyTextVO.class);
     }
 
     @Override
@@ -307,36 +301,16 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
         Assert.notNull(request.getFile(), "file must not be null");
         Assert.notNull(request.getUserId(), "userId must not be null");
         Assert.notNull(request.getApiKey(), "apiKey must not be null");
+        MultipartBodyBuilder builder = MultipartBodyUtil.getMultipartBodyBuilderByUser(request.getFile(), request.getUserId());
 
-//        MultipartBodyBuilder builder = new MultipartBodyBuilder();
-//
-//        try {
-//            // Get file content and type
-//            byte[] fileContent = request.getFile().getBytes();
-//            String contentType = request.getFile().getContentType();
-//            contentType = (StrUtil.isEmpty(contentType)) ? MediaType.TEXT_PLAIN_VALUE : contentType;
-//
-//            // Add file part
-//            builder.part("file", fileContent)
-//                    .header("Content-Disposition",
-//                            "form-data; name=\"file\"; filename=\"" + request.getFile().getOriginalFilename() + "\"")
-//                    .header("Content-Type", contentType);
-//            request.setFile(null);
-//
-//            builder.part("user", request.getUserId());
-//        } catch (IOException e) {
-//            throw new DiftChatException(DiftChatExceptionEnum.DIFY_DATA_PARSING_FAILURE);
-//        }
-//
-//        return httpClient.post()
-//                .uri(DatasetUriConstant.V1_FILES_UPLOAD)
-//                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request.getApiKey()).accept(h))
-//                .contentType(MediaType.MULTIPART_FORM_DATA)
-//                .body(builder.build())
-//                .retrieve()
-//                .onStatus(responseErrorHandler)
-//                .body(FileUploadResponse.class);
-        return null;
+        return httpClient.post()
+                .uri(DatasetUriConstant.V1_FILES_UPLOAD)
+                .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(request.getApiKey()).accept(h))
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(builder.build())
+                .retrieve()
+                .onStatus(responseErrorHandler)
+                .body(FileUploadResponse.class);
     }
 
     @Override

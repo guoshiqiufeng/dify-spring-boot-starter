@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import reactor.core.publisher.Flux;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -131,7 +132,7 @@ class DefaultRequestBodyUriSpecTest {
 
     @Test
     void testUriWithFunction() {
-        Function<UriBuilder, String> uriFunction = builder -> {
+        Function<UriBuilder, URI> uriFunction = builder -> {
             builder.path("/users");
             builder.queryParam("page", "1");
             return builder.build();
@@ -149,7 +150,7 @@ class DefaultRequestBodyUriSpecTest {
     @Test
     void testUriWithNullFunction() {
         assertThrows(IllegalArgumentException.class, () -> {
-            spec.uri((Function<UriBuilder, String>) null);
+            spec.uri((Function<UriBuilder, URI>) null);
         });
     }
 
@@ -157,7 +158,7 @@ class DefaultRequestBodyUriSpecTest {
     void testUriWithVariablesAndFunction() {
         String uri = "/users/{id}";
         Object[] variables = {123};
-        Function<UriBuilder, String> uriFunction = builder -> {
+        Function<UriBuilder, URI> uriFunction = builder -> {
             builder.queryParam("page", "1");
             return builder.build();
         };
@@ -174,7 +175,7 @@ class DefaultRequestBodyUriSpecTest {
     @Test
     void testUriWithVariablesAndFunctionNullUri() {
         Object[] variables = {123};
-        Function<UriBuilder, String> uriFunction = builder -> builder.build();
+        Function<UriBuilder, URI> uriFunction = builder -> builder.build();
 
         assertThrows(IllegalArgumentException.class, () -> {
             spec.uri(null, variables, uriFunction);

@@ -24,11 +24,13 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -84,7 +86,7 @@ class WebClientExecutor {
      * @param <T>          response type
      * @return response body
      */
-    <T> T execute(String method, String uri, Map<String, String> headers,
+    <T> T execute(String method, URI uri, Map<String, String> headers,
                   Map<String, String> cookies, Map<String, String> queryParams,
                   Object body, Class<T> responseType) {
         WebClient.RequestBodySpec requestSpec = buildRequest(method, uri, headers, cookies, queryParams, body);
@@ -109,7 +111,7 @@ class WebClientExecutor {
      * @param <T>           response type
      * @return response body
      */
-    <T> T execute(String method, String uri, Map<String, String> headers,
+    <T> T execute(String method, URI uri, Map<String, String> headers,
                   Map<String, String> cookies, Map<String, String> queryParams,
                   Object body, TypeReference<T> typeReference) {
         WebClient.RequestBodySpec requestSpec = buildRequest(method, uri, headers, cookies, queryParams, body);
@@ -134,7 +136,7 @@ class WebClientExecutor {
      * @param <T>          response type
      * @return HttpResponse with status, headers, and body
      */
-    <T> HttpResponse<T> executeForEntity(String method, String uri, Map<String, String> headers,
+    <T> HttpResponse<T> executeForEntity(String method, URI uri, Map<String, String> headers,
                                          Map<String, String> cookies, Map<String, String> queryParams,
                                          Object body, Class<T> responseType) {
         WebClient.RequestBodySpec requestSpec = buildRequest(method, uri, headers, cookies, queryParams, body);
@@ -197,7 +199,7 @@ class WebClientExecutor {
      * @param <T>           response type
      * @return HttpResponse with status, headers, and body
      */
-    <T> HttpResponse<T> executeForEntity(String method, String uri, Map<String, String> headers,
+    <T> HttpResponse<T> executeForEntity(String method, URI uri, Map<String, String> headers,
                                          Map<String, String> cookies, Map<String, String> queryParams,
                                          Object body, TypeReference<T> typeReference) {
         WebClient.RequestBodySpec requestSpec = buildRequest(method, uri, headers, cookies, queryParams, body);
@@ -275,7 +277,7 @@ class WebClientExecutor {
      * @param <T>          response type
      * @return Flux of response items
      */
-    <T> Flux<T> executeStream(String method, String uri, Map<String, String> headers,
+    <T> Flux<T> executeStream(String method, URI uri, Map<String, String> headers,
                               Map<String, String> cookies, Map<String, String> queryParams,
                               Object body, Class<T> responseType) {
         WebClient.RequestBodySpec requestSpec = buildRequest(method, uri, headers, cookies, queryParams, body);
@@ -319,7 +321,7 @@ class WebClientExecutor {
      * @param <T>           response type
      * @return Flux of response items
      */
-    <T> Flux<T> executeStream(String method, String uri, Map<String, String> headers,
+    <T> Flux<T> executeStream(String method, URI uri, Map<String, String> headers,
                               Map<String, String> cookies, Map<String, String> queryParams,
                               Object body, TypeReference<T> typeReference) {
         WebClient.RequestBodySpec requestSpec = buildRequest(method, uri, headers, cookies, queryParams, body);
@@ -333,7 +335,7 @@ class WebClientExecutor {
                 .accept(MediaType.TEXT_EVENT_STREAM)
                 .retrieve()
                 .bodyToFlux(sseType)
-                .mapNotNull(sse -> sse.data())
+                .mapNotNull(ServerSentEvent::data)
                 .filter(data -> data != null && !data.isEmpty() && isCompleteJson(data))
                 .mapNotNull(json -> {
                     try {
@@ -397,7 +399,7 @@ class WebClientExecutor {
      * @param body        request body
      * @return WebClient.RequestBodySpec
      */
-    WebClient.RequestBodySpec buildRequest(String method, String uri, Map<String, String> headers,
+    WebClient.RequestBodySpec buildRequest(String method, URI uri, Map<String, String> headers,
                                            Map<String, String> cookies, Map<String, String> queryParams,
                                            Object body) {
         // Start request
@@ -406,17 +408,7 @@ class WebClientExecutor {
         // Set URI
         WebClient.RequestBodySpec bodySpec;
         if (uri != null) {
-            if (queryParams.isEmpty()) {
-                bodySpec = requestSpec.uri(uri);
-            } else {
-                bodySpec = requestSpec.uri(uriBuilder -> {
-                    uriBuilder.path(uri);
-                    for (Map.Entry<String, String> entry : queryParams.entrySet()) {
-                        uriBuilder.queryParam(entry.getKey(), entry.getValue());
-                    }
-                    return uriBuilder.build();
-                });
-            }
+            bodySpec = requestSpec.uri(uri);
         } else {
             bodySpec = requestSpec.uri("");
         }

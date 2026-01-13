@@ -569,7 +569,7 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
                 .headers(h -> DatasetHeaderUtils.getHttpHeadersConsumer(apiKey).accept(h))
                 .retrieve()
                 .onStatus(responseErrorHandler)
-                .body(void.class);
+                .body(Void.class);
     }
 
     @Override
