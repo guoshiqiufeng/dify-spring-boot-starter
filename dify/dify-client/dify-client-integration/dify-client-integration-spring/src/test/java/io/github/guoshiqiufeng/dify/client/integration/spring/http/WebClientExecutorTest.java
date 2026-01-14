@@ -16,6 +16,9 @@
 package io.github.guoshiqiufeng.dify.client.integration.spring.http;
 
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +27,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.lang.reflect.Method;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -50,6 +52,18 @@ class WebClientExecutorTest {
     void setUp() {
         executor = new WebClientExecutor(webClient, jsonMapper);
     }
+
+//    @Test
+//    void testExecute() {
+//        URI uri = URI.create("http://localhost:8080/api/test");
+//        Map<String, String> headers = new HashMap<>();
+//        headers.put("Content-Type", "application/json");
+//        Map<String, String> cookies = new HashMap<>();
+//
+//        String jsonResponse = "{\"name\":\"test\",\"value\":123}";
+//        TestDto expectedDto = new TestDto("test", 123);
+//        Object get = executor.execute("GET", uri, headers, cookies, null, null, TestDto.class);
+//    }
 
     @Test
     void testConstructorWithTwoParameters() {
@@ -201,5 +215,16 @@ class WebClientExecutorTest {
 
         // Act & Assert - missing closing quote should return "file"
         assertEquals("file", method.invoke(executor, "filename=\"test.txt"));
+    }
+
+    /**
+     * Test DTO for deserialization testing
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    private static class TestDto {
+        private String name;
+        private int value;
     }
 }

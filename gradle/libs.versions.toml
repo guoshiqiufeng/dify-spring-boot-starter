@@ -37,6 +37,7 @@ jackson-datatype-jsr310 = { group = "com.fasterxml.jackson.datatype", name = "ja
 
 # HTTP client dependencies
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+okhttp-mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver", version.ref = "okhttp" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 
 tools-jackson-core = { group = "tools.jackson.core", name = "jackson-core", version.ref = "jackson3" }

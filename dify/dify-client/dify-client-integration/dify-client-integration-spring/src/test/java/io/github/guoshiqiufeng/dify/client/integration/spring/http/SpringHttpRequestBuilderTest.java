@@ -393,6 +393,7 @@ class SpringHttpRequestBuilderTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testExecuteWithTypeReference() throws Exception {
         // Arrange
         builder.uri("/api/test");
@@ -438,6 +439,7 @@ class SpringHttpRequestBuilderTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testExecuteForResponseWithTypeReference() throws Exception {
         // Arrange
         builder.uri("/api/test");
@@ -483,6 +485,7 @@ class SpringHttpRequestBuilderTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testResponseSpecToEntityWithClass() throws Exception {
         // Arrange
         builder.uri("/api/test");
@@ -511,6 +514,7 @@ class SpringHttpRequestBuilderTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testResponseSpecToEntityWithTypeReference() throws Exception {
         // Arrange
         builder.uri("/api/test");
@@ -542,6 +546,7 @@ class SpringHttpRequestBuilderTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testResponseSpecToBodilessEntity() throws Exception {
         // Arrange
         builder.uri("/api/test");
@@ -590,6 +595,7 @@ class SpringHttpRequestBuilderTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testResponseSpecBodyToFluxWithTypeReference() throws Exception {
         // Arrange
         builder.uri("/api/test");

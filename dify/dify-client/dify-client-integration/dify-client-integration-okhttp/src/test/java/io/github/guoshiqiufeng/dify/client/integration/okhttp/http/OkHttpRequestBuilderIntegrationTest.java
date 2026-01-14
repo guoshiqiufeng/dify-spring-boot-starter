@@ -577,4 +577,236 @@ class OkHttpRequestBuilderIntegrationTest {
             this.id = id;
         }
     }
+
+    // ========== Request Building Tests ==========
+
+//    @Test
+//    void testRequestWithQueryParameters() throws Exception {
+//        // Arrange
+//        mockServer.enqueue(new MockResponse()
+//                .setResponseCode(200)
+//                .setBody("{\"name\":\"test\",\"id\":123}")
+//                .setHeader("Content-Type", "application/json"));
+//
+//        // Act
+//        TestResponse result = getBuilder(client.get()
+//                .uri(uri ->
+//                    uri.queryParam("page", "1")
+//                            .queryParam("limit", "10").build()
+//                ).retrieve()
+//                .execute(TestResponse.class);
+//
+//        // Assert
+//        assertNotNull(result);
+//        RecordedRequest request = mockServer.takeRequest();
+//        assertTrue(request.getPath().contains("page=1"));
+//        assertTrue(request.getPath().contains("limit=10"));
+//    }
+
+    @Test
+    void testRequestWithHeaders() throws Exception {
+        // Arrange
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"test\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        // Act
+        TestResponse result = getBuilder(client.get()
+                .uri("/api/test")
+                .header("Authorization", "Bearer token123")
+                .header("X-Custom-Header", "custom-value"))
+                .execute(TestResponse.class);
+
+        // Assert
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        assertEquals("Bearer token123", request.getHeader("Authorization"));
+        assertEquals("custom-value", request.getHeader("X-Custom-Header"));
+    }
+
+    @Test
+    void testRequestWithHeadersNullValue() throws Exception {
+        // Arrange
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"test\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        // Act
+        TestResponse result = getBuilder(client.get()
+                .uri("/api/test")
+                .header("Authorization", null)
+                .header("X-Custom-Header", "custom-value"))
+                .execute(TestResponse.class);
+
+        // Assert
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        assertNull(request.getHeader("Authorization"));
+        assertEquals("custom-value", request.getHeader("X-Custom-Header"));
+    }
+
+    @Test
+    void testRequestWithCookies() throws Exception {
+        // Arrange
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"test\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        // Act
+        TestResponse result = getBuilder(client.get()
+                .uri("/api/test")
+                .cookies(cookies -> {
+                    cookies.add("sessionId", "abc123");
+                    cookies.add("userId", "user456");
+                }))
+                .execute(TestResponse.class);
+
+        // Assert
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        String cookieHeader = request.getHeader("Cookie");
+        assertNotNull(cookieHeader);
+        assertTrue(cookieHeader.contains("sessionId=abc123"));
+        assertTrue(cookieHeader.contains("userId=user456"));
+    }
+
+    @Test
+    void testRequestWithCookiesNullValue() throws Exception {
+        // Arrange
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"test\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        // Act
+        TestResponse result = getBuilder(client.get()
+                .uri("/api/test")
+                .cookies(cookies -> {
+                    cookies.add("sessionId", null);
+                    cookies.add("userId", "user456");
+                }))
+                .execute(TestResponse.class);
+
+        // Assert
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        String cookieHeader = request.getHeader("Cookie");
+        // Should only contain userId since sessionId is null
+        assertNotNull(cookieHeader);
+        assertTrue(cookieHeader.contains("userId=user456"));
+        assertFalse(cookieHeader.contains("sessionId"));
+    }
+
+    @Test
+    void testRequestWithJsonBody() throws Exception {
+        // Arrange
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"response\",\"id\":999}")
+                .setHeader("Content-Type", "application/json"));
+
+        Map<String, Object> requestBody = new java.util.HashMap<>();
+        requestBody.put("name", "test");
+        requestBody.put("value", 123);
+
+        // Act
+        TestResponse result = getBuilder(client.post()
+                .uri("/api/create")
+                .body(requestBody))
+                .execute(TestResponse.class);
+
+        // Assert
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        assertEquals("POST", request.getMethod());
+        String body = request.getBody().readUtf8();
+        assertTrue(body.contains("\"name\""));
+        assertTrue(body.contains("\"test\""));
+    }
+
+//    @Test
+//    void testRequestWithMultipartData() throws Exception {
+//        // Arrange
+//        mockServer.enqueue(new MockResponse()
+//                .setResponseCode(200)
+//                .setBody("{\"name\":\"uploaded\",\"id\":888}")
+//                .setHeader("Content-Type", "application/json"));
+//
+//        Map<String, Object> formData = new java.util.HashMap<>();
+//        formData.put("field1", "value1");
+//        formData.put("field2", "value2");
+//        formData.put("file", "test data".getBytes());
+//
+//        // Act
+//        TestResponse result = getBuilder(client.post()
+//                .uri("/api/upload")
+//                .multipart(formData))
+//                .execute(TestResponse.class);
+//
+//        // Assert
+//        assertNotNull(result);
+//        RecordedRequest request = mockServer.takeRequest();
+//        assertEquals("POST", request.getMethod());
+//        String body = request.getBody().readUtf8();
+//        assertTrue(body.contains("field1"));
+//        assertTrue(body.contains("value1"));
+//    }
+
+    @Test
+    void testRequestWithEmptyBodyForPost() throws Exception {
+        // Arrange
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"created\",\"id\":777}")
+                .setHeader("Content-Type", "application/json"));
+
+        // Act
+        TestResponse result = getBuilder(client.post()
+                .uri("/api/create"))
+                .execute(TestResponse.class);
+
+        // Assert
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        assertEquals("POST", request.getMethod());
+    }
+
+    @Test
+    void testRequestWithEmptyBodyForPut() throws Exception {
+        // Arrange
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"updated\",\"id\":666}")
+                .setHeader("Content-Type", "application/json"));
+
+        // Act
+        TestResponse result = getBuilder(client.put()
+                .uri("/api/update"))
+                .execute(TestResponse.class);
+
+        // Assert
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        assertEquals("PUT", request.getMethod());
+    }
+
+    @Test
+    void testHandleErrorWithNullBody() {
+        // Arrange
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(500)
+                .setHeader("Content-Length", "0"));
+
+        // Act & Assert
+        HttpClientException exception = assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/error"))
+                        .execute(TestResponse.class)
+        );
+
+        assertEquals(500, exception.getStatusCode());
+    }
 }

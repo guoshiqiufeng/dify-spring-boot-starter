@@ -173,4 +173,42 @@ class OkHttpRequestBuilderTest {
         var responseSpec = builder.retrieve();
         assertNotNull(responseSpec);
     }
+
+    @Test
+    void testHeadersConsumerWithNullValues() {
+        var result = builder.headers(headers -> {
+            headers.add("Content-Type", null);
+            headers.add("Authorization", "Bearer token");
+        });
+        assertNotNull(result);
+        assertSame(builder, result);
+    }
+
+    @Test
+    void testHeadersConsumerWithEmptyValues() {
+        var result = builder.headers(headers -> {
+            // Add empty list - should not add to headers map
+        });
+        assertNotNull(result);
+        assertSame(builder, result);
+    }
+
+    @Test
+    void testCookiesConsumerWithNullValues() {
+        var result = builder.cookies(cookies -> {
+            cookies.add("sessionId", null);
+            cookies.add("userId", "user456");
+        });
+        assertNotNull(result);
+        assertSame(builder, result);
+    }
+
+    @Test
+    void testCookiesConsumerWithEmptyValues() {
+        var result = builder.cookies(cookies -> {
+            // Add empty list - should not add to cookies map
+        });
+        assertNotNull(result);
+        assertSame(builder, result);
+    }
 }

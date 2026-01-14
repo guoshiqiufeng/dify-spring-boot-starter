@@ -28,6 +28,7 @@ import io.github.guoshiqiufeng.dify.client.core.web.client.ResponseSpec;
 import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
 import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
 import io.github.guoshiqiufeng.dify.client.integration.okhttp.publisher.OkHttpStreamPublisher;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,7 @@ import java.util.function.Consumer;
  * @version 2.0.0
  * @since 2025-12-26
  */
+@Slf4j
 public class OkHttpRequestBuilder implements HttpRequestBuilder {
 
     private static final Logger log = LoggerFactory.getLogger(OkHttpRequestBuilder.class);
@@ -555,6 +557,10 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
             return null;
         }
 
+        if (responseType == Void.class || responseType == void.class) {
+            return null;
+        }
+
         // Handle byte array response
         if (responseType == byte[].class) {
             @SuppressWarnings("unchecked")
@@ -573,6 +579,9 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
         try {
             return jsonMapper.fromJson(bodyString, responseType);
         } catch (Exception e) {
+            if(log.isErrorEnabled()) {
+                log.error("Failed to deserialize response body error:{}", e.getMessage(), e);
+            }
             throw new HttpClientException("Failed to deserialize response body", e);
         }
     }
@@ -658,80 +667,5 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
                 method, response.request().url(), statusCode, responseBody);
 
         throw new HttpClientException(statusCode, responseBody);
-    }
-
-    /**
-     * Replace URI path variables with values.
-     * Only replaces placeholders in the path portion, not in query parameters.
-     * Query parameters with placeholders are extracted and matched with remaining uriParams.
-     *
-     * @param uri       URI template with placeholders (e.g., "/users/{id}?page={page}&limit={limit}")
-     * @param uriParams parameter values for both path and query variables
-     * @return URI with replaced path variables
-     */
-    private String replaceUriVariables(String uri, Object... uriParams) {
-        // Split URI into path and query parts
-        int queryIndex = uri.indexOf('?');
-        if (queryIndex == -1) {
-            // No query parameters, replace all placeholders in path
-            String result = uri;
-            for (Object param : uriParams) {
-                result = result.replaceFirst("\\{[^}]+\\}", String.valueOf(param));
-            }
-            return result;
-        }
-
-        // Has query parameters - handle path and query separately
-        String pathPart = uri.substring(0, queryIndex);
-        String queryPart = uri.substring(queryIndex + 1);
-
-        // Count placeholders in path
-        int pathPlaceholderCount = 0;
-        String tempPath = pathPart;
-        while (tempPath.contains("{") && tempPath.contains("}")) {
-            int start = tempPath.indexOf("{");
-            int end = tempPath.indexOf("}", start);
-            if (end > start) {
-                pathPlaceholderCount++;
-                tempPath = tempPath.substring(end + 1);
-            } else {
-                break;
-            }
-        }
-
-        // Replace path variables
-        String resultPath = pathPart;
-        int paramIndex = 0;
-        for (int i = 0; i < pathPlaceholderCount && paramIndex < uriParams.length; i++, paramIndex++) {
-            resultPath = resultPath.replaceFirst("\\{[^}]+\\}", String.valueOf(uriParams[paramIndex]));
-        }
-
-        // Parse query parameters
-        String[] queryPairs = queryPart.split("&");
-        for (String pair : queryPairs) {
-            int eqIndex = pair.indexOf('=');
-            if (eqIndex > 0) {
-                String key = pair.substring(0, eqIndex);
-                String value = pair.substring(eqIndex + 1);
-
-                // Check if value is a placeholder
-                if (value.startsWith("{") && value.endsWith("}")) {
-                    // Match with remaining uriParams
-                    if (paramIndex < uriParams.length) {
-                        Object paramValue = uriParams[paramIndex++];
-                        // Only add non-null values to queryParams
-                        if (paramValue != null) {
-                            this.queryParams.put(key, String.valueOf(paramValue));
-                        }
-                    }
-                } else {
-                    // Static query parameter value
-                    this.queryParams.put(key, value);
-                }
-            }
-        }
-
-        // Return only the path portion
-        return resultPath;
     }
 }
