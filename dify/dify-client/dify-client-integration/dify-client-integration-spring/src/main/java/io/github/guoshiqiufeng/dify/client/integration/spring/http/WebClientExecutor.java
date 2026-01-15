@@ -168,7 +168,21 @@ class WebClientExecutor {
                         .build();
             }
         } catch (WebClientResponseException e) {
-            throw new HttpClientException("WebClient request failed: " + getExceptionMessage(e), unwrapException(e));
+            // Handle HTTP error responses (4xx, 5xx) thrown by WebClient
+            int statusCode = e.getStatusCode().value();
+            String errorBody = e.getResponseBodyAsString();
+
+            log.debug("WebClient error response: status={}, body={}", statusCode, errorBody);
+
+            // Return error response without throwing exception
+            // Let the upper layer handleErrors() process it
+            @SuppressWarnings("unchecked")
+            T typedErrorBody = (T) errorBody;
+            return HttpResponse.<T>builder()
+                    .statusCode(statusCode)
+                    .headers(convertHeaders(e.getHeaders()))
+                    .body(typedErrorBody)
+                    .build();
         }
     }
 
@@ -217,7 +231,21 @@ class WebClientExecutor {
                         .build();
             }
         } catch (WebClientResponseException e) {
-            throw new HttpClientException("WebClient request failed: " + getExceptionMessage(e), unwrapException(e));
+            // Handle HTTP error responses (4xx, 5xx) thrown by WebClient
+            int statusCode = e.getStatusCode().value();
+            String errorBody = e.getResponseBodyAsString();
+
+            log.debug("WebClient error response: status={}, body={}", statusCode, errorBody);
+
+            // Return error response without throwing exception
+            // Let the upper layer handleErrors() process it
+            @SuppressWarnings("unchecked")
+            T typedErrorBody = (T) errorBody;
+            return HttpResponse.<T>builder()
+                    .statusCode(statusCode)
+                    .headers(convertHeaders(e.getHeaders()))
+                    .body(typedErrorBody)
+                    .build();
         }
     }
 
