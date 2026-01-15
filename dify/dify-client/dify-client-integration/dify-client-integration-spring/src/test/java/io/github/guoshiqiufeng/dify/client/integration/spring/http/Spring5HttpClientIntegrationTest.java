@@ -391,7 +391,8 @@ class Spring5HttpClientIntegrationTest {
 
         // Act
         client.get()
-                .uri("/test")
+                .uri(uri -> uri.path("/test")
+                        .queryParam("date", "2025-10-23 00:00").build())
                 .retrieve()
                 .body(String.class)
         ;

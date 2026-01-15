@@ -405,10 +405,32 @@ class WebClientExecutor {
         // Start request
         WebClient.RequestBodyUriSpec requestSpec = webClient.method(HttpMethod.valueOf(method));
 
-        // Set URI - use String instead of URI to respect baseUrl
+        // Set URI - use uriBuilder to respect baseUrl and avoid double encoding
         WebClient.RequestBodySpec bodySpec;
         if (uri != null) {
-            bodySpec = requestSpec.uri(uri.toString());
+            // Extract path and query from URI
+            String path = uri.getPath();
+            String query = uri.getQuery();
+
+            // Use uriBuilder to properly handle baseUrl concatenation
+            bodySpec = requestSpec.uri(uriBuilder -> {
+                uriBuilder.path(path != null ? path : "");
+                if (query != null && !query.isEmpty()) {
+                    // Parse and add query parameters from URI
+                    String[] pairs = query.split("&");
+                    for (String pair : pairs) {
+                        int idx = pair.indexOf("=");
+                        if (idx > 0) {
+                            String key = pair.substring(0, idx);
+                            String value = pair.substring(idx + 1);
+                            uriBuilder.queryParam(key, value);
+                        } else {
+                            uriBuilder.queryParam(pair, "");
+                        }
+                    }
+                }
+                return uriBuilder.build();
+            });
         } else {
             bodySpec = requestSpec.uri("");
         }
