@@ -25,6 +25,7 @@ import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import io.github.guoshiqiufeng.dify.support.impl.builder.DifyServerBuilder;
 import org.junit.jupiter.api.*;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
 
@@ -38,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @version 1.0
  * @since 2026/1/12 14:00
  */
+@Testcontainers(disabledWithoutDocker = true)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServerTest {
 

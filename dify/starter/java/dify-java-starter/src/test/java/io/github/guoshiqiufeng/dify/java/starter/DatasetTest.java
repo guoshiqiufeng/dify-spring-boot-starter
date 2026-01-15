@@ -32,6 +32,7 @@ import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponse;
 import io.github.guoshiqiufeng.dify.support.impl.builder.DifyDatasetBuilder;
 import io.github.guoshiqiufeng.dify.support.impl.builder.DifyServerBuilder;
 import org.junit.jupiter.api.*;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,6 +48,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @version 1.0
  * @since 2026/1/12 14:00
  */
+@Testcontainers(disabledWithoutDocker = true)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DatasetTest {
 

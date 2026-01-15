@@ -37,6 +37,7 @@ import io.github.guoshiqiufeng.dify.support.impl.builder.DifyChatBuilder;
 import io.github.guoshiqiufeng.dify.support.impl.builder.DifyDatasetBuilder;
 import io.github.guoshiqiufeng.dify.support.impl.builder.DifyServerBuilder;
 import org.junit.jupiter.api.*;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
@@ -54,6 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @version 1.0
  * @since 2026/1/12 14:00
  */
+@Testcontainers(disabledWithoutDocker = true)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ChatTest {
 

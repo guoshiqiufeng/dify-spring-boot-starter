@@ -260,10 +260,26 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
         public <T> HttpResponse<T> toEntity(Class<T> responseType) {
             Request request = buildRequest();
             try (Response response = client.getOkHttpClient().newCall(request).execute()) {
-                T responseBody = handleResponse(response, responseType, false);
-                HttpResponse<T> httpResponse = buildHttpResponse(response, responseBody);
-                handleErrors(httpResponse);
-                return httpResponse;
+                int statusCode = response.code();
+
+                // For success responses (2xx), deserialize normally
+                if (statusCode >= 200 && statusCode < 300) {
+                    T responseBody = handleResponse(response, responseType, false);
+                    HttpResponse<T> httpResponse = buildHttpResponse(response, responseBody);
+                    handleErrors(httpResponse);
+                    return httpResponse;
+                } else {
+                    // For error responses, return raw error message as body
+                    // The error handler will receive this and can process it
+                    String errorBody = response.body() != null ? response.body().string() : "";
+                    log.debug("OkHttp error response: status={}, body={}", statusCode, errorBody);
+
+                    @SuppressWarnings("unchecked")
+                    T typedErrorBody = (T) errorBody;
+                    HttpResponse<T> httpResponse = buildHttpResponse(response, typedErrorBody);
+                    handleErrors(httpResponse);
+                    return httpResponse;
+                }
             } catch (IOException e) {
                 throw new HttpClientException("HTTP request failed: " + e.getMessage(), e);
             }
@@ -273,10 +289,26 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
         public <T> HttpResponse<T> toEntity(io.github.guoshiqiufeng.dify.client.core.http.TypeReference<T> typeReference) {
             Request request = buildRequest();
             try (Response response = client.getOkHttpClient().newCall(request).execute()) {
-                T responseBody = handleResponse(response, typeReference, false);
-                HttpResponse<T> httpResponse = buildHttpResponse(response, responseBody);
-                handleErrors(httpResponse);
-                return httpResponse;
+                int statusCode = response.code();
+
+                // For success responses (2xx), deserialize normally
+                if (statusCode >= 200 && statusCode < 300) {
+                    T responseBody = handleResponse(response, typeReference, false);
+                    HttpResponse<T> httpResponse = buildHttpResponse(response, responseBody);
+                    handleErrors(httpResponse);
+                    return httpResponse;
+                } else {
+                    // For error responses, return raw error message as body
+                    // The error handler will receive this and can process it
+                    String errorBody = response.body() != null ? response.body().string() : "";
+                    log.debug("OkHttp error response: status={}, body={}", statusCode, errorBody);
+
+                    @SuppressWarnings("unchecked")
+                    T typedErrorBody = (T) errorBody;
+                    HttpResponse<T> httpResponse = buildHttpResponse(response, typedErrorBody);
+                    handleErrors(httpResponse);
+                    return httpResponse;
+                }
             } catch (IOException e) {
                 throw new HttpClientException("HTTP request failed: " + e.getMessage(), e);
             }
@@ -556,7 +588,9 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
         if (bodyString.isEmpty()) {
             return null;
         }
-
+        if (!response.isSuccessful()) {
+            return null;
+        }
         if (responseType == Void.class || responseType == void.class) {
             return null;
         }
