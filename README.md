@@ -64,7 +64,7 @@ Provides Spring Boot Starter and pure Java support for Dify to simplify developm
         <dependency>
             <groupId>io.github.guoshiqiufeng.dify</groupId>
             <artifactId>dify-bom</artifactId>
-            <version>2.0.0</version>
+            <version>1.8.0</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>

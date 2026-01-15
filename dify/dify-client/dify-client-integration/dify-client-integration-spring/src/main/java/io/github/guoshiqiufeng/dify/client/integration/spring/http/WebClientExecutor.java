@@ -168,21 +168,7 @@ class WebClientExecutor {
                         .build();
             }
         } catch (WebClientResponseException e) {
-            // Handle HTTP error responses (4xx, 5xx) thrown by WebClient
-            int statusCode = e.getStatusCode().value();
-            String errorBody = e.getResponseBodyAsString();
-
-            log.debug("WebClient error response: status={}, body={}", statusCode, errorBody);
-
-            // Return error response without throwing exception
-            // Let the upper layer handleErrors() process it
-            @SuppressWarnings("unchecked")
-            T typedErrorBody = (T) errorBody;
-            return HttpResponse.<T>builder()
-                    .statusCode(statusCode)
-                    .headers(convertHeaders(e.getHeaders()))
-                    .body(typedErrorBody)
-                    .build();
+            throw new HttpClientException("WebClient request failed: " + getExceptionMessage(e), unwrapException(e));
         }
     }
 
@@ -231,21 +217,7 @@ class WebClientExecutor {
                         .build();
             }
         } catch (WebClientResponseException e) {
-            // Handle HTTP error responses (4xx, 5xx) thrown by WebClient
-            int statusCode = e.getStatusCode().value();
-            String errorBody = e.getResponseBodyAsString();
-
-            log.debug("WebClient error response: status={}, body={}", statusCode, errorBody);
-
-            // Return error response without throwing exception
-            // Let the upper layer handleErrors() process it
-            @SuppressWarnings("unchecked")
-            T typedErrorBody = (T) errorBody;
-            return HttpResponse.<T>builder()
-                    .statusCode(statusCode)
-                    .headers(convertHeaders(e.getHeaders()))
-                    .body(typedErrorBody)
-                    .build();
+            throw new HttpClientException("WebClient request failed: " + getExceptionMessage(e), unwrapException(e));
         }
     }
 
@@ -518,5 +490,31 @@ class WebClientExecutor {
         }
 
         return "file";
+    }
+
+    /**
+     * Unwrap InvocationTargetException to get the actual cause.
+     *
+     * @param e exception to unwrap
+     * @return unwrapped exception
+     */
+    private Throwable unwrapException(Exception e) {
+        if (e instanceof java.lang.reflect.InvocationTargetException) {
+            Throwable cause = e.getCause();
+            return cause != null ? cause : e;
+        }
+        return e;
+    }
+
+    /**
+     * Get meaningful exception message, unwrapping InvocationTargetException if needed.
+     *
+     * @param e exception
+     * @return exception message
+     */
+    private String getExceptionMessage(Exception e) {
+        Throwable unwrapped = unwrapException(e);
+        String message = unwrapped.getMessage();
+        return message != null ? message : unwrapped.getClass().getSimpleName();
     }
 }
