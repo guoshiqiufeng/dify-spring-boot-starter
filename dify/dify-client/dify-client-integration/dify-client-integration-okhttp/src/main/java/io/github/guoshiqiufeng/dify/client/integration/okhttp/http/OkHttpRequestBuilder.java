@@ -49,7 +49,6 @@ import java.util.function.Consumer;
  * @version 2.0.0
  * @since 2025-12-26
  */
-@Slf4j
 public class OkHttpRequestBuilder implements HttpRequestBuilder {
 
     private static final Logger log = LoggerFactory.getLogger(OkHttpRequestBuilder.class);

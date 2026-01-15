@@ -17,9 +17,11 @@ package io.github.guoshiqiufeng.dify.client.integration.okhttp.http;
 
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
+import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
 import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,6 +50,14 @@ class JavaHttpClientFactoryTest {
     void setUp() {
         factory = new JavaHttpClientFactory(jsonMapper);
     }
+
+    @Test
+    void testForInit() {
+        new JavaHttpClientFactory(jsonMapper);
+        new JavaHttpClientFactory(new OkHttpClient.Builder(), jsonMapper);
+        new JavaHttpClientFactory(null, jsonMapper);
+    }
+
 
     @Test
     void testCreateClientWithBaseUrl() {

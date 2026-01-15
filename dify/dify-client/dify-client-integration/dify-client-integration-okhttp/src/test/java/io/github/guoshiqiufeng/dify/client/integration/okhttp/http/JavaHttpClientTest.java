@@ -17,9 +17,11 @@ package io.github.guoshiqiufeng.dify.client.integration.okhttp.http;
 
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.enums.HttpMethod;
+import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
 import io.github.guoshiqiufeng.dify.client.core.web.client.RequestBodyUriSpec;
 import io.github.guoshiqiufeng.dify.client.core.web.client.RequestHeadersUriSpec;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
+import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,6 +51,31 @@ class JavaHttpClientTest {
         String baseUrl = "http://example.com";
         clientConfig = new DifyProperties.ClientConfig();
         httpClient = new JavaHttpClient(baseUrl, clientConfig, jsonMapper);
+    }
+
+    @Test
+    void testForInit() {
+        String baseUrl = "http://example.com";
+        new JavaHttpClient(baseUrl, jsonMapper);
+        new JavaHttpClient(baseUrl, new DifyProperties.ClientConfig(), jsonMapper);
+        new JavaHttpClient(baseUrl, null, jsonMapper);
+        DifyProperties.ClientConfig nullConfig = new DifyProperties.ClientConfig();
+        nullConfig.setConnectTimeout(null);
+        nullConfig.setReadTimeout(null);
+        nullConfig.setWriteTimeout(null);
+        nullConfig.setSkipNull(false);
+        nullConfig.setLogging(null);
+        new JavaHttpClient(baseUrl, nullConfig, jsonMapper);
+        DifyProperties.ClientConfig clientConfig1 = new DifyProperties.ClientConfig();
+        nullConfig.setLogging(false);
+        new JavaHttpClient(baseUrl, clientConfig1, new OkHttpClient.Builder(),
+                jsonMapper);
+        new JavaHttpClient(baseUrl, new DifyProperties.ClientConfig(), new OkHttpClient.Builder(),
+                jsonMapper, new HttpHeaders());
+        new JavaHttpClient(baseUrl, new DifyProperties.ClientConfig(), new OkHttpClient.Builder(),
+                jsonMapper, null);
+        new JavaHttpClient(baseUrl, new DifyProperties.ClientConfig(), new OkHttpClient.Builder(),
+                jsonMapper, null, null);
     }
 
     @Test

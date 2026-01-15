@@ -22,6 +22,7 @@ import io.github.guoshiqiufeng.dify.client.core.web.client.RequestBodyUriSpec;
 import io.github.guoshiqiufeng.dify.client.core.web.client.RequestHeadersUriSpec;
 import io.github.guoshiqiufeng.dify.client.integration.okhttp.logging.LoggingInterceptor;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
+import io.github.guoshiqiufeng.dify.core.utils.StrUtil;
 import lombok.Getter;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -157,8 +158,12 @@ public class JavaHttpClient implements HttpClient {
             builder.addInterceptor(chain -> {
                 okhttp3.Request.Builder requestBuilder = chain.request().newBuilder();
                 defaultHeaders.forEach((key, values) -> {
-                    if (values != null) {
-                        values.forEach(value -> requestBuilder.addHeader(key, value));
+                    if (!values.isEmpty()) {
+                        values.forEach(value -> {
+                            if(StrUtil.isNotEmpty(value)) {
+                                requestBuilder.addHeader(key, value);
+                            }
+                        });
                     }
                 });
                 return chain.proceed(requestBuilder.build());

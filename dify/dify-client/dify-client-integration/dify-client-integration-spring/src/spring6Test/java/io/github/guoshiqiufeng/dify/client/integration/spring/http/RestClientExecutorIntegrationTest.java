@@ -747,6 +747,394 @@ class RestClientExecutorIntegrationTest {
         assertTrue(exception.getMessage().contains("500") || exception.getMessage().contains("Internal Server Error"));
     }
 
+    // ========== Multipart Request Tests ==========
+
+    @Test
+    void testRequestWithMultipartFileUpload() throws Exception {
+        // Arrange
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"uploaded\",\"id\":1}")
+                .setHeader("Content-Type", "application/json"));
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "multipart/form-data");
+        Map<String, String> cookies = new HashMap<>();
+
+        // Create multipart body with file
+        io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder builder =
+                new io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder();
+        byte[] fileContent = "test file content".getBytes();
+        io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part filePart =
+                builder.part("file", fileContent)
+                        .header("Content-Disposition", "form-data; name=\"file\"; filename=\"test.txt\"")
+                        .header("Content-Type", "text/plain")
+                        .build();
+
+        Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> body = new HashMap<>();
+        body.put("file", filePart);
+
+        // Act
+        TestResponse result = executor.execute(
+                "POST",
+                URI.create(mockServer.url("/api/upload").toString()),
+                headers,
+                cookies,
+                body,
+                TestResponse.class
+        );
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("uploaded", result.getName());
+        RecordedRequest request = mockServer.takeRequest();
+        assertEquals("POST", request.getMethod());
+        String contentType = request.getHeader("Content-Type");
+        assertNotNull(contentType);
+        assertTrue(contentType.contains("multipart"));
+    }
+
+    @Test
+    void testRequestWithMultipartMixedContent() throws Exception {
+        // Arrange
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"success\",\"id\":2}")
+                .setHeader("Content-Type", "application/json"));
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "multipart/form-data");
+        Map<String, String> cookies = new HashMap<>();
+
+        // Create multipart body with mixed content types
+        io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder builder =
+                new io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder();
+
+        // File part
+        byte[] fileContent = "file data".getBytes();
+        io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part filePart =
+                builder.part("file", fileContent)
+                        .header("Content-Disposition", "form-data; name=\"file\"; filename=\"data.bin\"")
+                        .build();
+
+        // String part
+        io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part stringPart =
+                builder.part("description", "test description")
+                        .header("Content-Disposition", "form-data; name=\"description\"")
+                        .build();
+
+        // Number part
+        io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part numberPart =
+                builder.part("count", 42)
+                        .header("Content-Disposition", "form-data; name=\"count\"")
+                        .build();
+
+        // Boolean part
+        io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part booleanPart =
+                builder.part("enabled", true)
+                        .header("Content-Disposition", "form-data; name=\"enabled\"")
+                        .build();
+
+        // Complex object part
+        TestData complexData = new TestData("complex", 99, null);
+        io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part objectPart =
+                builder.part("data", complexData)
+                        .header("Content-Disposition", "form-data; name=\"data\"")
+                        .build();
+
+        Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> body = new HashMap<>();
+        body.put("file", filePart);
+        body.put("description", stringPart);
+        body.put("count", numberPart);
+        body.put("enabled", booleanPart);
+        body.put("data", objectPart);
+
+        // Act
+        TestResponse result = executor.execute(
+                "POST",
+                URI.create(mockServer.url("/api/upload-mixed").toString()),
+                headers,
+                cookies,
+                body,
+                TestResponse.class
+        );
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("success", result.getName());
+        RecordedRequest request = mockServer.takeRequest();
+        String contentType = request.getHeader("Content-Type");
+        assertNotNull(contentType);
+        assertTrue(contentType.contains("multipart"));
+    }
+
+    @Test
+    void testRequestWithMultipartComplexObject() throws Exception {
+        // Arrange
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"processed\",\"id\":3}")
+                .setHeader("Content-Type", "application/json"));
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "multipart/form-data");
+        Map<String, String> cookies = new HashMap<>();
+
+        // Create multipart body with complex object (skipNull=true by default)
+        io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder builder =
+                new io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder();
+
+        TestData complexData = new TestData("test", 123, null);
+        io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part objectPart =
+                builder.part("metadata", complexData)
+                        .header("Content-Disposition", "form-data; name=\"metadata\"")
+                        .build();
+
+        Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> body = new HashMap<>();
+        body.put("metadata", objectPart);
+
+        // Act
+        TestResponse result = executor.execute(
+                "POST",
+                URI.create(mockServer.url("/api/upload-object").toString()),
+                headers,
+                cookies,
+                body,
+                TestResponse.class
+        );
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("processed", result.getName());
+        RecordedRequest request = mockServer.takeRequest();
+        String requestBody = request.getBody().readUtf8();
+        // With skipNull=true (default), null fields should be omitted
+        assertFalse(requestBody.contains("\"nullField\""));
+    }
+
+    @Test
+    void testRequestWithMultipartEmptyMap() throws Exception {
+        // Arrange
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"empty\",\"id\":4}")
+                .setHeader("Content-Type", "application/json"));
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "multipart/form-data");
+        Map<String, String> cookies = new HashMap<>();
+
+        // Empty multipart body
+        Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> body = new HashMap<>();
+
+        // Act
+        TestResponse result = executor.execute(
+                "POST",
+                URI.create(mockServer.url("/api/upload-empty").toString()),
+                headers,
+                cookies,
+                body,
+                TestResponse.class
+        );
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("empty", result.getName());
+    }
+
+    // ========== skipNull=false Tests ==========
+
+    @Test
+    void testRequestWithSkipNullFalse() throws Exception {
+        // Arrange
+        RestClient restClient = RestClient.builder()
+                .baseUrl(mockServer.url("/").toString())
+                .build();
+        RestClientExecutor executorWithNulls = new RestClientExecutor(
+                restClient,
+                new io.github.guoshiqiufeng.dify.client.codec.jackson.JacksonJsonMapper(),
+                false  // skipNull=false
+        );
+
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"with-nulls\",\"id\":5}")
+                .setHeader("Content-Type", "application/json"));
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "application/json");
+        Map<String, String> cookies = new HashMap<>();
+
+        TestData bodyWithNulls = new TestData("test", 123, null);
+
+        // Act
+        TestResponse result = executorWithNulls.execute(
+                "POST",
+                URI.create(mockServer.url("/api/with-nulls").toString()),
+                headers,
+                cookies,
+                bodyWithNulls,
+                TestResponse.class
+        );
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("with-nulls", result.getName());
+        RecordedRequest request = mockServer.takeRequest();
+        String requestBody = request.getBody().readUtf8();
+        // With skipNull=false, null fields should be present
+        assertTrue(requestBody.contains("\"nullField\":null"));
+    }
+
+    @Test
+    void testRequestWithSkipNullFalseMultipart() throws Exception {
+        // Arrange
+        RestClient restClient = RestClient.builder()
+                .baseUrl(mockServer.url("/").toString())
+                .build();
+        RestClientExecutor executorWithNulls = new RestClientExecutor(
+                restClient,
+                new io.github.guoshiqiufeng.dify.client.codec.jackson.JacksonJsonMapper(),
+                false  // skipNull=false
+        );
+
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"multipart-nulls\",\"id\":6}")
+                .setHeader("Content-Type", "application/json"));
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "multipart/form-data");
+        Map<String, String> cookies = new HashMap<>();
+
+        // Create multipart body with complex object containing nulls
+        io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder builder =
+                new io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder();
+
+        TestData complexData = new TestData("test", 456, null);
+        io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part objectPart =
+                builder.part("metadata", complexData)
+                        .header("Content-Disposition", "form-data; name=\"metadata\"")
+                        .build();
+
+        Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> body = new HashMap<>();
+        body.put("metadata", objectPart);
+
+        // Act
+        TestResponse result = executorWithNulls.execute(
+                "POST",
+                URI.create(mockServer.url("/api/multipart-nulls").toString()),
+                headers,
+                cookies,
+                body,
+                TestResponse.class
+        );
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("multipart-nulls", result.getName());
+        RecordedRequest request = mockServer.takeRequest();
+        String requestBody = request.getBody().readUtf8();
+        // With skipNull=false, null fields should be present in JSON
+        assertTrue(requestBody.contains("\"nullField\":null"));
+    }
+
+    // ========== Non-2xx Status Code Tests ==========
+
+    @Test
+    void testExecuteForEntityWith3xxRedirect() throws Exception {
+        // Arrange
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(302)
+                .setHeader("Location", "http://example.com/new-location")
+                .setBody("Redirecting..."));
+
+        Map<String, String> headers = new HashMap<>();
+        Map<String, String> cookies = new HashMap<>();
+
+        // Act
+        HttpResponse<TestResponse> response = executor.executeForEntity(
+                "GET",
+                URI.create(mockServer.url("/api/redirect").toString()),
+                headers,
+                cookies,
+                null,
+                TestResponse.class
+        );
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(302, response.getStatusCode());
+        assertEquals("http://example.com/new-location", response.getHeaders().getFirst("Location"));
+        // Body should not be deserialized for non-2xx responses
+    }
+
+    @Test
+    void testExecuteForEntityWith5xxServerError() throws Exception {
+        // Arrange
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(503)
+                .setBody("{\"error\":\"Service unavailable\"}"));
+
+        Map<String, String> headers = new HashMap<>();
+        Map<String, String> cookies = new HashMap<>();
+
+        // Act
+        HttpResponse<TestResponse> response = executor.executeForEntity(
+                "GET",
+                URI.create(mockServer.url("/api/unavailable").toString()),
+                headers,
+                cookies,
+                null,
+                TestResponse.class
+        );
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(503, response.getStatusCode());
+        // Error body should be accessible as String (not deserialized to TestResponse)
+        assertNotNull(response.getBody());
+    }
+
+    // ========== Content-Type Case Insensitive Test ==========
+
+    @Test
+    void testRequestWithContentTypeCaseInsensitive() throws Exception {
+        // Arrange
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"case-test\",\"id\":7}")
+                .setHeader("Content-Type", "application/json"));
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "Multipart/Form-Data");  // Mixed case
+        Map<String, String> cookies = new HashMap<>();
+
+        io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder builder =
+                new io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder();
+        io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part stringPart =
+                builder.part("field", "value")
+                        .header("Content-Disposition", "form-data; name=\"field\"")
+                        .build();
+
+        Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> body = new HashMap<>();
+        body.put("field", stringPart);
+
+        // Act
+        TestResponse result = executor.execute(
+                "POST",
+                URI.create(mockServer.url("/api/case-test").toString()),
+                headers,
+                cookies,
+                body,
+                TestResponse.class
+        );
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("case-test", result.getName());
+    }
+
     // ========== Test Data Classes ==========
 
     public static class TestResponse {
@@ -775,6 +1163,45 @@ class RestClientExecutorIntegrationTest {
 
         public void setId(int id) {
             this.id = id;
+        }
+    }
+
+    public static class TestData {
+        private String name;
+        private int value;
+        private String nullField;
+
+        public TestData() {
+        }
+
+        public TestData(String name, int value, String nullField) {
+            this.name = name;
+            this.value = value;
+            this.nullField = nullField;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public void setValue(int value) {
+            this.value = value;
+        }
+
+        public String getNullField() {
+            return nullField;
+        }
+
+        public void setNullField(String nullField) {
+            this.nullField = nullField;
         }
     }
 }

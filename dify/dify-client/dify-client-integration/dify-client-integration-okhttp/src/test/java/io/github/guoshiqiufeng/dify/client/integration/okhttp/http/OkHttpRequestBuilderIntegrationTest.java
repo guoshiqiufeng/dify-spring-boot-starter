@@ -17,10 +17,13 @@ package io.github.guoshiqiufeng.dify.client.integration.okhttp.http;
 
 import io.github.guoshiqiufeng.dify.client.codec.gson.GsonJsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
+import io.github.guoshiqiufeng.dify.client.core.constant.MediaType;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
+import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
+import io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder;
 import okhttp3.OkHttpClient;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -55,11 +58,15 @@ class OkHttpRequestBuilderIntegrationTest {
         mockServer = new MockWebServer();
         mockServer.start();
         DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        HttpHeaders defaultHeaders = new HttpHeaders();
+        defaultHeaders.set("test-key", "test-value");
+        defaultHeaders.set("test-null", null);
         client = new JavaHttpClient(
                 mockServer.url("/").toString(),
                 config,
-                new OkHttpClient.Builder(),
-                new GsonJsonMapper()
+                null,
+                new GsonJsonMapper(),
+                defaultHeaders
         );
     }
 
@@ -727,33 +734,36 @@ class OkHttpRequestBuilderIntegrationTest {
         assertTrue(body.contains("\"test\""));
     }
 
-//    @Test
-//    void testRequestWithMultipartData() throws Exception {
-//        // Arrange
-//        mockServer.enqueue(new MockResponse()
-//                .setResponseCode(200)
-//                .setBody("{\"name\":\"uploaded\",\"id\":888}")
-//                .setHeader("Content-Type", "application/json"));
-//
-//        Map<String, Object> formData = new java.util.HashMap<>();
-//        formData.put("field1", "value1");
-//        formData.put("field2", "value2");
-//        formData.put("file", "test data".getBytes());
-//
-//        // Act
-//        TestResponse result = getBuilder(client.post()
-//                .uri("/api/upload")
-//                .multipart(formData))
-//                .execute(TestResponse.class);
-//
-//        // Assert
-//        assertNotNull(result);
-//        RecordedRequest request = mockServer.takeRequest();
-//        assertEquals("POST", request.getMethod());
-//        String body = request.getBody().readUtf8();
-//        assertTrue(body.contains("field1"));
-//        assertTrue(body.contains("value1"));
-//    }
+    @Test
+    void testRequestWithMultipartData() throws Exception {
+        // Arrange
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"uploaded\",\"id\":888}")
+                .setHeader("Content-Type", "application/json"));
+
+        MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
+        multipartBodyBuilder.part("field1", "value1");
+        multipartBodyBuilder.part("field2", "value2");
+        multipartBodyBuilder.part("field3", 3);
+        multipartBodyBuilder.part("field4", false);
+        multipartBodyBuilder.part("file", "test data".getBytes())
+                .header("Content-Disposition",
+                "form-data; name=\"file\"; filename=\"file\";");
+        // Act
+        TestResponse result = getBuilder(client.post()
+                .uri("/api/upload")
+                .body(multipartBodyBuilder.build()))
+                .execute(TestResponse.class);
+
+        // Assert
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        assertEquals("POST", request.getMethod());
+        String body = request.getBody().readUtf8();
+        assertTrue(body.contains("field1"));
+        assertTrue(body.contains("value1"));
+    }
 
     @Test
     void testRequestWithEmptyBodyForPost() throws Exception {
@@ -808,5 +818,330 @@ class OkHttpRequestBuilderIntegrationTest {
         );
 
         assertEquals(500, exception.getStatusCode());
+    }
+
+    // ========== Multipart Form Data Tests (multipart() method) ==========
+
+    @Test
+    void testMultipartWithStringValues() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"uploaded\",\"id\":100}")
+                .setHeader("Content-Type", "application/json"));
+
+        java.util.Map<String, Object> formData = new java.util.HashMap<>();
+        formData.put("field1", "value1");
+        formData.put("field2", "value2");
+
+        TestResponse result = getBuilder(client.post()
+                .uri("/api/upload"))
+                .multipart(formData)
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        String body = request.getBody().readUtf8();
+        assertTrue(body.contains("field1"));
+        assertTrue(body.contains("value1"));
+    }
+
+    @Test
+    void testMultipartWithByteArray() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"uploaded\",\"id\":101}")
+                .setHeader("Content-Type", "application/json"));
+
+        java.util.Map<String, Object> formData = new java.util.HashMap<>();
+        formData.put("file", "test data".getBytes());
+
+        TestResponse result = getBuilder(client.post()
+                .uri("/api/upload"))
+                .multipart(formData)
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        assertTrue(request.getHeader("Content-Type").contains("multipart/form-data"));
+    }
+
+    @Test
+    void testMultipartWithComplexObject() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"uploaded\",\"id\":102}")
+                .setHeader("Content-Type", "application/json"));
+
+        java.util.Map<String, Object> formData = new java.util.HashMap<>();
+        TestResponse complexObj = new TestResponse("complex", 999);
+        formData.put("data", complexObj);
+
+        TestResponse result = getBuilder(client.post()
+                .uri("/api/upload"))
+                .multipart(formData)
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+    }
+
+    // ========== Multipart from Parts Tests ==========
+
+    @Test
+    void testMultipartFromPartsWithByteArray() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"uploaded\",\"id\":103}")
+                .setHeader("Content-Type", "application/json"));
+
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        builder.part("file", "test file content".getBytes())
+                .header("Content-Disposition", "form-data; name=\"file\"; filename=\"test.txt\"")
+                .header("Content-Type", "text/plain");
+
+        TestResponse result = getBuilder(client.post()
+                .uri("/api/upload")
+                .header("Content-Type", "multipart/form-data")
+                .body(builder.build()))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        String body = request.getBody().readUtf8();
+        assertTrue(body.contains("test.txt"));
+    }
+
+    @Test
+    void testMultipartFromPartsWithString() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"uploaded\",\"id\":104}")
+                .setHeader("Content-Type", "application/json"));
+
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        builder.part("textField", "text value");
+
+        TestResponse result = getBuilder(client.post()
+                .uri("/api/upload")
+                .header("Content-Type", "multipart/form-data")
+                .body(builder.build()))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void testMultipartFromPartsWithNumber() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"uploaded\",\"id\":105}")
+                .setHeader("Content-Type", "application/json"));
+
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        builder.part("numberField", 12345);
+
+        TestResponse result = getBuilder(client.post()
+                .uri("/api/upload")
+                .header("Content-Type", "multipart/form-data")
+                .body(builder.build()))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        String body = request.getBody().readUtf8();
+        assertTrue(body.contains("12345"));
+    }
+
+    @Test
+    void testMultipartFromPartsWithBoolean() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"uploaded\",\"id\":106}")
+                .setHeader("Content-Type", "application/json"));
+
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        builder.part("boolField", true);
+
+        TestResponse result = getBuilder(client.post()
+                .uri("/api/upload")
+                .header("Content-Type", "multipart/form-data")
+                .body(builder.build()))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        String body = request.getBody().readUtf8();
+        assertTrue(body.contains("true"));
+    }
+
+    @Test
+    void testMultipartFromPartsWithComplexObject() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"uploaded\",\"id\":107}")
+                .setHeader("Content-Type", "application/json"));
+
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        TestResponse complexObj = new TestResponse("complex", 888);
+        builder.part("objectField", complexObj);
+
+        TestResponse result = getBuilder(client.post()
+                .uri("/api/upload")
+                .header("Content-Type", "multipart/form-data")
+                .body(builder.build()))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void testMultipartFromPartsWithNullContentDisposition() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"uploaded\",\"id\":108}")
+                .setHeader("Content-Type", "application/json"));
+
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        builder.part("file", "test content".getBytes());
+
+        TestResponse result = getBuilder(client.post()
+                .uri("/api/upload")
+                .header("Content-Type", "multipart/form-data")
+                .body(builder.build()))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void testMultipartFromPartsWithDifferentContentType() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"uploaded\",\"id\":109}")
+                .setHeader("Content-Type", "application/json"));
+
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        builder.part("file", "image data".getBytes())
+                .header("Content-Disposition", "form-data; name=\"file\"; filename=\"image.png\"")
+                .header("Content-Type", "image/png");
+
+        TestResponse result = getBuilder(client.post()
+                .uri("/api/upload")
+                .header("Content-Type", "multipart/form-data")
+                .body(builder.build()))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+    }
+
+    // ========== Query Parameters Tests ==========
+
+    @Test
+    void testRequestWithQueryParameters() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"test\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        TestResponse result = getBuilder(client.get()
+                .uri("/api/test"))
+                .queryParam("page", "1")
+                .queryParam("limit", "10")
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        assertTrue(request.getPath().contains("page=1"));
+        assertTrue(request.getPath().contains("limit=10"));
+    }
+
+    @Test
+    void testRequestWithSpecialCharactersInQueryParams() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"test\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        TestResponse result = getBuilder(client.get()
+                .uri("/api/test"))
+                .queryParam("search", "hello world")
+                .queryParam("filter", "a&b")
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        assertNotNull(request.getPath());
+    }
+
+    // ========== URL Building Tests ==========
+
+    @Test
+    void testUrlBuildingWithDoubleSlash() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"test\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        TestResponse result = getBuilder(client.get()
+                .uri("/api/test"))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        assertFalse(request.getPath().contains("//api"));
+    }
+
+    // ========== Error Handling Tests ==========
+
+    @Test
+    void testExecuteForStatusWithIOException() throws IOException {
+        mockServer.shutdown();
+
+        assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/test"))
+                        .executeForStatus()
+        );
+    }
+
+    @Test
+    void testHandleResponseWithVoidClass() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("")
+                .setHeader("Content-Type", "application/json"));
+
+        Void result = getBuilder(client.get()
+                .uri("/api/void"))
+                .execute(Void.class);
+
+        assertNull(result);
+    }
+
+    @Test
+    void testHandleResponseWithEmptyBodyString() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("")
+                .setHeader("Content-Type", "application/json"));
+
+        TestResponse result = getBuilder(client.get()
+                .uri("/api/empty"))
+                .execute(TestResponse.class);
+
+        assertNull(result);
+    }
+
+    @Test
+    void testHandleResponseWithNonSuccessfulAndNonEmptyBody() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(400)
+                .setBody("{\"error\":\"bad request\"}")
+                .setHeader("Content-Type", "application/json"));
+
+        assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/error"))
+                        .execute(TestResponse.class)
+        );
     }
 }
