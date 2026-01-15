@@ -19,6 +19,8 @@ import io.github.guoshiqiufeng.dify.client.codec.jackson.JacksonJsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import lombok.Getter;
+import lombok.Setter;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -1137,6 +1139,8 @@ class RestClientExecutorIntegrationTest {
 
     // ========== Test Data Classes ==========
 
+    @Setter
+    @Getter
     public static class TestResponse {
         private String name;
         private int id;
@@ -1149,23 +1153,10 @@ class RestClientExecutorIntegrationTest {
             this.id = id;
         }
 
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public void setId(int id) {
-            this.id = id;
-        }
     }
 
+    @Setter
+    @Getter
     public static class TestData {
         private String name;
         private int value;
@@ -1180,28 +1171,5 @@ class RestClientExecutorIntegrationTest {
             this.nullField = nullField;
         }
 
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public int getValue() {
-            return value;
-        }
-
-        public void setValue(int value) {
-            this.value = value;
-        }
-
-        public String getNullField() {
-            return nullField;
-        }
-
-        public void setNullField(String nullField) {
-            this.nullField = nullField;
-        }
     }
 }

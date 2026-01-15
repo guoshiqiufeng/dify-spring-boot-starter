@@ -405,10 +405,10 @@ class WebClientExecutor {
         // Start request
         WebClient.RequestBodyUriSpec requestSpec = webClient.method(HttpMethod.valueOf(method));
 
-        // Set URI
+        // Set URI - use String instead of URI to respect baseUrl
         WebClient.RequestBodySpec bodySpec;
         if (uri != null) {
-            bodySpec = requestSpec.uri(uri);
+            bodySpec = requestSpec.uri(uri.toString());
         } else {
             bodySpec = requestSpec.uri("");
         }

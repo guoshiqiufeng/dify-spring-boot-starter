@@ -234,6 +234,7 @@ public class SpringHttpClient implements HttpClient {
      * @param builder custom builder (optional)
      * @return configured RestClient, or null if not available
      */
+    @SuppressWarnings("unchecked")
     private Object createRestClient(Object builder) {
         if (!SpringVersionDetector.hasRestClient()) {
             return null;
@@ -262,12 +263,25 @@ public class SpringHttpClient implements HttpClient {
 
                 // Try to use JdkClientHttpRequestFactory (Spring 6.1+) which properly handles error response bodies
                 try {
-                    Class<?> jdkFactoryClass = Class.forName("org.springframework.http.client.JdkClientHttpRequestFactory");
-                    Object factory = jdkFactoryClass.getDeclaredConstructor().newInstance();
+                    // Create Duration objects for timeouts
+                    Class<?> durationClass = Class.forName("java.time.Duration");
+                    Object connectDuration = durationClass.getMethod("ofSeconds", long.class).invoke(null, (long) connectTimeout);
+                    Object readDuration = durationClass.getMethod("ofSeconds", long.class).invoke(null, (long) readTimeout);
 
-                    // Set timeouts
-                    jdkFactoryClass.getMethod("setConnectTimeout", int.class).invoke(factory, connectTimeout * 1000);
-                    jdkFactoryClass.getMethod("setReadTimeout", int.class).invoke(factory, readTimeout * 1000);
+                    // Create HttpClient with connect timeout
+                    Class<?> httpClientClass = Class.forName("java.net.http.HttpClient");
+                    Class<?> httpClientBuilderClass = Class.forName("java.net.http.HttpClient$Builder");
+                    Object httpClientBuilder = httpClientClass.getMethod("newBuilder").invoke(null);
+                    httpClientBuilder = httpClientBuilderClass.getMethod("connectTimeout", durationClass)
+                            .invoke(httpClientBuilder, connectDuration);
+                    Object httpClient = httpClientBuilderClass.getMethod("build").invoke(httpClientBuilder);
+
+                    // Create JdkClientHttpRequestFactory with HttpClient
+                    Class<?> jdkFactoryClass = Class.forName("org.springframework.http.client.JdkClientHttpRequestFactory");
+                    Object factory = jdkFactoryClass.getConstructor(httpClientClass).newInstance(httpClient);
+
+                    // Set read timeout
+                    jdkFactoryClass.getMethod("setReadTimeout", durationClass).invoke(factory, readDuration);
 
                     // Set the request factory
                     Class<?> clientHttpRequestFactoryClass = Class.forName("org.springframework.http.client.ClientHttpRequestFactory");

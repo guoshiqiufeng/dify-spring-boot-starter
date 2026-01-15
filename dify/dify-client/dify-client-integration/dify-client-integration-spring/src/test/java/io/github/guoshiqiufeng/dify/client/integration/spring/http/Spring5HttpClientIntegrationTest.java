@@ -15,7 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.client.integration.spring.http;
 
-import io.github.guoshiqiufeng.dify.client.codec.jackson.JacksonJsonMapper;
+import io.github.guoshiqiufeng.dify.client.codec.gson.GsonJsonMapper;
+import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.enums.HttpMethod;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
 import io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler;
@@ -29,7 +30,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -46,11 +46,11 @@ import static org.junit.jupiter.api.Assertions.*;
  * @version 2.0.0
  * @since 2026/1/14
  */
-class SpringHttpClientIntegrationTest {
+class Spring5HttpClientIntegrationTest {
 
     private MockWebServer mockServer;
     private String baseUrl;
-    private JacksonJsonMapper jsonMapper;
+    private JsonMapper jsonMapper;
     private DifyProperties.ClientConfig clientConfig;
 
     @BeforeEach
@@ -58,8 +58,7 @@ class SpringHttpClientIntegrationTest {
         mockServer = new MockWebServer();
         mockServer.start();
         baseUrl = mockServer.url("/").toString();
-        jsonMapper = new JacksonJsonMapper();
-
+        jsonMapper = GsonJsonMapper.getInstance();
         // Create default client config
         clientConfig = new DifyProperties.ClientConfig();
         clientConfig.setConnectTimeout(5);
@@ -98,23 +97,6 @@ class SpringHttpClientIntegrationTest {
         // Assert
         assertNotNull(client);
         assertNotNull(client.getWebClient());
-    }
-
-    @Test
-    void testConstructorWithCustomRestClientBuilder() {
-        // Arrange
-        RestClient.Builder restClientBuilder = RestClient.builder();
-
-        // Act
-        SpringHttpClient client = new SpringHttpClient(baseUrl, clientConfig, null, restClientBuilder, jsonMapper);
-
-        // Assert
-        assertNotNull(client);
-        assertNotNull(client.getWebClient());
-        // RestClient should be available in Spring 6+
-        if (client.hasRestClient()) {
-            assertNotNull(client.getRestClient());
-        }
     }
 
     @Test
@@ -389,7 +371,7 @@ class SpringHttpClientIntegrationTest {
                 .uri("/test")
                 .retrieve()
                 .body(String.class)
-                ;
+        ;
 
         // Assert
         RecordedRequest request = mockServer.takeRequest();
@@ -412,7 +394,7 @@ class SpringHttpClientIntegrationTest {
                 .uri("/test")
                 .retrieve()
                 .body(String.class)
-                ;
+        ;
 
         // Assert
         RecordedRequest request = mockServer.takeRequest();
@@ -452,78 +434,6 @@ class SpringHttpClientIntegrationTest {
         // Assert
         assertNotNull(client.getWebClient());
     }
-
-    // ========== Interceptor Tests ==========
-
-    @Test
-    void testWebClientInterceptorIsApplied() {
-        // Arrange
-        List<Object> interceptors = new ArrayList<>();
-        final boolean[] interceptorCalled = {false};
-
-        // Use ClientHttpRequestInterceptor for Spring 6+ (RestClient)
-        ClientHttpRequestInterceptor interceptor = (request, body, execution) -> {
-            interceptorCalled[0] = true;
-            return execution.execute(request, body);
-        };
-        interceptors.add(interceptor);
-
-        mockServer.enqueue(new MockResponse()
-                .setResponseCode(200)
-                .setBody("{\"status\":\"ok\"}")
-                .setHeader("Content-Type", "application/json"));
-
-        SpringHttpClient client = new SpringHttpClient(baseUrl, clientConfig, null, null, jsonMapper, new HttpHeaders(), interceptors);
-
-        // Act
-        client.get()
-                .uri("/test")
-                .retrieve()
-                .body(String.class)
-                ;
-
-        // Assert
-        assertTrue(interceptorCalled[0]);
-    }
-
-    @Test
-    void testMultipleInterceptorsAreApplied() {
-        // Arrange
-        List<Object> interceptors = new ArrayList<>();
-        final int[] callCount = {0};
-
-        // Use ClientHttpRequestInterceptor for Spring 6+ (RestClient)
-        ClientHttpRequestInterceptor interceptor1 = (request, body, execution) -> {
-            callCount[0]++;
-            return execution.execute(request, body);
-        };
-
-        ClientHttpRequestInterceptor interceptor2 = (request, body, execution) -> {
-            callCount[0]++;
-            return execution.execute(request, body);
-        };
-
-        interceptors.add(interceptor1);
-        interceptors.add(interceptor2);
-
-        mockServer.enqueue(new MockResponse()
-                .setResponseCode(200)
-                .setBody("{\"status\":\"ok\"}")
-                .setHeader("Content-Type", "application/json"));
-
-        SpringHttpClient client = new SpringHttpClient(baseUrl, clientConfig, null, null, jsonMapper, new HttpHeaders(), interceptors);
-
-        // Act
-        client.get()
-                .uri("/test")
-                .retrieve()
-                .body(String.class)
-                ;
-
-        // Assert
-        assertEquals(2, callCount[0]);
-    }
-
     // ========== Error Handling Tests ==========
 
     //@Test
@@ -538,7 +448,7 @@ class SpringHttpClientIntegrationTest {
                     .uri("/test")
                     .retrieve()
                     .body(String.class)
-                    ;
+            ;
         });
     }
 
@@ -560,7 +470,7 @@ class SpringHttpClientIntegrationTest {
                         throw new RuntimeException("Internal Server Error");
                     }))
                     .body(String.class)
-                    ;
+            ;
         });
     }
 
@@ -582,7 +492,7 @@ class SpringHttpClientIntegrationTest {
                         throw new RuntimeException("Not Found");
                     }))
                     .body(String.class)
-                    ;
+            ;
         });
     }
 
@@ -602,8 +512,7 @@ class SpringHttpClientIntegrationTest {
         String response = client.get()
                 .uri("/api/test")
                 .retrieve()
-                .body(String.class)
-                ;
+                .body(String.class);
 
         // Assert
         assertNotNull(response);
@@ -629,8 +538,7 @@ class SpringHttpClientIntegrationTest {
                 .uri("/api/create")
                 .body("{\"name\":\"test\"}")
                 .retrieve()
-                .body(String.class)
-                ;
+                .body(String.class);
 
         // Assert
         assertNotNull(response);
@@ -658,7 +566,7 @@ class SpringHttpClientIntegrationTest {
                 .header("X-Request-ID", "req-456")
                 .retrieve()
                 .body(String.class)
-                ;
+        ;
 
         // Assert
         RecordedRequest request = mockServer.takeRequest();
@@ -679,8 +587,7 @@ class SpringHttpClientIntegrationTest {
         String response = client.get()
                 .uri("/api/empty")
                 .retrieve()
-                .body(String.class)
-                ;
+                .body(String.class);
 
         // Assert - 204 No Content should return null or empty
         // The behavior depends on the WebClient configuration
