@@ -18,6 +18,8 @@ package io.github.guoshiqiufeng.dify.client.codec.gson;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonException;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonNode;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
+import lombok.Getter;
+import lombok.Setter;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -236,7 +238,52 @@ class GsonJsonMapperTest {
         assertEquals(original.getAge(), deserialized.getAge());
     }
 
+    @Test
+    void testToJsonIgnoreNull() {
+        TestPojo pojo = new TestPojo(null, 30);
+        String json = mapper.toJsonIgnoreNull(pojo);
+        assertNotNull(json);
+        assertFalse(json.contains("null"));
+        assertFalse(json.contains("\"name\""));
+        assertTrue(json.contains("\"age\""));
+    }
+
+    @Test
+    void testToJsonIgnoreNullWithAllFields() {
+        TestPojo pojo = new TestPojo("John", 30);
+        String json = mapper.toJsonIgnoreNull(pojo);
+        assertNotNull(json);
+        assertTrue(json.contains("John"));
+        assertTrue(json.contains("30"));
+    }
+
+    @Test
+    void testFromJsonWithTypeReferenceInvalidJson() {
+        assertThrows(JsonException.class, () -> {
+            mapper.fromJson("{invalid}", new TypeReference<List<String>>() {});
+        });
+    }
+
+    @Test
+    void testFromJsonWithCustomDeserializer() {
+        String json = "{\"value\":\"test-value\"}";
+        CustomDeserializerPojo pojo = mapper.fromJson(json, CustomDeserializerPojo.class);
+        assertNotNull(pojo);
+        assertEquals("CUSTOM:test-value", pojo.getValue());
+    }
+
+    @Test
+    void testTreeToValueWithInvalidType() {
+        String json = "{\"name\":\"John\",\"age\":\"not-a-number\"}";
+        JsonNode node = mapper.parseTree(json);
+        assertThrows(JsonException.class, () -> {
+            mapper.treeToValue(node, TestPojo.class);
+        });
+    }
+
     // Test POJO class
+    @Setter
+    @Getter
     public static class TestPojo {
         private String name;
         private int age;
@@ -249,20 +296,27 @@ class GsonJsonMapperTest {
             this.age = age;
         }
 
-        public String getName() {
-            return name;
-        }
+    }
 
-        public void setName(String name) {
-            this.name = name;
-        }
+    // Test POJO with custom deserializer
+    @Setter
+    @Getter
+    @io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserialize(using = CustomDeserializerPojo.CustomDeserializer.class)
+    public static class CustomDeserializerPojo {
+        private String value;
 
-        public int getAge() {
-            return age;
-        }
-
-        public void setAge(int age) {
-            this.age = age;
+        public static class CustomDeserializer implements io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserializer<CustomDeserializerPojo> {
+            @Override
+            public CustomDeserializerPojo deserialize(io.github.guoshiqiufeng.dify.client.core.codec.JsonNode node,
+                                                      io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper mapper) {
+                CustomDeserializerPojo pojo = new CustomDeserializerPojo();
+                if (node.has("value")) {
+                    String value = node.get("value").asText();
+                    pojo.setValue("CUSTOM:" + value);
+                }
+                return pojo;
+            }
         }
     }
+
 }

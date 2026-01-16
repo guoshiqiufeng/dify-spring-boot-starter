@@ -60,6 +60,12 @@ class JacksonJsonNodeTest {
     }
 
     @Test
+    void testIsTextualWithNullNode() {
+        JacksonJsonNode nullNode = new JacksonJsonNode(null);
+        assertFalse(nullNode.isTextual());
+    }
+
+    @Test
     void testIsNumber() {
         JacksonJsonNode intNode = new JacksonJsonNode(new IntNode(123));
         assertTrue(intNode.isNumber());
@@ -69,6 +75,12 @@ class JacksonJsonNodeTest {
 
         JacksonJsonNode stringNode = new JacksonJsonNode(new TextNode("test"));
         assertFalse(stringNode.isNumber());
+    }
+
+    @Test
+    void testIsNumberWithNullNode() {
+        JacksonJsonNode nullNode = new JacksonJsonNode(null);
+        assertFalse(nullNode.isNumber());
     }
 
     @Test
@@ -84,6 +96,12 @@ class JacksonJsonNodeTest {
     }
 
     @Test
+    void testIsBooleanWithNullNode() {
+        JacksonJsonNode nullNode = new JacksonJsonNode(null);
+        assertFalse(nullNode.isBoolean());
+    }
+
+    @Test
     void testIsArray() {
         ArrayNode array = objectMapper.createArrayNode();
         array.add("test");
@@ -95,6 +113,12 @@ class JacksonJsonNodeTest {
     }
 
     @Test
+    void testIsArrayWithNullNode() {
+        JacksonJsonNode nullNode = new JacksonJsonNode(null);
+        assertFalse(nullNode.isArray());
+    }
+
+    @Test
     void testIsObject() {
         ObjectNode object = objectMapper.createObjectNode();
         object.put("key", "value");
@@ -103,6 +127,12 @@ class JacksonJsonNodeTest {
 
         JacksonJsonNode stringNode = new JacksonJsonNode(new TextNode("test"));
         assertFalse(stringNode.isObject());
+    }
+
+    @Test
+    void testIsObjectWithNullNode() {
+        JacksonJsonNode nullNode = new JacksonJsonNode(null);
+        assertFalse(nullNode.isObject());
     }
 
     @Test

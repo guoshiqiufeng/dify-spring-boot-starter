@@ -60,6 +60,12 @@ class Jackson3JsonNodeTest {
     }
 
     @Test
+    void testIsTextualWithNullNode() {
+        Jackson3JsonNode nullNode = new Jackson3JsonNode(null);
+        assertFalse(nullNode.isTextual());
+    }
+
+    @Test
     void testIsNumber() {
         Jackson3JsonNode intNode = new Jackson3JsonNode(IntNode.valueOf(123));
         assertTrue(intNode.isNumber());
@@ -69,6 +75,12 @@ class Jackson3JsonNodeTest {
 
         Jackson3JsonNode stringNode = new Jackson3JsonNode(jsonMapper.getNodeFactory().stringNode("test"));
         assertFalse(stringNode.isNumber());
+    }
+
+    @Test
+    void testIsNumberWithNullNode() {
+        Jackson3JsonNode nullNode = new Jackson3JsonNode(null);
+        assertFalse(nullNode.isNumber());
     }
 
     @Test
@@ -84,6 +96,12 @@ class Jackson3JsonNodeTest {
     }
 
     @Test
+    void testIsBooleanWithNullNode() {
+        Jackson3JsonNode nullNode = new Jackson3JsonNode(null);
+        assertFalse(nullNode.isBoolean());
+    }
+
+    @Test
     void testIsArray() {
         ArrayNode array = jsonMapper.createArrayNode();
         array.add("test");
@@ -95,6 +113,12 @@ class Jackson3JsonNodeTest {
     }
 
     @Test
+    void testIsArrayWithNullNode() {
+        Jackson3JsonNode nullNode = new Jackson3JsonNode(null);
+        assertFalse(nullNode.isArray());
+    }
+
+    @Test
     void testIsObject() {
         ObjectNode object = jsonMapper.createObjectNode();
         object.put("key", "value");
@@ -103,6 +127,12 @@ class Jackson3JsonNodeTest {
 
         Jackson3JsonNode stringNode = new Jackson3JsonNode(jsonMapper.getNodeFactory().stringNode("test"));
         assertFalse(stringNode.isObject());
+    }
+
+    @Test
+    void testIsObjectWithNullNode() {
+        Jackson3JsonNode nullNode = new Jackson3JsonNode(null);
+        assertFalse(nullNode.isObject());
     }
 
     @Test

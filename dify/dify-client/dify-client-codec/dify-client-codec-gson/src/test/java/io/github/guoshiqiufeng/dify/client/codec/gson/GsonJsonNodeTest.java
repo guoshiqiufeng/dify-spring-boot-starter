@@ -54,6 +54,12 @@ class GsonJsonNodeTest {
 
         GsonJsonNode booleanNode = new GsonJsonNode(new JsonPrimitive(true));
         assertFalse(booleanNode.isTextual());
+
+        GsonJsonNode objectNode = new GsonJsonNode(new JsonObject());
+        assertFalse(objectNode.isTextual());
+
+        GsonJsonNode nullNode = new GsonJsonNode(null);
+        assertFalse(nullNode.isTextual());
     }
 
     @Test
@@ -66,6 +72,12 @@ class GsonJsonNodeTest {
 
         GsonJsonNode stringNode = new GsonJsonNode(new JsonPrimitive("test"));
         assertFalse(stringNode.isNumber());
+
+        GsonJsonNode objectNode = new GsonJsonNode(new JsonObject());
+        assertFalse(objectNode.isNumber());
+
+        GsonJsonNode nullNode = new GsonJsonNode(null);
+        assertFalse(nullNode.isNumber());
     }
 
     @Test
@@ -78,6 +90,12 @@ class GsonJsonNodeTest {
 
         GsonJsonNode stringNode = new GsonJsonNode(new JsonPrimitive("test"));
         assertFalse(stringNode.isBoolean());
+
+        GsonJsonNode objectNode = new GsonJsonNode(new JsonObject());
+        assertFalse(objectNode.isBoolean());
+
+        GsonJsonNode nullNode = new GsonJsonNode(null);
+        assertFalse(nullNode.isBoolean());
     }
 
     @Test
@@ -89,6 +107,12 @@ class GsonJsonNodeTest {
 
         GsonJsonNode stringNode = new GsonJsonNode(new JsonPrimitive("test"));
         assertFalse(stringNode.isArray());
+
+        GsonJsonNode objectNode = new GsonJsonNode(new JsonObject());
+        assertFalse(objectNode.isArray());
+
+        GsonJsonNode nullNode = new GsonJsonNode(null);
+        assertFalse(nullNode.isArray());
     }
 
     @Test
@@ -100,6 +124,9 @@ class GsonJsonNodeTest {
 
         GsonJsonNode stringNode = new GsonJsonNode(new JsonPrimitive("test"));
         assertFalse(stringNode.isObject());
+
+        GsonJsonNode nullNode = new GsonJsonNode(null);
+        assertFalse(nullNode.isObject());
     }
 
     @Test
@@ -119,6 +146,12 @@ class GsonJsonNodeTest {
 
         JsonNode nonExistentNode = objectNode.get("nonexistent");
         assertNull(nonExistentNode);
+
+        GsonJsonNode stringNode = new GsonJsonNode(new JsonPrimitive("test"));
+        assertNull(stringNode.get("name"));
+
+        GsonJsonNode nullNode = new GsonJsonNode(null);
+        assertNull(nullNode.get("name"));
     }
 
     @Test
@@ -136,6 +169,12 @@ class GsonJsonNodeTest {
 
         assertTrue(objectNode.has("name"));
         assertFalse(objectNode.has("age"));
+
+        GsonJsonNode stringNode = new GsonJsonNode(new JsonPrimitive("test"));
+        assertFalse(stringNode.has("name"));
+
+        GsonJsonNode nullNode = new GsonJsonNode(null);
+        assertFalse(nullNode.has("name"));
     }
 
     @Test
@@ -149,8 +188,14 @@ class GsonJsonNodeTest {
         GsonJsonNode stringNode = new GsonJsonNode(new JsonPrimitive("test"));
         assertEquals("test", stringNode.asText());
 
+        GsonJsonNode stringNode2 = new GsonJsonNode(new JsonObject());
+        assertEquals("{}", stringNode2.asText());
+
         GsonJsonNode nullNode = new GsonJsonNode(JsonNull.INSTANCE);
         assertNull(nullNode.asText());
+
+        GsonJsonNode nullNode2 = new GsonJsonNode(null);
+        assertNull(nullNode2.asText());
 
         GsonJsonNode numberNode = new GsonJsonNode(new JsonPrimitive(123));
         assertNotNull(numberNode.asText());
@@ -164,8 +209,18 @@ class GsonJsonNodeTest {
         GsonJsonNode stringIntNode = new GsonJsonNode(new JsonPrimitive("456"));
         assertEquals(456, stringIntNode.asInt());
 
+        GsonJsonNode booleanIntNode = new GsonJsonNode(new JsonPrimitive(false));
+        assertEquals(0, booleanIntNode.asInt());
+
         GsonJsonNode nullNode = new GsonJsonNode(JsonNull.INSTANCE);
         assertEquals(0, nullNode.asInt());
+
+        GsonJsonNode nullNode2 = new GsonJsonNode(null);
+        assertEquals(0, nullNode2.asInt());
+
+        GsonJsonNode nullNode3 = new GsonJsonNode(new JsonObject());
+        assertEquals(0, nullNode3.asInt());
+
     }
 
     @Test
@@ -176,8 +231,17 @@ class GsonJsonNodeTest {
         GsonJsonNode stringLongNode = new GsonJsonNode(new JsonPrimitive("987654321"));
         assertEquals(987654321L, stringLongNode.asLong());
 
+        GsonJsonNode booleanNode = new GsonJsonNode(new JsonPrimitive(false));
+        assertEquals(0L, booleanNode.asLong());
+
         GsonJsonNode nullNode = new GsonJsonNode(JsonNull.INSTANCE);
         assertEquals(0L, nullNode.asLong());
+
+        GsonJsonNode nullNode2 = new GsonJsonNode(null);
+        assertEquals(0L, nullNode2.asLong());
+
+        GsonJsonNode nullNode3 = new GsonJsonNode(new JsonObject());
+        assertEquals(0L, nullNode3.asLong());
     }
 
     @Test
@@ -188,8 +252,17 @@ class GsonJsonNodeTest {
         GsonJsonNode stringDoubleNode = new GsonJsonNode(new JsonPrimitive("678.90"));
         assertEquals(678.90, stringDoubleNode.asDouble(), 0.001);
 
+        GsonJsonNode booleanNode = new GsonJsonNode(new JsonPrimitive(false));
+        assertEquals(0.0, booleanNode.asDouble(), 0.001);
+
         GsonJsonNode nullNode = new GsonJsonNode(JsonNull.INSTANCE);
         assertEquals(0.0, nullNode.asDouble(), 0.001);
+
+        GsonJsonNode nullNode2 = new GsonJsonNode(null);
+        assertEquals(0.0, nullNode2.asDouble(), 0.001);
+
+        GsonJsonNode nullNode3 = new GsonJsonNode(new JsonObject());
+        assertEquals(0.0, nullNode3.asDouble(), 0.001);
     }
 
     @Test
@@ -206,8 +279,17 @@ class GsonJsonNodeTest {
         GsonJsonNode stringFalseNode = new GsonJsonNode(new JsonPrimitive("false"));
         assertFalse(stringFalseNode.asBoolean());
 
+        GsonJsonNode intNode = new GsonJsonNode(new JsonPrimitive(0));
+        assertFalse(intNode.asBoolean());
+
         GsonJsonNode nullNode = new GsonJsonNode(JsonNull.INSTANCE);
         assertFalse(nullNode.asBoolean());
+
+        GsonJsonNode nullNode2 = new GsonJsonNode(null);
+        assertFalse(nullNode2.asBoolean());
+
+        GsonJsonNode nullNode3 = new GsonJsonNode(new JsonObject());
+        assertFalse(nullNode3.asBoolean());
     }
 
     @Test
@@ -224,6 +306,12 @@ class GsonJsonNodeTest {
         assertEquals("b", elements.next().asText());
         assertEquals("c", elements.next().asText());
         assertFalse(elements.hasNext());
+
+        GsonJsonNode stringNode = new GsonJsonNode(new JsonPrimitive("test"));
+        assertNotNull(stringNode.elements());
+
+        GsonJsonNode nullNode = new GsonJsonNode(null);
+        assertNotNull(nullNode.elements());
     }
 
     @Test
@@ -251,6 +339,12 @@ class GsonJsonNodeTest {
             count++;
         }
         assertEquals(3, count);
+
+        GsonJsonNode stringNode = new GsonJsonNode(new JsonPrimitive("test"));
+        assertNotNull(stringNode.fieldNames());
+
+        GsonJsonNode nullNode = new GsonJsonNode(null);
+        assertNotNull(nullNode.fieldNames());
     }
 
     @Test

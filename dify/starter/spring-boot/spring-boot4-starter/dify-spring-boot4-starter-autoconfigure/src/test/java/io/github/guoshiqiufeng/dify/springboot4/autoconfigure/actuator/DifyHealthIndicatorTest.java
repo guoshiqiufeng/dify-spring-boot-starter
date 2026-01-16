@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.springboot.autoconfigure.actuator;
+package io.github.guoshiqiufeng.dify.springboot4.autoconfigure.actuator;
 
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
-import io.github.guoshiqiufeng.dify.status.actuator.DifyHealthIndicator;
 import io.github.guoshiqiufeng.dify.status.dto.AggregatedStatusReport;
 import io.github.guoshiqiufeng.dify.status.enums.ApiStatus;
 import io.github.guoshiqiufeng.dify.status.service.DifyStatusService;
@@ -24,8 +23,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.health.Status;
+import org.springframework.boot.health.contributor.Health;
+import org.springframework.boot.health.contributor.Status;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

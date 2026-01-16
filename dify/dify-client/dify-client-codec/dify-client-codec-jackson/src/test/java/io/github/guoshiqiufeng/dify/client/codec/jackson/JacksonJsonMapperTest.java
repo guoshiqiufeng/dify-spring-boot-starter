@@ -15,8 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.client.codec.jackson;
 
-import io.github.guoshiqiufeng.dify.client.core.codec.JsonException;
-import io.github.guoshiqiufeng.dify.client.core.codec.JsonNode;
+import io.github.guoshiqiufeng.dify.client.core.codec.*;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 import org.junit.jupiter.api.Test;
 
@@ -76,6 +75,41 @@ class JacksonJsonMapperTest {
     }
 
     @Test
+    void testToJsonIgnoreNullWithNullFields() {
+        TestPojo pojo = new TestPojo(null, 30);
+        String json = mapper.toJsonIgnoreNull(pojo);
+        assertNotNull(json);
+        assertFalse(json.contains("name"));
+        assertTrue(json.contains("age"));
+        assertTrue(json.contains("30"));
+    }
+
+    @Test
+    void testToJsonIgnoreNullWithAllNullFields() {
+        TestPojoWithNullable pojo = new TestPojoWithNullable(null, null);
+        String json = mapper.toJsonIgnoreNull(pojo);
+        assertNotNull(json);
+        assertEquals("{}", json);
+    }
+
+    @Test
+    void testToJsonIgnoreNullWithNoNullFields() {
+        TestPojo pojo = new TestPojo("John", 30);
+        String json = mapper.toJsonIgnoreNull(pojo);
+        assertNotNull(json);
+        assertTrue(json.contains("name"));
+        assertTrue(json.contains("John"));
+        assertTrue(json.contains("age"));
+        assertTrue(json.contains("30"));
+    }
+
+    @Test
+    void testToJsonIgnoreNullWithNull() {
+        String json = mapper.toJsonIgnoreNull(null);
+        assertEquals("null", json);
+    }
+
+    @Test
     void testFromJsonSimpleObject() {
         String json = "{\"name\":\"John\",\"age\":30}";
         TestPojo pojo = mapper.fromJson(json, TestPojo.class);
@@ -113,7 +147,8 @@ class JacksonJsonMapperTest {
     @Test
     void testFromJsonWithTypeReference() {
         String json = "[\"a\",\"b\",\"c\"]";
-        List<String> list = mapper.fromJson(json, new TypeReference<List<String>>() {});
+        List<String> list = mapper.fromJson(json, new TypeReference<List<String>>() {
+        });
         assertNotNull(list);
         assertEquals(3, list.size());
         assertEquals("a", list.get(0));
@@ -124,7 +159,8 @@ class JacksonJsonMapperTest {
     @Test
     void testFromJsonMapWithTypeReference() {
         String json = "{\"key1\":\"value1\",\"key2\":\"value2\"}";
-        Map<String, String> map = mapper.fromJson(json, new TypeReference<Map<String, String>>() {});
+        Map<String, String> map = mapper.fromJson(json, new TypeReference<Map<String, String>>() {
+        });
         assertNotNull(map);
         assertEquals(2, map.size());
         assertEquals("value1", map.get("key1"));
@@ -134,13 +170,32 @@ class JacksonJsonMapperTest {
     @Test
     void testFromJsonComplexTypeReference() {
         String json = "[{\"name\":\"John\",\"age\":30},{\"name\":\"Jane\",\"age\":25}]";
-        List<TestPojo> list = mapper.fromJson(json, new TypeReference<List<TestPojo>>() {});
+        List<TestPojo> list = mapper.fromJson(json, new TypeReference<List<TestPojo>>() {
+        });
         assertNotNull(list);
         assertEquals(2, list.size());
         assertEquals("John", list.get(0).getName());
         assertEquals(30, list.get(0).getAge());
         assertEquals("Jane", list.get(1).getName());
         assertEquals(25, list.get(1).getAge());
+    }
+
+    @Test
+    void testFromJsonWithCustomDeserializer() {
+        String json = "{\"customName\":\"Test\",\"customValue\":42}";
+        CustomTestPojo pojo = mapper.fromJson(json, CustomTestPojo.class);
+        assertNotNull(pojo);
+        assertEquals("Test", pojo.getName());
+        assertEquals(42, pojo.getValue());
+    }
+
+    @Test
+    void testFromJsonWithCustomDeserializerComplexObject() {
+        String json = "{\"customName\":\"ComplexTest\",\"customValue\":100}";
+        CustomTestPojo pojo = mapper.fromJson(json, CustomTestPojo.class);
+        assertNotNull(pojo);
+        assertEquals("ComplexTest", pojo.getName());
+        assertEquals(100, pojo.getValue());
     }
 
     @Test
@@ -271,6 +326,64 @@ class JacksonJsonMapperTest {
         assertTrue(json.contains("Jane"));
     }
 
+    @Test
+    void testToJsonWithUnserializableObject() {
+        UnserializableObject obj = new UnserializableObject();
+        assertThrows(JsonException.class, () -> {
+            mapper.toJson(obj);
+        });
+    }
+
+    @Test
+    void testToJsonIgnoreNullWithUnserializableObject() {
+        UnserializableObject obj = new UnserializableObject();
+        assertThrows(JsonException.class, () -> {
+            mapper.toJsonIgnoreNull(obj);
+        });
+    }
+
+    @Test
+    void testFromJsonWithTypeReferenceInvalidJson() {
+        String invalidJson = "{invalid json}";
+        assertThrows(JsonException.class, () -> {
+            mapper.fromJson(invalidJson, new TypeReference<List<String>>() {
+            });
+        });
+    }
+
+    @Test
+    void testFromJsonWithTypeReferenceMismatchedType() {
+        String json = "{\"key\":\"value\"}";
+        assertThrows(JsonException.class, () -> {
+            mapper.fromJson(json, new TypeReference<List<String>>() {
+            });
+        });
+    }
+
+    @Test
+    void testFromJsonWithCustomDeserializerThrowsException() {
+        String json = "{\"customName\":\"Test\"}";
+        assertThrows(JsonException.class, () -> {
+            mapper.fromJson(json, FailingCustomTestPojo.class);
+        });
+    }
+
+    @Test
+    void testTreeToValueWithInvalidNode() {
+        JsonNode node = mapper.parseTree("{\"name\":\"John\"}");
+        assertThrows(JsonException.class, () -> {
+            mapper.treeToValue(node, InvalidTestPojo.class);
+        });
+    }
+
+    @Test
+    void testValueToTreeWithUnserializableObject() {
+        UnserializableObject obj = new UnserializableObject();
+        assertThrows(JsonException.class, () -> {
+            mapper.valueToTree(obj);
+        });
+    }
+
     // Test POJO class
     public static class TestPojo {
         private String name;
@@ -298,6 +411,131 @@ class JacksonJsonMapperTest {
 
         public void setAge(int age) {
             this.age = age;
+        }
+    }
+
+    // Test POJO class with nullable fields
+    public static class TestPojoWithNullable {
+        private String name;
+        private Integer age;
+
+        public TestPojoWithNullable() {
+        }
+
+        public TestPojoWithNullable(String name, Integer age) {
+            this.name = name;
+            this.age = age;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public Integer getAge() {
+            return age;
+        }
+
+        public void setAge(Integer age) {
+            this.age = age;
+        }
+    }
+
+    // Custom deserializer for testing
+    public static class CustomTestDeserializer implements JsonDeserializer<CustomTestPojo> {
+        @Override
+        public CustomTestPojo deserialize(JsonNode root, JsonMapper jsonMapper) throws JsonException {
+            String name = root.get("customName").asText();
+            int value = root.get("customValue").asInt();
+            return new CustomTestPojo(name, value);
+        }
+    }
+
+    // Test POJO with custom deserializer
+    @JsonDeserialize(using = CustomTestDeserializer.class)
+    public static class CustomTestPojo {
+        private String name;
+        private int value;
+
+        public CustomTestPojo() {
+        }
+
+        public CustomTestPojo(String name, int value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public void setValue(int value) {
+            this.value = value;
+        }
+    }
+
+    // Unserializable object for testing serialization exceptions
+    public static class UnserializableObject {
+        private Object selfReference;
+
+        public UnserializableObject() {
+            this.selfReference = this;
+        }
+
+        public Object getSelfReference() {
+            return selfReference;
+        }
+    }
+
+    // Failing custom deserializer for testing
+    public static class FailingCustomDeserializer implements JsonDeserializer<FailingCustomTestPojo> {
+        @Override
+        public FailingCustomTestPojo deserialize(JsonNode root, JsonMapper jsonMapper) throws JsonException {
+            throw new JsonException("Intentional deserialization failure");
+        }
+    }
+
+    // Test POJO with failing custom deserializer
+    @JsonDeserialize(using = FailingCustomDeserializer.class)
+    public static class FailingCustomTestPojo {
+        private String name;
+
+        public FailingCustomTestPojo() {
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
+    // Invalid test POJO that cannot be deserialized from the given JSON structure
+    public static class InvalidTestPojo {
+        private final String requiredField;
+
+        public InvalidTestPojo(String requiredField) {
+            this.requiredField = requiredField;
+            if (requiredField == null) {
+                throw new IllegalArgumentException("requiredField cannot be null");
+            }
+        }
+
+        public String getRequiredField() {
+            return requiredField;
         }
     }
 }
