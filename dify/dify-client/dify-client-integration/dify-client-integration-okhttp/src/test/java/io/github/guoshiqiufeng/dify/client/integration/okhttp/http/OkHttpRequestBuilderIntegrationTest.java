@@ -17,14 +17,12 @@ package io.github.guoshiqiufeng.dify.client.integration.okhttp.http;
 
 import io.github.guoshiqiufeng.dify.client.codec.gson.GsonJsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
-import io.github.guoshiqiufeng.dify.client.core.constant.MediaType;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder;
-import okhttp3.OkHttpClient;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -285,6 +283,20 @@ class OkHttpRequestBuilderIntegrationTest {
         );
     }
 
+    @Test
+    void testExecuteWithTypeReferenceIOException() throws IOException {
+        // Arrange - shutdown server to cause IOException
+        mockServer.shutdown();
+
+        // Act & Assert
+        assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/test"))
+                        .execute(new TypeReference<List<TestResponse>>() {
+                        })
+        );
+    }
+
     // ========== executeForResponse(Class) Tests ==========
 
     @Test
@@ -401,6 +413,19 @@ class OkHttpRequestBuilderIntegrationTest {
         assertEquals(2, cookies.size());
     }
 
+    @Test
+    void testExecuteForResponseWithIOException() throws IOException {
+        // Arrange - shutdown server to cause IOException
+        mockServer.shutdown();
+
+        // Act & Assert
+        assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/test"))
+                        .executeForResponse(TestResponse.class)
+        );
+    }
+
     // ========== executeForResponse(TypeReference) Tests ==========
 
     @Test
@@ -453,6 +478,20 @@ class OkHttpRequestBuilderIntegrationTest {
         assertThrows(HttpClientException.class, () ->
                 getBuilder(client.get()
                         .uri("/api/forbidden"))
+                        .executeForResponse(new TypeReference<List<TestResponse>>() {
+                        })
+        );
+    }
+
+    @Test
+    void testExecuteForResponseTypeReferenceIOException() throws IOException {
+        // Arrange - shutdown server to cause IOException
+        mockServer.shutdown();
+
+        // Act & Assert
+        assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/test"))
                         .executeForResponse(new TypeReference<List<TestResponse>>() {
                         })
         );
@@ -749,7 +788,7 @@ class OkHttpRequestBuilderIntegrationTest {
         multipartBodyBuilder.part("field4", false);
         multipartBodyBuilder.part("file", "test data".getBytes())
                 .header("Content-Disposition",
-                "form-data; name=\"file\"; filename=\"file\";");
+                        "form-data; name=\"file\"; filename=\"file\";");
         // Act
         TestResponse result = getBuilder(client.post()
                 .uri("/api/upload")
@@ -994,6 +1033,37 @@ class OkHttpRequestBuilderIntegrationTest {
     }
 
     @Test
+    void testMultipartFromPartsWithComplexObjectAndSkipNull() throws Exception {
+        // Test with skipNull enabled to cover the skipNull branch in buildMultipartBodyFromParts
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setSkipNull(true);
+        JavaHttpClient skipNullClient = new JavaHttpClient(
+                mockServer.url("/").toString(),
+                config,
+                null,
+                new GsonJsonMapper(),
+                null
+        );
+
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"uploaded\",\"id\":108}")
+                .setHeader("Content-Type", "application/json"));
+
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        TestResponse complexObj = new TestResponse("complex", 999);
+        builder.part("objectField", complexObj);
+
+        TestResponse result = getBuilder(skipNullClient.post()
+                .uri("/api/upload")
+                .header("Content-Type", "multipart/form-data")
+                .body(builder.build()))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+    }
+
+    @Test
     void testMultipartFromPartsWithNullContentDisposition() throws Exception {
         mockServer.enqueue(new MockResponse()
                 .setResponseCode(200)
@@ -1143,5 +1213,228 @@ class OkHttpRequestBuilderIntegrationTest {
                         .uri("/api/error"))
                         .execute(TestResponse.class)
         );
+    }
+
+    // ========== buildRequestBody() Branch Coverage Tests ==========
+
+    @Test
+    void testRequestBodyWithNullContentType() throws Exception {
+        // Test: contentType == null, body != null -> buildJsonBody()
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"response\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        Map<String, Object> requestBody = new java.util.HashMap<>();
+        requestBody.put("test", "value");
+
+        TestResponse result = getBuilder(client.post()
+                .uri("/api/test")
+                // No Content-Type header set
+                .body(requestBody))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void testRequestBodyWithNonMultipartContentType() throws Exception {
+        // Test: contentType != null but not multipart -> buildJsonBody()
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"response\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        Map<String, Object> requestBody = new java.util.HashMap<>();
+        requestBody.put("test", "value");
+
+        TestResponse result = getBuilder(client.post()
+                .uri("/api/test")
+                .header("Content-Type", "application/json")
+                .body(requestBody))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void testRequestBodyWithMultipartButNotMap() throws Exception {
+        // Test: isMultipart=true but body is not Map -> buildJsonBody()
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"response\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        String requestBody = "not a map";
+
+        TestResponse result = getBuilder(client.post()
+                .uri("/api/test")
+                .header("Content-Type", "multipart/form-data")
+                .body(requestBody))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void testRequestBodyWithEmptyMap() throws Exception {
+        // Test: isMultipart=true, body is Map but empty -> buildJsonBody()
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"response\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        Map<String, Object> emptyMap = new java.util.HashMap<>();
+
+        TestResponse result = getBuilder(client.post()
+                .uri("/api/test")
+                .header("Content-Type", "multipart/form-data")
+                .body(emptyMap))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void testRequestBodyWithMapButNotPart() throws Exception {
+        // Test: isMultipart=true, body is Map but firstValue is not Part -> buildJsonBody()
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"response\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        Map<String, Object> mapWithNonPart = new java.util.HashMap<>();
+        mapWithNonPart.put("key", "regular string value");
+
+        TestResponse result = getBuilder(client.post()
+                .uri("/api/test")
+                .header("Content-Type", "multipart/form-data")
+                .body(mapWithNonPart))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void testRequestBodyWithPatchMethod() throws Exception {
+        // Test: PATCH method with empty body
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"patched\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        TestResponse result = getBuilder(client.patch()
+                .uri("/api/patch"))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        assertEquals("PATCH", request.getMethod());
+    }
+
+    @Test
+    void testRequestBodyWithGetMethodReturnsNull() throws Exception {
+        // Test: GET method returns null body
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"test\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        TestResponse result = getBuilder(client.get()
+                .uri("/api/test"))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        assertEquals("GET", request.getMethod());
+        // GET requests should have no body
+        assertEquals(0, request.getBodySize());
+    }
+
+    @Test
+    void testRequestBodyWithDeleteMethodReturnsNull() throws Exception {
+        // Test: DELETE method returns null body
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(204)
+                .setHeader("Content-Length", "0"));
+
+        int statusCode = getBuilder(client.delete()
+                .uri("/api/delete"))
+                .executeForStatus();
+
+        assertEquals(204, statusCode);
+        RecordedRequest request = mockServer.takeRequest();
+        assertEquals("DELETE", request.getMethod());
+    }
+
+    @Test
+    void testRequestBodyWithPostAndNullBody() throws Exception {
+        // Test: POST with null body and null multipartData -> empty body
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"created\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        TestResponse result = getBuilder(client.post()
+                .uri("/api/create"))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        assertEquals("POST", request.getMethod());
+    }
+
+    @Test
+    void testRequestBodyWithPutAndNullBody() throws Exception {
+        // Test: PUT with null body and null multipartData -> empty body
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"updated\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        TestResponse result = getBuilder(client.put()
+                .uri("/api/update"))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        assertEquals("PUT", request.getMethod());
+    }
+
+    @Test
+    void testRequestBodyWithPatchAndNullBody() throws Exception {
+        // Test: PATCH with null body and null multipartData -> empty body
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"patched\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        TestResponse result = getBuilder(client.patch()
+                .uri("/api/patch"))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        assertEquals("PATCH", request.getMethod());
+    }
+
+    @Test
+    void testRequestBodyWithMultipartContentTypeVariations() throws Exception {
+        // Test: Content-Type with different case variations
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"uploaded\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        builder.part("field", "value");
+
+        TestResponse result = getBuilder(client.post()
+                .uri("/api/upload")
+                .header("Content-Type", "MULTIPART/FORM-DATA; boundary=----")
+                .body(builder.build()))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
     }
 }

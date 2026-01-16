@@ -47,6 +47,10 @@ testing {
             }
 
             dependencies {
+                implementation libs.mockito.core
+                implementation libs.mockito.junit.jupiter
+                implementation libs.bytebuddy
+                implementation libs.bytebuddy.agent
                 implementation "org.springframework.boot:spring-boot-starter-reactor-netty:3.5.9"
                 implementation 'io.projectreactor:reactor-core:3.7.3'
                 implementation 'io.projectreactor.netty:reactor-netty:1.2.8'

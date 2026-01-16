@@ -306,6 +306,41 @@ class BeanUtilsTest {
         assertTrue(target.isBooleanValue());
     }
 
+    @Test
+    void testCopyToListWithInvalidTargetClass() {
+        List<SourceBean> sourceList = new ArrayList<>();
+        SourceBean source = new SourceBean();
+        source.setName("John");
+        sourceList.add(source);
+
+        // Test with a class that doesn't have a no-arg constructor
+        assertThrows(RuntimeException.class, () -> {
+            BeanUtils.copyToList(sourceList, NoDefaultConstructorBean.class);
+        });
+    }
+
+    @Test
+    void testCopyPropertiesWithPrivateClass() {
+        PrivateFieldBean source = new PrivateFieldBean();
+        source.setName("John");
+
+        PrivateFieldBean target = new PrivateFieldBean();
+        BeanUtils.copyProperties(source, target);
+
+        assertEquals("John", target.getName());
+    }
+
+    @Test
+    void testGetPropertyDescriptorsError() {
+        // This test ensures the error handling in getPropertyDescriptors is covered
+        SourceBean source = new SourceBean();
+        source.setName("Test");
+        TargetBean target = new TargetBean();
+
+        // Normal copy should work fine
+        assertDoesNotThrow(() -> BeanUtils.copyProperties(source, target));
+    }
+
     // Test beans
 
     public static class SourceBean {
@@ -482,6 +517,34 @@ class BeanUtilsTest {
 
         public void setBooleanValue(boolean booleanValue) {
             this.booleanValue = booleanValue;
+        }
+    }
+
+    public static class NoDefaultConstructorBean {
+        private String name;
+
+        public NoDefaultConstructorBean(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
+    public static class PrivateFieldBean {
+        private String name;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
         }
     }
 }

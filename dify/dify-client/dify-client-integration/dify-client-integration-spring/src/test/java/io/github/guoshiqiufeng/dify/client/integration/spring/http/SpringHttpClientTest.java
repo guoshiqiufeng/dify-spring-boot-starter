@@ -189,4 +189,189 @@ class SpringHttpClientTest {
         // Assert
         assertNotNull(client);
     }
+
+    // ==================== Additional Coverage Tests ====================
+
+    @Test
+    void testConstructorWithCustomWebClientBuilder() {
+        // Arrange
+        org.springframework.web.reactive.function.client.WebClient.Builder webClientBuilder =
+            org.springframework.web.reactive.function.client.WebClient.builder();
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", clientConfig,
+            webClientBuilder, null, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+    }
+
+    @Test
+    void testConstructorWithCustomWebClientBuilderAndHeaders() {
+        // Arrange
+        org.springframework.web.reactive.function.client.WebClient.Builder webClientBuilder =
+            org.springframework.web.reactive.function.client.WebClient.builder();
+        io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders headers =
+            new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders();
+        headers.add("X-Custom-Header", "test-value");
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", clientConfig,
+            webClientBuilder, null, jsonMapper, headers);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+    }
+
+    @Test
+    void testConstructorWithCustomWebClientBuilderHeadersAndInterceptors() {
+        // Arrange
+        org.springframework.web.reactive.function.client.WebClient.Builder webClientBuilder =
+            org.springframework.web.reactive.function.client.WebClient.builder();
+        io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders headers =
+            new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders();
+        headers.add("X-Custom-Header", "test-value");
+        java.util.List<Object> interceptors = new java.util.ArrayList<>();
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", clientConfig,
+            webClientBuilder, null, jsonMapper, headers, interceptors);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+    }
+
+    @Test
+    void testConstructorWithTimeoutConfiguration() {
+        // Arrange
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setConnectTimeout(10);
+        config.setReadTimeout(20);
+        config.setWriteTimeout(30);
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+    }
+
+    @Test
+    void testConstructorWithLoggingEnabled() {
+        // Arrange
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setLogging(true);
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+    }
+
+    // ==================== ClassNotFoundException Coverage Tests ====================
+
+    @Test
+    void testCreateWebClientWithInvalidInterceptor() throws Exception {
+        // Arrange
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        java.util.List<Object> interceptors = new java.util.ArrayList<>();
+
+        // Add an object that is not an ExchangeFilterFunction to trigger ClassNotFoundException path
+        // We'll use a custom class that will fail the instanceof check
+        Object invalidInterceptor = new Object() {
+            @Override
+            public String toString() {
+                return "InvalidInterceptor";
+            }
+        };
+        interceptors.add(invalidInterceptor);
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", config,
+            null, null, jsonMapper, new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders(), interceptors);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+    }
+
+    @Test
+    void testCreateWebClientWithNullInterceptors() {
+        // Arrange
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", config,
+            null, null, jsonMapper, new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders(), null);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+    }
+
+    @Test
+    void testCreateWebClientWithEmptyHeaders() {
+        // Arrange
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders emptyHeaders =
+            new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders();
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", config,
+            null, null, jsonMapper, emptyHeaders, new java.util.ArrayList<>());
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+    }
+
+    @Test
+    void testCreateWebClientWithNullHeaders() {
+        // Arrange
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", config,
+            null, null, jsonMapper, null, new java.util.ArrayList<>());
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+    }
+
+    @Test
+    void testConstructorWithNullTimeoutConfiguration() {
+        // Arrange
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setConnectTimeout(null);
+        config.setReadTimeout(null);
+        config.setWriteTimeout(null);
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+    }
+
+    @Test
+    void testConstructorWithLoggingDisabled() {
+        // Arrange
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setLogging(false);
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+    }
 }

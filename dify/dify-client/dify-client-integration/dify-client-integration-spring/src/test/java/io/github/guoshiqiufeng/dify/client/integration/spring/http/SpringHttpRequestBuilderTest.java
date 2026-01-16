@@ -41,6 +41,7 @@ import static org.mockito.Mockito.*;
  * @version 2.0.0
  * @since 2026/1/13
  */
+@SuppressWarnings({"unchecked", "deprecation"})
 @ExtendWith(MockitoExtension.class)
 class SpringHttpRequestBuilderTest {
 
@@ -553,5 +554,388 @@ class SpringHttpRequestBuilderTest {
 
         // Assert
         assertNotNull(result);
+    }
+
+    // ==================== Additional Coverage Tests ====================
+
+    @Test
+    void testStreamMethod() throws Exception {
+        // Arrange
+        builder.uri("/api/stream");
+
+        java.lang.reflect.Field executorField = SpringHttpRequestBuilder.class.getDeclaredField("webClientExecutor");
+        executorField.setAccessible(true);
+        WebClientExecutor mockExecutor = mock(WebClientExecutor.class);
+        executorField.set(builder, mockExecutor);
+
+        reactor.core.publisher.Flux<String> mockFlux = reactor.core.publisher.Flux.just("data1", "data2");
+        when(mockExecutor.executeStream(anyString(), any(URI.class), any(), any(), any(), any(), eq(String.class)))
+            .thenReturn(mockFlux);
+
+        // Act
+        var result = builder.stream(String.class);
+
+        // Assert
+        assertNotNull(result);
+        verify(mockExecutor).executeStream(anyString(), any(URI.class), any(), any(), any(), any(), eq(String.class));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testResponseSpecBodyWithClass() throws Exception {
+        // Arrange
+        builder.uri("/api/test");
+
+        java.lang.reflect.Field executorField = SpringHttpRequestBuilder.class.getDeclaredField("webClientExecutor");
+        executorField.setAccessible(true);
+        WebClientExecutor mockExecutor = mock(WebClientExecutor.class, withSettings().lenient());
+        executorField.set(builder, mockExecutor);
+
+        io.github.guoshiqiufeng.dify.client.core.response.HttpResponse<String> mockResponse =
+            mock(io.github.guoshiqiufeng.dify.client.core.response.HttpResponse.class, withSettings().lenient());
+        when(mockResponse.getStatusCode()).thenReturn(200);
+        when(mockResponse.getBody()).thenReturn("response body");
+
+        when(mockExecutor.executeForEntity(anyString(), any(URI.class), any(), any(), any(), any(), eq(String.class)))
+            .thenReturn(mockResponse);
+
+        // Act
+        var responseSpec = builder.retrieve();
+        String result = responseSpec.body(String.class);
+
+        // Assert
+        assertEquals("response body", result);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testResponseSpecBodyWithTypeReference() throws Exception {
+        // Arrange
+        builder.uri("/api/test");
+
+        java.lang.reflect.Field executorField = SpringHttpRequestBuilder.class.getDeclaredField("webClientExecutor");
+        executorField.setAccessible(true);
+        WebClientExecutor mockExecutor = mock(WebClientExecutor.class, withSettings().lenient());
+        executorField.set(builder, mockExecutor);
+
+        io.github.guoshiqiufeng.dify.client.core.response.HttpResponse<String> mockResponse =
+            mock(io.github.guoshiqiufeng.dify.client.core.response.HttpResponse.class, withSettings().lenient());
+        when(mockResponse.getStatusCode()).thenReturn(200);
+        when(mockResponse.getBody()).thenReturn("response body");
+
+        when(mockExecutor.executeForEntity(anyString(), any(URI.class), any(), any(), any(), any(),
+            any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class)))
+            .thenReturn(mockResponse);
+
+        // Act
+        var responseSpec = builder.retrieve();
+        io.github.guoshiqiufeng.dify.client.core.http.TypeReference<String> typeRef =
+            new io.github.guoshiqiufeng.dify.client.core.http.TypeReference<String>() {};
+        String result = responseSpec.body(typeRef);
+
+        // Assert
+        assertEquals("response body", result);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testResponseSpecWithErrorHandler() throws Exception {
+        // Arrange
+        builder.uri("/api/test");
+
+        java.lang.reflect.Field executorField = SpringHttpRequestBuilder.class.getDeclaredField("webClientExecutor");
+        executorField.setAccessible(true);
+        WebClientExecutor mockExecutor = mock(WebClientExecutor.class, withSettings().lenient());
+        executorField.set(builder, mockExecutor);
+
+        io.github.guoshiqiufeng.dify.client.core.response.HttpResponse<String> mockResponse =
+            mock(io.github.guoshiqiufeng.dify.client.core.response.HttpResponse.class, withSettings().lenient());
+        when(mockResponse.getStatusCode()).thenReturn(404);
+        when(mockResponse.getBody()).thenReturn("Not Found");
+
+        when(mockExecutor.executeForEntity(anyString(), any(URI.class), any(), any(), any(), any(), eq(String.class)))
+            .thenReturn(mockResponse);
+
+        // Act & Assert
+        var responseSpec = builder.retrieve();
+        responseSpec.onStatus(
+            io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler.onStatus(
+                status -> status == 404,
+                response -> {
+                    throw new RuntimeException("Not found error");
+                }
+            )
+        );
+
+        assertThrows(RuntimeException.class, () -> responseSpec.toEntity(String.class));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testResponseSpecWithMultipleErrorHandlers() throws Exception {
+        // Arrange
+        builder.uri("/api/test");
+
+        java.lang.reflect.Field executorField = SpringHttpRequestBuilder.class.getDeclaredField("webClientExecutor");
+        executorField.setAccessible(true);
+        WebClientExecutor mockExecutor = mock(WebClientExecutor.class, withSettings().lenient());
+        executorField.set(builder, mockExecutor);
+
+        io.github.guoshiqiufeng.dify.client.core.response.HttpResponse<String> mockResponse =
+            mock(io.github.guoshiqiufeng.dify.client.core.response.HttpResponse.class, withSettings().lenient());
+        when(mockResponse.getStatusCode()).thenReturn(500);
+        when(mockResponse.getBody()).thenReturn("Server Error");
+
+        when(mockExecutor.executeForEntity(anyString(), any(URI.class), any(), any(), any(), any(), eq(String.class)))
+            .thenReturn(mockResponse);
+
+        // Act & Assert
+        var responseSpec = builder.retrieve();
+        responseSpec.onStatus(
+            io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler.onStatus(
+                status -> status == 404,
+                response -> {
+                    throw new RuntimeException("Not found");
+                }
+            )
+        ).onStatus(
+            io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler.onStatus(
+                status -> status >= 500,
+                response -> {
+                    throw new RuntimeException("Server error");
+                }
+            )
+        );
+
+        assertThrows(RuntimeException.class, () -> responseSpec.toEntity(String.class));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testResponseSpecWithNonMatchingErrorHandler() throws Exception {
+        // Arrange
+        builder.uri("/api/test");
+
+        java.lang.reflect.Field executorField = SpringHttpRequestBuilder.class.getDeclaredField("webClientExecutor");
+        executorField.setAccessible(true);
+        WebClientExecutor mockExecutor = mock(WebClientExecutor.class);
+        executorField.set(builder, mockExecutor);
+
+        io.github.guoshiqiufeng.dify.client.core.response.HttpResponse<String> mockResponse =
+            mock(io.github.guoshiqiufeng.dify.client.core.response.HttpResponse.class);
+        when(mockResponse.getStatusCode()).thenReturn(200);
+        when(mockResponse.getBody()).thenReturn("Success");
+
+        when(mockExecutor.executeForEntity(anyString(), any(URI.class), any(), any(), any(), any(), eq(String.class)))
+            .thenReturn(mockResponse);
+
+        // Act
+        var responseSpec = builder.retrieve();
+        responseSpec.onStatus(
+            io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler.onStatus(
+                status -> status >= 400,
+                response -> {
+                    throw new RuntimeException("Error");
+                }
+            )
+        );
+
+        var result = responseSpec.toEntity(String.class);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(200, result.getStatusCode());
+        assertEquals("Success", result.getBody());
+    }
+
+    @Test
+    void testConstructorWithNullDefaultHeaders() {
+        // Act
+        SpringHttpRequestBuilder builder = new SpringHttpRequestBuilder(client, "GET", jsonMapper, null);
+
+        // Assert
+        assertNotNull(builder);
+    }
+
+    @Test
+    void testConstructorWithEmptyDefaultHeaders() {
+        // Arrange
+        HttpHeaders emptyHeaders = new HttpHeaders();
+
+        // Act
+        SpringHttpRequestBuilder builder = new SpringHttpRequestBuilder(client, "POST", jsonMapper, emptyHeaders);
+
+        // Assert
+        assertNotNull(builder);
+    }
+
+    @Test
+    void testConstructorWithDefaultHeadersContainingNullValues() {
+        // Arrange
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Header-1", "value1");
+        headers.put("X-Header-2", null); // null value list
+
+        // Act
+        SpringHttpRequestBuilder builder = new SpringHttpRequestBuilder(client, "POST", jsonMapper, headers);
+
+        // Assert
+        assertNotNull(builder);
+    }
+
+    @Test
+    void testConstructorWithDefaultHeadersContainingEmptyList() {
+        // Arrange
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Header-1", "value1");
+        headers.put("X-Header-2", new java.util.ArrayList<>()); // empty list
+
+        // Act
+        SpringHttpRequestBuilder builder = new SpringHttpRequestBuilder(client, "POST", jsonMapper, headers);
+
+        // Assert
+        assertNotNull(builder);
+    }
+
+    @Test
+    void testHeadersConsumerWithNullValues() {
+        // Act
+        HttpRequestBuilder result = builder.headers(headers -> {
+            headers.add("X-Header-1", "value1");
+            headers.put("X-Header-2", null); // null value list
+        });
+
+        // Assert
+        assertNotNull(result);
+        assertSame(builder, result);
+    }
+
+    @Test
+    void testHeadersConsumerWithEmptyList() {
+        // Act
+        HttpRequestBuilder result = builder.headers(headers -> {
+            headers.add("X-Header-1", "value1");
+            headers.put("X-Header-2", new java.util.ArrayList<>()); // empty list
+        });
+
+        // Assert
+        assertNotNull(result);
+        assertSame(builder, result);
+    }
+
+    @Test
+    void testCookiesConsumerWithNullValues() {
+        // Act
+        HttpRequestBuilder result = builder.cookies(cookies -> {
+            cookies.add("cookie1", "value1");
+            cookies.put("cookie2", null); // null value list
+        });
+
+        // Assert
+        assertNotNull(result);
+        assertSame(builder, result);
+    }
+
+    @Test
+    void testCookiesConsumerWithEmptyList() {
+        // Act
+        HttpRequestBuilder result = builder.cookies(cookies -> {
+            cookies.add("cookie1", "value1");
+            cookies.put("cookie2", new java.util.ArrayList<>()); // empty list
+        });
+
+        // Assert
+        assertNotNull(result);
+        assertSame(builder, result);
+    }
+
+    @Test
+    void testExecuteWithRestClientExecutor() throws Exception {
+        // Arrange
+        when(client.hasRestClient()).thenReturn(true);
+        Object mockRestClient = new Object();
+        when(client.getRestClient()).thenReturn(mockRestClient);
+
+        SpringHttpRequestBuilder builderWithRestClient = new SpringHttpRequestBuilder(client, "GET", jsonMapper, null);
+        builderWithRestClient.uri("/api/test");
+
+        java.lang.reflect.Field restExecutorField = SpringHttpRequestBuilder.class.getDeclaredField("restClientExecutor");
+        restExecutorField.setAccessible(true);
+        RestClientExecutor mockRestExecutor = mock(RestClientExecutor.class);
+        restExecutorField.set(builderWithRestClient, mockRestExecutor);
+
+        when(mockRestExecutor.execute(anyString(), any(URI.class), any(), any(), any(), eq(String.class)))
+            .thenReturn("rest client response");
+
+        // Act
+        String result = builderWithRestClient.execute(String.class);
+
+        // Assert
+        assertEquals("rest client response", result);
+        verify(mockRestExecutor).execute(anyString(), any(URI.class), any(), any(), any(), eq(String.class));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testExecuteWithRestClientExecutorAndTypeReference() throws Exception {
+        // Arrange
+        when(client.hasRestClient()).thenReturn(true);
+        Object mockRestClient = new Object();
+        when(client.getRestClient()).thenReturn(mockRestClient);
+
+        SpringHttpRequestBuilder builderWithRestClient = new SpringHttpRequestBuilder(client, "GET", jsonMapper, null);
+        builderWithRestClient.uri("/api/test");
+
+        java.lang.reflect.Field restExecutorField = SpringHttpRequestBuilder.class.getDeclaredField("restClientExecutor");
+        restExecutorField.setAccessible(true);
+        RestClientExecutor mockRestExecutor = mock(RestClientExecutor.class);
+        restExecutorField.set(builderWithRestClient, mockRestExecutor);
+
+        io.github.guoshiqiufeng.dify.client.core.http.TypeReference<String> typeRef =
+            new io.github.guoshiqiufeng.dify.client.core.http.TypeReference<String>() {};
+
+        when(mockRestExecutor.execute(anyString(), any(URI.class), any(), any(), any(),
+            any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class)))
+            .thenReturn("rest client response");
+
+        // Act
+        String result = builderWithRestClient.execute(typeRef);
+
+        // Assert
+        assertEquals("rest client response", result);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testResponseSpecWithCheckedExceptionInErrorHandler() throws Exception {
+        // Arrange
+        builder.uri("/api/test");
+
+        java.lang.reflect.Field executorField = SpringHttpRequestBuilder.class.getDeclaredField("webClientExecutor");
+        executorField.setAccessible(true);
+        WebClientExecutor mockExecutor = mock(WebClientExecutor.class, withSettings().lenient());
+        executorField.set(builder, mockExecutor);
+
+        io.github.guoshiqiufeng.dify.client.core.response.HttpResponse<String> mockResponse =
+            mock(io.github.guoshiqiufeng.dify.client.core.response.HttpResponse.class, withSettings().lenient());
+        when(mockResponse.getStatusCode()).thenReturn(400);
+        when(mockResponse.getBody()).thenReturn("Bad Request");
+
+        when(mockExecutor.executeForEntity(anyString(), any(URI.class), any(), any(), any(), any(), eq(String.class)))
+            .thenReturn(mockResponse);
+
+        // Act & Assert
+        var responseSpec = builder.retrieve();
+        responseSpec.onStatus(
+            io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler.onStatus(
+                status -> status == 400,
+                response -> {
+                    throw new Exception("Checked exception");
+                }
+            )
+        );
+
+        assertThrows(io.github.guoshiqiufeng.dify.client.core.http.HttpClientException.class,
+            () -> responseSpec.toEntity(String.class));
     }
 }

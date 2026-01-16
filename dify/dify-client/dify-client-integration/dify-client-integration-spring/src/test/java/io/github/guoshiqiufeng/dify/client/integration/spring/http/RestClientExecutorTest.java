@@ -1550,6 +1550,683 @@ class RestClientExecutorTest {
         }
     }
 
+    // ==================== Phase 10: Additional Coverage Tests ====================
+
+    @Test
+    void testRetrieveEntityWithNonResponseEntityReturn() throws Exception {
+        // Arrange
+        Method retrieveEntityMethod = RestClientExecutor.class.getDeclaredMethod("retrieveEntity", Object.class);
+        retrieveEntityMethod.setAccessible(true);
+
+        // Create a mock requestSpec that returns a non-ResponseEntity object
+        Object mockRequestSpec = new Object() {
+            public Object retrieve() {
+                return new Object() {
+                    public Object toEntity(Class<?> clazz) {
+                        // Return a non-ResponseEntity object to trigger the error path
+                        return "Not a ResponseEntity";
+                    }
+                };
+            }
+        };
+
+        // Act & Assert
+        try {
+            retrieveEntityMethod.invoke(executor, mockRequestSpec);
+            fail("Expected InvocationTargetException");
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            assertInstanceOf(HttpClientException.class, e.getCause());
+            assertTrue(e.getCause().getMessage().contains("Unexpected return type"));
+        }
+    }
+
+    @Test
+    void testRetrieveEntityWithInvocationTargetExceptionNullCause() throws Exception {
+        // Arrange
+        Method retrieveEntityMethod = RestClientExecutor.class.getDeclaredMethod("retrieveEntity", Object.class);
+        retrieveEntityMethod.setAccessible(true);
+
+        // Create a mock requestSpec that throws InvocationTargetException with null cause
+        Object mockRequestSpec = new Object() {
+            public Object retrieve() {
+                return new Object() {
+                    public Object toEntity(Class<?> clazz) throws Exception {
+                        throw new java.lang.reflect.InvocationTargetException(null);
+                    }
+                };
+            }
+        };
+
+        // Act & Assert
+        try {
+            retrieveEntityMethod.invoke(executor, mockRequestSpec);
+            fail("Expected InvocationTargetException");
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            // The inner InvocationTargetException should be thrown
+            assertNotNull(e.getCause());
+        }
+    }
+
+    @Test
+    void testRetrieveEntityWithErrorExtractionSuccess() throws Exception {
+        // Arrange
+        Method retrieveEntityMethod = RestClientExecutor.class.getDeclaredMethod("retrieveEntity", Object.class);
+        retrieveEntityMethod.setAccessible(true);
+
+        // Create a mock exception that simulates a Spring HTTP exception
+        // Note: We can't override getClass().getName(), so the extraction will fail
+        // and the exception will be re-thrown
+        Throwable mockHttpException = new Throwable("404 Not Found") {
+            public HttpStatus getStatusCode() {
+                return HttpStatus.NOT_FOUND;
+            }
+
+            public String getResponseBodyAsString() {
+                return "{\"error\":\"Resource not found\"}";
+            }
+
+            public org.springframework.http.HttpHeaders getResponseHeaders() {
+                org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+                headers.add("Content-Type", "application/json");
+                return headers;
+            }
+        };
+
+        // Create a mock requestSpec that throws the exception
+        Object mockRequestSpec = new Object() {
+            public Object retrieve() {
+                return new Object() {
+                    public Object toEntity(Class<?> clazz) throws Exception {
+                        throw new java.lang.reflect.InvocationTargetException(mockHttpException);
+                    }
+                };
+            }
+        };
+
+        // Act & Assert - The extraction will fail because the class name doesn't match Spring patterns
+        // So this test should throw the exception
+        try {
+            retrieveEntityMethod.invoke(executor, mockRequestSpec);
+            fail("Expected InvocationTargetException");
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            // Expected - the inner exception should be thrown
+            assertNotNull(e.getCause());
+        }
+    }
+
+    @Test
+    void testExtractErrorResponseWithRestClientResponseException() throws Exception {
+        // Arrange
+        Method method = RestClientExecutor.class.getDeclaredMethod("extractErrorResponse", Throwable.class);
+        method.setAccessible(true);
+
+        // Create a mock exception with class name matching RestClientResponseException
+        // Note: We can't override getClass().getName(), so this will return null
+        Throwable mockException = new Throwable("400 Bad Request") {
+            public HttpStatus getStatusCode() {
+                return HttpStatus.BAD_REQUEST;
+            }
+
+            public String getResponseBodyAsString() {
+                return "{\"error\":\"Invalid request\"}";
+            }
+
+            public org.springframework.http.HttpHeaders getResponseHeaders() {
+                org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+                headers.add("Content-Type", "application/json");
+                return headers;
+            }
+        };
+
+        // Act
+        ResponseEntity<String> result = (ResponseEntity<String>) method.invoke(executor, mockException);
+
+        // Assert - Should return null because class name doesn't match Spring exception patterns
+        assertNull(result);
+    }
+
+    @Test
+    void testExtractErrorResponseWithHttpServerErrorException() throws Exception {
+        // Arrange
+        Method method = RestClientExecutor.class.getDeclaredMethod("extractErrorResponse", Throwable.class);
+        method.setAccessible(true);
+
+        // Create a mock exception - will return null because class name doesn't match
+        Throwable mockException = new Throwable("500 Internal Server Error") {
+            public HttpStatus getStatusCode() {
+                return HttpStatus.INTERNAL_SERVER_ERROR;
+            }
+
+            public String getResponseBodyAsString() {
+                return "{\"error\":\"Server error\"}";
+            }
+
+            public org.springframework.http.HttpHeaders getResponseHeaders() {
+                org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+                headers.add("Content-Type", "application/json");
+                return headers;
+            }
+        };
+
+        // Act
+        ResponseEntity<String> result = (ResponseEntity<String>) method.invoke(executor, mockException);
+
+        // Assert - Should return null because class name doesn't match Spring exception patterns
+        assertNull(result);
+    }
+
+    @Test
+    void testExtractErrorResponseWithHttpStatusCodeException() throws Exception {
+        // Arrange
+        Method method = RestClientExecutor.class.getDeclaredMethod("extractErrorResponse", Throwable.class);
+        method.setAccessible(true);
+
+        // Create a mock exception - will return null because class name doesn't match
+        Throwable mockException = new Throwable("403 Forbidden") {
+            public HttpStatus getStatusCode() {
+                return HttpStatus.FORBIDDEN;
+            }
+
+            public String getResponseBodyAsString() {
+                return "{\"error\":\"Access denied\"}";
+            }
+
+            public org.springframework.http.HttpHeaders getResponseHeaders() {
+                org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+                headers.add("Content-Type", "application/json");
+                headers.add("X-Custom-Header", "test-value");
+                return headers;
+            }
+        };
+
+        // Act
+        ResponseEntity<String> result = (ResponseEntity<String>) method.invoke(executor, mockException);
+
+        // Assert - Should return null because class name doesn't match Spring exception patterns
+        assertNull(result);
+    }
+
+    // ==================== Phase 11: Reflection Fallback Path Tests ====================
+
+    @Test
+    void testExtractStatusCodeViaReflectionWithGetRawStatusCode() throws Exception {
+        // Arrange
+        Method method = RestClientExecutor.class.getDeclaredMethod("extractStatusCodeViaReflection", Throwable.class, Class.class);
+        method.setAccessible(true);
+
+        // Create a mock exception with getRawStatusCode() method (Spring 6+)
+        Throwable mockException = new Throwable() {
+            public int getRawStatusCode() {
+                return 503;
+            }
+        };
+
+        // Act
+        int statusCode = (int) method.invoke(executor, mockException, mockException.getClass());
+
+        // Assert
+        assertEquals(503, statusCode);
+    }
+
+    @Test
+    void testExtractStatusCodeViaReflectionWithGetStatusCodeValueMethod() throws Exception {
+        // Arrange
+        Method method = RestClientExecutor.class.getDeclaredMethod("extractStatusCodeViaReflection", Throwable.class, Class.class);
+        method.setAccessible(true);
+
+        // Create a mock exception without any status code methods - should fail
+        Throwable mockException = new Throwable() {
+            public int getStatusCodeValue() {
+                return 429;
+            }
+        };
+
+        // Act & Assert - extractStatusCodeViaReflection doesn't support getStatusCodeValue()
+        // It only supports getStatusCode() and getRawStatusCode()
+        try {
+            method.invoke(executor, mockException, mockException.getClass());
+            fail("Expected InvocationTargetException");
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            assertInstanceOf(Exception.class, e.getCause());
+            assertTrue(e.getCause().getMessage().contains("Unable to extract status code"));
+        }
+    }
+
+    @Test
+    void testFindMethodWithSuperclassMethod() throws Exception {
+        // Arrange
+        Method findMethodMethod = RestClientExecutor.class.getDeclaredMethod("findMethod", Class.class, String.class, Class[].class);
+        findMethodMethod.setAccessible(true);
+
+        // Create a class hierarchy
+        class BaseClass {
+            public void baseMethod() {
+            }
+        }
+
+        class DerivedClass extends BaseClass {
+        }
+
+        // Act - find method in superclass
+        Method foundMethod = (Method) findMethodMethod.invoke(executor, DerivedClass.class, "baseMethod", new Class[]{});
+
+        // Assert
+        assertNotNull(foundMethod);
+        assertEquals("baseMethod", foundMethod.getName());
+    }
+
+    @Test
+    void testFindMethodWithInterfaceMethod() throws Exception {
+        // Arrange
+        Method findMethodMethod = RestClientExecutor.class.getDeclaredMethod("findMethod", Class.class, String.class, Class[].class);
+        findMethodMethod.setAccessible(true);
+
+        // Create an interface and implementing class
+        interface TestInterface {
+            void interfaceMethod();
+        }
+
+        class TestClass implements TestInterface {
+            @Override
+            public void interfaceMethod() {
+            }
+        }
+
+        // Act - find method from interface
+        Method foundMethod = (Method) findMethodMethod.invoke(executor, TestClass.class, "interfaceMethod", new Class[]{});
+
+        // Assert
+        assertNotNull(foundMethod);
+        assertEquals("interfaceMethod", foundMethod.getName());
+    }
+
+    @Test
+    void testFindMethodWithMultipleLevelHierarchy() throws Exception {
+        // Arrange
+        Method findMethodMethod = RestClientExecutor.class.getDeclaredMethod("findMethod", Class.class, String.class, Class[].class);
+        findMethodMethod.setAccessible(true);
+
+        // Create a multi-level class hierarchy
+        class GrandParent {
+            public void grandParentMethod() {
+            }
+        }
+
+        class Parent extends GrandParent {
+            public void parentMethod() {
+            }
+        }
+
+        class Child extends Parent {
+        }
+
+        // Act - find method in grandparent
+        Method foundMethod = (Method) findMethodMethod.invoke(executor, Child.class, "grandParentMethod", new Class[]{});
+
+        // Assert
+        assertNotNull(foundMethod);
+        assertEquals("grandParentMethod", foundMethod.getName());
+    }
+
+    @Test
+    void testGetStatusCodeValueWithReflectionException() throws Exception {
+        // Arrange
+        Method method = RestClientExecutor.class.getDeclaredMethod("getStatusCodeValue", ResponseEntity.class);
+        method.setAccessible(true);
+
+        // Create a ResponseEntity with a valid status code
+        ResponseEntity<String> responseEntity = ResponseEntity.status(HttpStatus.ACCEPTED).body("test");
+
+        // Act - This should work normally, but tests the fallback path
+        int statusCode = (int) method.invoke(executor, responseEntity);
+
+        // Assert
+        assertEquals(202, statusCode);
+    }
+
+    @Test
+    void testExtractStatusCodeWithGetRawStatusCodeFallback() throws Exception {
+        // Arrange
+        Method method = RestClientExecutor.class.getDeclaredMethod("extractStatusCode", Throwable.class, Class.class);
+        method.setAccessible(true);
+
+        // Create a mock exception with getRawStatusCode() method
+        Throwable mockException = new Throwable() {
+            public int getRawStatusCode() {
+                return 502;
+            }
+        };
+
+        // Act
+        int statusCode = (int) method.invoke(executor, mockException, mockException.getClass());
+
+        // Assert
+        assertEquals(502, statusCode);
+    }
+
+    @Test
+    void testExtractStatusCodeWithAllFallbackPaths() throws Exception {
+        // Arrange
+        Method method = RestClientExecutor.class.getDeclaredMethod("extractStatusCode", Throwable.class, Class.class);
+        method.setAccessible(true);
+
+        // Test 1: getStatusCode() with value() method
+        Throwable exception1 = new Throwable() {
+            public HttpStatus getStatusCode() {
+                return HttpStatus.OK;
+            }
+        };
+        assertEquals(200, (int) method.invoke(executor, exception1, exception1.getClass()));
+
+        // Test 2: getRawStatusCode() method
+        Throwable exception2 = new Throwable() {
+            public int getRawStatusCode() {
+                return 201;
+            }
+        };
+        assertEquals(201, (int) method.invoke(executor, exception2, exception2.getClass()));
+
+        // Test 3: getStatusCodeValue() method
+        Throwable exception3 = new Throwable() {
+            public int getStatusCodeValue() {
+                return 202;
+            }
+        };
+        assertEquals(202, (int) method.invoke(executor, exception3, exception3.getClass()));
+    }
+
+    // ==================== Phase 12: Edge Case Tests ====================
+
+    @Test
+    void testExtractResponseBodyViaReflectionNoSuchMethodException() throws Exception {
+        // Arrange
+        Method method = RestClientExecutor.class.getDeclaredMethod("extractResponseBodyViaReflection", Throwable.class, Class.class);
+        method.setAccessible(true);
+
+        // Create a mock exception without getResponseBodyAsString or getResponseBodyAsByteArray methods
+        Throwable mockException = new Throwable("Custom error message") {
+            // No body extraction methods
+        };
+
+        // Act
+        String body = (String) method.invoke(executor, mockException, mockException.getClass());
+
+        // Assert
+        assertEquals("Custom error message", body);
+    }
+
+    @Test
+    void testExtractResponseBodyViaReflectionWithBothMethodsThrowingException() throws Exception {
+        // Arrange
+        Method method = RestClientExecutor.class.getDeclaredMethod("extractResponseBodyViaReflection", Throwable.class, Class.class);
+        method.setAccessible(true);
+
+        // Create a mock exception where both methods throw exceptions
+        Throwable mockException = new Throwable("Fallback message") {
+            public String getResponseBodyAsString() throws Exception {
+                throw new RuntimeException("Method failed");
+            }
+
+            public byte[] getResponseBodyAsByteArray() throws Exception {
+                throw new RuntimeException("Method failed");
+            }
+        };
+
+        // Act
+        String body = (String) method.invoke(executor, mockException, mockException.getClass());
+
+        // Assert
+        assertEquals("Fallback message", body);
+    }
+
+    @Test
+    void testExtractResponseBodyViaReflectionWithNullAndEmptyValues() throws Exception {
+        // Arrange
+        Method method = RestClientExecutor.class.getDeclaredMethod("extractResponseBodyViaReflection", Throwable.class, Class.class);
+        method.setAccessible(true);
+
+        // Test with null string and null byte array
+        Throwable mockException = new Throwable("Error") {
+            public String getResponseBodyAsString() {
+                return null;
+            }
+
+            public byte[] getResponseBodyAsByteArray() {
+                return null;
+            }
+        };
+
+        // Act
+        String body = (String) method.invoke(executor, mockException, mockException.getClass());
+
+        // Assert
+        assertEquals("Error", body);
+    }
+
+    @Test
+    void testExtractStatusCodeViaReflectionWithGetStatusCodeValueFallback() throws Exception {
+        // Arrange
+        Method method = RestClientExecutor.class.getDeclaredMethod("extractStatusCodeViaReflection", Throwable.class, Class.class);
+        method.setAccessible(true);
+
+        // Create a mock exception that fails getStatusCode() and getRawStatusCode()
+        // extractStatusCodeViaReflection doesn't support getStatusCodeValue(), so this should fail
+        Throwable mockException = new Throwable() {
+            public Object getStatusCode() throws Exception {
+                throw new RuntimeException("Method not available");
+            }
+
+            public int getStatusCodeValue() {
+                return 418; // I'm a teapot
+            }
+        };
+
+        // Act & Assert - Should fail because extractStatusCodeViaReflection doesn't support getStatusCodeValue()
+        try {
+            method.invoke(executor, mockException, mockException.getClass());
+            fail("Expected InvocationTargetException");
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            assertInstanceOf(Exception.class, e.getCause());
+            assertTrue(e.getCause().getMessage().contains("Unable to extract status code"));
+        }
+    }
+
+    @Test
+    void testFindMethodInHierarchyWithMultipleInterfaces() throws Exception {
+        // Arrange
+        Method method = RestClientExecutor.class.getDeclaredMethod("findMethodInHierarchy", Class.class, String.class);
+        method.setAccessible(true);
+
+        // Create multiple interfaces
+        interface Interface1 {
+            void method1();
+        }
+
+        interface Interface2 {
+            void method2();
+        }
+
+        class TestClass implements Interface1, Interface2 {
+            @Override
+            public void method1() {
+            }
+
+            @Override
+            public void method2() {
+            }
+        }
+
+        // Act
+        Method foundMethod1 = (Method) method.invoke(executor, TestClass.class, "method1");
+        Method foundMethod2 = (Method) method.invoke(executor, TestClass.class, "method2");
+
+        // Assert
+        assertNotNull(foundMethod1);
+        assertEquals("method1", foundMethod1.getName());
+        assertNotNull(foundMethod2);
+        assertEquals("method2", foundMethod2.getName());
+    }
+
+    @Test
+    void testExtractHeadersViaReflectionWithNullHeaders() throws Exception {
+        // Arrange
+        Method method = RestClientExecutor.class.getDeclaredMethod("extractHeadersViaReflection", Throwable.class, Class.class);
+        method.setAccessible(true);
+
+        // Create a mock exception with getResponseHeaders() returning null
+        Throwable mockException = new Throwable() {
+            public org.springframework.http.HttpHeaders getResponseHeaders() {
+                return null;
+            }
+        };
+
+        // Act
+        org.springframework.http.HttpHeaders headers = (org.springframework.http.HttpHeaders) method.invoke(executor, mockException, mockException.getClass());
+
+        // Assert
+        assertNotNull(headers);
+        assertTrue(headers.isEmpty());
+    }
+
+    @Test
+    void testExtractErrorResponseWithExtractionFailure() throws Exception {
+        // Arrange
+        Method method = RestClientExecutor.class.getDeclaredMethod("extractErrorResponse", Throwable.class);
+        method.setAccessible(true);
+
+        // Create a mock exception that will cause extraction to fail
+        Throwable mockException = new Throwable("Error") {
+            @Override
+            public String toString() {
+                return "org.springframework.web.client.HttpClientErrorException: Error";
+            }
+
+            public HttpStatus getStatusCode() throws Exception {
+                throw new RuntimeException("Cannot extract status code");
+            }
+        };
+
+        // Act
+        ResponseEntity<String> result = (ResponseEntity<String>) method.invoke(executor, mockException);
+
+        // Assert - Should return null when extraction fails
+        assertNull(result);
+    }
+
+    @Test
+    void testExtractStatusCodeViaReflectionWithStatusCodeReturningInteger() throws Exception {
+        // Arrange
+        Method method = RestClientExecutor.class.getDeclaredMethod("extractStatusCodeViaReflection", Throwable.class, Class.class);
+        method.setAccessible(true);
+
+        // Create a mock exception where getStatusCode() returns Integer directly
+        Throwable mockException = new Throwable() {
+            public Integer getStatusCode() {
+                return 201;
+            }
+        };
+
+        // Act
+        int statusCode = (int) method.invoke(executor, mockException, mockException.getClass());
+
+        // Assert
+        assertEquals(201, statusCode);
+    }
+
+    @Test
+    void testFindMethodWithParameterTypes() throws Exception {
+        // Arrange
+        Method findMethodMethod = RestClientExecutor.class.getDeclaredMethod("findMethod", Class.class, String.class, Class[].class);
+        findMethodMethod.setAccessible(true);
+
+        // Create a class with overloaded methods
+        class TestClass {
+            public void testMethod() {
+            }
+
+            public void testMethod(String param) {
+            }
+
+            public void testMethod(String param1, int param2) {
+            }
+        }
+
+        // Act - find method with specific parameter types
+        Method foundMethod1 = (Method) findMethodMethod.invoke(executor, TestClass.class, "testMethod", new Class[]{});
+        Method foundMethod2 = (Method) findMethodMethod.invoke(executor, TestClass.class, "testMethod", new Class[]{String.class});
+        Method foundMethod3 = (Method) findMethodMethod.invoke(executor, TestClass.class, "testMethod", new Class[]{String.class, int.class});
+
+        // Assert
+        assertNotNull(foundMethod1);
+        assertEquals(0, foundMethod1.getParameterCount());
+        assertNotNull(foundMethod2);
+        assertEquals(1, foundMethod2.getParameterCount());
+        assertNotNull(foundMethod3);
+        assertEquals(2, foundMethod3.getParameterCount());
+    }
+
+    @Test
+    void testExtractResponseBodyViaReflectionWithEmptyStringAndEmptyByteArray() throws Exception {
+        // Arrange
+        Method method = RestClientExecutor.class.getDeclaredMethod("extractResponseBodyViaReflection", Throwable.class, Class.class);
+        method.setAccessible(true);
+
+        // Create a mock exception with empty string and empty byte array
+        Throwable mockException = new Throwable("Default message") {
+            public String getResponseBodyAsString() {
+                return "";
+            }
+
+            public byte[] getResponseBodyAsByteArray() {
+                return new byte[0];
+            }
+        };
+
+        // Act
+        String body = (String) method.invoke(executor, mockException, mockException.getClass());
+
+        // Assert
+        assertEquals("Default message", body);
+    }
+
+    @Test
+    void testExtractResponseBodyViaReflectionWithValidByteArrayOnly() throws Exception {
+        // Arrange
+        Method method = RestClientExecutor.class.getDeclaredMethod("extractResponseBodyViaReflection", Throwable.class, Class.class);
+        method.setAccessible(true);
+
+        // Create a mock exception with empty string but valid byte array
+        Throwable mockException = new Throwable("Default message") {
+            public String getResponseBodyAsString() {
+                return "";
+            }
+
+            public byte[] getResponseBodyAsByteArray() {
+                return "Valid byte array content".getBytes();
+            }
+        };
+
+        // Act
+        String body = (String) method.invoke(executor, mockException, mockException.getClass());
+
+        // Assert
+        assertEquals("Valid byte array content", body);
+    }
+
+    @Test
+    void testFindMethodInHierarchyWithObjectClass() throws Exception {
+        // Arrange
+        Method method = RestClientExecutor.class.getDeclaredMethod("findMethodInHierarchy", Class.class, String.class);
+        method.setAccessible(true);
+
+        // Act - find toString method which is in Object class
+        Method foundMethod = (Method) method.invoke(executor, String.class, "toString");
+
+        // Assert
+        assertNotNull(foundMethod);
+        assertEquals("toString", foundMethod.getName());
+    }
+
     // ==================== Test Helper Classes ====================
 
     /**

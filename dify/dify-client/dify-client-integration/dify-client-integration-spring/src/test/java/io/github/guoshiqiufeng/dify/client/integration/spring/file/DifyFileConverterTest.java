@@ -20,7 +20,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for DifyFileConverter
@@ -122,5 +125,41 @@ class DifyFileConverterTest {
 
         assertInstanceOf(UnsupportedOperationException.class, exception.getCause());
         assertEquals("Utility class", exception.getCause().getMessage());
+    }
+
+    @Test
+    void testFromMultipartFileWithIOException() throws IOException {
+        // Arrange - Create a mock MultipartFile that throws IOException
+        MultipartFile mockFile = mock(MultipartFile.class);
+        when(mockFile.isEmpty()).thenReturn(false);
+        when(mockFile.getBytes()).thenThrow(new IOException("Failed to read file"));
+
+        // Act & Assert - Verify that RuntimeException is thrown wrapping the IOException
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> DifyFileConverter.from(mockFile)
+        );
+
+        // Verify the cause is the IOException we threw
+        assertInstanceOf(IOException.class, exception.getCause());
+        assertEquals("Failed to read file", exception.getCause().getMessage());
+    }
+
+    @Test
+    void testConvertMultipartFileWithIOException() throws IOException {
+        // Arrange - Create a mock MultipartFile that throws IOException
+        MultipartFile mockFile = mock(MultipartFile.class);
+        when(mockFile.isEmpty()).thenReturn(false);
+        when(mockFile.getBytes()).thenThrow(new IOException("Read error"));
+
+        // Act & Assert - Verify that convert() also handles IOException properly
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> DifyFileConverter.convert(mockFile)
+        );
+
+        // Verify the cause is the IOException
+        assertInstanceOf(IOException.class, exception.getCause());
+        assertEquals("Read error", exception.getCause().getMessage());
     }
 }

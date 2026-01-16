@@ -541,30 +541,4 @@ class WebClientExecutor {
 
         return "file";
     }
-
-    /**
-     * Unwrap InvocationTargetException to get the actual cause.
-     *
-     * @param e exception to unwrap
-     * @return unwrapped exception
-     */
-    private Throwable unwrapException(Exception e) {
-        if (e instanceof java.lang.reflect.InvocationTargetException) {
-            Throwable cause = e.getCause();
-            return cause != null ? cause : e;
-        }
-        return e;
-    }
-
-    /**
-     * Get meaningful exception message, unwrapping InvocationTargetException if needed.
-     *
-     * @param e exception
-     * @return exception message
-     */
-    private String getExceptionMessage(Exception e) {
-        Throwable unwrapped = unwrapException(e);
-        String message = unwrapped.getMessage();
-        return message != null ? message : unwrapped.getClass().getSimpleName();
-    }
 }
