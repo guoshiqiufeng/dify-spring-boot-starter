@@ -1,0 +1,87 @@
+name: Docs publish 1.x
+permissions:
+  contents: write
+  pull-requests: write
+on:
+  # 每当 push 到 main 分支时触发部署
+  #  push:
+  #    branches: [ main ]
+  # 手动触发部署
+  workflow_dispatch:
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # "最近更新时间" 等 git 日志相关信息，需要拉取全部提交记录
+          fetch-depth: 0
+
+      - name: Init VuePress
+        run: |
+          APP_VERSION=$(grep 'APP_VERSION' gradle.properties | awk -F'=' '{print $2}' | tr -d '[:space:]')
+          echo '{
+             "name": "dify-spring-boot-starter-doc",
+             "version": "'"$APP_VERSION"'",
+             "description": "dify-spring-boot-starter doc",
+             "main": "index.js",
+             "scripts": {
+               "docs:dev": "vuepress dev docs",
+               "docs:build": "vuepress build docs"
+             },
+             "repository": {
+               "type": "git",
+               "url": "git+https://github.com/guoshiqiufeng/dify-spring-boot-starter.git"
+             },
+             "keywords": [
+               "dify",
+               "dify-spring-boot-starter"
+             ],
+             "author": "guoshiqiufeng",
+             "license": "MIT",
+             "bugs": {
+               "url": "https://github.com/guoshiqiufeng/dify-spring-boot-starter/issues"
+             },
+             "homepage": "https://github.com/guoshiqiufeng/dify-spring-boot-starter#readme",
+             "devDependencies": {
+               "@vuepress/client": "^2.0.0-rc.0",
+               "@vuepress/plugin-docsearch": "^2.0.0-rc.3",
+               "sass-embedded": "^1.78.0",
+               "vue": "^3.3.8",
+               "vuepress": "^2.0.0-rc.0"
+             },
+             "dependencies": {
+               "@vuepress/bundler-vite": "^2.0.0-rc.2",
+               "@vuepress/theme-default": "^2.0.0-rc.0"
+             }
+           }' > package.json
+          cp -r docs/.vuepress/config-1x.js docs/.vuepress/config.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          # 选择要使用的 node 版本
+          node-version: 20
+
+      - name: Build VuePress site
+        run: |
+          npm install
+          npm run docs:build
+
+      # Extract version for commit message
+      - name: Extract version
+        id: version
+        run: |
+          APP_VERSION=$(grep 'APP_VERSION' gradle.properties | awk -F'=' '{print $2}' | tr -d '[:space:]')
+          echo "version=$APP_VERSION" >> $GITHUB_OUTPUT
+
+      # Deploy to dify-spring-boot-starter-doc repository v1.x-SNAPSHOT directory
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          deploy_key: ${{ secrets.DOC_PUSH_KEY }}
+          publish_dir: ./docs/.vuepress/dist
+          destination_dir: v1.x
+          external_repository: guoshiqiufeng/dify-spring-boot-starter-doc
+          publish_branch: main
+          commit_message: ${{ steps.version.outputs.version }}
