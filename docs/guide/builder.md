@@ -4,6 +4,10 @@ title: 客户端构建器
 description: 
 ---
 
+<script setup>import {inject} from "vue";
+const version = inject('version');
+</script>
+
 # 客户端构建器
 
 Dify Java 客户端库使用构建器模式，使创建和配置与 Dify API 交互所需的各种客户端变得简单。若在非 SpringBoot
@@ -15,11 +19,11 @@ Dify Java 客户端库使用构建器模式，使创建和配置与 Dify API 交
 
 ### 添加依赖
 
-```xml
+```xml:no-line-numbers:no-v-pre
 <dependency>
     <groupId>io.github.guoshiqiufeng.dify</groupId>
     <artifactId>dify-java-starter</artifactId>
-    <version>${dify.version}</version>
+    <version>{{version}}</version>
 </dependency>
 ```
 

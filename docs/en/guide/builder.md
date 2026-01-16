@@ -4,6 +4,10 @@ title: Client Builder
 description: Client Builder
 ---
 
+<script setup>import {inject} from "vue";
+const version = inject('version');
+</script>
+
 # Client Builder
 
 The Dify Java client library uses the builder pattern to make it easy to create and configure the various clients needed
@@ -16,11 +20,11 @@ For non-Spring Boot projects, you can use the `dify-java-starter` module:
 
 ### Add Dependency
 
-```xml
+```xml:no-line-numbers:no-v-pre
 <dependency>
     <groupId>io.github.guoshiqiufeng.dify</groupId>
     <artifactId>dify-java-starter</artifactId>
-    <version>${dify.version}</version>
+    <version>{{version}}</version>
 </dependency>
 ```
 
