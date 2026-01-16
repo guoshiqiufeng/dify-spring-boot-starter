@@ -83,7 +83,7 @@ jobs:
         with:
           deploy_key: ${{ secrets.DOC_PUSH_KEY }}
           publish_dir: ./docs/.vuepress/dist
-          destination_dir: v1.x-SNAPSHOT
+          destination_dir: v2.x-SNAPSHOT
           external_repository: guoshiqiufeng/dify-spring-boot-starter-doc
           publish_branch: main
           commit_message: ${{ steps.version.outputs.version }}

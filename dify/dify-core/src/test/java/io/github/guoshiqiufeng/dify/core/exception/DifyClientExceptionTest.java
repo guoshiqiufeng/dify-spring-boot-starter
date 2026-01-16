@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,6 +81,40 @@ public class DifyClientExceptionTest {
         // Test enum constructor
         DifyClientException exception1 = new DifyClientException(DiftClientExceptionEnum.NOT_FOUND);
         assertEquals("Not Found", exception1.getMessage());
+    }
+
+    /**
+     * Test noLogin() method with 401 code
+     */
+    @Test
+    public void testNoLoginWithCode401() {
+        DifyClientException exception = new DifyClientException(DiftClientExceptionEnum.UNAUTHORIZED);
+        Boolean result = exception.noLogin();
+        assertTrue(result);
+    }
+
+    /**
+     * Test noLogin() method with [401] in message
+     */
+    @Test
+    public void testNoLoginWithMessageContaining401() {
+        // Create a custom exception with [401] in message
+        BaseException exception = new BaseException(500, "Error [401] occurred");
+        DifyClientException difyException = new DifyClientException(DiftClientExceptionEnum.UNAUTHORIZED);
+
+        // Test the noLogin method
+        Boolean result = difyException.noLogin();
+        assertTrue(result);
+    }
+
+    /**
+     * Test noLogin() method returns false when not 401
+     */
+    @Test
+    public void testNoLoginReturnsFalse() {
+        DifyClientException exception = new DifyClientException(DiftClientExceptionEnum.NOT_FOUND);
+        Boolean result = exception.noLogin();
+        assertFalse(result);
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package io.github.guoshiqiufeng.dify.dataset.dto.request;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.guoshiqiufeng.dify.core.pojo.DifyFile;
 import io.github.guoshiqiufeng.dify.dataset.dto.RetrievalModel;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.document.ProcessRule;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.file.FileOperation;
@@ -24,8 +25,6 @@ import io.github.guoshiqiufeng.dify.dataset.enums.IndexingTechniqueEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.document.DocFormEnum;
 import io.github.guoshiqiufeng.dify.dataset.enums.document.DocTypeEnum;
 import org.junit.jupiter.api.Test;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -60,7 +59,7 @@ public class DocumentCreateByFileRequestTest {
         // Set values for fields
         String datasetId = "ds-12345";
         String originalDocumentId = "doc-67890";
-        MultipartFile file = new MockMultipartFile("testFile", "test.txt", "text/plain", "test content".getBytes());
+        DifyFile file = new DifyFile("test.txt", "text/plain", "test content".getBytes());
         DocTypeEnum docType = DocTypeEnum.others;
         List<MetaData> docMetadata = Arrays.asList(
                 MetaData.builder().type("string").value("Test Author").build(),
@@ -115,7 +114,7 @@ public class DocumentCreateByFileRequestTest {
         assertInstanceOf(FileOperation.class, request);
 
         // Test setting and getting file
-        MultipartFile file = new MockMultipartFile("testFile", "test.txt", "text/plain", "test content".getBytes());
+        DifyFile file = new DifyFile("test.txt", "text/plain", "test content".getBytes());
         request.setFile(file);
         assertEquals(file, request.getFile());
     }
@@ -142,7 +141,7 @@ public class DocumentCreateByFileRequestTest {
         request.setEmbeddingModel("test-model");
         request.setEmbeddingModelProvider("test-provider");
 
-        // Set file to null for serialization (MultipartFile is not serializable)
+        // Set file to null for serialization
         request.setFile(null);
 
         // Serialize to JSON

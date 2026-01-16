@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.dataset.impl;
 
+import io.github.guoshiqiufeng.dify.core.pojo.DifyFile;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
 import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;
@@ -28,7 +29,6 @@ import io.github.guoshiqiufeng.dify.dataset.enums.document.DocActionEnum;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -180,7 +180,7 @@ public class DifyDatasetClientImplTest {
         DocumentCreateByFileRequest request = new DocumentCreateByFileRequest();
         request.setDatasetId("dataset_123");
         request.setOriginalDocumentId("original_doc_123");
-        request.setFile(mock(MultipartFile.class));
+        request.setFile(mock(DifyFile.class));
         request.setIndexingTechnique(IndexingTechniqueEnum.HIGH_QUALITY);
 
         DocumentInfo documentInfo = new DocumentInfo();
@@ -243,7 +243,7 @@ public class DifyDatasetClientImplTest {
         request.setDatasetId("dataset_123");
         request.setDocumentId("doc_789");
         request.setName("Updated File Document");
-        request.setFile(mock(MultipartFile.class));
+        request.setFile(mock(DifyFile.class));
         request.setIndexingTechnique(IndexingTechniqueEnum.HIGH_QUALITY);
 
         DocumentInfo documentInfo = new DocumentInfo();

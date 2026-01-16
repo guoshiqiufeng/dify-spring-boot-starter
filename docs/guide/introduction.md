@@ -6,13 +6,19 @@ description:
 
 # 简介
 
-[dify-spring-boot-starter](https://github.com/guoshiqiufeng/dify-spring-boot-starter) 是一个基于 Spring Boot 实现的 Dify
-接口调用框架。
+[dify-spring-boot-starter](https://github.com/guoshiqiufeng/dify-spring-boot-starter) 是一个基于 Spring Boot 和纯 Java 实现的 Dify 接口调用框架。
+
+::: tip 2.0 版本重大更新
+版本 2.0.0 引入了模块化架构重构，支持纯 Java 项目（无需 Spring），提供灵活的 HTTP 客户端和多种 JSON 编解码器选项。查看 [变更记录](https://github.com/guoshiqiufeng/dify-spring-boot-starter/blob/next/CHANGELOG-2.0-zh.md)
+:::
 
 ## 特性
 
-- **无侵入**: 通过 spring-boot-starter 的方式，无侵入式地集成调用。
-- **统一规范**: 基于 Dify 接口规范。
+- **无侵入**: 通过 spring-boot-starter 的方式，无侵入式地集成调用
+- **统一规范**: 基于 Dify 接口规范
+- **模块化架构**: 框架无关的核心抽象，支持多种 HTTP 客户端实现
+- **纯 Java 支持**: 2.0+ 版本支持纯 Java 项目（无需 Spring）
+- **灵活编解码**: 支持 Gson、Jackson 2.x、Jackson 3.x 多种 JSON 库
 
 ## 支持的服务
 
@@ -20,6 +26,33 @@ description:
 - Workflow (工作流相关)
 - Dataset (知识库)
 - Server (未提供开放接口的功能)
+- Status (服务状态监控)
+
+## 核心模块
+
+### 2.0 版本模块架构
+
+- **dify-core**: 核心模块，包含基础类和接口
+- **dify-client**: 网络请求层封装（框架无关）
+  - **dify-client-core**: 客户端核心抽象和接口
+  - **dify-client-codec**: 编解码器层
+    - dify-client-codec-gson: Gson 实现
+    - dify-client-codec-jackson: Jackson 2.x/3.x 实现
+  - **dify-client-integration**: HTTP 客户端集成层
+    - dify-client-integration-okhttp: OkHttp 实现（纯 Java）
+    - dify-client-integration-spring: Spring WebClient/RestClient 实现
+- **dify-support**: Dify 相关业务逻辑接口定义
+  - dify-support-chat: 聊天功能接口
+  - dify-support-dataset: 知识库功能接口
+  - dify-support-workflow: 工作流功能接口
+  - dify-support-server: 服务器管理功能接口
+- **dify-support-impl**: 统一的业务逻辑实现（所有 Spring 版本共享）
+- **dify-status**: 服务状态监控模块
+- **starter**: 启动器
+  - **dify-java-starter**: 纯 Java 项目启动器（2.0+）
+  - **dify-spring-boot-starter**: Spring Boot 3.1+ 启动器
+  - **dify-spring-boot2-starter**: Spring Boot 2.x/3.0.x 启动器
+  - **dify-spring-boot4-starter**: Spring Boot 4.x 启动器
 
 ## 功能
 

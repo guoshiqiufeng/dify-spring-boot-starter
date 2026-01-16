@@ -6,13 +6,19 @@ description: en-US
 
 # Guide
 
-[dify-spring-boot-starter](https://github.com/guoshiqiufeng/dify-spring-boot-starter) is a Spring Boot starter
-implementation of the Dify API calling framework.
+[dify-spring-boot-starter](https://github.com/guoshiqiufeng/dify-spring-boot-starter) is a Dify API client framework based on Spring Boot and pure Java.
+
+::: tip Version 2.0 Major Update
+Version 2.0.0 introduces a modular architecture refactoring with support for pure Java projects (no Spring required), flexible HTTP clients, and multiple JSON codec options. See [Changelog](https://github.com/guoshiqiufeng/dify-spring-boot-starter/blob/next/CHANGELOG-2.0.md)
+:::
 
 ## Characteristics
 
-- **Non-intrusive**: Non-intrusive integration calls through spring-boot-starter approach.
-- **Standardized**: Based on Dify interface specifications.
+- **Non-intrusive**: Non-intrusive integration calls through spring-boot-starter approach
+- **Standardized**: Based on Dify interface specifications
+- **Modular Architecture**: Framework-agnostic core abstractions supporting multiple HTTP client implementations
+- **Pure Java Support**: Version 2.0+ supports pure Java projects (no Spring required)
+- **Flexible Codecs**: Support for Gson, Jackson 2.x, and Jackson 3.x JSON libraries
 
 ## Supported Services
 
@@ -20,6 +26,33 @@ implementation of the Dify API calling framework.
 - Workflow (Workflow Related)
 - Dataset (Knowledge Base)
 - Server (Features without open interfaces)
+- Status (Service Status Monitoring)
+
+## Core Modules
+
+### Version 2.0 Module Architecture
+
+- **dify-core**: Core module with base classes and interfaces
+- **dify-client**: Network request layer encapsulation (framework-agnostic)
+  - **dify-client-core**: Client core abstractions and interfaces
+  - **dify-client-codec**: Codec layer
+    - dify-client-codec-gson: Gson implementation
+    - dify-client-codec-jackson: Jackson 2.x/3.x implementation
+  - **dify-client-integration**: HTTP client integration layer
+    - dify-client-integration-okhttp: OkHttp implementation (pure Java)
+    - dify-client-integration-spring: Spring WebClient/RestClient implementation
+- **dify-support**: Dify business logic interface definitions
+  - dify-support-chat: Chat feature interfaces
+  - dify-support-dataset: Dataset feature interfaces
+  - dify-support-workflow: Workflow feature interfaces
+  - dify-support-server: Server management feature interfaces
+- **dify-support-impl**: Unified business logic implementation (shared across all Spring versions)
+- **dify-status**: Service status monitoring module
+- **starter**: Starters
+  - **dify-java-starter**: Pure Java project starter (2.0+)
+  - **dify-spring-boot-starter**: Spring Boot 3.1+ starter
+  - **dify-spring-boot2-starter**: Spring Boot 2.x/3.0.x starter
+  - **dify-spring-boot4-starter**: Spring Boot 4.x starter
 
 ## Features
 

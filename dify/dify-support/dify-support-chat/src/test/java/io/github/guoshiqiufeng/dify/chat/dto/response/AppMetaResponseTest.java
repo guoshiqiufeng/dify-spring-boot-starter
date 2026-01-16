@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -160,6 +160,7 @@ public class AppMetaResponseTest {
      * Test with nested objects in the map
      */
     @Test
+    @SuppressWarnings("unchecked")
     public void testNestedObjects() throws JsonProcessingException {
         // Create an instance with nested objects in the map
         AppMetaResponse response = new AppMetaResponse();

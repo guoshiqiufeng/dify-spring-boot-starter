@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.server.client;
 
+import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
+import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
 import io.github.guoshiqiufeng.dify.core.exception.DiftClientExceptionEnum;
 import io.github.guoshiqiufeng.dify.core.exception.DifyClientException;
 import io.github.guoshiqiufeng.dify.server.dto.response.LoginResponse;
@@ -24,7 +26,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpHeaders;
 
 import java.lang.reflect.Field;
 
@@ -62,7 +63,6 @@ class DifyServerTokenDefaultTest {
 
         // Create a fresh mock for this test
         HttpHeaders httpHeaders = mock(HttpHeaders.class);
-
         // Execute
         tokenDefault.addAuthorizationHeader(httpHeaders, difyServerClient);
 
@@ -275,10 +275,11 @@ class DifyServerTokenDefaultTest {
     void testExecuteWithRetryWith401() {
         // Setup - first call throws 401, second succeeds
         String expectedResult = "success";
+        @SuppressWarnings("unchecked")
         RequestSupplier<String> mockSupplier = mock(RequestSupplier.class);
         when(mockSupplier.get())
-            .thenThrow(new RuntimeException("[401] Unauthorized"))
-            .thenReturn(expectedResult);
+                .thenThrow(new RuntimeException("[401] Unauthorized"))
+                .thenReturn(expectedResult);
 
         // Execute - this should trigger refresh and retry
         String result = tokenDefault.executeWithRetry(mockSupplier, difyServerClient);
@@ -293,14 +294,15 @@ class DifyServerTokenDefaultTest {
     @DisplayName("Test executeWithRetry with non-401 error that should not retry")
     void testExecuteWithRetryWithNon401Error() {
         // Setup
+        @SuppressWarnings("unchecked")
         RequestSupplier<String> supplier = mock(RequestSupplier.class);
         RuntimeException expectedException = new RuntimeException("Some other error");
         when(supplier.get()).thenThrow(expectedException);
 
         // Execute and verify exception is re-thrown
         RuntimeException thrown = org.junit.jupiter.api.Assertions.assertThrows(
-            RuntimeException.class,
-            () -> tokenDefault.executeWithRetry(supplier, difyServerClient)
+                RuntimeException.class,
+                () -> tokenDefault.executeWithRetry(supplier, difyServerClient)
         );
 
         // Verify
@@ -313,13 +315,14 @@ class DifyServerTokenDefaultTest {
     @DisplayName("Test executeWithRetry with multiple 401 errors that reach max retries")
     void testExecuteWithRetryMaxRetriesReached() {
         // Setup - always throw 401
+        @SuppressWarnings("unchecked")
         RequestSupplier<String> supplier = mock(RequestSupplier.class);
         when(supplier.get()).thenThrow(new RuntimeException("[401] Unauthorized"));
 
         // Execute and verify exception is thrown after max retries
         RuntimeException thrown = org.junit.jupiter.api.Assertions.assertThrows(
-            RuntimeException.class,
-            () -> tokenDefault.executeWithRetry(supplier, difyServerClient)
+                RuntimeException.class,
+                () -> tokenDefault.executeWithRetry(supplier, difyServerClient)
         );
 
         // Verify
@@ -332,7 +335,8 @@ class DifyServerTokenDefaultTest {
     @DisplayName("Test addAuthorizationCookies with no existing token")
     void testAddAuthorizationCookiesWithNoToken() {
         // Setup
-        org.springframework.util.MultiValueMap<String, String> cookies = mock(org.springframework.util.MultiValueMap.class);
+        @SuppressWarnings("unchecked")
+        MultiValueMap<String, String> cookies = mock(MultiValueMap.class);
 
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setAccessToken("test-access-token");
@@ -355,7 +359,8 @@ class DifyServerTokenDefaultTest {
     @DisplayName("Test addAuthorizationCookies with existing token")
     void testAddAuthorizationCookiesWithExistingToken() {
         // Setup - first call to set the token
-        org.springframework.util.MultiValueMap<String, String> initialCookies = mock(org.springframework.util.MultiValueMap.class);
+        @SuppressWarnings("unchecked")
+        MultiValueMap<String, String> initialCookies = mock(MultiValueMap.class);
 
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setAccessToken("test-access-token");
@@ -377,7 +382,8 @@ class DifyServerTokenDefaultTest {
         reset(difyServerClient);
 
         // Create a new mock for the second call
-        org.springframework.util.MultiValueMap<String, String> secondCookies = mock(org.springframework.util.MultiValueMap.class);
+        @SuppressWarnings("unchecked")
+        MultiValueMap<String, String> secondCookies = mock(MultiValueMap.class);
 
         // Execute second call, should use existing token
         tokenDefault.addAuthorizationCookies(secondCookies, difyServerClient);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.dataset.client;
 
+import io.github.guoshiqiufeng.dify.core.pojo.DifyFile;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.*;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.*;
@@ -25,7 +26,6 @@ import io.github.guoshiqiufeng.dify.dataset.enums.SearchMethodEnum;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +43,7 @@ import static org.mockito.Mockito.*;
  * @version 0.10.0
  * @since 2025/4/23 14:27
  */
+@SuppressWarnings("deprecation")
 class DifyDatasetClientTest {
 
     private static DifyDatasetClient difyDatasetClient;
@@ -160,7 +161,7 @@ class DifyDatasetClientTest {
         DocumentCreateByFileRequest request = new DocumentCreateByFileRequest();
         request.setDatasetId("dataset_123");
         request.setOriginalDocumentId("original_doc_123");
-        request.setFile(mock(MultipartFile.class));
+        request.setFile(mock(DifyFile.class));
         request.setIndexingTechnique(IndexingTechniqueEnum.HIGH_QUALITY);
 
         DocumentInfo documentInfo = new DocumentInfo();
@@ -223,7 +224,7 @@ class DifyDatasetClientTest {
         request.setDatasetId("dataset_123");
         request.setDocumentId("doc_789");
         request.setName("Updated File Document");
-        request.setFile(mock(MultipartFile.class));
+        request.setFile(mock(DifyFile.class));
         request.setIndexingTechnique(IndexingTechniqueEnum.HIGH_QUALITY);
 
         DocumentInfo documentInfo = new DocumentInfo();

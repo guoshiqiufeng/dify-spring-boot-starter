@@ -10,8 +10,8 @@ const version = inject('version');
 
 # Install
 
-[dify-spring-boot-starter](https://github.com/guoshiqiufeng/dify-spring-boot-starter) Based on JDK21, support SpringBoot
-3.x、2.x.
+[dify-spring-boot-starter](https://github.com/guoshiqiufeng/dify-spring-boot-starter) Based on JDK8, support SpringBoot
+4.x、3.x、2.x.
 
 ## SpringBoot 3.1 and above
 

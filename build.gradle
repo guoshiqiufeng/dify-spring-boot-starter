@@ -21,6 +21,11 @@ subprojects {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 
+    ext {
+        isBomProject = project.name == "dify-bom"
+        springBootVersionForProject = getSpringBootVersionForProject(project)
+    }
+
     lombok {
         version = libs.versions.lombok.get()
     }
@@ -38,31 +43,16 @@ subprojects {
         mavenCentral()
     }
 
-    def onlyPom = project.name == "dify-bom"
-
-    if (!onlyPom) {
-        dependencyManagement {
-            imports {
-                if (project.name.contains("spring5") || project.name.contains("core") || project.name.contains("support") || project.name.contains("status") || project.name.contains("spring-boot2-starter")) {
-                    mavenBom "org.springframework.boot:spring-boot-dependencies:${libs.versions.springBoot2.get()}"
-                } else if (project.name.contains("spring-boot4-starter") || project.name.contains("spring7")) {
-                    mavenBom "org.springframework.boot:spring-boot-dependencies:${libs.versions.springBoot4.get()}"
-                } else if (project.name.contains("spring-boot-starter") || project.name.contains("spring6")) {
-                    mavenBom "org.springframework.boot:spring-boot-dependencies:${libs.versions.springBoot3.get()}"
-                }
-                mavenBom "org.testcontainers:testcontainers-bom:${libs.versions.testcontainers.get()}"
-            }
-            dependencies {
-
-            }
-        }
+    // 仅非BOM项目应用依赖管理
+    if (!isBomProject) {
+        configureDependencyManagement(project)
     }
 
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
         options.warnings = false
         options.deprecation = true
-        options.compilerArgs += ["-parameters"]
+        options.compilerArgs += ["-Xlint:unchecked", "-parameters"]
     }
 
     tasks.withType(GenerateModuleMetadata) {
@@ -190,7 +180,7 @@ subprojects {
 
         publications {
             mavenJava(MavenPublication) {
-                if (!onlyPom) {
+                if (!isBomProject) {
                     from components.java
                     artifact sourcesJar
                     artifact javadocJar
@@ -198,7 +188,7 @@ subprojects {
                 pom {
                     name = artifactId
                     description = 'Provide springboot starter for dify to simplify development'
-                    if (onlyPom) {
+                    if (isBomProject) {
                         packaging 'pom'
                     } else {
                         packaging 'jar'
@@ -244,6 +234,29 @@ subprojects {
 
         signing {
             sign publishing.publications.mavenJava
+        }
+    }
+}
+
+
+// 提取方法：确定项目对应的Spring Boot版本
+static String getSpringBootVersionForProject(Project project) {
+    if (project.name.contains("core") || project.name.contains("client")
+            || project.name.contains("support") || project.name.contains("status")
+            || project.name.contains("spring-boot2-starter") || project.name.contains("java-starter")) {
+        return "springBoot2"
+    } else if (project.name.contains("spring-boot4-starter")) {
+        return "springBoot4"
+    }
+    return "springBoot3"
+}
+
+// 提取方法：配置依赖管理
+void configureDependencyManagement(Project project) {
+    project.dependencyManagement {
+        imports {
+            mavenBom "org.springframework.boot:spring-boot-dependencies:${libs.versions[springBootVersionForProject].get()}"
+            mavenBom "org.testcontainers:testcontainers-bom:${libs.versions.testcontainers.get()}"
         }
     }
 }

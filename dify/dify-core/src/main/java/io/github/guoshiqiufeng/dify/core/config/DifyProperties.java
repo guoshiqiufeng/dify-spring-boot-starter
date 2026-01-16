@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,6 +104,26 @@ public class DifyProperties implements Serializable {
         private Boolean skipNull = true;
 
         private Boolean logging = true;
+
+        /**
+         * 连接超时时间（秒），默认 30 秒
+         */
+        private Integer connectTimeout = 30;
+
+        /**
+         * 读取超时时间（秒），默认 30 秒
+         */
+        private Integer readTimeout = 30;
+
+        /**
+         * 写入超时时间（秒），默认 30 秒
+         */
+        private Integer writeTimeout = 30;
+
+        public ClientConfig(Boolean skipNull, Boolean logging) {
+            this.skipNull = skipNull;
+            this.logging = logging;
+        }
     }
 
     @Data

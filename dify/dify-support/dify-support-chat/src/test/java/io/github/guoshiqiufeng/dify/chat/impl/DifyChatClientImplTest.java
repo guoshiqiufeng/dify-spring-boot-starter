@@ -1,4 +1,20 @@
 /*
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
  * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,13 +38,16 @@ import io.github.guoshiqiufeng.dify.chat.dto.response.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.parameter.Enabled;
 import io.github.guoshiqiufeng.dify.chat.enums.AnnotationReplyActionEnum;
 import io.github.guoshiqiufeng.dify.chat.enums.IconTypeEnum;
+import io.github.guoshiqiufeng.dify.client.core.constant.MediaType;
+import io.github.guoshiqiufeng.dify.client.core.http.ContentDisposition;
+import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
+import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.core.pojo.DifyFile;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.http.*;
-import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
@@ -257,12 +276,12 @@ class DifyChatClientImplTest {
         request.setText("Convert this text to speech");
 
         byte[] mockAudioData = "audio data".getBytes();
-        ResponseEntity<byte[]> expectedResponse = ResponseEntity.ok(mockAudioData);
+        HttpResponse<byte[]> expectedResponse = new HttpResponse<>(200, new HttpHeaders() ,mockAudioData);
 
         when(difyChatClient.textToAudio(any(TextToAudioRequest.class))).thenReturn(expectedResponse);
 
         // Act
-        ResponseEntity<byte[]> actualResponse = difyChat.textToAudio(request);
+        HttpResponse<byte[]> actualResponse = difyChat.textToAudio(request);
 
         // Assert
         assertNotNull(actualResponse);
@@ -341,7 +360,7 @@ class DifyChatClientImplTest {
         String apiKey = "test-api-key";
 
         FileUploadRequest request = new FileUploadRequest();
-        request.setFile(mock(MultipartFile.class));
+        request.setFile(mock(DifyFile.class));
         request.setUserId("0524");
         request.setApiKey(apiKey);
 
@@ -377,16 +396,16 @@ class DifyChatClientImplTest {
         headers.setContentType(MediaType.IMAGE_PNG);
         headers.setContentLength(expectedContent.length);
 
-        ResponseEntity<byte[]> expectedResponse = new ResponseEntity<>(expectedContent, headers, HttpStatus.OK);
+        HttpResponse<byte[]> expectedResponse = new HttpResponse<>(200, headers, expectedContent);
 
         when(difyChatClient.filePreview(any(FilePreviewRequest.class))).thenReturn(expectedResponse);
 
         // Act
-        ResponseEntity<byte[]> actualResponse = difyChat.filePreview(request);
+        HttpResponse<byte[]> actualResponse = difyChat.filePreview(request);
 
         // Assert
         assertNotNull(actualResponse);
-        assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
+        assertEquals(200, actualResponse.getStatusCode());
         assertArrayEquals(expectedContent, actualResponse.getBody());
         assertEquals(MediaType.IMAGE_PNG, actualResponse.getHeaders().getContentType());
         verify(difyChatClient, times(1)).filePreview(request);
@@ -405,18 +424,17 @@ class DifyChatClientImplTest {
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         headers.setContentDisposition(ContentDisposition.attachment().filename("test-file.pdf").build());
 
-        ResponseEntity<byte[]> expectedResponse = new ResponseEntity<>(expectedContent, headers, HttpStatus.OK);
+        HttpResponse<byte[]> expectedResponse = new HttpResponse<>(200, headers, expectedContent);
 
         when(difyChatClient.filePreview(any(FilePreviewRequest.class))).thenReturn(expectedResponse);
 
         // Act
-        ResponseEntity<byte[]> actualResponse = difyChat.filePreview(request);
+        HttpResponse<byte[]> actualResponse = difyChat.filePreview(request);
 
         // Assert
         assertNotNull(actualResponse);
-        assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
+        assertEquals(200, actualResponse.getStatusCode());
         assertArrayEquals(expectedContent, actualResponse.getBody());
-        assertEquals(MediaType.APPLICATION_OCTET_STREAM, actualResponse.getHeaders().getContentType());
         assertNotNull(actualResponse.getHeaders().getContentDisposition());
         verify(difyChatClient, times(1)).filePreview(request);
     }

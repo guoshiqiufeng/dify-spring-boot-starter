@@ -9,6 +9,9 @@ bytebuddy = "1.17.8"
 lombok = "1.18.30"
 jacoco = "0.8.13"
 junit = "5.10.2"
+okhttp = "4.12.0"
+gson = "2.11.0"
+jackson3 = "3.0.2"
 
 [libraries]
 # Hutool libraries
@@ -17,7 +20,9 @@ hutool-extra = { group = "cn.hutool", name = "hutool-extra", version.ref = "huto
 hutool-json = { group = "cn.hutool", name = "hutool-json", version.ref = "hutool" }
 
 # Spring Boot dependencies
+spring-web = { group = "org.springframework", name = "spring-web" }
 spring-webflux = { group = "org.springframework", name = "spring-webflux" }
+spring-context = { group = "org.springframework", name = "spring-context" }
 spring-boot-starter-reactor-netty = { group = "org.springframework.boot", name = "spring-boot-starter-reactor-netty" }
 spring-boot-starter-data-redis = { group = "org.springframework.boot", name = "spring-boot-starter-data-redis" }
 spring-boot-autoconfigure = { group = "org.springframework.boot", name = "spring-boot-autoconfigure" }
@@ -30,8 +35,13 @@ jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-datab
 jackson-core = { group = "com.fasterxml.jackson.core", name = "jackson-core" }
 jackson-datatype-jsr310 = { group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310" }
 
-tools-jackson-core = { group = "tools.jackson.core", name = "jackson-core" }
-tools-jackson-databind = { group = "tools.jackson.core", name = "jackson-databind" }
+# HTTP client dependencies
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+okhttp-mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver", version.ref = "okhttp" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+
+tools-jackson-core = { group = "tools.jackson.core", name = "jackson-core", version.ref = "jackson3" }
+tools-jackson-databind = { group = "tools.jackson.core", name = "jackson-databind", version.ref = "jackson3" }
 
 # Test dependencies
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit" }

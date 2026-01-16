@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,9 @@
  */
 package io.github.guoshiqiufeng.dify.server.client;
 
+import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
 import io.github.guoshiqiufeng.dify.server.dto.response.LoginResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.util.MultiValueMap;
 
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -43,20 +42,29 @@ public class DifyServerTokenDefault extends BaseDifyServerToken {
         if (accessToken == null) {
             obtainToken(difyServerClient);
         }
-        headers.setBearerAuth(accessToken);
-        headers.add("x-csrf-token", csrfToken);
+        if (accessToken != null) {
+            headers.setBearerAuth(accessToken);
+        }
+        if (csrfToken != null) {
+            headers.add("x-csrf-token", csrfToken);
+        }
     }
 
     @Override
-    public void addAuthorizationCookies(MultiValueMap<String, String> cookies, DifyServerClient difyServerClient) {
+    public void addAuthorizationCookies(io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap<String, String> cookies, DifyServerClient difyServerClient) {
         if (accessToken == null) {
             obtainToken(difyServerClient);
         }
-        cookies.add("access_token", accessToken);
-        cookies.add("csrf_token", csrfToken);
-        // support Https
-        cookies.add("__Host-access_token", accessToken);
-        cookies.add("__Host-csrf_token", csrfToken);
+        if (accessToken != null) {
+            cookies.add("access_token", accessToken);
+            // support Https
+            cookies.add("__Host-access_token", accessToken);
+        }
+        if (csrfToken != null) {
+            cookies.add("csrf_token", csrfToken);
+            // support Https
+            cookies.add("__Host-csrf_token", csrfToken);
+        }
     }
 
     private void obtainToken(DifyServerClient difyServerClient) {

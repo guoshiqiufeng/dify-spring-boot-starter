@@ -7,7 +7,7 @@ export default defineUserConfig({
     lang: 'zh-CN',
     title: 'dify-spring-boot-starter',
     description: 'dify-spring-boot-starter-doc',
-    base: '/dify-spring-boot-starter-doc/v1.x-SNAPSHOT/',
+    base: '/dify-spring-boot-starter-doc/v2.x-SNAPSHOT/',
     locales: {
         // 键名是该语言所属的子路径
         // 作为特例，默认语言可以使用 '/' 作为其路径。
@@ -23,8 +23,8 @@ export default defineUserConfig({
         }
     },
     head: [
-        ['link', {rel: 'icon', href: '/dify-spring-boot-starter-doc/v1.x-SNAPSHOT/images/f.ico'}],
-        ['link', {rel: 'shortcut icon', href: '/dify-spring-boot-starter-doc/v1.x-SNAPSHOT/images/f.ico'}]
+        ['link', {rel: 'icon', href: '/dify-spring-boot-starter-doc/v2.x-SNAPSHOT/images/f.ico'}],
+        ['link', {rel: 'shortcut icon', href: '/dify-spring-boot-starter-doc/v2.x-SNAPSHOT/images/f.ico'}]
     ],
     bundler: viteBundler(),
     theme: defaultTheme({
@@ -135,8 +135,11 @@ export default defineUserConfig({
                         text: `v${version}`,
                         children: [
                             {
-                                text: 'v1.x',
+                                text: 'v2.x',
                                 link: 'https://guoshiqiufeng.github.io/dify-spring-boot-starter/',
+                            }, {
+                                text: 'v1.x',
+                                link: 'https://guoshiqiufeng.github.io/dify-spring-boot-starter-doc/v1.x/',
                             }, {
                                 text: 'v0.x',
                                 link: 'https://guoshiqiufeng.github.io/dify-spring-boot-starter-doc/v0.x/',
@@ -248,8 +251,11 @@ export default defineUserConfig({
                         text: `v${version}`,
                         children: [
                             {
-                                text: 'v1.x',
+                                text: 'v2.x',
                                 link: 'https://guoshiqiufeng.github.io/dify-spring-boot-starter/',
+                            }, {
+                                text: 'v1.x',
+                                link: 'https://guoshiqiufeng.github.io/dify-spring-boot-starter-doc/v1.x/',
                             }, {
                                 text: 'v0.x',
                                 link: 'https://guoshiqiufeng.github.io/dify-spring-boot-starter-doc/v0.x/',

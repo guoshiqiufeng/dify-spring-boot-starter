@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
  *
@@ -15,6 +16,8 @@
  */
 package io.github.guoshiqiufeng.dify.server.client;
 
+import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
+import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
 import io.github.guoshiqiufeng.dify.server.cache.DifyRedisKey;
 import io.github.guoshiqiufeng.dify.server.dto.response.LoginResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,13 +28,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.http.HttpHeaders;
 
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.*;
 
 /**
@@ -196,8 +197,8 @@ class DifyServerTokenRedisTest {
         String expectedResult = "success";
         RequestSupplier<String> mockSupplier = mock(RequestSupplier.class);
         when(mockSupplier.get())
-            .thenThrow(new RuntimeException("[401] Unauthorized"))
-            .thenReturn(expectedResult);
+                .thenThrow(new RuntimeException("[401] Unauthorized"))
+                .thenReturn(expectedResult);
 
         // Execute - this should trigger refresh and retry
         String result = tokenRedis.executeWithRetry(mockSupplier, difyServerClient);
@@ -218,8 +219,8 @@ class DifyServerTokenRedisTest {
 
         // Execute and verify exception is re-thrown
         RuntimeException thrown = org.junit.jupiter.api.Assertions.assertThrows(
-            RuntimeException.class,
-            () -> tokenRedis.executeWithRetry(supplier, difyServerClient)
+                RuntimeException.class,
+                () -> tokenRedis.executeWithRetry(supplier, difyServerClient)
         );
 
         // Verify
@@ -237,8 +238,8 @@ class DifyServerTokenRedisTest {
 
         // Execute and verify exception is thrown after max retries
         RuntimeException thrown = org.junit.jupiter.api.Assertions.assertThrows(
-            RuntimeException.class,
-            () -> tokenRedis.executeWithRetry(supplier, difyServerClient)
+                RuntimeException.class,
+                () -> tokenRedis.executeWithRetry(supplier, difyServerClient)
         );
 
         // Verify
@@ -248,10 +249,11 @@ class DifyServerTokenRedisTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     @DisplayName("Test addAuthorizationCookies with token in Redis")
     void testAddAuthorizationCookiesWithTokenInRedis() {
         // Setup
-        org.springframework.util.MultiValueMap<String, String> cookies = mock(org.springframework.util.MultiValueMap.class);
+        MultiValueMap<String, String> cookies = mock(MultiValueMap.class);
 
         when(valueOperations.get(DifyRedisKey.ACCESS_TOKEN)).thenReturn("redis-access-token");
         when(valueOperations.get(DifyRedisKey.CSRF_TOKEN)).thenReturn("redis-csrf-token");
@@ -273,7 +275,7 @@ class DifyServerTokenRedisTest {
     @DisplayName("Test addAuthorizationCookies without token in Redis")
     void testAddAuthorizationCookiesWithoutTokenInRedis() {
         // Setup
-        org.springframework.util.MultiValueMap<String, String> cookies = mock(org.springframework.util.MultiValueMap.class);
+        MultiValueMap<String, String> cookies = mock(MultiValueMap.class);
 
         when(valueOperations.get(DifyRedisKey.ACCESS_TOKEN)).thenReturn(null);
         when(valueOperations.get(DifyRedisKey.CSRF_TOKEN)).thenReturn(null);
