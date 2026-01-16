@@ -7,7 +7,7 @@ export default defineUserConfig({
     lang: 'zh-CN',
     title: 'dify-spring-boot-starter',
     description: 'dify-spring-boot-starter-doc',
-    base: '/dify-spring-boot-starter-doc/',
+    base: '/dify-spring-boot-starter/',
     locales: {
         // 键名是该语言所属的子路径
         // 作为特例，默认语言可以使用 '/' 作为其路径。
@@ -23,8 +23,8 @@ export default defineUserConfig({
         }
     },
     head: [
-        ['link', {rel: 'icon', href: '/dify-spring-boot-starter-doc/images/f.ico'}],
-        ['link', {rel: 'shortcut icon', href: '/dify-spring-boot-starter-doc/images/f.ico'}]
+        ['link', {rel: 'icon', href: '/dify-spring-boot-starter/images/f.ico'}],
+        ['link', {rel: 'shortcut icon', href: '/dify-spring-boot-starter/images/f.ico'}]
     ],
     bundler: viteBundler(),
     theme: defaultTheme({
