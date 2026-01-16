@@ -16,7 +16,6 @@
 package io.github.guoshiqiufeng.dify.client.integration.okhttp.http;
 
 import io.github.guoshiqiufeng.dify.client.codec.gson.GsonJsonMapper;
-import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
@@ -1437,4 +1436,808 @@ class OkHttpRequestBuilderIntegrationTest {
 
         assertNotNull(result);
     }
+
+    // ========== handleError() Coverage Tests ==========
+
+    @Test
+    void testHandleErrorWith400BadRequest() {
+        // Test 400 Bad Request error
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(400)
+                .setBody("{\"error\":\"Bad request\",\"message\":\"Invalid parameters\"}"));
+
+        HttpClientException exception = assertThrows(HttpClientException.class, () ->
+                getBuilder(client.post()
+                        .uri("/api/bad-request"))
+                        .execute(TestResponse.class)
+        );
+
+        assertEquals(400, exception.getStatusCode());
+        assertTrue(exception.getResponseBody().contains("Bad request"));
+    }
+
+    @Test
+    void testHandleErrorWith401Unauthorized() {
+        // Test 401 Unauthorized error
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(401)
+                .setBody("{\"error\":\"Unauthorized\",\"message\":\"Invalid credentials\"}"));
+
+        HttpClientException exception = assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/protected"))
+                        .execute(TestResponse.class)
+        );
+
+        assertEquals(401, exception.getStatusCode());
+        assertTrue(exception.getResponseBody().contains("Unauthorized"));
+    }
+
+    @Test
+    void testHandleErrorWith403Forbidden() {
+        // Test 403 Forbidden error
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(403)
+                .setBody("{\"error\":\"Forbidden\",\"message\":\"Access denied\"}"));
+
+        HttpClientException exception = assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/forbidden"))
+                        .execute(TestResponse.class)
+        );
+
+        assertEquals(403, exception.getStatusCode());
+        assertTrue(exception.getResponseBody().contains("Forbidden"));
+    }
+
+    @Test
+    void testHandleErrorWith404NotFound() {
+        // Test 404 Not Found error
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(404)
+                .setBody("{\"error\":\"Not found\",\"message\":\"Resource not found\"}"));
+
+        HttpClientException exception = assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/notfound"))
+                        .execute(TestResponse.class)
+        );
+
+        assertEquals(404, exception.getStatusCode());
+        assertTrue(exception.getResponseBody().contains("Not found"));
+    }
+
+    @Test
+    void testHandleErrorWith500InternalServerError() {
+        // Test 500 Internal Server Error
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(500)
+                .setBody("{\"error\":\"Internal server error\",\"message\":\"Something went wrong\"}"));
+
+        HttpClientException exception = assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/error"))
+                        .execute(TestResponse.class)
+        );
+
+        assertEquals(500, exception.getStatusCode());
+        assertTrue(exception.getResponseBody().contains("Internal server error"));
+    }
+
+    @Test
+    void testHandleErrorWith502BadGateway() {
+        // Test 502 Bad Gateway error
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(502)
+                .setBody("{\"error\":\"Bad gateway\"}"));
+
+        HttpClientException exception = assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/gateway"))
+                        .execute(TestResponse.class)
+        );
+
+        assertEquals(502, exception.getStatusCode());
+        assertTrue(exception.getResponseBody().contains("Bad gateway"));
+    }
+
+    @Test
+    void testHandleErrorWith503ServiceUnavailable() {
+        // Test 503 Service Unavailable error
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(503)
+                .setBody("{\"error\":\"Service unavailable\"}"));
+
+        HttpClientException exception = assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/unavailable"))
+                        .execute(TestResponse.class)
+        );
+
+        assertEquals(503, exception.getStatusCode());
+        assertTrue(exception.getResponseBody().contains("Service unavailable"));
+    }
+
+    @Test
+    void testHandleErrorWithEmptyResponseBody() {
+        // Test error with empty response body (response.body() != null but string is empty)
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(500)
+                .setBody(""));
+
+        HttpClientException exception = assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/error-empty"))
+                        .execute(TestResponse.class)
+        );
+
+        assertEquals(500, exception.getStatusCode());
+        assertEquals("", exception.getResponseBody());
+    }
+
+    @Test
+    void testHandleErrorWithPlainTextResponse() {
+        // Test error with plain text response (not JSON)
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(500)
+                .setBody("Internal Server Error")
+                .setHeader("Content-Type", "text/plain"));
+
+        HttpClientException exception = assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/error-text"))
+                        .execute(TestResponse.class)
+        );
+
+        assertEquals(500, exception.getStatusCode());
+        assertEquals("Internal Server Error", exception.getResponseBody());
+    }
+
+    @Test
+    void testHandleErrorInExecuteForResponse() {
+        // Test handleError is called in executeForResponse method
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(404)
+                .setBody("{\"error\":\"Not found\"}"));
+
+        HttpClientException exception = assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/notfound"))
+                        .executeForResponse(TestResponse.class)
+        );
+
+        assertEquals(404, exception.getStatusCode());
+    }
+
+    @Test
+    void testHandleErrorInExecuteForResponseWithTypeReference() {
+        // Test handleError is called in executeForResponse with TypeReference
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(500)
+                .setBody("{\"error\":\"Server error\"}"));
+
+        HttpClientException exception = assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/error"))
+                        .executeForResponse(new TypeReference<List<TestResponse>>() {
+                        })
+        );
+
+        assertEquals(500, exception.getStatusCode());
+    }
+
+    @Test
+    void testHandleErrorInExecuteForStatus() {
+        // Test handleError is called in executeForStatus method
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(403)
+                .setBody("{\"error\":\"Forbidden\"}"));
+
+        HttpClientException exception = assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/forbidden"))
+                        .executeForStatus()
+        );
+
+        assertEquals(403, exception.getStatusCode());
+    }
+
+    @Test
+    void testHandleErrorWithLargeResponseBody() {
+        // Test error with large response body
+        StringBuilder largeBody = new StringBuilder("{\"error\":\"Large error\",\"details\":\"");
+        for (int i = 0; i < 1000; i++) {
+            largeBody.append("Error detail ").append(i).append(". ");
+        }
+        largeBody.append("\"}");
+
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(500)
+                .setBody(largeBody.toString()));
+
+        HttpClientException exception = assertThrows(HttpClientException.class, () ->
+                getBuilder(client.post()
+                        .uri("/api/large-error"))
+                        .execute(TestResponse.class)
+        );
+
+        assertEquals(500, exception.getStatusCode());
+        assertTrue(exception.getResponseBody().contains("Large error"));
+    }
+
+    @Test
+    void testHandleErrorWithSpecialCharactersInResponseBody() {
+        // Test error with special characters in response body
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(400)
+                .setBody("{\"error\":\"Invalid input\",\"message\":\"Special chars: <>&\\\"'\"}"));
+
+        HttpClientException exception = assertThrows(HttpClientException.class, () ->
+                getBuilder(client.post()
+                        .uri("/api/special"))
+                        .execute(TestResponse.class)
+        );
+
+        assertEquals(400, exception.getStatusCode());
+        assertTrue(exception.getResponseBody().contains("Special chars"));
+    }
+
+    // ========== handleResponse with TypeReference Coverage Tests ==========
+
+    @Test
+    void testHandleResponseTypeReferenceWithError() {
+        // Test handleError branch in handleResponse(TypeReference, checkError=true) when response is not successful
+        // This tests the path: execute(TypeReference) -> handleResponse(response, typeReference) -> handleResponse(response, typeReference, true)
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(404)
+                .setBody("{\"error\":\"Not found\"}"));
+
+        HttpClientException exception = assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/notfound"))
+                        .execute(new TypeReference<List<TestResponse>>() {
+                        })
+        );
+
+        assertEquals(404, exception.getStatusCode());
+        assertTrue(exception.getResponseBody().contains("Not found"));
+    }
+
+    @Test
+    void testHandleResponseTypeReferenceWithError500() {
+        // Additional test for handleError branch with 500 error
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(500)
+                .setBody("{\"error\":\"Internal server error\"}"));
+
+        HttpClientException exception = assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/error"))
+                        .execute(new TypeReference<Map<String, String>>() {
+                        })
+        );
+
+        assertEquals(500, exception.getStatusCode());
+    }
+
+    @Test
+    void testHandleResponseTypeReferenceWithError400() {
+        // Additional test for handleError branch with 400 error
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(400)
+                .setBody("{\"error\":\"Bad request\"}"));
+
+        HttpClientException exception = assertThrows(HttpClientException.class, () ->
+                getBuilder(client.post()
+                        .uri("/api/bad"))
+                        .execute(new TypeReference<List<TestResponse>>() {
+                        })
+        );
+
+        assertEquals(400, exception.getStatusCode());
+    }
+
+    @Test
+    void testHandleResponseTypeReferenceWithNullBody() throws Exception {
+        // Test return null branch when responseBody == null
+        // Using 204 No Content which should have no body
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(204));
+
+        List<TestResponse> result = getBuilder(client.get()
+                .uri("/api/nocontent"))
+                .execute(new TypeReference<List<TestResponse>>() {
+                });
+
+        assertNull(result);
+    }
+
+    @Test
+    void testHandleResponseTypeReferenceWithNullBodyIn205() throws Exception {
+        // Test return null branch with 205 Reset Content
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(205));
+
+        Map<String, String> result = getBuilder(client.get()
+                .uri("/api/reset"))
+                .execute(new TypeReference<Map<String, String>>() {
+                });
+
+        assertNull(result);
+    }
+
+    @Test
+    void testHandleResponseTypeReferenceWithEmptyBodyString() throws Exception {
+        // Test return null branch when bodyString.isEmpty()
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("")
+                .setHeader("Content-Type", "application/json"));
+
+        List<TestResponse> result = getBuilder(client.get()
+                .uri("/api/empty"))
+                .execute(new TypeReference<List<TestResponse>>() {
+                });
+
+        assertNull(result);
+    }
+
+    @Test
+    void testHandleResponseTypeReferenceWithDeserializationError() {
+        // Test Exception branch when JSON deserialization fails
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{invalid json syntax}")
+                .setHeader("Content-Type", "application/json"));
+
+        assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/invalid"))
+                        .execute(new TypeReference<List<TestResponse>>() {
+                        })
+        );
+    }
+
+    @Test
+    void testHandleResponseTypeReferenceWithMalformedJson() {
+        // Test Exception branch with malformed JSON
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("[{\"name\":\"test\",\"id\":}]")  // Missing value for id
+                .setHeader("Content-Type", "application/json"));
+
+        assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/malformed"))
+                        .execute(new TypeReference<List<TestResponse>>() {
+                        })
+        );
+    }
+
+    @Test
+    void testHandleResponseTypeReferenceWithTypeMismatch() {
+        // Test Exception branch when response type doesn't match expected type
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"test\",\"id\":123}")  // Single object, not a list
+                .setHeader("Content-Type", "application/json"));
+
+        assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/mismatch"))
+                        .execute(new TypeReference<List<TestResponse>>() {
+                        })
+        );
+    }
+
+    @Test
+    void testExecuteForResponseTypeReferenceWithNullBody() throws Exception {
+        // Test return null in executeForResponse with TypeReference when body is null
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(204)
+                .setHeader("Content-Length", "0"));
+
+        HttpResponse<List<TestResponse>> response = getBuilder(client.get()
+                .uri("/api/nocontent"))
+                .executeForResponse(new TypeReference<List<TestResponse>>() {
+                });
+
+        assertNotNull(response);
+        assertEquals(204, response.getStatusCode());
+        assertNull(response.getBody());
+    }
+
+    @Test
+    void testExecuteForResponseTypeReferenceWithEmptyBody() throws Exception {
+        // Test return null in executeForResponse with TypeReference when body is empty
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("")
+                .setHeader("Content-Type", "application/json"));
+
+        HttpResponse<List<TestResponse>> response = getBuilder(client.get()
+                .uri("/api/empty"))
+                .executeForResponse(new TypeReference<List<TestResponse>>() {
+                });
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode());
+        assertNull(response.getBody());
+    }
+
+    @Test
+    void testExecuteForResponseTypeReferenceWithDeserializationError() {
+        // Test Exception in executeForResponse with TypeReference
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("not a valid json")
+                .setHeader("Content-Type", "application/json"));
+
+        assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/invalid"))
+                        .executeForResponse(new TypeReference<List<TestResponse>>() {
+                        })
+        );
+    }
+
+    @Test
+    void testExecuteForResponseTypeReferenceWithError() {
+        // Test handleError is called in executeForResponse(TypeReference)
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(401)
+                .setBody("{\"error\":\"Unauthorized\"}"));
+
+        HttpClientException exception = assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/protected"))
+                        .executeForResponse(new TypeReference<List<TestResponse>>() {
+                        })
+        );
+
+        assertEquals(401, exception.getStatusCode());
+    }
+
+    @Test
+    void testExecuteTypeReferenceWithMultipleErrorCodes() {
+        // Test handleError with different error codes to ensure branch coverage
+        int[] errorCodes = {400, 401, 403, 404, 500, 502, 503};
+
+        for (int errorCode : errorCodes) {
+            mockServer.enqueue(new MockResponse()
+                    .setResponseCode(errorCode)
+                    .setBody("{\"error\":\"Error " + errorCode + "\"}"));
+
+            HttpClientException exception = assertThrows(HttpClientException.class, () ->
+                    getBuilder(client.get()
+                            .uri("/api/error"))
+                            .execute(new TypeReference<List<TestResponse>>() {
+                            })
+            );
+
+            assertEquals(errorCode, exception.getStatusCode());
+        }
+    }
+
+    // ========== buildJsonBody and buildMultipartBody Exception Coverage Tests ==========
+
+    /**
+     * Helper class with circular reference to trigger JSON serialization error
+     */
+    static class CircularReferenceObject {
+        String name;
+        CircularReferenceObject self;
+
+        public CircularReferenceObject(String name) {
+            this.name = name;
+            this.self = this; // Circular reference
+        }
+    }
+
+    /**
+     * Helper class that cannot be serialized
+     */
+    static class UnserializableObject {
+        private final Thread thread = new Thread(); // Thread objects cannot be serialized by Gson
+        String name;
+
+        public UnserializableObject(String name) {
+            this.name = name;
+        }
+    }
+
+    @Test
+    void testBuildJsonBodyWithUnserializableObject() {
+        // Test Exception branch in buildJsonBody with unserializable object
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"result\":\"ok\"}")
+                .setHeader("Content-Type", "application/json"));
+
+        UnserializableObject unserializable = new UnserializableObject("test");
+
+        assertThrows(HttpClientException.class, () ->
+                getBuilder(client.post()
+                        .uri("/api/create")
+                        .body(unserializable))
+                        .execute(TestResponse.class)
+        );
+    }
+
+    @Test
+    void testBuildMultipartBodyWithUnserializableComplexObject() {
+        // Test Exception branch in buildMultipartBody with unserializable complex object
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"result\":\"ok\"}")
+                .setHeader("Content-Type", "application/json"));
+
+        Map<String, Object> formData = new java.util.HashMap<>();
+        formData.put("field1", "value1");
+        formData.put("unserializable", new UnserializableObject("test"));
+
+        assertThrows(HttpClientException.class, () ->
+                {
+                    TestResponse execute = getBuilder(client.post()
+                            .uri("/api/upload"))
+                            .multipart(formData)
+                            .execute(TestResponse.class);
+                }
+        );
+    }
+
+    @Test
+    void testBuildMultipartBodyFromPartsWithUnserializableObject() {
+        // Test Exception branch in buildMultipartBodyFromParts with unserializable object
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"result\":\"ok\"}")
+                .setHeader("Content-Type", "application/json"));
+
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        builder.part("field1", "value1");
+        builder.part("unserializable", new UnserializableObject("test"));
+
+        assertThrows(HttpClientException.class, () ->
+                getBuilder(client.post()
+                        .uri("/api/upload")
+                        .header("Content-Type", "multipart/form-data")
+                        .body(builder.build()))
+                        .execute(TestResponse.class)
+        );
+    }
+
+    // ========== handleResponse(Class, boolean) Coverage Tests ==========
+
+    @Test
+    void testHandleResponseClassWithErrorAndCheckError() {
+        // Test handleError branch in handleResponse(Class, checkError=true) when response is not successful
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(404)
+                .setBody("{\"error\":\"Not found\"}"));
+
+        HttpClientException exception = assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/notfound"))
+                        .execute(TestResponse.class)
+        );
+
+        assertEquals(404, exception.getStatusCode());
+    }
+
+    @Test
+    void testHandleResponseClassWithNullBody() throws Exception {
+        // Test return null branch when responseBody == null
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(204));
+
+        TestResponse result = getBuilder(client.get()
+                .uri("/api/nocontent"))
+                .execute(TestResponse.class);
+
+        assertNull(result);
+    }
+
+    @Test
+    void testHandleResponseClassWithError() throws Exception {
+        // Test return null branch when responseBody == null
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(500));
+
+        assertThrows(HttpClientException.class, () -> {
+            getBuilder(client.get()
+                    .uri("/api/nocontent"))
+                    .execute(TestResponse.class);
+        });
+    }
+
+    @Test
+    void testHandleResponseClassWithEmptyBodyString() throws Exception {
+        // Test return null branch when bodyString.isEmpty()
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("")
+                .setHeader("Content-Type", "application/json"));
+
+        TestResponse result = getBuilder(client.get()
+                .uri("/api/empty"))
+                .execute(TestResponse.class);
+
+        assertNull(result);
+    }
+
+    @Test
+    void testHandleResponseClassWithUnsuccessfulAndNonEmptyBody() throws Exception {
+        // Test return null branch when !response.isSuccessful() but checkError=false
+        // This happens in retrieve().toEntity() path where checkError=false for success responses
+        // But we need to test the case where response is not successful and checkError=false
+        // This is tested in OkHttpResponseSpec.toEntity() which handles errors differently
+
+        // For direct execute() call, if response is not successful, handleError is called first
+        // So we test the path through executeForResponse which also uses handleResponse
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(400)
+                .setBody("{\"error\":\"Bad request\"}"));
+
+        assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/bad"))
+                        .execute(TestResponse.class)
+        );
+    }
+
+    @Test
+    void testHandleResponseClassWithVoidType() throws Exception {
+        // Test return null branch when responseType == Void.class
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"result\":\"ok\"}")
+                .setHeader("Content-Type", "application/json"));
+
+        Void result = getBuilder(client.get()
+                .uri("/api/void"))
+                .execute(Void.class);
+
+        assertNull(result);
+    }
+
+    @Test
+    void testHandleResponseClassWithVoidPrimitiveType() throws Exception {
+        // Test return null branch when responseType == void.class
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"result\":\"ok\"}")
+                .setHeader("Content-Type", "application/json"));
+
+        Object result = getBuilder(client.get()
+                .uri("/api/void"))
+                .execute(void.class);
+
+        assertNull(result);
+    }
+
+    @Test
+    void testHandleResponseClassWithByteArrayType() throws Exception {
+        // Test byte array response handling
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("test data")
+                .setHeader("Content-Type", "application/octet-stream"));
+
+        byte[] result = getBuilder(client.get()
+                .uri("/api/bytes"))
+                .execute(byte[].class);
+
+        assertNotNull(result);
+        assertArrayEquals("test data".getBytes(), result);
+    }
+
+    @Test
+    void testHandleResponseClassWithStringType() throws Exception {
+        // Test String response handling
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("test string")
+                .setHeader("Content-Type", "text/plain"));
+
+        String result = getBuilder(client.get()
+                .uri("/api/string"))
+                .execute(String.class);
+
+        assertNotNull(result);
+        assertEquals("test string", result);
+    }
+
+    @Test
+    void testHandleResponseClassWithDeserializationError() {
+        // Test Exception branch when JSON deserialization fails
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{invalid json}")
+                .setHeader("Content-Type", "application/json"));
+
+        assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/invalid"))
+                        .execute(TestResponse.class)
+        );
+    }
+
+    @Test
+    void testExecuteForResponseClassWithNullBody() throws Exception {
+        // Test return null in executeForResponse when body is null
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(204));
+
+        HttpResponse<TestResponse> response = getBuilder(client.get()
+                .uri("/api/nocontent"))
+                .executeForResponse(TestResponse.class);
+
+        assertNotNull(response);
+        assertEquals(204, response.getStatusCode());
+        assertNull(response.getBody());
+    }
+
+    @Test
+    void testExecuteForResponseClassWithEmptyBody() throws Exception {
+        // Test return null in executeForResponse when body is empty
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("")
+                .setHeader("Content-Type", "application/json"));
+
+        HttpResponse<TestResponse> response = getBuilder(client.get()
+                .uri("/api/empty"))
+                .executeForResponse(TestResponse.class);
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode());
+        assertNull(response.getBody());
+    }
+
+    @Test
+    void testExecuteForResponseClassWithVoidType() throws Exception {
+        // Test executeForResponse with Void.class
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"result\":\"ok\"}")
+                .setHeader("Content-Type", "application/json"));
+
+        HttpResponse<Void> response = getBuilder(client.get()
+                .uri("/api/void"))
+                .executeForResponse(Void.class);
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode());
+        assertNull(response.getBody());
+    }
+
+    @Test
+    void testHandleResponseClassWithMultipleStatusCodes() throws Exception {
+        // Test handleResponse with various 2xx success codes
+        int[] successCodes = {200, 201, 202, 204};
+
+        for (int statusCode : successCodes) {
+            if (statusCode == 204) {
+                mockServer.enqueue(new MockResponse()
+                        .setResponseCode(statusCode));
+            } else {
+                mockServer.enqueue(new MockResponse()
+                        .setResponseCode(statusCode)
+                        .setBody("{\"name\":\"test\",\"id\":123}")
+                        .setHeader("Content-Type", "application/json"));
+            }
+
+            TestResponse result = getBuilder(client.get()
+                    .uri("/api/test"))
+                    .execute(TestResponse.class);
+
+            if (statusCode == 204) {
+                assertNull(result);
+            } else {
+                assertNotNull(result);
+            }
+        }
+    }
+
 }

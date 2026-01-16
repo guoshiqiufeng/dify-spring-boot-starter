@@ -530,6 +530,648 @@ class OkHttpRequestBuilderResponseSpecTest {
         // handler2 won't be called because handler1 throws
     }
 
+    @Test
+    void testErrorHandlerWithSuccessfulResponse() {
+        // Test that error handlers are not called for successful responses
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"test\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        AtomicBoolean handlerCalled = new AtomicBoolean(false);
+
+        TestResponse result = client.get()
+                .uri("/api/test")
+                .retrieve()
+                .onStatus(ResponseErrorHandler.onStatus(status -> status >= 400, response -> {
+                    handlerCalled.set(true);
+                    throw new RuntimeException("Should not be called");
+                }))
+                .body(TestResponse.class);
+
+        assertNotNull(result);
+        assertFalse(handlerCalled.get());
+    }
+
+    @Test
+    void testErrorHandlerAccessesResponseBody() {
+        // Test that error handler can access response body
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(400)
+                .setBody("{\"error\":\"Bad request\",\"details\":\"Invalid parameter\"}"));
+
+        AtomicBoolean bodyAccessed = new AtomicBoolean(false);
+
+        assertThrows(RuntimeException.class, () ->
+                client.get()
+                        .uri("/api/bad")
+                        .retrieve()
+                        .onStatus(ResponseErrorHandler.onStatus(status -> status == 400, response -> {
+                            // Access response body in error handler
+                            Object body = response.getBody();
+                            if (body != null && body.toString().contains("Bad request")) {
+                                bodyAccessed.set(true);
+                            }
+                            throw new RuntimeException("Bad request");
+                        }))
+                        .body(TestResponse.class)
+        );
+
+        assertTrue(bodyAccessed.get());
+    }
+
+    @Test
+    void testErrorHandlerAccessesResponseHeaders() {
+        // Test that error handler can access response headers
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(401)
+                .setBody("{\"error\":\"Unauthorized\"}")
+                .setHeader("WWW-Authenticate", "Bearer realm=\"example\""));
+
+        AtomicBoolean headerAccessed = new AtomicBoolean(false);
+
+        assertThrows(RuntimeException.class, () ->
+                client.get()
+                        .uri("/api/protected")
+                        .retrieve()
+                        .onStatus(ResponseErrorHandler.onStatus(status -> status == 401, response -> {
+                            // Access response headers in error handler
+                            String authHeader = response.getHeaders().getFirst("WWW-Authenticate");
+                            if (authHeader != null && authHeader.contains("Bearer")) {
+                                headerAccessed.set(true);
+                            }
+                            throw new RuntimeException("Unauthorized");
+                        }))
+                        .body(TestResponse.class)
+        );
+
+        assertTrue(headerAccessed.get());
+    }
+
+    @Test
+    void testErrorHandlerAccessesStatusCode() {
+        // Test that error handler can access status code
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(403)
+                .setBody("{\"error\":\"Forbidden\"}"));
+
+        AtomicBoolean statusCodeChecked = new AtomicBoolean(false);
+
+        assertThrows(RuntimeException.class, () ->
+                client.get()
+                        .uri("/api/forbidden")
+                        .retrieve()
+                        .onStatus(ResponseErrorHandler.onStatus(status -> status == 403, response -> {
+                            // Access status code in error handler
+                            if (response.getStatusCode() == 403) {
+                                statusCodeChecked.set(true);
+                            }
+                            throw new RuntimeException("Forbidden");
+                        }))
+                        .body(TestResponse.class)
+        );
+
+        assertTrue(statusCodeChecked.get());
+    }
+
+    @Test
+    void testErrorHandlerWithToEntity() {
+        // Test error handler is called in toEntity() method
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(500)
+                .setBody("{\"error\":\"Server error\"}"));
+
+        AtomicBoolean handlerCalled = new AtomicBoolean(false);
+
+        assertThrows(RuntimeException.class, () ->
+                client.get()
+                        .uri("/api/error")
+                        .retrieve()
+                        .onStatus(ResponseErrorHandler.onStatus(status -> status >= 500, response -> {
+                            handlerCalled.set(true);
+                            throw new RuntimeException("Server error");
+                        }))
+                        .toEntity(TestResponse.class)
+        );
+
+        assertTrue(handlerCalled.get());
+    }
+
+    @Test
+    void testErrorHandlerWithToEntityTypeReference() {
+        // Test error handler is called in toEntity(TypeReference) method
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(404)
+                .setBody("{\"error\":\"Not found\"}"));
+
+        AtomicBoolean handlerCalled = new AtomicBoolean(false);
+
+        assertThrows(RuntimeException.class, () ->
+                client.get()
+                        .uri("/api/notfound")
+                        .retrieve()
+                        .onStatus(ResponseErrorHandler.onStatus(status -> status == 404, response -> {
+                            handlerCalled.set(true);
+                            throw new RuntimeException("Not found");
+                        }))
+                        .toEntity(new TypeReference<List<TestResponse>>() {})
+        );
+
+        assertTrue(handlerCalled.get());
+    }
+
+    @Test
+    void testErrorHandlerWithToBodilessEntity() {
+        // Test error handler is called in toBodilessEntity() method
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(403)
+                .setBody("{\"error\":\"Forbidden\"}"));
+
+        AtomicBoolean handlerCalled = new AtomicBoolean(false);
+
+        assertThrows(RuntimeException.class, () ->
+                client.delete()
+                        .uri("/api/forbidden")
+                        .retrieve()
+                        .onStatus(ResponseErrorHandler.onStatus(status -> status == 403, response -> {
+                            handlerCalled.set(true);
+                            throw new RuntimeException("Forbidden");
+                        }))
+                        .toBodilessEntity()
+        );
+
+        assertTrue(handlerCalled.get());
+    }
+
+    @Test
+    void testErrorHandlerWithDifferentStatusRanges() {
+        // Test error handlers with different status code ranges
+        int[] errorCodes = {400, 401, 403, 404, 500, 502, 503};
+
+        for (int errorCode : errorCodes) {
+            mockServer.enqueue(new MockResponse()
+                    .setResponseCode(errorCode)
+                    .setBody("{\"error\":\"Error " + errorCode + "\"}"));
+
+            AtomicBoolean handlerCalled = new AtomicBoolean(false);
+
+            assertThrows(RuntimeException.class, () ->
+                    client.get()
+                            .uri("/api/error")
+                            .retrieve()
+                            .onStatus(ResponseErrorHandler.onStatus(status -> status >= 400, response -> {
+                                handlerCalled.set(true);
+                                throw new RuntimeException("Error " + response.getStatusCode());
+                            }))
+                            .body(TestResponse.class)
+            );
+
+            assertTrue(handlerCalled.get(), "Handler should be called for status code " + errorCode);
+        }
+    }
+
+    @Test
+    void testErrorHandlerDoesNotThrowException() {
+        // Test error handler that doesn't throw exception (just logs or processes)
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(400)
+                .setBody("{\"error\":\"Bad request\"}"));
+
+        AtomicBoolean handlerCalled = new AtomicBoolean(false);
+
+        // This should still throw because the response is an error, but handler is called
+        assertThrows(RuntimeException.class, () ->
+                client.get()
+                        .uri("/api/bad")
+                        .retrieve()
+                        .onStatus(ResponseErrorHandler.onStatus(status -> status == 400, response -> {
+                            handlerCalled.set(true);
+                            // Don't throw, just process
+                        }))
+                        .onStatus(ResponseErrorHandler.onStatus(status -> status >= 400, response -> {
+                            // This handler throws
+                            throw new RuntimeException("Bad request");
+                        }))
+                        .body(TestResponse.class)
+        );
+
+        assertTrue(handlerCalled.get());
+    }
+
+    @Test
+    void testErrorHandlerWithCustomException() {
+        // Test error handler throwing custom exception
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(404)
+                .setBody("{\"error\":\"Not found\"}"));
+
+        class CustomNotFoundException extends RuntimeException {
+            public CustomNotFoundException(String message) {
+                super(message);
+            }
+        }
+
+        assertThrows(CustomNotFoundException.class, () ->
+                client.get()
+                        .uri("/api/notfound")
+                        .retrieve()
+                        .onStatus(ResponseErrorHandler.onStatus(status -> status == 404, response -> {
+                            throw new CustomNotFoundException("Resource not found");
+                        }))
+                        .body(TestResponse.class)
+        );
+    }
+
+    @Test
+    void testToEntityWithErrorResponseAndNoThrowingHandler() {
+        // Test toEntity returns HttpResponse when error handler doesn't throw
+        // This covers the line: handleErrors(httpResponse); return httpResponse; in error branch
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(404)
+                .setBody("{\"error\":\"Not found\"}"));
+
+        AtomicBoolean handlerCalled = new AtomicBoolean(false);
+
+        // Error handler that doesn't throw - just processes the error
+        HttpResponse<TestResponse> response = client.get()
+                .uri("/api/notfound")
+                .retrieve()
+                .onStatus(ResponseErrorHandler.onStatus(status -> status == 404, httpResponse -> {
+                    handlerCalled.set(true);
+                    // Don't throw, just log or process
+                }))
+                .toEntity(TestResponse.class);
+
+        // Verify handler was called
+        assertTrue(handlerCalled.get());
+
+        // Verify response is returned with error status
+        assertNotNull(response);
+        assertEquals(404, response.getStatusCode());
+        assertNotNull(response.getBody());
+    }
+
+    @Test
+    void testToEntityWithErrorResponseAndMultipleNonThrowingHandlers() {
+        // Test multiple error handlers that don't throw
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(500)
+                .setBody("{\"error\":\"Server error\"}"));
+
+        AtomicBoolean handler1Called = new AtomicBoolean(false);
+        AtomicBoolean handler2Called = new AtomicBoolean(false);
+
+        HttpResponse<TestResponse> response = client.get()
+                .uri("/api/error")
+                .retrieve()
+                .onStatus(ResponseErrorHandler.onStatus(status -> status >= 500, httpResponse -> {
+                    handler1Called.set(true);
+                    // Don't throw
+                }))
+                .onStatus(ResponseErrorHandler.onStatus(status -> status == 500, httpResponse -> {
+                    handler2Called.set(true);
+                    // Don't throw
+                }))
+                .toEntity(TestResponse.class);
+
+        // Both handlers should be called
+        assertTrue(handler1Called.get());
+        assertTrue(handler2Called.get());
+
+        // Response should be returned
+        assertNotNull(response);
+        assertEquals(500, response.getStatusCode());
+    }
+
+    @Test
+    void testToEntityTypeReferenceWithErrorResponseAndNoThrowingHandler() {
+        // Test toEntity(TypeReference) returns HttpResponse when error handler doesn't throw
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(400)
+                .setBody("{\"error\":\"Bad request\"}"));
+
+        AtomicBoolean handlerCalled = new AtomicBoolean(false);
+
+        HttpResponse<List<TestResponse>> response = client.get()
+                .uri("/api/bad")
+                .retrieve()
+                .onStatus(ResponseErrorHandler.onStatus(status -> status == 400, httpResponse -> {
+                    handlerCalled.set(true);
+                    // Don't throw
+                }))
+                .toEntity(new TypeReference<List<TestResponse>>() {});
+
+        assertTrue(handlerCalled.get());
+        assertNotNull(response);
+        assertEquals(400, response.getStatusCode());
+    }
+
+    @Test
+    void testToEntityWithSuccessResponseAndNonThrowingHandler() {
+        // Test toEntity with success response and error handler (handler shouldn't be called)
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"test\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        AtomicBoolean handlerCalled = new AtomicBoolean(false);
+
+        HttpResponse<TestResponse> response = client.get()
+                .uri("/api/test")
+                .retrieve()
+                .onStatus(ResponseErrorHandler.onStatus(status -> status >= 400, httpResponse -> {
+                    handlerCalled.set(true);
+                }))
+                .toEntity(TestResponse.class);
+
+        // Handler should not be called for success response
+        assertFalse(handlerCalled.get());
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("test", response.getBody().name);
+    }
+
+    @Test
+    void testToEntityWithErrorResponseEmptyBody() {
+        // Test toEntity with error response and empty body
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(500)
+                .setBody(""));
+
+        AtomicBoolean handlerCalled = new AtomicBoolean(false);
+
+        HttpResponse<TestResponse> response = client.get()
+                .uri("/api/error")
+                .retrieve()
+                .onStatus(ResponseErrorHandler.onStatus(status -> status >= 500, httpResponse -> {
+                    handlerCalled.set(true);
+                    // Verify body is empty string
+                    assertEquals("", httpResponse.getBody());
+                }))
+                .toEntity(TestResponse.class);
+
+        assertTrue(handlerCalled.get());
+        assertNotNull(response);
+        assertEquals(500, response.getStatusCode());
+    }
+
+    @Test
+    void testToEntityWithErrorResponseNullBody() {
+        // Test toEntity with error response and null body
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(500)
+                .setHeader("Content-Length", "0"));
+
+        AtomicBoolean handlerCalled = new AtomicBoolean(false);
+
+        HttpResponse<TestResponse> response = client.get()
+                .uri("/api/error")
+                .retrieve()
+                .onStatus(ResponseErrorHandler.onStatus(status -> status >= 500, httpResponse -> {
+                    handlerCalled.set(true);
+                    // Verify body is empty string (not null)
+                    assertEquals("", httpResponse.getBody());
+                }))
+                .toEntity(TestResponse.class);
+
+        assertTrue(handlerCalled.get());
+        assertNotNull(response);
+        assertEquals(500, response.getStatusCode());
+    }
+
+    @Test
+    void testToEntityWithDifferentErrorStatusCodes() {
+        // Test toEntity with various error status codes and non-throwing handlers
+        int[] errorCodes = {400, 401, 403, 404, 500, 502, 503};
+
+        for (int errorCode : errorCodes) {
+            mockServer.enqueue(new MockResponse()
+                    .setResponseCode(errorCode)
+                    .setBody("{\"error\":\"Error " + errorCode + "\"}"));
+
+            AtomicBoolean handlerCalled = new AtomicBoolean(false);
+
+            HttpResponse<TestResponse> response = client.get()
+                    .uri("/api/error")
+                    .retrieve()
+                    .onStatus(ResponseErrorHandler.onStatus(status -> status >= 400, httpResponse -> {
+                        handlerCalled.set(true);
+                        assertEquals(errorCode, httpResponse.getStatusCode());
+                    }))
+                    .toEntity(TestResponse.class);
+
+            assertTrue(handlerCalled.get(), "Handler should be called for status " + errorCode);
+            assertNotNull(response);
+            assertEquals(errorCode, response.getStatusCode());
+        }
+    }
+
+    @Test
+    void testToEntityWithErrorHandlerAccessingErrorBody() {
+        // Test that error handler can access and process error body
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(400)
+                .setBody("{\"error\":\"Validation failed\",\"field\":\"email\"}"));
+
+        AtomicBoolean bodyProcessed = new AtomicBoolean(false);
+
+        HttpResponse<TestResponse> response = client.get()
+                .uri("/api/validate")
+                .retrieve()
+                .onStatus(ResponseErrorHandler.onStatus(status -> status == 400, httpResponse -> {
+                    Object body = httpResponse.getBody();
+                    if (body != null && body.toString().contains("Validation failed")) {
+                        bodyProcessed.set(true);
+                    }
+                }))
+                .toEntity(TestResponse.class);
+
+        assertTrue(bodyProcessed.get());
+        assertNotNull(response);
+        assertEquals(400, response.getStatusCode());
+    }
+
+    @Test
+    void testToEntitySuccessWithNullResponseBody() {
+        // Test toEntity with success response (2xx) but null body
+        // This tests handleResponse(response, responseType, false) with responseBody == null
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(204));
+
+        HttpResponse<TestResponse> response = client.get()
+                .uri("/api/nocontent")
+                .retrieve()
+                .toEntity(TestResponse.class);
+
+        assertNotNull(response);
+        assertEquals(204, response.getStatusCode());
+        assertNull(response.getBody());
+    }
+
+    @Test
+    void testToEntitySuccessWithEmptyBodyString() {
+        // Test toEntity with success response (2xx) but empty body string
+        // This tests handleResponse(response, responseType, false) with bodyString.isEmpty()
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("")
+                .setHeader("Content-Type", "application/json"));
+
+        HttpResponse<TestResponse> response = client.get()
+                .uri("/api/empty")
+                .retrieve()
+                .toEntity(TestResponse.class);
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode());
+        assertNull(response.getBody());
+    }
+
+    @Test
+    void testToEntitySuccessWithVoidType() {
+        // Test toEntity with success response and Void.class
+        // This tests handleResponse(response, Void.class, false)
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"result\":\"ok\"}")
+                .setHeader("Content-Type", "application/json"));
+
+        HttpResponse<Void> response = client.get()
+                .uri("/api/void")
+                .retrieve()
+                .toEntity(Void.class);
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode());
+        assertNull(response.getBody());
+    }
+
+    @Test
+    void testToEntitySuccessWithByteArrayType() {
+        // Test toEntity with success response and byte[].class
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("test data")
+                .setHeader("Content-Type", "application/octet-stream"));
+
+        HttpResponse<byte[]> response = client.get()
+                .uri("/api/bytes")
+                .retrieve()
+                .toEntity(byte[].class);
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertArrayEquals("test data".getBytes(), response.getBody());
+    }
+
+    @Test
+    void testToEntitySuccessWithStringType() {
+        // Test toEntity with success response and String.class
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("test string")
+                .setHeader("Content-Type", "text/plain"));
+
+        HttpResponse<String> response = client.get()
+                .uri("/api/string")
+                .retrieve()
+                .toEntity(String.class);
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("test string", response.getBody());
+    }
+
+    @Test
+    void testToEntitySuccessWithJsonDeserialization() {
+        // Test toEntity with success response and JSON deserialization
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"test\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        HttpResponse<TestResponse> response = client.get()
+                .uri("/api/test")
+                .retrieve()
+                .toEntity(TestResponse.class);
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("test", response.getBody().name);
+        assertEquals(123, response.getBody().id);
+    }
+
+    @Test
+    void testToEntitySuccessWithDeserializationError() {
+        // Test toEntity with success response but JSON deserialization fails
+        // This tests the Exception branch in handleResponse when checkError=false
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{invalid json}")
+                .setHeader("Content-Type", "application/json"));
+
+        assertThrows(HttpClientException.class, () ->
+                client.get()
+                        .uri("/api/invalid")
+                        .retrieve()
+                        .toEntity(TestResponse.class)
+        );
+    }
+
+    @Test
+    void testToEntityTypeReferenceSuccessWithNullBody() {
+        // Test toEntity(TypeReference) with success response but null body
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(204));
+
+        HttpResponse<List<TestResponse>> response = client.get()
+                .uri("/api/nocontent")
+                .retrieve()
+                .toEntity(new TypeReference<List<TestResponse>>() {});
+
+        assertNotNull(response);
+        assertEquals(204, response.getStatusCode());
+        assertNull(response.getBody());
+    }
+
+    @Test
+    void testToEntityTypeReferenceSuccessWithEmptyBody() {
+        // Test toEntity(TypeReference) with success response but empty body
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("")
+                .setHeader("Content-Type", "application/json"));
+
+        HttpResponse<List<TestResponse>> response = client.get()
+                .uri("/api/empty")
+                .retrieve()
+                .toEntity(new TypeReference<List<TestResponse>>() {});
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode());
+        assertNull(response.getBody());
+    }
+
+    @Test
+    void testToEntityTypeReferenceSuccessWithDeserializationError() {
+        // Test toEntity(TypeReference) with success response but deserialization fails
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{invalid json}")
+                .setHeader("Content-Type", "application/json"));
+
+        assertThrows(HttpClientException.class, () ->
+                client.get()
+                        .uri("/api/invalid")
+                        .retrieve()
+                        .toEntity(new TypeReference<List<TestResponse>>() {})
+        );
+    }
+
     // ========== Test Data Classes ==========
 
     static class TestResponse {

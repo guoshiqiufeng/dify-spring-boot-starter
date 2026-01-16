@@ -401,4 +401,36 @@ class HttpHeadersTest {
         // Verify it implements Serializable
         assertTrue(headers instanceof java.io.Serializable);
     }
+
+    @Test
+    void testSetBearerAuth() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth("test-token-123");
+
+        assertEquals("Bearer test-token-123", headers.getFirst("AUTHORIZATION"));
+    }
+
+    @Test
+    void testSetBearerAuthReplacesExisting() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("AUTHORIZATION", "Basic abc123");
+        headers.setBearerAuth("new-token");
+
+        List<String> authValues = headers.get("AUTHORIZATION");
+        assertEquals(1, authValues.size());
+        assertEquals("Bearer new-token", authValues.get(0));
+    }
+
+    @Test
+    void testGetNull() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("AUTHORIZATION-empty", "");
+        headers.add("AUTHORIZATION-null", null);
+        headers.setBearerAuth("test-token-123");
+
+        headers.containsKey(null);
+
+        headers.getFirst("AUTHORIZATION-empty");
+        headers.getFirst("AUTHORIZATION-null");
+    }
 }

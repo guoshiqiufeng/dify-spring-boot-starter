@@ -61,6 +61,23 @@ class DefaultRequestBodyUriSpecTest {
     }
 
     @Test
+    void testUriWithURI() throws Exception {
+        URI uri = new URI("http://example.com/users/123");
+
+        RequestBodySpec result = spec.uri(uri);
+
+        assertSame(spec, result);
+        verify(mockRequestBuilder).uri(uri.toString());
+    }
+
+    @Test
+    void testUriWithNullURI() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            spec.uri((URI) null);
+        });
+    }
+
+    @Test
     void testUriWithStringAndVariables() {
         String uri = "/users/{id}";
         Object[] variables = {123};
