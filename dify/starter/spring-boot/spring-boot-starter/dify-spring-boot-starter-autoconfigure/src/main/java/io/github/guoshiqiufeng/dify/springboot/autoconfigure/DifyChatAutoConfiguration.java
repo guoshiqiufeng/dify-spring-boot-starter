@@ -89,7 +89,7 @@ public class DifyChatAutoConfiguration {
     @ConditionalOnMissingBean(PipelineHandler.class)
     public PipelineHandler pipelineHandler(List<PipelineProcess<ChatMessagePipelineModel>> produceProcessList) {
         PipelineHandler processHandler = new PipelineHandler();
-        Map<String, PipelineTemplate<? extends PipelineModel>> templateConfig = new HashMap<>(2);
+        Map<String, PipelineTemplate<? extends PipelineModel>> templateConfig = new HashMap<>(1);
         templateConfig.put("CHAT", chatTemplate(produceProcessList));
         processHandler.setTemplateConfig(templateConfig);
         return processHandler;

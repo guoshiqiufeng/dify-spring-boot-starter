@@ -12,7 +12,6 @@ dependencies {
 
     implementation "io.projectreactor:reactor-core"
 
-    // implementation libs.hutool.core
     implementation libs.slf4j.api
 
     testImplementation libs.junit.jupiter
@@ -21,6 +20,6 @@ dependencies {
     testImplementation libs.bytebuddy
     testImplementation libs.bytebuddy.agent
 
-    testImplementation 'io.projectreactor:reactor-test:3.6.0'
+    testImplementation libs.reactor.test
     testImplementation project(":dify:dify-client:dify-client-integration:dify-client-integration-spring")
 }

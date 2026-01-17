@@ -37,6 +37,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * Dify status auto-configuration
@@ -85,6 +86,7 @@ public class DifyStatusAutoConfiguration {
     }
 
     @Bean
+    @Lazy
     @ConditionalOnMissingBean(DifyStatusService.class)
     public DifyStatusService difyStatusService(
             ObjectProvider<DifyChatStatusChecker> chatChecker,

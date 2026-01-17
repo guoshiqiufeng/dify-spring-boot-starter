@@ -19,7 +19,7 @@ features:
     details: Framework-agnostic core abstractions with flexible HTTP clients and codec options
   - title: Multi-Version Support
     details: Supports Spring Boot 2.x/3.x/4.x and pure Java projects
-footer: Apache License 2.0 | Copyright © 2024-present fubluesky
+footer: Apache License 2.0 | Copyright © 2024-2026 fubluesky
 ---
 
 ### Latest version
