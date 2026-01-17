@@ -6,7 +6,7 @@ description:
 
 # 配置
 
-[dify-spring-boot-starter](https://github.com/guoshiqiufeng/dify-spring-boot-starter) 的配置异常的简单，我们仅需要一些简单的配置即可！
+[dify-spring-boot-starter](https://github.com/guoshiqiufeng/dify-spring-boot-starter) 的配置非常简单，只需要一些基础配置即可开始使用！
 
 > 请确保您已经安装了 dify-spring-boot-starter，如果您尚未安装，请查看 [安装](install.md)。
 

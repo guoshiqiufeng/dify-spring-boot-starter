@@ -44,4 +44,12 @@ public class BaseException extends RuntimeException {
         this.msg = abstractExceptionEnum.getMsg();
     }
 
+    public Integer getCode() {
+        return code;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
 }

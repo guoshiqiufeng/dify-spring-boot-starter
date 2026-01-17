@@ -29,47 +29,52 @@ import java.util.concurrent.locks.ReentrantLock;
 @Slf4j
 public class DifyServerTokenDefault extends BaseDifyServerToken {
 
-    private String accessToken;
+    private volatile String accessToken;
 
-    private String refreshToken;
+    private volatile String refreshToken;
 
-    private String csrfToken;
+    private volatile String csrfToken;
 
     private final ReentrantLock tokenLock = new ReentrantLock();
 
     @Override
     public void addAuthorizationHeader(HttpHeaders headers, DifyServerClient difyServerClient) {
-        if (accessToken == null) {
-            obtainToken(difyServerClient);
+        String token = accessToken;
+        if (token == null) {
+            token = obtainTokenIfNeeded(difyServerClient);
         }
-        if (accessToken != null) {
-            headers.setBearerAuth(accessToken);
+        if (token != null) {
+            headers.setBearerAuth(token);
         }
-        if (csrfToken != null) {
-            headers.add("x-csrf-token", csrfToken);
+        String csrf = csrfToken;
+        if (csrf != null) {
+            headers.add("x-csrf-token", csrf);
         }
     }
 
     @Override
     public void addAuthorizationCookies(io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap<String, String> cookies, DifyServerClient difyServerClient) {
-        if (accessToken == null) {
-            obtainToken(difyServerClient);
+        String token = accessToken;
+        if (token == null) {
+            token = obtainTokenIfNeeded(difyServerClient);
         }
-        if (accessToken != null) {
-            cookies.add("access_token", accessToken);
+        if (token != null) {
+            cookies.add("access_token", token);
             // support Https
-            cookies.add("__Host-access_token", accessToken);
+            cookies.add("__Host-access_token", token);
         }
-        if (csrfToken != null) {
-            cookies.add("csrf_token", csrfToken);
+        String csrf = csrfToken;
+        if (csrf != null) {
+            cookies.add("csrf_token", csrf);
             // support Https
-            cookies.add("__Host-csrf_token", csrfToken);
+            cookies.add("__Host-csrf_token", csrf);
         }
     }
 
-    private void obtainToken(DifyServerClient difyServerClient) {
+    private String obtainTokenIfNeeded(DifyServerClient difyServerClient) {
         tokenLock.lock();
         try {
+            // Double-check inside lock
             if (accessToken == null) {
                 LoginResponse loginResponse = difyServerClient.login();
                 if (loginResponse != null) {
@@ -78,6 +83,7 @@ public class DifyServerTokenDefault extends BaseDifyServerToken {
                     this.csrfToken = loginResponse.getCsrfToken();
                 }
             }
+            return accessToken;
         } finally {
             tokenLock.unlock();
         }

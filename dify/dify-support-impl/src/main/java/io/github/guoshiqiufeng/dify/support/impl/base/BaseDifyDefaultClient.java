@@ -71,12 +71,20 @@ public class BaseDifyDefaultClient implements BaseDifyClient {
             String message = body != null ? body.toString() : "";
             log.error("【Dify】请求错误，状态码：{}，错误信息：{}", statusCode, message);
             switch (statusCode) {
+                case 400:
+                    throw new DifyClientException(DiftClientExceptionEnum.BAD_REQUEST);
                 case 401:
                     throw new DifyClientException(DiftClientExceptionEnum.UNAUTHORIZED);
                 case 404:
                     throw new DifyClientException(DiftClientExceptionEnum.NOT_FOUND);
+                case 429:
+                    throw new DifyClientException(DiftClientExceptionEnum.RATE_LIMIT_EXCEEDED);
+                case 500:
+                    throw new DifyClientException(DiftClientExceptionEnum.INTERNAL_SERVER_ERROR);
+                case 503:
+                    throw new DifyClientException(DiftClientExceptionEnum.SERVICE_UNAVAILABLE);
                 default:
-                    throw new RuntimeException(String.format("[%s] %s", statusCode, message));
+                    throw new DifyClientException(statusCode, message);
             }
         }
     }

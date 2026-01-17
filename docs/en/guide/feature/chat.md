@@ -8,10 +8,9 @@ description:
 
 ## Interface Overview
 
-Chat service interfaces provide complete chat functionality integration capabilities, including message sending and
-receiving, session management, voice conversion and other core functions. All interfaces require a valid API key for
-authentication.
-Use the `DifyChat` interface instance.
+Chat service interfaces provide complete chat functionality integration capabilities, including message sending and receiving, session management, voice conversion and other core functions. All interfaces require a valid API key for authentication.
+
+Use the `DifyChat` interface instance for invocation.
 
 ## 1. Message
 

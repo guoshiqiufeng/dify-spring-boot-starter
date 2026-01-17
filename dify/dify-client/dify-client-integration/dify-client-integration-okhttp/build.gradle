@@ -10,7 +10,7 @@ dependencies {
     testImplementation libs.junit.jupiter
     testImplementation libs.mockito.core
     testImplementation libs.mockito.junit.jupiter
-    testImplementation 'com.squareup.okhttp3:mockwebserver:4.12.0'
-    testImplementation 'io.projectreactor:reactor-test:3.6.0'
+    testImplementation libs.okhttp.mockwebserver
+    testImplementation libs.reactor.test
     testImplementation 'ch.qos.logback:logback-classic'
 }

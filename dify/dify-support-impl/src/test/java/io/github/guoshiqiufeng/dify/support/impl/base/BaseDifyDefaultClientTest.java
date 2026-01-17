@@ -220,13 +220,12 @@ class BaseDifyDefaultClientTest {
         when(mockResponse.getBody()).thenReturn("Internal Server Error");
 
         // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        DifyClientException exception = assertThrows(DifyClientException.class, () -> {
             client.responseErrorHandler.handle(mockResponse);
         });
 
         assertNotNull(exception);
-        assertTrue(exception.getMessage().contains("500"));
-        assertTrue(exception.getMessage().contains("Internal Server Error"));
+        assertEquals(500, exception.getCode());
     }
 
     @Test
@@ -240,12 +239,12 @@ class BaseDifyDefaultClientTest {
         when(mockResponse.getBody()).thenReturn(null);
 
         // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        DifyClientException exception = assertThrows(DifyClientException.class, () -> {
             client.responseErrorHandler.handle(mockResponse);
         });
 
         assertNotNull(exception);
-        assertTrue(exception.getMessage().contains("500"));
+        assertEquals(500, exception.getCode());
     }
 
     @Test
@@ -259,13 +258,12 @@ class BaseDifyDefaultClientTest {
         when(mockResponse.getBody()).thenReturn("Bad Request: Invalid parameters");
 
         // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        DifyClientException exception = assertThrows(DifyClientException.class, () -> {
             client.responseErrorHandler.handle(mockResponse);
         });
 
         assertNotNull(exception);
-        assertTrue(exception.getMessage().contains("400"));
-        assertTrue(exception.getMessage().contains("Bad Request: Invalid parameters"));
+        assertEquals(400, exception.getCode());
     }
 
     @Test
@@ -279,12 +277,12 @@ class BaseDifyDefaultClientTest {
         when(mockResponse.getBody()).thenReturn("Forbidden");
 
         // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        DifyClientException exception = assertThrows(DifyClientException.class, () -> {
             client.responseErrorHandler.handle(mockResponse);
         });
 
         assertNotNull(exception);
-        assertTrue(exception.getMessage().contains("403"));
-        assertTrue(exception.getMessage().contains("Forbidden"));
+        assertEquals(403, exception.getCode());
+        assertEquals("Forbidden", exception.getMsg());
     }
 }
