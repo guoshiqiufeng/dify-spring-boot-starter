@@ -15,6 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.client.core.codec;
 
+import io.github.guoshiqiufeng.dify.client.core.codec.exception.JsonException;
+
 /**
  * Custom JSON deserializer interface
  * <p>

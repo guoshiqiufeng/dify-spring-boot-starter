@@ -21,6 +21,8 @@ import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
 import io.github.guoshiqiufeng.dify.server.impl.DifyServerClientImpl;
+import io.github.guoshiqiufeng.dify.springboot.common.autoconfigure.DifyCodecAutoConfiguration;
+import io.github.guoshiqiufeng.dify.springboot.common.autoconfigure.DifyPropertiesAutoConfiguration;
 import io.github.guoshiqiufeng.dify.support.impl.server.DifyServerDefaultClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;

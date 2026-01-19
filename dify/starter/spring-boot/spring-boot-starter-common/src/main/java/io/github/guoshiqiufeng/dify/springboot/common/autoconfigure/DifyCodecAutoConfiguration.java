@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.springboot.autoconfigure;
+package io.github.guoshiqiufeng.dify.springboot.common.autoconfigure;
 
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.codec.jackson.JacksonJsonMapper;
@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Dify Codec 自动配置
+ * Dify Codec 自动配置基类
  * <p>
  * 默认初始化 Jackson 的 JsonMapper 实现
  * Jackson 支持 @JsonProperty, @JsonAlias 等注解，与项目中的 DTO 定义兼容

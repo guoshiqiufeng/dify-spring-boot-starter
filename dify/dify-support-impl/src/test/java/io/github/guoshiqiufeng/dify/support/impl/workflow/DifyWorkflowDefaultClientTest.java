@@ -15,6 +15,11 @@
  */
 package io.github.guoshiqiufeng.dify.support.impl.workflow;
 
+import io.github.guoshiqiufeng.dify.chat.dto.request.ChatMessageSendRequest;
+import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
+import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
+import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.request.ChatMessageVO;
 import io.github.guoshiqiufeng.dify.support.impl.BaseClientTest;
@@ -26,8 +31,6 @@ import io.github.guoshiqiufeng.dify.workflow.dto.response.*;
 import io.github.guoshiqiufeng.dify.workflow.enums.StreamEventEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
-import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
 import reactor.core.publisher.Flux;
 
 import java.net.URI;
@@ -56,6 +59,12 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         super.setup();
         // Create real client with mocked HttpClient
         client = new DifyWorkflowDefaultClient(httpClientMock);
+    }
+
+    @Test
+    public void testConstructor() {
+        HttpClientFactory httpClientFactory = mock(HttpClientFactory.class);
+        new DifyWorkflowDefaultClient("http://127.0.0.1", new DifyProperties.ClientConfig(), httpClientFactory);
     }
 
     @Test
@@ -159,6 +168,16 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         inputs.put("question", "What is the weather today?");
         request.setInputs(inputs);
 
+        WorkflowRunRequest.WorkflowFile file = new WorkflowRunRequest.WorkflowFile();
+        file.setType(null);
+        file.setTransferMethod(null);
+        file.setUrl("https://file.com");
+        WorkflowRunRequest.WorkflowFile file2 = new WorkflowRunRequest.WorkflowFile();
+        file2.setTransferMethod("remote_url");
+        file2.setUrl("https://file.com");
+        file2.setType("image");
+        request.setFiles(List.of(file, file2));
+
         // Create expected responses for stream
         WorkflowRunStreamResponse response1 = new WorkflowRunStreamResponse();
         response1.setEvent(StreamEventEnum.workflow_started);
@@ -182,8 +201,9 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         WorkflowRunStreamResponseDto dto1 = new WorkflowRunStreamResponseDto(response1);
         WorkflowRunStreamResponseDto dto2 = new WorkflowRunStreamResponseDto(response2);
         WorkflowRunStreamResponseDto dto3 = new WorkflowRunStreamResponseDto(response3);
+        WorkflowRunStreamResponseDto dto4 = new WorkflowRunStreamResponseDto(null);
 
-        List<WorkflowRunStreamResponseDto> responses = List.of(dto1, dto2, dto3);
+        List<WorkflowRunStreamResponseDto> responses = List.of(dto1, dto2, dto3, dto4);
 
         // Mock the response
         when(responseSpecMock.bodyToFlux(WorkflowRunStreamResponseDto.class)).thenReturn(Flux.fromIterable(responses));

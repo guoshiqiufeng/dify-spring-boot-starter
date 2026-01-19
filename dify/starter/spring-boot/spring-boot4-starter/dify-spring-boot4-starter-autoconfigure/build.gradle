@@ -1,4 +1,7 @@
 dependencies {
+    // 依赖公共模块
+    api project(":dify:starter:spring-boot:spring-boot-starter-common")
+
     implementation project(":dify:dify-support:dify-support-chat")
     implementation project(":dify:dify-support:dify-support-dataset")
     implementation project(":dify:dify-support:dify-support-server")

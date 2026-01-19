@@ -62,8 +62,12 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
      */
     public DifyServerDefaultClient(HttpClient httpClient, DifyProperties.Server difyServerProperties, BaseDifyServerToken difyServerToken) {
         super(httpClient);
-        Assert.notNull(difyServerProperties, "difyServerProperties cannot be null");
-        Assert.notNull(difyServerToken, "difyServerToken cannot be null");
+        if (difyServerProperties == null) {
+            difyServerProperties = new DifyProperties.Server();
+        }
+        if (difyServerToken == null) {
+            difyServerToken = new DifyServerTokenDefault();
+        }
         this.difyServerProperties = difyServerProperties;
         this.difyServerToken = difyServerToken;
     }

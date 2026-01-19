@@ -18,6 +18,8 @@ package io.github.guoshiqiufeng.dify.springboot.autoconfigure;
 import io.github.guoshiqiufeng.dify.client.codec.jackson.JacksonJsonMapper;
 import io.github.guoshiqiufeng.dify.client.integration.spring.http.SpringHttpClientFactory;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
+import io.github.guoshiqiufeng.dify.springboot.common.autoconfigure.DifyCodecAutoConfiguration;
+import io.github.guoshiqiufeng.dify.springboot.common.autoconfigure.DifyPropertiesAutoConfiguration;
 import io.github.guoshiqiufeng.dify.support.impl.workflow.DifyWorkflowDefaultClient;
 import io.github.guoshiqiufeng.dify.workflow.DifyWorkflow;
 import io.github.guoshiqiufeng.dify.workflow.client.DifyWorkflowClient;

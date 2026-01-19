@@ -16,6 +16,8 @@
 package io.github.guoshiqiufeng.dify.springboot2.autoconfigure;
 
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
+import io.github.guoshiqiufeng.dify.springboot.common.autoconfigure.DifyConnectionDetails;
+import io.github.guoshiqiufeng.dify.springboot.common.autoconfigure.DifyPropertiesAutoConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;

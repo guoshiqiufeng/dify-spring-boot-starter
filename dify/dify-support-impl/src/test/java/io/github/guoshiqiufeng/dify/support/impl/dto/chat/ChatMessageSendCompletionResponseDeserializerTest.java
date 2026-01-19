@@ -190,6 +190,43 @@ class ChatMessageSendCompletionResponseDeserializerTest {
     }
 
     @Test
+    void testDeserializeWithDataNodeNull() {
+        JsonNode root = mock(JsonNode.class);
+        JsonNode eventNode = mock(JsonNode.class);
+
+        when(root.get("event")).thenReturn(eventNode);
+        when(eventNode.isTextual()).thenReturn(true);
+        when(eventNode.asText()).thenReturn("message");
+        when(root.has("data")).thenReturn(true);
+        when(root.get("data")).thenReturn(null);
+        when(jsonMapper.treeToValue(eq(root), any())).thenReturn(new io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendResponse());
+
+        ChatMessageSendCompletionResponseDto result = deserializer.deserialize(root, jsonMapper);
+
+        assertNotNull(result);
+        assertNotNull(result.getData());
+        assertNull(result.getData().getData());
+    }
+
+    @Test
+    void testDeserializeWithoutDataField() {
+        JsonNode root = mock(JsonNode.class);
+        JsonNode eventNode = mock(JsonNode.class);
+
+        when(root.get("event")).thenReturn(eventNode);
+        when(eventNode.isTextual()).thenReturn(true);
+        when(eventNode.asText()).thenReturn("message");
+        when(root.has("data")).thenReturn(false);
+        when(jsonMapper.treeToValue(eq(root), any())).thenReturn(new io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendResponse());
+
+        ChatMessageSendCompletionResponseDto result = deserializer.deserialize(root, jsonMapper);
+
+        assertNotNull(result);
+        assertNotNull(result.getData());
+        assertNull(result.getData().getData());
+    }
+
+    @Test
     void testDeserializeWithToolLabels() {
         JsonNode root = mock(JsonNode.class);
         JsonNode toolLabelsNode = mock(JsonNode.class);
@@ -234,5 +271,198 @@ class ChatMessageSendCompletionResponseDeserializerTest {
         assertNotNull(result.getData().getMessageFiles());
         assertEquals(1, result.getData().getMessageFiles().size());
         assertEquals("file-123", result.getData().getMessageFiles().get(0));
+    }
+
+    @Test
+    void testDeserializeWithNonTextualEvent() {
+        JsonNode root = mock(JsonNode.class);
+        JsonNode eventNode = mock(JsonNode.class);
+
+        when(root.get("event")).thenReturn(eventNode);
+        when(eventNode.isTextual()).thenReturn(false);
+        when(jsonMapper.treeToValue(any(), any())).thenReturn(new io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendResponse());
+
+        ChatMessageSendCompletionResponseDto result = deserializer.deserialize(root, jsonMapper);
+
+        assertNotNull(result);
+        assertNotNull(result.getData());
+    }
+
+    @Test
+    void testDeserializeWithNullToolLabels() {
+        JsonNode root = mock(JsonNode.class);
+        JsonNode toolLabelsNode = mock(JsonNode.class);
+
+        when(root.get("event")).thenReturn(null);
+        when(root.has("tool_labels")).thenReturn(true);
+        when(root.get("tool_labels")).thenReturn(toolLabelsNode);
+        when(toolLabelsNode.isObject()).thenReturn(false);
+        when(jsonMapper.treeToValue(any(), any())).thenReturn(new io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendResponse());
+
+        ChatMessageSendCompletionResponseDto result = deserializer.deserialize(root, jsonMapper);
+
+        assertNotNull(result);
+        assertNotNull(result.getData().getToolLabels());
+        assertTrue(result.getData().getToolLabels().isEmpty());
+    }
+
+    @Test
+    void testDeserializeWithNullMessageFiles() {
+        JsonNode root = mock(JsonNode.class);
+        JsonNode messageFilesNode = mock(JsonNode.class);
+
+        when(root.get("event")).thenReturn(null);
+        when(root.has("message_files")).thenReturn(true);
+        when(root.get("message_files")).thenReturn(messageFilesNode);
+        when(messageFilesNode.isArray()).thenReturn(false);
+        when(jsonMapper.treeToValue(any(), any())).thenReturn(new io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendResponse());
+
+        ChatMessageSendCompletionResponseDto result = deserializer.deserialize(root, jsonMapper);
+
+        assertNotNull(result);
+        assertNotNull(result.getData().getMessageFiles());
+        assertTrue(result.getData().getMessageFiles().isEmpty());
+    }
+
+    @Test
+    void testDeserializeWithToolLabelsContainingDifferentTypes() {
+        JsonNode root = mock(JsonNode.class);
+        JsonNode toolLabelsNode = mock(JsonNode.class);
+        JsonNode textNode = mock(JsonNode.class);
+        JsonNode numberNode = mock(JsonNode.class);
+        JsonNode booleanNode = mock(JsonNode.class);
+        JsonNode nullNode = mock(JsonNode.class);
+        JsonNode arrayNode = mock(JsonNode.class);
+        JsonNode objectNode = mock(JsonNode.class);
+        JsonNode arrayElement = mock(JsonNode.class);
+
+        when(root.get("event")).thenReturn(null);
+        when(root.has("tool_labels")).thenReturn(true);
+        when(root.get("tool_labels")).thenReturn(toolLabelsNode);
+        when(toolLabelsNode.isObject()).thenReturn(true);
+        Iterator<String> fieldNames = Arrays.asList("text", "number", "boolean", "null", "array", "object", "nullField").iterator();
+        when(toolLabelsNode.fieldNames()).thenReturn(fieldNames);
+
+        when(toolLabelsNode.get("text")).thenReturn(textNode);
+        when(textNode.isNull()).thenReturn(false);
+        when(textNode.isTextual()).thenReturn(true);
+        when(textNode.asText()).thenReturn("textValue");
+
+        when(toolLabelsNode.get("number")).thenReturn(numberNode);
+        when(numberNode.isNull()).thenReturn(false);
+        when(numberNode.isTextual()).thenReturn(false);
+        when(numberNode.isNumber()).thenReturn(true);
+        when(numberNode.asDouble()).thenReturn(42.5);
+
+        when(toolLabelsNode.get("boolean")).thenReturn(booleanNode);
+        when(booleanNode.isNull()).thenReturn(false);
+        when(booleanNode.isTextual()).thenReturn(false);
+        when(booleanNode.isNumber()).thenReturn(false);
+        when(booleanNode.isBoolean()).thenReturn(true);
+        when(booleanNode.asBoolean()).thenReturn(true);
+
+        when(toolLabelsNode.get("null")).thenReturn(nullNode);
+        when(nullNode.isNull()).thenReturn(true);
+
+        when(toolLabelsNode.get("array")).thenReturn(arrayNode);
+        when(arrayNode.isNull()).thenReturn(false);
+        when(arrayNode.isTextual()).thenReturn(false);
+        when(arrayNode.isNumber()).thenReturn(false);
+        when(arrayNode.isBoolean()).thenReturn(false);
+        when(arrayNode.isArray()).thenReturn(true);
+        when(arrayNode.elements()).thenReturn(Arrays.asList(arrayElement).iterator());
+        when(arrayElement.isNull()).thenReturn(false);
+        when(arrayElement.isTextual()).thenReturn(true);
+        when(arrayElement.asText()).thenReturn("element1");
+
+        when(toolLabelsNode.get("object")).thenReturn(objectNode);
+        when(objectNode.isNull()).thenReturn(false);
+        when(objectNode.isTextual()).thenReturn(false);
+        when(objectNode.isNumber()).thenReturn(false);
+        when(objectNode.isBoolean()).thenReturn(false);
+        when(objectNode.isArray()).thenReturn(false);
+        when(objectNode.isObject()).thenReturn(true);
+        when(objectNode.fieldNames()).thenReturn(Collections.emptyIterator());
+
+        when(toolLabelsNode.get("nullField")).thenReturn(null);
+
+        when(jsonMapper.treeToValue(any(), any())).thenReturn(new io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendResponse());
+
+        ChatMessageSendCompletionResponseDto result = deserializer.deserialize(root, jsonMapper);
+
+        assertNotNull(result);
+        Map<String, Object> toolLabels = result.getData().getToolLabels();
+        assertNotNull(toolLabels);
+        assertEquals("textValue", toolLabels.get("text"));
+        assertEquals(42.5, toolLabels.get("number"));
+        assertEquals(true, toolLabels.get("boolean"));
+        assertNull(toolLabels.get("null"));
+        assertTrue(toolLabels.get("array") instanceof List);
+        assertTrue(toolLabels.get("object") instanceof Map);
+        assertNull(toolLabels.get("nullField"));
+    }
+
+    @Test
+    void testDeserializeWithDefaultConvertToObject() {
+        JsonNode root = mock(JsonNode.class);
+        JsonNode toolLabelsNode = mock(JsonNode.class);
+        JsonNode unknownNode = mock(JsonNode.class);
+
+        when(root.get("event")).thenReturn(null);
+        when(root.has("tool_labels")).thenReturn(true);
+        when(root.get("tool_labels")).thenReturn(toolLabelsNode);
+        when(toolLabelsNode.isObject()).thenReturn(true);
+        Iterator<String> fieldNames = Arrays.asList("unknown").iterator();
+        when(toolLabelsNode.fieldNames()).thenReturn(fieldNames);
+
+        when(toolLabelsNode.get("unknown")).thenReturn(unknownNode);
+        when(unknownNode.isNull()).thenReturn(false);
+        when(unknownNode.isTextual()).thenReturn(false);
+        when(unknownNode.isNumber()).thenReturn(false);
+        when(unknownNode.isBoolean()).thenReturn(false);
+        when(unknownNode.isArray()).thenReturn(false);
+        when(unknownNode.isObject()).thenReturn(false);
+        when(unknownNode.asText()).thenReturn("fallback");
+
+        when(jsonMapper.treeToValue(any(), any())).thenReturn(new io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendResponse());
+
+        ChatMessageSendCompletionResponseDto result = deserializer.deserialize(root, jsonMapper);
+
+        assertNotNull(result);
+        Map<String, Object> toolLabels = result.getData().getToolLabels();
+        assertNotNull(toolLabels);
+        assertEquals("fallback", toolLabels.get("unknown"));
+    }
+
+    @Test
+    void testDeserializeWithNullToolLabelsNode() {
+        JsonNode root = mock(JsonNode.class);
+
+        when(root.get("event")).thenReturn(null);
+        when(root.has("tool_labels")).thenReturn(true);
+        when(root.get("tool_labels")).thenReturn(null);
+        when(jsonMapper.treeToValue(any(), any())).thenReturn(new io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendResponse());
+
+        ChatMessageSendCompletionResponseDto result = deserializer.deserialize(root, jsonMapper);
+
+        assertNotNull(result);
+        assertNotNull(result.getData().getToolLabels());
+        assertTrue(result.getData().getToolLabels().isEmpty());
+    }
+
+    @Test
+    void testDeserializeWithNullMessageFilesNode() {
+        JsonNode root = mock(JsonNode.class);
+
+        when(root.get("event")).thenReturn(null);
+        when(root.has("message_files")).thenReturn(true);
+        when(root.get("message_files")).thenReturn(null);
+        when(jsonMapper.treeToValue(any(), any())).thenReturn(new io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendResponse());
+
+        ChatMessageSendCompletionResponseDto result = deserializer.deserialize(root, jsonMapper);
+
+        assertNotNull(result);
+        assertNotNull(result.getData().getMessageFiles());
+        assertTrue(result.getData().getMessageFiles().isEmpty());
     }
 }

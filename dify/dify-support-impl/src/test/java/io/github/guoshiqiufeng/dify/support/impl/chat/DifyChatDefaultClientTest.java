@@ -22,10 +22,15 @@ import io.github.guoshiqiufeng.dify.chat.enums.AnnotationReplyActionEnum;
 import io.github.guoshiqiufeng.dify.chat.enums.IconTypeEnum;
 import io.github.guoshiqiufeng.dify.client.core.constant.MediaType;
 import io.github.guoshiqiufeng.dify.client.core.enums.HttpMethod;
+import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
+import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
+import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
 import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
 import io.github.guoshiqiufeng.dify.client.core.web.client.ResponseSpec;
+import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
 import io.github.guoshiqiufeng.dify.client.integration.spring.file.DifyFileConverter;
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
 import io.github.guoshiqiufeng.dify.core.pojo.request.ChatMessageVO;
@@ -36,16 +41,14 @@ import io.github.guoshiqiufeng.dify.support.impl.dto.chat.ChatMessageSendComplet
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import org.mockito.ArgumentCaptor;
 import org.springframework.web.multipart.MultipartFile;
-import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.net.URI;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -71,6 +74,12 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         super.setup();
         // Create real client with mocked HttpClient
         client = new DifyChatDefaultClient(httpClientMock);
+    }
+
+    @Test
+    public void testConstructor() {
+        HttpClientFactory httpClientFactory = mock(HttpClientFactory.class);
+        new DifyChatDefaultClient("http://127.0.0.1", new DifyProperties.ClientConfig(), httpClientFactory);
     }
 
     @Test
@@ -125,6 +134,11 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         // Verify content type is set correctly
         verify(requestBodySpecMock).contentType(MediaType.MULTIPART_FORM_DATA);
 
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         // Verify body is set
         verify(requestBodySpecMock).body(any());
 
@@ -156,6 +170,11 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         verify(requestHeadersUriSpecMock).uri(DatasetUriConstant.V1_INFO);
 
         // Verify response handling
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(responseSpecMock).body(AppInfoResponse.class);
     }
 
@@ -185,6 +204,11 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         verify(requestHeadersUriSpecMock).uri(DatasetUriConstant.V1_META);
 
         // Verify response handling
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(responseSpecMock).body(AppMetaResponse.class);
     }
 
@@ -256,7 +280,10 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         ChatMessageSendCompletionResponseDto dto2 = new ChatMessageSendCompletionResponseDto();
         dto2.setData(response2);
 
-        Flux<ChatMessageSendCompletionResponseDto> mockFlux = Flux.just(dto1, dto2);
+        ChatMessageSendCompletionResponseDto dto3 = new ChatMessageSendCompletionResponseDto();
+        dto3.setData(null);
+
+        Flux<ChatMessageSendCompletionResponseDto> mockFlux = Flux.just(dto1, dto2, dto3);
 
         when(responseSpec.bodyToFlux(ChatMessageSendCompletionResponseDto.class)).thenReturn(mockFlux);
 
@@ -837,6 +864,10 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 page,
                 limit
         );
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
         verify(responseSpecMock).body(any(TypeReference.class));
     }
 
@@ -880,6 +911,12 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         verify(httpClientMock).post();
         verify(requestBodyUriSpecMock).uri(DatasetUriConstant.V1_APPS_ANNOTATIONS);
         verify(requestBodySpecMock).body(request);
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(responseSpecMock).body(AppAnnotationResponse.class);
     }
 
@@ -927,6 +964,12 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 DatasetUriConstant.V1_APPS_ANNOTATIONS + "/{annotation_id}",
                 annotationId
         );
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(requestBodySpecMock).body(request);
         verify(responseSpecMock).body(AppAnnotationResponse.class);
     }
@@ -949,6 +992,11 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 DatasetUriConstant.V1_APPS_ANNOTATIONS + "/{annotation_id}",
                 annotationId
         );
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
     }
 
     @Test
@@ -990,6 +1038,12 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 DatasetUriConstant.V1_APPS_ANNOTATIONS_REPLY + "/{action}",
                 AnnotationReplyActionEnum.enable
         );
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(requestBodySpecMock).body(request);
         verify(responseSpecMock).body(AppAnnotationReplyResponse.class);
     }
@@ -1031,6 +1085,12 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 AnnotationReplyActionEnum.enable,
                 jobId
         );
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(responseSpecMock).body(AppAnnotationReplyResponse.class);
     }
 
@@ -1143,6 +1203,8 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
 
         // Test with asAttachment = false
         request.setAsAttachment(false);
+        client.filePreview(request);
+        request.setAsAttachment(null);
         client.filePreview(request);
     }
 
@@ -1335,6 +1397,14 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         });
 
         client.conversationVariables(request2);
+
+        // Test without variable name
+        ConversationVariableRequest request3 = new ConversationVariableRequest();
+        request3.setApiKey(apiKey);
+        request3.setUserId(userId);
+        request3.setConversationId(conversationId);
+        request3.setVariableName("");
+        client.conversationVariables(request3);
     }
 
     @Test

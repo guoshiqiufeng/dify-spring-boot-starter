@@ -18,11 +18,11 @@ package io.github.guoshiqiufeng.dify.support.impl.dto.workflow;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserializer;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonNode;
+import io.github.guoshiqiufeng.dify.client.core.codec.utils.JsonNodeUtils;
 import io.github.guoshiqiufeng.dify.workflow.dto.response.WorkflowRunStreamResponse;
 import io.github.guoshiqiufeng.dify.workflow.enums.StreamEventEnum;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -74,7 +74,7 @@ public class WorkflowRunStreamResponseDeserializer implements JsonDeserializer<W
             if (dataNode != null && !dataNode.isNull()) {
                 Object data;
                 if (dataClass == Map.class) {
-                    data = convertToMap(dataNode);
+                    data = JsonNodeUtils.convertToMap(dataNode);
                 } else {
                     data = jsonMapper.treeToValue(dataNode, dataClass);
                 }
@@ -101,53 +101,5 @@ public class WorkflowRunStreamResponseDeserializer implements JsonDeserializer<W
             response.setWorkflowRunId(root.get(CONSTANT_WORKFLOW_RUN_ID).asText());
         }
         return response;
-    }
-
-    /**
-     * 将 JsonNode 转换为 Map
-     */
-    private static Map<String, Object> convertToMap(JsonNode node) {
-        Map<String, Object> map = new LinkedHashMap<>();
-        if (node == null || !node.isObject()) {
-            return map;
-        }
-
-        java.util.Iterator<String> fieldNames = node.fieldNames();
-        while (fieldNames.hasNext()) {
-            String fieldName = fieldNames.next();
-            JsonNode value = node.get(fieldName);
-            map.put(fieldName, convertToObject(value));
-        }
-        return map;
-    }
-
-    /**
-     * 将 JsonNode 转换为 Java 对象
-     */
-    private static Object convertToObject(JsonNode node) {
-        if (node == null || node.isNull()) {
-            return null;
-        }
-        if (node.isTextual()) {
-            return node.asText();
-        }
-        if (node.isNumber()) {
-            return node.asDouble();
-        }
-        if (node.isBoolean()) {
-            return node.asBoolean();
-        }
-        if (node.isArray()) {
-            java.util.List<Object> list = new java.util.ArrayList<>();
-            java.util.Iterator<JsonNode> elements = node.elements();
-            while (elements.hasNext()) {
-                list.add(convertToObject(elements.next()));
-            }
-            return list;
-        }
-        if (node.isObject()) {
-            return convertToMap(node);
-        }
-        return node.asText();
     }
 }

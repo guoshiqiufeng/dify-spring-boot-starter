@@ -15,32 +15,21 @@
  */
 package io.github.guoshiqiufeng.dify.springboot2.autoconfigure;
 
-import io.github.guoshiqiufeng.dify.chat.DifyChat;
 import io.github.guoshiqiufeng.dify.chat.client.DifyChatClient;
-import io.github.guoshiqiufeng.dify.chat.impl.DifyChatClientImpl;
-import io.github.guoshiqiufeng.dify.chat.pipeline.ChatMessagePipelineModel;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
-import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
 import io.github.guoshiqiufeng.dify.client.integration.spring.http.SpringHttpClientFactory;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
-import io.github.guoshiqiufeng.dify.core.pipeline.PipelineHandler;
-import io.github.guoshiqiufeng.dify.core.pipeline.PipelineModel;
-import io.github.guoshiqiufeng.dify.core.pipeline.PipelineProcess;
-import io.github.guoshiqiufeng.dify.core.pipeline.PipelineTemplate;
-import io.github.guoshiqiufeng.dify.support.impl.chat.DifyChatDefaultClient;
+import io.github.guoshiqiufeng.dify.springboot.common.autoconfigure.AbstractDifyChatAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
+ * Spring Boot 2 Chat 自动配置
+ * 继承公共基类，提供 Spring Boot 2 特定的 HttpClientFactory 实现（仅支持 WebClient）
+ *
  * @author yanghq
  * @version 0.9.0
  * @since 2025/3/18 16:17
@@ -48,48 +37,20 @@ import java.util.Map;
 @Slf4j
 @Configuration
 @ConditionalOnClass({DifyChatClient.class})
-public class DifyChatAutoConfiguration {
+public class DifyChatAutoConfiguration extends AbstractDifyChatAutoConfiguration {
 
-    @Bean
-    @ConditionalOnMissingBean(DifyChatClient.class)
-    public DifyChatClient difyChatClient(DifyProperties properties,
-                                         JsonMapper jsonMapper,
-                                         ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
-        SpringHttpClientFactory httpClientFactory = new SpringHttpClientFactory(
+    private final ObjectProvider<WebClient.Builder> webClientBuilderProvider;
+
+    public DifyChatAutoConfiguration(ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
+        this.webClientBuilderProvider = webClientBuilderProvider;
+    }
+
+    @Override
+    protected SpringHttpClientFactory createHttpClientFactory(DifyProperties properties, JsonMapper jsonMapper) {
+        // Spring Boot 2 不支持 RestClient，只使用 WebClient
+        return new SpringHttpClientFactory(
                 webClientBuilderProvider.getIfAvailable(WebClient::builder),
                 null,
                 jsonMapper);
-        HttpClient httpClient = httpClientFactory.createClient(properties.getUrl(), properties.getClientConfig());
-        return new DifyChatDefaultClient(httpClient);
     }
-
-    @Bean
-    @ConditionalOnMissingBean({DifyChat.class})
-    public DifyChatClientImpl difyChatHandler(DifyChatClient difyChatClient) {
-        return new DifyChatClientImpl(difyChatClient);
-    }
-
-    @Bean("chatTemplate")
-    @ConditionalOnMissingBean(name = "chatTemplate")
-    public PipelineTemplate<ChatMessagePipelineModel> chatTemplate(List<PipelineProcess<ChatMessagePipelineModel>> processList) {
-        PipelineTemplate<ChatMessagePipelineModel> processTemplate = new PipelineTemplate<>();
-        processTemplate.setProcessList(processList);
-        return processTemplate;
-    }
-
-    /**
-     * pipeline流程控制器
-     *
-     * @return PipelineHandler
-     */
-    @Bean
-    @ConditionalOnMissingBean(PipelineHandler.class)
-    public PipelineHandler pipelineHandler(List<PipelineProcess<ChatMessagePipelineModel>> produceProcessList) {
-        PipelineHandler processHandler = new PipelineHandler();
-        Map<String, PipelineTemplate<? extends PipelineModel>> templateConfig = new HashMap<>(1);
-        templateConfig.put("CHAT", chatTemplate(produceProcessList));
-        processHandler.setTemplateConfig(templateConfig);
-        return processHandler;
-    }
-
 }

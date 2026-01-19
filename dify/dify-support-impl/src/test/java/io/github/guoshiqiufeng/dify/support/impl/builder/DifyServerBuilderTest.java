@@ -23,7 +23,8 @@ import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.*;
 
 /**
@@ -67,18 +68,15 @@ class DifyServerBuilderTest {
         HttpClient mockHttpClient = mock(HttpClient.class);
         BaseDifyServerToken mockToken = mock(BaseDifyServerToken.class);
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            DifyServerBuilder.createClient(mockHttpClient, mockToken);
-        });
+        DifyServerBuilder.createClient(mockHttpClient, mockToken);
     }
 
     @Test
-    void testCreateClientFromHttpClientWithNullProperties() {
+    void testCreateClientFromHttpClientOnly() {
         HttpClient mockHttpClient = mock(HttpClient.class);
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            DifyServerBuilder.createClient(mockHttpClient);
-        });
+        DifyServerBuilder.createClient(mockHttpClient);
+
     }
 
     @Test
@@ -276,5 +274,13 @@ class DifyServerBuilderTest {
                 .build();
 
         assertNotNull(client);
+    }
+
+    @Test
+    void testBuilderWith() {
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        DifyServerBuilder.createClient(mockHttpClient);
+        DifyProperties.Server serverProperties = new DifyProperties.Server();
+        DifyServerBuilder.createClient(mockHttpClient, serverProperties);
     }
 }

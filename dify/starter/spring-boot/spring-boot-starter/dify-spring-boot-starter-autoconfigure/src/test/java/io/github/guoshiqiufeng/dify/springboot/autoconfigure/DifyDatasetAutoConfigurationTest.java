@@ -18,6 +18,8 @@ package io.github.guoshiqiufeng.dify.springboot.autoconfigure;
 import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
 import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;
 import io.github.guoshiqiufeng.dify.dataset.impl.DifyDatasetClientImpl;
+import io.github.guoshiqiufeng.dify.springboot.common.autoconfigure.DifyCodecAutoConfiguration;
+import io.github.guoshiqiufeng.dify.springboot.common.autoconfigure.DifyPropertiesAutoConfiguration;
 import io.github.guoshiqiufeng.dify.support.impl.dataset.DifyDatasetDefaultClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
