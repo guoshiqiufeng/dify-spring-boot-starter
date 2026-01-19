@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.chat.pipeline;
 
+import io.github.guoshiqiufeng.dify.core.exception.UtilException;
 import io.github.guoshiqiufeng.dify.core.extra.spring.SpringUtil;
 import io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendCompletionResponse;
 import io.github.guoshiqiufeng.dify.core.pipeline.PipelineContext;
@@ -58,6 +59,7 @@ class DifyChatPipelineUtilsTest {
     @Test
     void testProcessChatWithNullPipelineHandler() {
         // Given
+        springUtilMock.when(SpringUtil::isSpringEnvironment).thenReturn(true);
         springUtilMock.when(() -> SpringUtil.getBean(PipelineHandler.class)).thenReturn(null);
         ChatMessageSendCompletionResponse response = new ChatMessageSendCompletionResponse();
         response.setAnswer("test_answer");
@@ -74,6 +76,7 @@ class DifyChatPipelineUtilsTest {
     @SuppressWarnings("unchecked")
     void testProcessChatWithValidPipelineHandler() {
         // Given
+        springUtilMock.when(SpringUtil::isSpringEnvironment).thenReturn(true);
         springUtilMock.when(() -> SpringUtil.getBean(PipelineHandler.class)).thenReturn(pipelineHandler);
 
         ChatMessageSendCompletionResponse response = new ChatMessageSendCompletionResponse();
@@ -125,5 +128,38 @@ class DifyChatPipelineUtilsTest {
         assertNotNull(result);
         assertEquals("modified_answer", result.getAnswer());
         assertEquals("test_event", result.getEvent());
+    }
+
+    @Test
+    void testProcessChatWithNoSpringEnvironment() {
+        // Given
+        springUtilMock.when(SpringUtil::isSpringEnvironment).thenReturn(false);
+        ChatMessageSendCompletionResponse response = new ChatMessageSendCompletionResponse();
+        response.setAnswer("test_answer");
+
+        // When
+        ChatMessageSendCompletionResponse result = DifyChatPipelineUtils.processChat(response);
+
+        // Then
+        assertSame(response, result);
+        assertEquals("test_answer", result.getAnswer());
+    }
+
+    @Test
+    void testProcessChatWithUtilException() {
+        // Given
+        springUtilMock.when(SpringUtil::isSpringEnvironment).thenReturn(true);
+        springUtilMock.when(() -> SpringUtil.getBean(PipelineHandler.class))
+                .thenThrow(new UtilException("Failed to get bean"));
+
+        ChatMessageSendCompletionResponse response = new ChatMessageSendCompletionResponse();
+        response.setAnswer("test_answer");
+
+        // When
+        ChatMessageSendCompletionResponse result = DifyChatPipelineUtils.processChat(response);
+
+        // Then
+        assertSame(response, result);
+        assertEquals("test_answer", result.getAnswer());
     }
 }

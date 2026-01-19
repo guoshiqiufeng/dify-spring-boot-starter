@@ -16,8 +16,11 @@
 package io.github.guoshiqiufeng.dify.server.impl;
 
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
+import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -508,5 +511,151 @@ class DifyServerClientImplTest {
 
         // Assert
         verify(difyServerClient, times(1)).deleteDatasetApiKey(apiKeyId);
+    }
+
+    @Test
+    void testAppsWithRequest() {
+        // Arrange
+        AppsRequest request = new AppsRequest();
+        request.setPage(1);
+        request.setLimit(20);
+
+        AppsResponse app1 = new AppsResponse();
+        app1.setId("app-123");
+        app1.setName("Test App 1");
+
+        AppsResponse app2 = new AppsResponse();
+        app2.setId("app-456");
+        app2.setName("Test App 2");
+
+        AppsResponseResult expectedResult = new AppsResponseResult();
+        expectedResult.setData(Arrays.asList(app1, app2));
+        expectedResult.setPage(1);
+        expectedResult.setLimit(20);
+        expectedResult.setTotal(2);
+        expectedResult.setHasMore(false);
+
+        when(difyServerClient.apps(request)).thenReturn(expectedResult);
+
+        // Act
+        AppsResponseResult actualResult = difyServerClientImpl.apps(request);
+
+        // Assert
+        assertNotNull(actualResult);
+        assertEquals(expectedResult.getTotal(), actualResult.getTotal());
+        assertEquals(expectedResult.getPage(), actualResult.getPage());
+        assertEquals(expectedResult.getLimit(), actualResult.getLimit());
+        assertEquals(expectedResult.getData().size(), actualResult.getData().size());
+        assertEquals(expectedResult.getData().get(0).getId(), actualResult.getData().get(0).getId());
+        verify(difyServerClient, times(1)).apps(request);
+    }
+
+    @Test
+    void testGetDatasetIndexingStatus() {
+        // Arrange
+        String datasetId = "dataset-123";
+
+        DocumentIndexingStatusResponse expectedResponse = new DocumentIndexingStatusResponse();
+
+        DocumentIndexingStatusResponse.ProcessingStatus status1 = new DocumentIndexingStatusResponse.ProcessingStatus();
+        status1.setId("doc-1");
+        status1.setIndexingStatus("completed");
+        status1.setProcessingStartedAt(1234567890L);
+        status1.setCompletedAt(1234567900L);
+
+        DocumentIndexingStatusResponse.ProcessingStatus status2 = new DocumentIndexingStatusResponse.ProcessingStatus();
+        status2.setId("doc-2");
+        status2.setIndexingStatus("indexing");
+        status2.setProcessingStartedAt(1234567895L);
+
+        expectedResponse.setData(Arrays.asList(status1, status2));
+
+        when(difyServerClient.getDatasetIndexingStatus(datasetId)).thenReturn(expectedResponse);
+
+        // Act
+        DocumentIndexingStatusResponse actualResponse = difyServerClientImpl.getDatasetIndexingStatus(datasetId);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getData().size(), actualResponse.getData().size());
+        assertEquals(expectedResponse.getData().get(0).getId(), actualResponse.getData().get(0).getId());
+        assertEquals(expectedResponse.getData().get(0).getIndexingStatus(), actualResponse.getData().get(0).getIndexingStatus());
+        verify(difyServerClient, times(1)).getDatasetIndexingStatus(datasetId);
+    }
+
+    @Test
+    void testGetDocumentIndexingStatus() {
+        // Arrange
+        String datasetId = "dataset-123";
+        String documentId = "doc-456";
+
+        DocumentIndexingStatusResponse.ProcessingStatus expectedStatus = new DocumentIndexingStatusResponse.ProcessingStatus();
+        expectedStatus.setId(documentId);
+        expectedStatus.setIndexingStatus("completed");
+        expectedStatus.setProcessingStartedAt(1234567890L);
+        expectedStatus.setCompletedAt(1234567900L);
+        expectedStatus.setError(null);
+
+        when(difyServerClient.getDocumentIndexingStatus(datasetId, documentId)).thenReturn(expectedStatus);
+
+        // Act
+        DocumentIndexingStatusResponse.ProcessingStatus actualStatus =
+            difyServerClientImpl.getDocumentIndexingStatus(datasetId, documentId);
+
+        // Assert
+        assertNotNull(actualStatus);
+        assertEquals(expectedStatus.getId(), actualStatus.getId());
+        assertEquals(expectedStatus.getIndexingStatus(), actualStatus.getIndexingStatus());
+        assertEquals(expectedStatus.getProcessingStartedAt(), actualStatus.getProcessingStartedAt());
+        assertEquals(expectedStatus.getCompletedAt(), actualStatus.getCompletedAt());
+        verify(difyServerClient, times(1)).getDocumentIndexingStatus(datasetId, documentId);
+    }
+
+    @Test
+    void testGetDatasetErrorDocuments() {
+        // Arrange
+        String datasetId = "dataset-123";
+
+        DatasetErrorDocumentsResponse expectedResponse = new DatasetErrorDocumentsResponse();
+
+        DocumentIndexingStatusResponse.ProcessingStatus errorDoc1 = new DocumentIndexingStatusResponse.ProcessingStatus();
+        errorDoc1.setId("doc-error-1");
+        errorDoc1.setError("Parsing failed");
+        errorDoc1.setIndexingStatus("error");
+
+        DocumentIndexingStatusResponse.ProcessingStatus errorDoc2 = new DocumentIndexingStatusResponse.ProcessingStatus();
+        errorDoc2.setId("doc-error-2");
+        errorDoc2.setError("Timeout");
+        errorDoc2.setIndexingStatus("error");
+
+        expectedResponse.setData(Arrays.asList(errorDoc1, errorDoc2));
+        expectedResponse.setTotal(2);
+
+        when(difyServerClient.getDatasetErrorDocuments(datasetId)).thenReturn(expectedResponse);
+
+        // Act
+        DatasetErrorDocumentsResponse actualResponse = difyServerClientImpl.getDatasetErrorDocuments(datasetId);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getTotal(), actualResponse.getTotal());
+        assertEquals(expectedResponse.getData().size(), actualResponse.getData().size());
+        assertEquals(expectedResponse.getData().get(0).getId(), actualResponse.getData().get(0).getId());
+        assertEquals(expectedResponse.getData().get(0).getError(), actualResponse.getData().get(0).getError());
+        verify(difyServerClient, times(1)).getDatasetErrorDocuments(datasetId);
+    }
+
+    @Test
+    void testRetryDocumentIndexing() {
+        // Arrange
+        DocumentRetryRequest request = new DocumentRetryRequest();
+        request.setDatasetId("dataset-123");
+        request.setDocumentIds(Arrays.asList("doc-456", "doc-789"));
+
+        // Act
+        difyServerClientImpl.retryDocumentIndexing(request);
+
+        // Assert
+        verify(difyServerClient, times(1)).retryDocumentIndexing(request);
     }
 }

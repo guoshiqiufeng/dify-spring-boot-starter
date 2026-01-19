@@ -395,4 +395,170 @@ class DifyServerTokenDefaultTest {
         verify(secondCookies).add("__Host-access_token", "test-access-token");
         verify(secondCookies).add("__Host-csrf_token", "test-csrf-token");
     }
+
+    @Test
+    @DisplayName("Test addAuthorizationHeader with token but no csrf token")
+    void testAddAuthorizationHeaderWithTokenButNoCsrf() throws Exception {
+        // Setup - set token directly without csrf
+        Field accessTokenField = DifyServerTokenDefault.class.getDeclaredField("accessToken");
+        accessTokenField.setAccessible(true);
+        accessTokenField.set(tokenDefault, "test-access-token");
+
+        HttpHeaders headers = mock(HttpHeaders.class);
+
+        // Execute
+        tokenDefault.addAuthorizationHeader(headers, difyServerClient);
+
+        // Verify
+        verify(headers).setBearerAuth("test-access-token");
+        verify(headers, never()).add(eq("x-csrf-token"), anyString());
+        verify(difyServerClient, never()).login();
+    }
+
+    @Test
+    @DisplayName("Test addAuthorizationHeader with both token and csrf token")
+    void testAddAuthorizationHeaderWithTokenAndCsrf() throws Exception {
+        // Setup - set both tokens directly
+        Field accessTokenField = DifyServerTokenDefault.class.getDeclaredField("accessToken");
+        accessTokenField.setAccessible(true);
+        accessTokenField.set(tokenDefault, "test-access-token");
+
+        Field csrfTokenField = DifyServerTokenDefault.class.getDeclaredField("csrfToken");
+        csrfTokenField.setAccessible(true);
+        csrfTokenField.set(tokenDefault, "test-csrf-token");
+
+        HttpHeaders headers = mock(HttpHeaders.class);
+
+        // Execute
+        tokenDefault.addAuthorizationHeader(headers, difyServerClient);
+
+        // Verify
+        verify(headers).setBearerAuth("test-access-token");
+        verify(headers).add("x-csrf-token", "test-csrf-token");
+        verify(difyServerClient, never()).login();
+    }
+
+    @Test
+    @DisplayName("Test addAuthorizationCookies with token but no csrf token")
+    void testAddAuthorizationCookiesWithTokenButNoCsrf() throws Exception {
+        // Setup - set token directly without csrf
+        Field accessTokenField = DifyServerTokenDefault.class.getDeclaredField("accessToken");
+        accessTokenField.setAccessible(true);
+        accessTokenField.set(tokenDefault, "test-access-token");
+
+        @SuppressWarnings("unchecked")
+        MultiValueMap<String, String> cookies = mock(MultiValueMap.class);
+
+        // Execute
+        tokenDefault.addAuthorizationCookies(cookies, difyServerClient);
+
+        // Verify
+        verify(cookies).add("access_token", "test-access-token");
+        verify(cookies).add("__Host-access_token", "test-access-token");
+        verify(cookies, never()).add(eq("csrf_token"), anyString());
+        verify(cookies, never()).add(eq("__Host-csrf_token"), anyString());
+        verify(difyServerClient, never()).login();
+    }
+
+    @Test
+    @DisplayName("Test obtainTokenIfNeeded when login returns null")
+    void testObtainTokenIfNeededWhenLoginReturnsNull() {
+        // Setup
+        when(difyServerClient.login()).thenReturn(null);
+
+        HttpHeaders headers = mock(HttpHeaders.class);
+
+        // Execute
+        tokenDefault.addAuthorizationHeader(headers, difyServerClient);
+
+        // Verify
+        verify(difyServerClient).login();
+        verify(headers, never()).setBearerAuth(anyString());
+        verify(headers, never()).add(eq("x-csrf-token"), anyString());
+    }
+
+    @Test
+    @DisplayName("Test refreshOrObtainNewToken when no refresh token exists")
+    void testRefreshOrObtainNewTokenWithNoRefreshToken() throws Exception {
+        // Setup - no initial tokens
+        LoginResponse loginResponse = new LoginResponse();
+        loginResponse.setAccessToken("new-access-token");
+        loginResponse.setRefreshToken("new-refresh-token");
+        loginResponse.setCsrfToken("new-csrf-token");
+        when(difyServerClient.login()).thenReturn(loginResponse);
+
+        // Execute
+        tokenDefault.refreshOrObtainNewToken(difyServerClient);
+
+        // Verify
+        verify(difyServerClient, never()).refreshToken(anyString());
+        verify(difyServerClient).login();
+
+        // Check internal state
+        Field accessTokenField = DifyServerTokenDefault.class.getDeclaredField("accessToken");
+        accessTokenField.setAccessible(true);
+        assertEquals("new-access-token", accessTokenField.get(tokenDefault));
+    }
+
+    @Test
+    @DisplayName("Test refreshOrObtainNewToken when login returns null after failed refresh")
+    void testRefreshOrObtainNewTokenWhenLoginReturnsNull() throws Exception {
+        // Setup - set initial refresh token
+        Field refreshTokenField = DifyServerTokenDefault.class.getDeclaredField("refreshToken");
+        refreshTokenField.setAccessible(true);
+        refreshTokenField.set(tokenDefault, "initial-refresh-token");
+
+        // Setup failed refresh and null login
+        when(difyServerClient.refreshToken("initial-refresh-token")).thenReturn(null);
+        when(difyServerClient.login()).thenReturn(null);
+
+        // Execute
+        tokenDefault.refreshOrObtainNewToken(difyServerClient);
+
+        // Verify
+        verify(difyServerClient).refreshToken("initial-refresh-token");
+        verify(difyServerClient).login();
+
+        // Check that tokens remain null
+        Field accessTokenField = DifyServerTokenDefault.class.getDeclaredField("accessToken");
+        accessTokenField.setAccessible(true);
+        assertEquals(null, accessTokenField.get(tokenDefault));
+    }
+
+    @Test
+    @DisplayName("Test addAuthorizationCookies when login returns null")
+    void testAddAuthorizationCookiesWhenLoginReturnsNull() {
+        // Setup
+        when(difyServerClient.login()).thenReturn(null);
+
+        @SuppressWarnings("unchecked")
+        MultiValueMap<String, String> cookies = mock(MultiValueMap.class);
+
+        // Execute
+        tokenDefault.addAuthorizationCookies(cookies, difyServerClient);
+
+        // Verify
+        verify(difyServerClient).login();
+        verify(cookies, never()).add(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("Test concurrent access to obtainTokenIfNeeded - double-check locking")
+    void testConcurrentObtainTokenIfNeeded() throws Exception {
+        // Setup - Set token directly to simulate it being set by another thread
+        Field accessTokenField = DifyServerTokenDefault.class.getDeclaredField("accessToken");
+        accessTokenField.setAccessible(true);
+        accessTokenField.set(tokenDefault, "existing-token");
+
+        // Use reflection to call obtainTokenIfNeeded directly
+        java.lang.reflect.Method obtainMethod = DifyServerTokenDefault.class.getDeclaredMethod("obtainTokenIfNeeded", DifyServerClient.class);
+        obtainMethod.setAccessible(true);
+
+        // Call obtainTokenIfNeeded - should return existing token without calling login
+        String result = (String) obtainMethod.invoke(tokenDefault, difyServerClient);
+
+        // Verify - should return the existing token without calling login
+        assertEquals("existing-token", result);
+        verify(difyServerClient, never()).login();
+    }
 }

@@ -21,6 +21,7 @@ import io.github.guoshiqiufeng.dify.core.exception.UtilException;
 import io.github.guoshiqiufeng.dify.core.extra.spring.SpringUtil;
 import io.github.guoshiqiufeng.dify.core.pipeline.PipelineContext;
 import io.github.guoshiqiufeng.dify.core.pipeline.PipelineHandler;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -29,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since 2025/8/26 09:37
  */
 @Slf4j
+@UtilityClass
 public class DifyChatPipelineUtils {
 
     private static final String CHAT_CODE = "CHAT";

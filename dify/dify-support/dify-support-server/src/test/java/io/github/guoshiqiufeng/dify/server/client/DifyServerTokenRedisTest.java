@@ -57,6 +57,7 @@ import static org.mockito.Mockito.*;
  * @version 0.10.0
  * @since 2025/4/23 14:45
  */
+@SuppressWarnings("unchecked")
 @ExtendWith(MockitoExtension.class)
 class DifyServerTokenRedisTest {
 
@@ -316,5 +317,160 @@ class DifyServerTokenRedisTest {
         verify(cookies).add("csrf_token", null);
         verify(cookies).add("__Host-access_token", "new-access-token");
         verify(cookies).add("__Host-csrf_token", null);
+    }
+
+    @Test
+    @DisplayName("Test obtainToken when login returns null")
+    void testObtainTokenWhenLoginReturnsNull() {
+        // Setup
+        when(valueOperations.get(DifyRedisKey.ACCESS_TOKEN)).thenReturn(null);
+        when(difyServerClient.login()).thenReturn(null);
+
+        // Execute
+        tokenRedis.addAuthorizationHeader(httpHeaders, difyServerClient);
+
+        // Verify
+        verify(difyServerClient).login();
+        verify(valueOperations, never()).set(eq(DifyRedisKey.ACCESS_TOKEN), anyString());
+        verify(httpHeaders).setBearerAuth(null);
+    }
+
+    @Test
+    @DisplayName("Test refreshOrObtainNewToken with csrf token in refresh response")
+    void testRefreshOrObtainNewTokenWithCsrfToken() {
+        // Setup
+        when(valueOperations.get(DifyRedisKey.REFRESH_TOKEN)).thenReturn("stored-refresh-token");
+
+        LoginResponse refreshResponse = new LoginResponse();
+        refreshResponse.setAccessToken("refreshed-access-token");
+        refreshResponse.setRefreshToken("refreshed-refresh-token");
+        refreshResponse.setCsrfToken("refreshed-csrf-token");
+        when(difyServerClient.refreshToken("stored-refresh-token")).thenReturn(refreshResponse);
+
+        // Execute
+        tokenRedis.refreshOrObtainNewToken(difyServerClient);
+
+        // Verify
+        verify(valueOperations).get(DifyRedisKey.REFRESH_TOKEN);
+        verify(difyServerClient).refreshToken("stored-refresh-token");
+        verify(difyServerClient, never()).login();
+
+        verify(valueOperations).set(eq(DifyRedisKey.ACCESS_TOKEN), eq("refreshed-access-token"));
+        verify(redisTemplate).expire(eq(DifyRedisKey.ACCESS_TOKEN), anyLong(), eq(TimeUnit.MINUTES));
+        verify(valueOperations).set(eq(DifyRedisKey.REFRESH_TOKEN), eq("refreshed-refresh-token"));
+        verify(valueOperations).set(eq(DifyRedisKey.CSRF_TOKEN), eq("refreshed-csrf-token"));
+    }
+
+    @Test
+    @DisplayName("Test refreshOrObtainNewToken with exception during refresh")
+    void testRefreshOrObtainNewTokenWithException() {
+        // Setup
+        when(valueOperations.get(DifyRedisKey.REFRESH_TOKEN)).thenReturn("stored-refresh-token");
+        when(difyServerClient.refreshToken("stored-refresh-token"))
+                .thenThrow(new RuntimeException("Refresh failed"));
+
+        LoginResponse loginResponse = new LoginResponse();
+        loginResponse.setAccessToken("new-access-token");
+        loginResponse.setRefreshToken("new-refresh-token");
+        when(difyServerClient.login()).thenReturn(loginResponse);
+
+        // Execute
+        tokenRedis.refreshOrObtainNewToken(difyServerClient);
+
+        // Verify
+        verify(valueOperations).get(DifyRedisKey.REFRESH_TOKEN);
+        verify(difyServerClient).refreshToken("stored-refresh-token");
+        verify(difyServerClient).login();
+
+        verify(valueOperations).set(eq(DifyRedisKey.ACCESS_TOKEN), eq("new-access-token"));
+        verify(redisTemplate).expire(eq(DifyRedisKey.ACCESS_TOKEN), anyLong(), eq(TimeUnit.MINUTES));
+        verify(valueOperations).set(eq(DifyRedisKey.REFRESH_TOKEN), eq("new-refresh-token"));
+    }
+
+    @Test
+    @DisplayName("Test refreshOrObtainNewToken with csrf token in login response")
+    void testRefreshOrObtainNewTokenWithCsrfTokenInLogin() {
+        // Setup
+        when(valueOperations.get(DifyRedisKey.REFRESH_TOKEN)).thenReturn(null);
+
+        LoginResponse loginResponse = new LoginResponse();
+        loginResponse.setAccessToken("new-access-token");
+        loginResponse.setRefreshToken("new-refresh-token");
+        loginResponse.setCsrfToken("new-csrf-token");
+        when(difyServerClient.login()).thenReturn(loginResponse);
+
+        // Execute
+        tokenRedis.refreshOrObtainNewToken(difyServerClient);
+
+        // Verify
+        verify(valueOperations).get(DifyRedisKey.REFRESH_TOKEN);
+        verify(difyServerClient, never()).refreshToken(anyString());
+        verify(difyServerClient).login();
+
+        verify(valueOperations).set(eq(DifyRedisKey.ACCESS_TOKEN), eq("new-access-token"));
+        verify(redisTemplate).expire(eq(DifyRedisKey.ACCESS_TOKEN), anyLong(), eq(TimeUnit.MINUTES));
+        verify(valueOperations).set(eq(DifyRedisKey.REFRESH_TOKEN), eq("new-refresh-token"));
+        verify(valueOperations).set(eq(DifyRedisKey.CSRF_TOKEN), eq("new-csrf-token"));
+    }
+
+    @Test
+    @DisplayName("Test refreshOrObtainNewToken when login returns null")
+    void testRefreshOrObtainNewTokenWhenLoginReturnsNull() {
+        // Setup
+        when(valueOperations.get(DifyRedisKey.REFRESH_TOKEN)).thenReturn(null);
+        when(difyServerClient.login()).thenReturn(null);
+
+        // Execute
+        tokenRedis.refreshOrObtainNewToken(difyServerClient);
+
+        // Verify
+        verify(valueOperations).get(DifyRedisKey.REFRESH_TOKEN);
+        verify(difyServerClient, never()).refreshToken(anyString());
+        verify(difyServerClient).login();
+
+        // Should not set any tokens when login returns null
+        verify(valueOperations, never()).set(eq(DifyRedisKey.ACCESS_TOKEN), anyString());
+    }
+
+    @Test
+    @DisplayName("Test addAuthorizationHeader with csrf token")
+    void testAddAuthorizationHeaderWithCsrfToken() {
+        // Setup
+        when(valueOperations.get(DifyRedisKey.ACCESS_TOKEN)).thenReturn("redis-access-token");
+        when(valueOperations.get(DifyRedisKey.CSRF_TOKEN)).thenReturn("redis-csrf-token");
+
+        // Execute
+        tokenRedis.addAuthorizationHeader(httpHeaders, difyServerClient);
+
+        // Verify
+        verify(valueOperations).get(DifyRedisKey.ACCESS_TOKEN);
+        verify(valueOperations).get(DifyRedisKey.CSRF_TOKEN);
+        verify(difyServerClient, never()).login();
+        verify(httpHeaders).setBearerAuth("redis-access-token");
+        verify(httpHeaders).add("x-csrf-token", "redis-csrf-token");
+    }
+
+    @Test
+    @DisplayName("Test obtainToken with csrf token in login response")
+    void testObtainTokenWithCsrfToken() {
+        // Setup
+        when(valueOperations.get(DifyRedisKey.ACCESS_TOKEN)).thenReturn(null);
+
+        LoginResponse loginResponse = new LoginResponse();
+        loginResponse.setAccessToken("new-access-token");
+        loginResponse.setRefreshToken("new-refresh-token");
+        loginResponse.setCsrfToken("new-csrf-token");
+        when(difyServerClient.login()).thenReturn(loginResponse);
+
+        // Execute
+        tokenRedis.addAuthorizationHeader(httpHeaders, difyServerClient);
+
+        // Verify
+        verify(difyServerClient).login();
+        verify(valueOperations).set(eq(DifyRedisKey.ACCESS_TOKEN), eq("new-access-token"));
+        verify(redisTemplate).expire(eq(DifyRedisKey.ACCESS_TOKEN), anyLong(), eq(TimeUnit.MINUTES));
+        verify(valueOperations).set(eq(DifyRedisKey.REFRESH_TOKEN), eq("new-refresh-token"));
+        verify(valueOperations).set(eq(DifyRedisKey.CSRF_TOKEN), eq("new-csrf-token"));
+        verify(httpHeaders).setBearerAuth("new-access-token");
     }
 }
