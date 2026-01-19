@@ -341,6 +341,166 @@ class BeanUtilsTest {
         assertDoesNotThrow(() -> BeanUtils.copyProperties(source, target));
     }
 
+    @Test
+    void testBeanUtilsConstructor() throws Exception {
+        // Test private constructor for utility class coverage
+        java.lang.reflect.Constructor<BeanUtils> constructor = BeanUtils.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        BeanUtils instance = constructor.newInstance();
+        assertNotNull(instance);
+    }
+
+    @Test
+    void testCopyPropertiesWithReflectionAccess() {
+        // Test copying properties that may require setAccessible
+        PrivateFieldBean source = new PrivateFieldBean();
+        source.setName("TestName");
+
+        PrivateFieldBean target = new PrivateFieldBean();
+
+        // This should work even with private fields (using public getters/setters)
+        assertDoesNotThrow(() -> BeanUtils.copyProperties(source, target));
+        assertEquals("TestName", target.getName());
+    }
+
+    @Test
+    void testCopyPropertiesWithPackagePrivateClass() {
+        // Test copying properties from package-private class
+        PackagePrivateBean source = new PackagePrivateBean();
+        source.setValue("PackagePrivateValue");
+
+        PackagePrivateBean target = new PackagePrivateBean();
+
+        // This should trigger setAccessible for non-public class
+        assertDoesNotThrow(() -> BeanUtils.copyProperties(source, target));
+        assertEquals("PackagePrivateValue", target.getValue());
+    }
+
+    @Test
+    void testCopyToListWithPackagePrivateClass() {
+        // Test copyToList with package-private class
+        List<PackagePrivateBean> sourceList = new ArrayList<>();
+
+        PackagePrivateBean bean1 = new PackagePrivateBean();
+        bean1.setValue("Value1");
+        sourceList.add(bean1);
+
+        PackagePrivateBean bean2 = new PackagePrivateBean();
+        bean2.setValue("Value2");
+        sourceList.add(bean2);
+
+        List<PackagePrivateBean> targetList = BeanUtils.copyToList(sourceList, PackagePrivateBean.class);
+
+        assertEquals(2, targetList.size());
+        assertEquals("Value1", targetList.get(0).getValue());
+        assertEquals("Value2", targetList.get(1).getValue());
+    }
+
+    @Test
+    void testCopyPropertiesWithWriteOnlyProperty() {
+        // Test that write-only properties (no getter) are skipped
+        SourceBean source = new SourceBean();
+        source.setName("TestName");
+
+        WriteOnlyPropertyBean target = new WriteOnlyPropertyBean();
+
+        // Should not throw, write-only property should be skipped
+        assertDoesNotThrow(() -> BeanUtils.copyProperties(source, target));
+    }
+
+    @Test
+    void testCopyPropertiesWithReadOnlyProperty() {
+        // Test that read-only properties (no setter) are skipped
+        ReadOnlyPropertyBean source = new ReadOnlyPropertyBean();
+        TargetBean target = new TargetBean();
+
+        // Should not throw, read-only property should be skipped
+        assertDoesNotThrow(() -> BeanUtils.copyProperties(source, target));
+    }
+
+    @Test
+    void testCopyPropertiesWithProblematicGetter() {
+        // Test that exception in getter is properly wrapped
+        ProblematicGetterBean source = new ProblematicGetterBean();
+        // Don't set name, so getter will throw exception
+        ProblematicGetterBean target = new ProblematicGetterBean();
+
+        // Should throw RuntimeException wrapping the getter exception
+        RuntimeException exception = assertThrows(RuntimeException.class,
+            () -> BeanUtils.copyProperties(source, target));
+        assertTrue(exception.getMessage().contains("Could not copy property"));
+    }
+
+    @Test
+    void testCopyPropertiesWithProblematicSetter() {
+        // Test that exception in setter is properly wrapped
+        SourceBean source = new SourceBean();
+        source.setName("TestName");
+
+        ProblematicSetterBean target = new ProblematicSetterBean();
+
+        // Should throw RuntimeException wrapping the setter exception
+        RuntimeException exception = assertThrows(RuntimeException.class,
+            () -> BeanUtils.copyProperties(source, target));
+        assertTrue(exception.getMessage().contains("Could not copy property"));
+    }
+
+    @Test
+    void testGetPropertyDescriptorsWithMockException() throws Exception {
+        // Test getPropertyDescriptors exception handling using reflection and mocking
+        java.lang.reflect.Method method = BeanUtils.class.getDeclaredMethod(
+            "getPropertyDescriptors", Class.class);
+        method.setAccessible(true);
+
+        // Create a class that will cause introspection to fail
+        // We'll use a class with a BeanInfo that throws exception
+        Class<?> problematicClass = ProblematicBeanInfoClass.class;
+
+        try {
+            method.invoke(null, problematicClass);
+            fail("Should have thrown InvocationTargetException");
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            // Verify the cause is RuntimeException with correct message
+            Throwable cause = e.getCause();
+            assertNotNull(cause);
+            assertTrue(cause instanceof RuntimeException);
+            assertTrue(cause.getMessage().contains("Failed to introspect class"));
+        }
+    }
+
+    @Test
+    void testCopyPropertiesWithSourceWriteOnlyProperty() {
+        // Test that source properties without getter (write-only) are skipped
+        // This covers the "if (readMethod == null) continue;" branch
+        SourceWriteOnlyBean source = new SourceWriteOnlyBean();
+        source.setName("TestName");
+        source.setWriteOnlyValue("WriteOnly");
+
+        TargetBean target = new TargetBean();
+
+        // Should not throw, write-only property in source should be skipped
+        assertDoesNotThrow(() -> BeanUtils.copyProperties(source, target));
+
+        // name should be copied (has getter)
+        assertEquals("TestName", target.getName());
+    }
+
+    @Test
+    void testCopyPropertiesWithTargetReadOnlyProperty() {
+        // Test that target properties without setter (read-only) are skipped
+        // This covers the "if (writeMethod == null) continue;" branch
+        SourceBean source = new SourceBean();
+        source.setName("TestName");
+
+        TargetReadOnlyBean target = new TargetReadOnlyBean("OldName");
+
+        // Should not throw, read-only property in target should be skipped
+        assertDoesNotThrow(() -> BeanUtils.copyProperties(source, target));
+
+        // name should not be copied (no setter in target)
+        assertEquals("OldName", target.getName());
+    }
+
     // Test beans
 
     public static class SourceBean {
@@ -545,6 +705,189 @@ class BeanUtilsTest {
 
         public void setName(String name) {
             this.name = name;
+        }
+    }
+
+    // Package-private class to test non-public class access
+    static class PackagePrivateBean {
+        private String value;
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+    }
+
+    // Bean with write-only property (no getter)
+    public static class WriteOnlyPropertyBean {
+        private String writeOnlyValue;
+
+        // No getter for writeOnlyValue
+        public void setWriteOnlyValue(String value) {
+            this.writeOnlyValue = value;
+        }
+
+        public String getStoredValue() {
+            return writeOnlyValue;
+        }
+    }
+
+    // Bean with read-only property (no setter)
+    public static class ReadOnlyPropertyBean {
+        private final String readOnlyValue;
+
+        public ReadOnlyPropertyBean() {
+            this.readOnlyValue = "ReadOnly";
+        }
+
+        public String getReadOnlyValue() {
+            return readOnlyValue;
+        }
+        // No setter for readOnlyValue
+    }
+
+    // Bean with problematic getter that throws exception
+    public static class ProblematicGetterBean {
+        private String name;
+
+        public String getName() {
+            if (name == null) {
+                throw new RuntimeException("Getter throws exception");
+            }
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
+    // Bean with problematic setter that throws exception
+    public static class ProblematicSetterBean {
+        private String name;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            throw new RuntimeException("Setter throws exception");
+        }
+    }
+
+    // Bean with indexed property that may cause introspection issues
+    public static class IndexedPropertyBean {
+        private String[] values = new String[10];
+
+        public String[] getValues() {
+            return values;
+        }
+
+        public void setValues(String[] values) {
+            this.values = values;
+        }
+
+        // Indexed getter
+        public String getValues(int index) {
+            return values[index];
+        }
+
+        // Indexed setter
+        public void setValues(int index, String value) {
+            values[index] = value;
+        }
+    }
+
+    // Class with problematic BeanInfo to trigger introspection exception
+    public static class ProblematicBeanInfoClass {
+        // This class has a corresponding BeanInfo class that will cause issues
+        private String value;
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+    }
+
+    // BeanInfo class for ProblematicBeanInfoClass that throws exception
+    public static class ProblematicBeanInfoClassBeanInfo implements java.beans.BeanInfo {
+        @Override
+        public java.beans.BeanDescriptor getBeanDescriptor() {
+            throw new RuntimeException("BeanInfo access failed");
+        }
+
+        @Override
+        public java.beans.EventSetDescriptor[] getEventSetDescriptors() {
+            return new java.beans.EventSetDescriptor[0];
+        }
+
+        @Override
+        public int getDefaultEventIndex() {
+            return -1;
+        }
+
+        @Override
+        public java.beans.PropertyDescriptor[] getPropertyDescriptors() {
+            throw new RuntimeException("Cannot get property descriptors");
+        }
+
+        @Override
+        public int getDefaultPropertyIndex() {
+            return -1;
+        }
+
+        @Override
+        public java.beans.MethodDescriptor[] getMethodDescriptors() {
+            return new java.beans.MethodDescriptor[0];
+        }
+
+        @Override
+        public java.beans.BeanInfo[] getAdditionalBeanInfo() {
+            return null;
+        }
+
+        @Override
+        public java.awt.Image getIcon(int iconKind) {
+            return null;
+        }
+    }
+
+    // Bean with write-only property in source (no getter)
+    public static class SourceWriteOnlyBean {
+        private String name;
+        private String writeOnlyValue;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        // Write-only property: has setter but no getter
+        public void setWriteOnlyValue(String value) {
+            this.writeOnlyValue = value;
+        }
+    }
+
+    // Bean with read-only property in target (no setter)
+    public static class TargetReadOnlyBean {
+        private final String name;
+
+        public TargetReadOnlyBean(String name) {
+            this.name = name;
+        }
+
+        // Read-only property: has getter but no setter
+        public String getName() {
+            return name;
         }
     }
 }

@@ -285,4 +285,40 @@ class BaseDifyDefaultClientTest {
         assertEquals(403, exception.getCode());
         assertEquals("Forbidden", exception.getMsg());
     }
+
+    @Test
+    void testErrorHandler_429RateLimitExceeded() {
+        // Arrange
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        BaseDifyDefaultClient client = new BaseDifyDefaultClient(mockHttpClient);
+        HttpResponse<String> mockResponse = mock(HttpResponse.class);
+
+        when(mockResponse.getStatusCode()).thenReturn(429);
+        when(mockResponse.getBody()).thenReturn("Rate limit exceeded");
+
+        // Act & Assert
+        DifyClientException exception = assertThrows(DifyClientException.class, () -> {
+            client.responseErrorHandler.handle(mockResponse);
+        });
+
+        assertNotNull(exception);
+    }
+
+    @Test
+    void testErrorHandler_503ServiceUnavailable() {
+        // Arrange
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        BaseDifyDefaultClient client = new BaseDifyDefaultClient(mockHttpClient);
+        HttpResponse<String> mockResponse = mock(HttpResponse.class);
+
+        when(mockResponse.getStatusCode()).thenReturn(503);
+        when(mockResponse.getBody()).thenReturn("Service Unavailable");
+
+        // Act & Assert
+        DifyClientException exception = assertThrows(DifyClientException.class, () -> {
+            client.responseErrorHandler.handle(mockResponse);
+        });
+
+        assertNotNull(exception);
+    }
 }

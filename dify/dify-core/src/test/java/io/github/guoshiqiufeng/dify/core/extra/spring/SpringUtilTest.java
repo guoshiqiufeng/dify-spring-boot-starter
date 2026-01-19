@@ -196,4 +196,19 @@ class SpringUtilTest {
         assertInstanceOf(AnotherBean.class, bean);
         assertEquals(123, ((AnotherBean) bean).getNumber());
     }
+
+    @Test
+    void testIsSpringEnvironmentWhenInitialized() {
+        assertTrue(SpringUtil.isSpringEnvironment());
+    }
+
+    @Test
+    void testIsSpringEnvironmentWhenNotInitialized() throws Exception {
+        // Reset applicationContext to null
+        Field field = SpringUtil.class.getDeclaredField("applicationContext");
+        field.setAccessible(true);
+        field.set(null, null);
+
+        assertFalse(SpringUtil.isSpringEnvironment());
+    }
 }

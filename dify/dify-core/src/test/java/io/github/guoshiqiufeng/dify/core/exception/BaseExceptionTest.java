@@ -112,4 +112,28 @@ public class BaseExceptionTest {
         BaseException exception2 = new BaseException(404, "Resource not found");
         assertNotNull(exception2.getMessage());
     }
+
+    /**
+     * Test getCode() method
+     */
+    @Test
+    public void testGetCode() {
+        BaseException exception1 = new BaseException(TestExceptionEnum.TEST_ERROR);
+        assertEquals(10001, exception1.getCode());
+
+        BaseException exception2 = new BaseException(500, "Internal error");
+        assertEquals(500, exception2.getCode());
+    }
+
+    /**
+     * Test getMsg() method
+     */
+    @Test
+    public void testGetMsg() {
+        BaseException exception1 = new BaseException(TestExceptionEnum.TEST_ERROR);
+        assertEquals("Test error message", exception1.getMsg());
+
+        BaseException exception2 = new BaseException(404, "Not found");
+        assertEquals("Not found", exception2.getMsg());
+    }
 }

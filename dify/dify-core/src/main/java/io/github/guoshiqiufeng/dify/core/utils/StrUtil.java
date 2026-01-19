@@ -15,11 +15,14 @@
  */
 package io.github.guoshiqiufeng.dify.core.utils;
 
+import lombok.experimental.UtilityClass;
+
 /**
  * @author yanghq
  * @version 1.0
  * @since 2026/1/5 14:03
  */
+@UtilityClass
 public class StrUtil {
 
     /**

@@ -81,6 +81,11 @@ public class DifyClientExceptionTest {
         // Test enum constructor
         DifyClientException exception1 = new DifyClientException(DiftClientExceptionEnum.NOT_FOUND);
         assertEquals("Not Found", exception1.getMessage());
+
+        // Test constructor with Integer and String parameters
+        DifyClientException exception2 = new DifyClientException(500, "Internal server error");
+        assertEquals("Internal server error", exception2.getMessage());
+        assertEquals(500, exception2.getCode());
     }
 
     /**
@@ -99,11 +104,10 @@ public class DifyClientExceptionTest {
     @Test
     public void testNoLoginWithMessageContaining401() {
         // Create a custom exception with [401] in message
-        BaseException exception = new BaseException(500, "Error [401] occurred");
-        DifyClientException difyException = new DifyClientException(DiftClientExceptionEnum.UNAUTHORIZED);
+        DifyClientException exception = new DifyClientException(500, "Error [401] occurred");
 
         // Test the noLogin method
-        Boolean result = difyException.noLogin();
+        Boolean result = exception.noLogin();
         assertTrue(result);
     }
 

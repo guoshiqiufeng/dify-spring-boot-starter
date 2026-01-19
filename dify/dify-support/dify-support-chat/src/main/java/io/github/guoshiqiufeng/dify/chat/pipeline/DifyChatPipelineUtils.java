@@ -15,13 +15,13 @@
  */
 package io.github.guoshiqiufeng.dify.chat.pipeline;
 
+import io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendCompletionResponse;
+import io.github.guoshiqiufeng.dify.core.bean.BeanUtils;
 import io.github.guoshiqiufeng.dify.core.exception.UtilException;
 import io.github.guoshiqiufeng.dify.core.extra.spring.SpringUtil;
-import io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendCompletionResponse;
 import io.github.guoshiqiufeng.dify.core.pipeline.PipelineContext;
 import io.github.guoshiqiufeng.dify.core.pipeline.PipelineHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 
 /**
  * @author yanghq
@@ -40,6 +40,12 @@ public class DifyChatPipelineUtils {
      * @return 拦截处理后消息
      */
     public static ChatMessageSendCompletionResponse processChat(ChatMessageSendCompletionResponse completionResponse) {
+        // 检查 Spring 环境是否可用
+        if (!SpringUtil.isSpringEnvironment()) {
+            log.debug("Spring environment is not available, skip pipeline processing");
+            return completionResponse;
+        }
+
         PipelineHandler pipelineHandler;
         try {
             pipelineHandler = SpringUtil.getBean(PipelineHandler.class);
