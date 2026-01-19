@@ -44,6 +44,7 @@ include 'dify:dify-support-impl'
 
 include "dify:starter"
 include "dify:starter:spring-boot"
+include "dify:starter:spring-boot:spring-boot-starter-common"
 
 include 'dify:starter:java:dify-java-starter'
 

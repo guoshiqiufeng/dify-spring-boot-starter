@@ -13,24 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.springboot.autoconfigure;
+package io.github.guoshiqiufeng.dify.client.core.codec.exception;
 
 /**
- * Dify Connection Details Interface
- * Provides connection information required to establish a connection to the Dify API.
- * This interface is used by the Spring Boot auto-configuration to set up Dify clients
- * with the appropriate connection settings.
+ * JSON 处理异常
  *
  * @author yanghq
- * @version 0.9.0
- * @since 2025/4/7 16:53
+ * @version 2.0.0
+ * @since 2025/12/30
  */
-public interface DifyConnectionDetails {
+public class JsonException extends RuntimeException {
 
-    /**
-     * Retrieves the URL of the Dify API server
-     *
-     * @return The base URL string for the Dify API endpoint
-     */
-    String getUrl();
+    public JsonException(String message) {
+        super(message);
+    }
+
+    public JsonException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public JsonException(Throwable cause) {
+        super(cause);
+    }
 }

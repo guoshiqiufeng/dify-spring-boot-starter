@@ -30,6 +30,7 @@ dependencyManagement {
         dependency "${APP_GROUP}:dify-support-impl:${APP_VERSION}"
         dependency "${APP_GROUP}:dify-java-starter:${APP_VERSION}"
         dependency "${APP_GROUP}:dify-spring-boot-starter:${APP_VERSION}"
+        dependency "${APP_GROUP}:spring-boot-starter-common:${APP_VERSION}"
         dependency "${APP_GROUP}:dify-spring-boot-starter-autoconfigure:${APP_VERSION}"
         dependency "${APP_GROUP}:dify-spring-boot-starter-chat:${APP_VERSION}"
         dependency "${APP_GROUP}:dify-spring-boot-starter-dataset:${APP_VERSION}"

@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.client.core.codec;
 
+import io.github.guoshiqiufeng.dify.client.core.codec.exception.JsonException;
 import org.junit.jupiter.api.Test;
 
 import java.lang.annotation.Annotation;

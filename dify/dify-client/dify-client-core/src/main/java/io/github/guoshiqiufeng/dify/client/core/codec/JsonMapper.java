@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.client.core.codec;
 
+import io.github.guoshiqiufeng.dify.client.core.codec.exception.JsonException;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 
 /**

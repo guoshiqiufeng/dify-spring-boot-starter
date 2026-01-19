@@ -17,8 +17,12 @@ package io.github.guoshiqiufeng.dify.support.impl.dataset;
 
 import io.github.guoshiqiufeng.dify.client.core.constant.MediaType;
 import io.github.guoshiqiufeng.dify.client.core.enums.HttpMethod;
+import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
+import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
+import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
 import io.github.guoshiqiufeng.dify.client.integration.spring.file.DifyFileConverter;
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.dataset.constant.DatasetUriConstant;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.*;
@@ -35,7 +39,7 @@ import io.github.guoshiqiufeng.dify.support.impl.BaseClientTest;
 import io.github.guoshiqiufeng.dify.support.impl.dto.dataset.SegmentDataResponseDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
+import org.mockito.ArgumentCaptor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
@@ -68,6 +72,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
     }
 
     @Test
+    public void testConstructor() {
+        HttpClientFactory httpClientFactory = mock(HttpClientFactory.class);
+        new DifyDatasetDefaultClient("http://127.0.0.1", new DifyProperties.ClientConfig(), httpClientFactory);
+    }
+
+    @Test
     public void testCreate() {
         // Prepare test data
         String apiKey = "test-api-key";
@@ -97,12 +107,19 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         assertEquals(expectedResponse.getName(), actualResponse.getName());
         assertEquals(expectedResponse.getDescription(), actualResponse.getDescription());
 
-        // Verify WebClient interactions
+        // Verify WebClient interactions and capture headers consumer
         verify(httpClientMock).post();
         verify(requestBodyUriSpecMock).uri(DatasetUriConstant.V1_DATASETS_URL);
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(requestBodySpecMock).body(request);
         verify(responseSpecMock).body(DatasetResponse.class);
     }
+
 
     @Test
     public void testPage() {
@@ -174,6 +191,11 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         verify(httpClientMock).get();
         verify(responseSpecMock).body(any(TypeReference.class));
 
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         request.setTagIds(List.of());
         request.setKeyword("");
         request.setIncludeAll(true);
@@ -233,6 +255,11 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).get();
         verify(responseSpecMock).body(DatasetInfoResponse.class);
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
     }
 
     @Test
@@ -290,6 +317,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).patch();
         verify(requestBodyUriSpecMock).uri(any(Function.class));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(requestBodySpecMock).body(request);
         verify(responseSpecMock).body(DatasetInfoResponse.class);
     }
@@ -309,6 +342,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).delete();
         verify(requestHeadersUriSpecMock).uri(eq(DatasetUriConstant.V1_DATASETS_URL + "/{datasetId}"), eq(datasetId));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(responseSpecMock).body(Void.class);
     }
 
@@ -349,6 +388,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).post();
         verify(requestBodyUriSpecMock).uri(eq(DatasetUriConstant.V1_DOCUMENT_CREATE_BY_TEXT_URL), eq(datasetId));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(requestBodySpecMock).body(request);
         verify(responseSpecMock).body(DocumentCreateResponse.class);
     }
@@ -400,6 +445,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).post();
         verify(requestBodyUriSpecMock).uri(eq(DatasetUriConstant.V1_DOCUMENT_CREATE_BY_FILE_URL), eq(datasetId));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(requestBodySpecMock).contentType(io.github.guoshiqiufeng.dify.client.core.constant.MediaType.MULTIPART_FORM_DATA);
         verify(requestBodySpecMock).body(any());
         verify(responseSpecMock).body(DocumentCreateResponse.class);
@@ -440,6 +491,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).post();
         verify(requestBodyUriSpecMock).uri(eq(DatasetUriConstant.V1_DOCUMENT_UPDATE_BY_TEXT_URL), eq(datasetId), eq(documentId));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(requestBodySpecMock).body(request);
         verify(responseSpecMock).body(DocumentCreateResponse.class);
     }
@@ -494,6 +551,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         verify(httpClientMock).post();
         verify(requestBodyUriSpecMock).uri(eq(DatasetUriConstant.V1_DOCUMENT_UPDATE_BY_FILE_URL), eq(datasetId), eq(documentId));
         verify(requestBodySpecMock).contentType(MediaType.MULTIPART_FORM_DATA);
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(requestBodySpecMock).body(any());
         verify(responseSpecMock).body(DocumentCreateResponse.class);
     }
@@ -506,6 +569,21 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         int page = 1;
         int limit = 10;
         String keyword = "test";
+
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("page"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("limit"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("keyword"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build(anyString())).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
 
         // Create request
         DatasetPageDocumentRequest request = new DatasetPageDocumentRequest();
@@ -551,6 +629,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).get();
         verify(requestHeadersUriSpecMock).uri(any(Function.class));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(responseSpecMock).body(any(TypeReference.class));
     }
 
@@ -605,6 +689,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         verify(httpClientMock).get();
         verify(requestHeadersUriSpecMock).uri(
                 eq(DatasetUriConstant.V1_DOCUMENT_INDEXING_STATUS_URL), eq(datasetId), eq(batch));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(responseSpecMock).body(any(TypeReference.class));
     }
 
@@ -622,6 +712,11 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).delete();
         verify(requestHeadersUriSpecMock).uri(eq(DatasetUriConstant.V1_DOCUMENT_URL), eq(datasetId), eq(documentId));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
     }
 
     @Test
@@ -692,6 +787,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).post();
         verify(requestBodyUriSpecMock).uri(eq(DatasetUriConstant.V1_DATASETS_RETRIEVE_URL), eq(datasetId));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(requestBodySpecMock).body(request);
         verify(responseSpecMock).body(RetrieveResponse.class);
     }
@@ -748,6 +849,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).get();
         verify(requestHeadersUriSpecMock).uri(DatasetUriConstant.V1_TEXT_EMBEDDING_LIST_URL);
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(responseSpecMock).body(TextEmbeddingListResponse.class);
     }
 
@@ -803,6 +910,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).get();
         verify(requestHeadersUriSpecMock).uri(DatasetUriConstant.V1_RERANK_LIST_URL);
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(responseSpecMock).body(TextEmbeddingListResponse.class);
     }
 
@@ -859,6 +972,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).post();
         verify(requestBodyUriSpecMock).uri(eq(DatasetUriConstant.V1_DOCUMENTS_SEGMENTS_URL), eq(datasetId), eq(documentId));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(requestBodySpecMock).body(request);
         verify(responseSpecMock).body(SegmentResponse.class);
     }
@@ -938,6 +1057,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
 
         // Verify WebClient interactions
         verify(httpClientMock).get();
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(responseSpecMock).body(any(TypeReference.class));
 
         request.setKeyword("");
@@ -961,6 +1086,11 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         verify(httpClientMock).delete();
         verify(requestHeadersUriSpecMock).uri(eq(DatasetUriConstant.V1_DOCUMENTS_SEGMENT_URL),
                 eq(datasetId), eq(documentId), eq(segmentId));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
     }
 
     @Test
@@ -1013,6 +1143,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         verify(httpClientMock).post();
         verify(requestBodyUriSpecMock).uri(eq(DatasetUriConstant.V1_DOCUMENTS_SEGMENT_URL),
                 eq(datasetId), eq(documentId), eq(segmentId));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(requestBodySpecMock).body(request);
         verify(responseSpecMock).body(SegmentUpdateResponse.class);
     }
@@ -1052,6 +1188,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).post();
         verify(requestBodyUriSpecMock).uri(eq(DatasetUriConstant.V1_METADATA_CREATE_URL), eq(datasetId));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(requestBodySpecMock).body(request);
         verify(responseSpecMock).body(MetaDataResponse.class);
     }
@@ -1089,6 +1231,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).patch();
         verify(requestBodyUriSpecMock).uri(eq(DatasetUriConstant.V1_METADATA_UPDATE_URL), eq(datasetId), eq(metadataId));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(requestBodySpecMock).body(request);
         verify(responseSpecMock).body(MetaDataResponse.class);
     }
@@ -1109,6 +1257,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).delete();
         verify(requestHeadersUriSpecMock).uri(eq(DatasetUriConstant.V1_METADATA_DELETE_URL), eq(datasetId), eq(metadataId));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(responseSpecMock).body(void.class);
     }
 
@@ -1133,6 +1287,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).post();
         verify(requestBodyUriSpecMock).uri(eq(DatasetUriConstant.V1_METADATA_ACTION_URL), eq(datasetId), eq(MetaDataActionEnum.enable.name()));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(responseSpecMock).body(Void.class);
     }
 
@@ -1183,6 +1343,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).post();
         verify(requestBodyUriSpecMock).uri(eq(DatasetUriConstant.V1_DOCUMENT_METADATA_UPDATE_URL), eq(datasetId));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(requestBodySpecMock).body(request);
         verify(responseSpecMock).body(Void.class);
     }
@@ -1237,6 +1403,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).get();
         verify(requestHeadersUriSpecMock).uri(eq(DatasetUriConstant.V1_METADATA_LIST_URL), eq(datasetId));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(responseSpecMock).body(MetaDataListResponse.class);
     }
 
@@ -1283,6 +1455,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         verify(httpClientMock).post();
         verify(requestBodyUriSpecMock).uri(eq(DatasetUriConstant.V1_DOCUMENTS_SEGMENTS_CHILD_CHUNKS_URL),
                 eq(datasetId), eq(documentId), eq(segmentId));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(requestBodySpecMock).body(request);
         verify(responseSpecMock).body(SegmentChildChunkCreateResponse.class);
     }
@@ -1297,6 +1475,21 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         String keyword = "test";
         int page = 1;
         int limit = 10;
+
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("keyword"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("page"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("limit"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build(anyString(), anyString(), anyString())).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
 
         // Create request
         SegmentChildChunkPageRequest request = new SegmentChildChunkPageRequest();
@@ -1352,6 +1545,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).get();
         verify(requestHeadersUriSpecMock).uri(any(Function.class));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(responseSpecMock).body(any(TypeReference.class));
     }
 
@@ -1379,6 +1578,11 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         verify(httpClientMock).delete();
         verify(requestHeadersUriSpecMock).uri(eq(DatasetUriConstant.V1_DOCUMENTS_SEGMENTS_CHILD_CHUNK_URL),
                 eq(datasetId), eq(documentId), eq(segmentId), eq(childChunkId));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
     }
 
     @Test
@@ -1390,6 +1594,18 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         String segmentId = "segment-123456";
         String childChunkId = "chunk-123456";
         String content = "Updated child chunk content";
+
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+        when(requestBodyUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build(anyString(), anyString(), anyString(), anyString())).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestBodySpecMock;
+        });
 
         // Create request
         SegmentChildChunkUpdateRequest request = new SegmentChildChunkUpdateRequest();
@@ -1425,6 +1641,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).patch();
         verify(requestBodyUriSpecMock).uri(any(Function.class));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(requestBodySpecMock).body(request);
         verify(responseSpecMock).body(SegmentChildChunkUpdateResponse.class);
     }
@@ -1468,6 +1690,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).get();
         verify(requestHeadersUriSpecMock).uri(eq(DatasetUriConstant.V1_DOCUMENTS_UPLOAD_FILE), eq(datasetId), eq(documentId));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(responseSpecMock).body(any(TypeReference.class));
     }
 
@@ -1499,7 +1727,13 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
 
         // Verify WebClient interactions
         verify(httpClientMock).post();
-        verify(requestBodyUriSpecMock).uri(DatasetUriConstant.V1_TAGS);
+        verify(requestBodyUriSpecMock).uri(eq(DatasetUriConstant.V1_TAGS));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(requestBodySpecMock).body(request);
         verify(responseSpecMock).body(TagInfoResponse.class);
     }
@@ -1537,6 +1771,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).get();
         verify(requestHeadersUriSpecMock).uri(DatasetUriConstant.V1_TAGS);
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(responseSpecMock).body(any(TypeReference.class));
     }
 
@@ -1571,6 +1811,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).patch();
         verify(requestBodyUriSpecMock).uri(DatasetUriConstant.V1_TAGS);
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(requestBodySpecMock).body(request);
         verify(responseSpecMock).body(TagInfoResponse.class);
     }
@@ -1590,6 +1836,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).method(HttpMethod.DELETE);
         verify(requestBodyUriSpecMock).uri(DatasetUriConstant.V1_TAGS);
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(requestBodySpecMock).body(any(Map.class));
         verify(responseSpecMock).body(Void.class);
     }
@@ -1652,6 +1904,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).post();
         verify(requestBodyUriSpecMock).uri(DatasetUriConstant.V1_TAGS_BINDING);
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(requestBodySpecMock).body(request);
         verify(responseSpecMock).body(Void.class);
     }
@@ -1678,6 +1936,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).post();
         verify(requestBodyUriSpecMock).uri(DatasetUriConstant.V1_TAGS_UNBINDING);
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(requestBodySpecMock).body(request);
         verify(responseSpecMock).body(Void.class);
     }
@@ -1724,6 +1988,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).get();
         verify(requestHeadersUriSpecMock).uri(eq(DatasetUriConstant.V1_DATASET_TAGS), eq(datasetId));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(responseSpecMock).body(DataSetTagsResponse.class);
     }
 
@@ -1749,6 +2019,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).patch();
         verify(requestBodyUriSpecMock).uri(eq(DatasetUriConstant.V1_DOCUMENT_STATUS), eq(datasetId), eq(DocActionEnum.enable.name()));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestBodySpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(requestBodySpecMock).body(argThat(body -> {
             if (body instanceof Map) {
                 Map<String, Set<String>> bodyMap = (Map<String, Set<String>>) body;
@@ -1789,6 +2065,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         verify(httpClientMock).get();
         verify(requestHeadersUriSpecMock).uri(eq(DatasetUriConstant.V1_DOCUMENT_URL), eq(datasetId), eq(documentId));
         verify(requestHeadersSpecMock).headers(any(Consumer.class));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(responseSpecMock).body(DocumentInfo.class);
     }
 
@@ -1834,6 +2116,12 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
 
         // Verify WebClient interactions
         verify(httpClientMock).get();
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(responseSpecMock).body(DocumentInfo.class);
     }
 
@@ -1869,6 +2157,42 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).get();
         verify(requestHeadersUriSpecMock).uri(eq(DatasetUriConstant.V1_DOCUMENTS_SEGMENT_URL), eq(datasetId), eq(documentId), eq(segmentId));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
         verify(requestHeadersSpecMock).headers(any(Consumer.class));
     }
+
+    @Test
+    public void testGetSegmentWithNullBody() {
+        // Prepare test data
+        String apiKey = "test-api-key";
+        String datasetId = "dataset-123456";
+        String documentId = "document-123456";
+        String segmentId = "segment-123456";
+
+        // Set up the response mock to return null
+        when(responseSpecMock.body(SegmentDataResponseDto.class)).thenReturn(null);
+
+        // Execute the method
+        SegmentData actualResponse = client.getSegment(datasetId, documentId, segmentId, apiKey);
+
+        // Verify the result is null
+        assertNull(actualResponse);
+
+        // Verify WebClient interactions
+        verify(httpClientMock).get();
+        verify(requestHeadersUriSpecMock).uri(eq(DatasetUriConstant.V1_DOCUMENTS_SEGMENT_URL), eq(datasetId), eq(documentId), eq(segmentId));
+
+        ArgumentCaptor<Consumer<HttpHeaders>> headersCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(requestHeadersSpecMock).headers(headersCaptor.capture());
+        // Execute the captured consumer to increase coverage
+        headersCaptor.getValue().accept(mock(HttpHeaders.class));
+
+        verify(requestHeadersSpecMock).headers(any(Consumer.class));
+    }
+
 }

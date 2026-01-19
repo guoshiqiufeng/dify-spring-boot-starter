@@ -1,8 +1,8 @@
-io.github.guoshiqiufeng.dify.springboot.autoconfigure.DifyPropertiesAutoConfiguration
-io.github.guoshiqiufeng.dify.springboot.autoconfigure.DifyCodecAutoConfiguration
+io.github.guoshiqiufeng.dify.springboot.common.autoconfigure.DifyPropertiesAutoConfiguration
+io.github.guoshiqiufeng.dify.springboot.common.autoconfigure.DifyCodecAutoConfiguration
 io.github.guoshiqiufeng.dify.springboot.autoconfigure.DifyChatAutoConfiguration
 io.github.guoshiqiufeng.dify.springboot.autoconfigure.DifyDatasetAutoConfiguration
-io.github.guoshiqiufeng.dify.springboot.autoconfigure.DifyServerRedisTokenAutoConfiguration
+io.github.guoshiqiufeng.dify.springboot.common.autoconfigure.DifyServerRedisTokenAutoConfiguration
 io.github.guoshiqiufeng.dify.springboot.autoconfigure.DifyServerAutoConfiguration
 io.github.guoshiqiufeng.dify.springboot.autoconfigure.DifyWorkflowAutoConfiguration
-io.github.guoshiqiufeng.dify.springboot.autoconfigure.DifyStatusAutoConfiguration
+io.github.guoshiqiufeng.dify.springboot.common.autoconfigure.DifyStatusAutoConfiguration
