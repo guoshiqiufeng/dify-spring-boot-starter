@@ -6,7 +6,7 @@ description: Configure
 
 # Configure
 
-[dify-spring-boot-starter](https://github.com/guoshiqiufeng/dify-spring-boot-starter) is very easy to configure, we just need some simple configuration!
+[dify-spring-boot-starter](https://github.com/guoshiqiufeng/dify-spring-boot-starter) is very easy to configure. You only need some basic configuration to get started!
 
 > Make sure you have dify-spring-boot-starter installed. If you haven't, check out the [Install](install.md).
 

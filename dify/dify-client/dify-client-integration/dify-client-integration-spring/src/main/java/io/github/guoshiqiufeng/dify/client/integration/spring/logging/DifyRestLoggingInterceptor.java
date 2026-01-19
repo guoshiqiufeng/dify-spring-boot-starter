@@ -77,9 +77,11 @@ public class DifyRestLoggingInterceptor implements ClientHttpRequestInterceptor 
     private byte[] logResponse(String requestId, ClientHttpResponse response) throws IOException {
         byte[] body = StreamUtils.copyToByteArray(response.getBody());
 
-        if (log.isDebugEnabled()) {
-            long executionTime = System.currentTimeMillis() - REQUEST_TIME_CACHE.getOrDefault(requestId, 0L);
-            REQUEST_TIME_CACHE.remove(requestId);
+        // Always remove from cache to prevent memory leak
+        Long startTime = REQUEST_TIME_CACHE.remove(requestId);
+
+        if (log.isDebugEnabled() && startTime != null) {
+            long executionTime = System.currentTimeMillis() - startTime;
 
             String bodyContent = body.length > 0 ? new String(body, StandardCharsets.UTF_8) : "";
             // Use reflection to get status code to support both Spring 5 (HttpStatus) and Spring 6+ (HttpStatusCode)

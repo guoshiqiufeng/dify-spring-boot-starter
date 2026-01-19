@@ -111,4 +111,13 @@ public class SpringUtil implements ApplicationContextAware {
         }
         return applicationContext.containsBean(name);
     }
+
+    /**
+     * Check if Spring environment is available
+     *
+     * @return true if ApplicationContext is initialized, false otherwise
+     */
+    public static boolean isSpringEnvironment() {
+        return applicationContext != null;
+    }
 }

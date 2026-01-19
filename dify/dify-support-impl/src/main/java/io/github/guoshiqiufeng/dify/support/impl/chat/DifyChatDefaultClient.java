@@ -110,7 +110,7 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
         Assert.notNull(apiKey, "apiKey must not be null");
         Assert.notNull(taskId, "taskId must not be null");
 
-        Map<String, Object> params = new HashMap<>(2);
+        Map<String, Object> params = new HashMap<>(1);
         params.put("user", userId);
 
         this.httpClient.post()

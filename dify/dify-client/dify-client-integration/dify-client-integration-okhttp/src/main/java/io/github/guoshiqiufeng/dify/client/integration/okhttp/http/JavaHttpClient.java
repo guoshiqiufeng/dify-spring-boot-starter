@@ -153,6 +153,13 @@ public class JavaHttpClient implements HttpClient {
             }
         }
 
+        builder.addInterceptor(chain -> {
+            okhttp3.Request.Builder requestBuilder = chain.request().newBuilder();
+            requestBuilder.addHeader("Content-Type", "application/json");
+            requestBuilder.addHeader("Accept", "application/json");
+            return chain.proceed(requestBuilder.build());
+        });
+
         // Add default headers interceptor if configured
         if (defaultHeaders != null && !defaultHeaders.isEmpty()) {
             builder.addInterceptor(chain -> {

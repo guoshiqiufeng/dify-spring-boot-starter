@@ -2,10 +2,7 @@ dependencies {
     api project(":dify:dify-core")
     api project(":dify:dify-client:dify-client-core")
 
-    // api libs.hutool.core
-
     implementation "io.projectreactor:reactor-core"
-//    implementation libs.spring.webflux
 
     implementation libs.jackson.databind
 

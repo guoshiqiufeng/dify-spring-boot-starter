@@ -15,6 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.core.utils;
 
+import lombok.experimental.UtilityClass;
+
 import java.util.Collection;
 import java.util.Map;
 
@@ -25,6 +27,7 @@ import java.util.Map;
  * @version 1.0
  * @since 2026/1/5 14:27
  */
+@UtilityClass
 public class CollUtil {
 
     /**

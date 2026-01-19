@@ -10,7 +10,7 @@ const version = inject('version');
 
 # 安装
 
-[dify-spring-boot-starter](https://github.com/guoshiqiufeng/dify-spring-boot-starter) 基于JDK8, 支持SpringBoot 4.x、3.x、2.x.
+[dify-spring-boot-starter](https://github.com/guoshiqiufeng/dify-spring-boot-starter) 基于 JDK 8+，支持 Spring Boot 2.x、3.x、4.x 和纯 Java 项目。
 
 ## SpringBoot 3.1 及以上
 

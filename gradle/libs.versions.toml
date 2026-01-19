@@ -12,6 +12,7 @@ junit = "5.10.2"
 okhttp = "4.12.0"
 gson = "2.11.0"
 jackson3 = "3.0.2"
+reactorTest = "3.6.0"
 
 [libraries]
 # Hutool libraries
@@ -49,7 +50,7 @@ mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mo
 mockito-junit-jupiter = { group = "org.mockito", name = "mockito-junit-jupiter", version.ref = "mockito" }
 bytebuddy = { group = "net.bytebuddy", name = "byte-buddy", version.ref = "bytebuddy" }
 bytebuddy-agent = { group = "net.bytebuddy", name = "byte-buddy-agent", version.ref = "bytebuddy" }
-reactor-test = { group = "io.projectreactor", name = "reactor-test" }
+reactor-test = { group = "io.projectreactor", name = "reactor-test", version.ref = "reactorTest" }
 
 # TestContainers
 testcontainers-bom = { group = "org.testcontainers", name = "testcontainers-bom", version.ref = "testcontainers" }

@@ -16,6 +16,8 @@
 package io.github.guoshiqiufeng.dify.server.client;
 
 import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
+import io.github.guoshiqiufeng.dify.core.exception.DifyClientException;
+import io.github.guoshiqiufeng.dify.core.exception.DiftClientExceptionEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -112,6 +114,100 @@ class BaseDifyServerTokenTest {
 
         assertSame(error, exception);
         assertEquals(0, token.refreshTokenCallCount); // Should not try to refresh
+        verify(supplier, times(1)).get();
+    }
+
+    @Test
+    @DisplayName("Test executeWithRetry with DifyClientException that requires login")
+    void testExecuteWithRetryDifyClientExceptionWithLogin() {
+        // Setup - DifyClientException with noLogin() returning true
+        DifyClientException authException = new DifyClientException(DiftClientExceptionEnum.UNAUTHORIZED);
+        RequestSupplier<String> supplier = mock(RequestSupplier.class);
+        when(supplier.get())
+                .thenThrow(authException)
+                .thenReturn("success after retry");
+
+        // Execute
+        String result = token.executeWithRetry(supplier, difyServerClient);
+
+        // Verify
+        assertEquals("success after retry", result);
+        assertEquals(1, token.refreshTokenCallCount);
+        verify(supplier, times(2)).get();
+    }
+
+    @Test
+    @DisplayName("Test executeWithRetry with DifyClientException that does not require login")
+    void testExecuteWithRetryDifyClientExceptionNoLogin() {
+        // Setup - DifyClientException with noLogin() returning false
+        DifyClientException exception = new DifyClientException(DiftClientExceptionEnum.SERVICE_UNAVAILABLE);
+        RequestSupplier<String> supplier = mock(RequestSupplier.class);
+        when(supplier.get()).thenThrow(exception);
+
+        // Execute and assert
+        Exception thrown = assertThrows(DifyClientException.class, () ->
+                token.executeWithRetry(supplier, difyServerClient));
+
+        assertSame(exception, thrown);
+        assertEquals(0, token.refreshTokenCallCount); // Should not try to refresh
+        verify(supplier, times(1)).get();
+    }
+
+    @Test
+    @DisplayName("Test executeWithRetry with exception that has null message")
+    void testExecuteWithRetryExceptionWithNullMessage() {
+        // Setup - exception with null message should not trigger retry
+        RuntimeException error = new RuntimeException((String) null);
+        RequestSupplier<String> supplier = mock(RequestSupplier.class);
+        when(supplier.get()).thenThrow(error);
+
+        // Execute and assert
+        Exception exception = assertThrows(RuntimeException.class, () ->
+                token.executeWithRetry(supplier, difyServerClient));
+
+        assertSame(error, exception);
+        assertEquals(0, token.refreshTokenCallCount); // Should not try to refresh
+        verify(supplier, times(1)).get();
+    }
+
+    @Test
+    @DisplayName("Test executeWithRetry with 401 error on last retry attempt")
+    void testExecuteWithRetry401OnLastAttempt() {
+        // Setup - 401 error on the last retry attempt (retryCount = 2)
+        RequestSupplier<String> supplier = mock(RequestSupplier.class);
+        when(supplier.get())
+                .thenThrow(new RuntimeException("[401] Unauthorized"))
+                .thenThrow(new RuntimeException("[401] Unauthorized"))
+                .thenThrow(new RuntimeException("[401] Unauthorized"));
+
+        // Execute and assert
+        Exception exception = assertThrows(RuntimeException.class, () ->
+                token.executeWithRetry(supplier, difyServerClient));
+
+        assertEquals("[401] Unauthorized", exception.getMessage());
+        assertEquals(2, token.refreshTokenCallCount); // Should refresh 2 times (not on the last attempt)
+        verify(supplier, times(3)).get();
+    }
+
+    @Test
+    @DisplayName("Test executeWithRetry with exception message null and noLogin true")
+    void testExecuteWithRetryNullMessageWithNoLogin() {
+        // Setup - DifyClientException with null message but noLogin() returns true
+        DifyClientException exception = new DifyClientException(DiftClientExceptionEnum.UNAUTHORIZED) {
+            @Override
+            public String getMessage() {
+                return null;
+            }
+        };
+        RequestSupplier<String> supplier = mock(RequestSupplier.class);
+        when(supplier.get()).thenThrow(exception);
+
+        // Execute and assert - should throw immediately because message is null
+        Exception thrown = assertThrows(DifyClientException.class, () ->
+                token.executeWithRetry(supplier, difyServerClient));
+
+        assertSame(exception, thrown);
+        assertEquals(0, token.refreshTokenCallCount); // Should not refresh when message is null
         verify(supplier, times(1)).get();
     }
 

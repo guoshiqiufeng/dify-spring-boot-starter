@@ -35,6 +35,26 @@ public enum DiftClientExceptionEnum implements BaseExceptionEnum {
      * notFound
      */
     NOT_FOUND(404, "Not Found"),
+    /**
+     * badRequest
+     */
+    BAD_REQUEST(400, "Bad Request"),
+    /**
+     * rateLimitExceeded
+     */
+    RATE_LIMIT_EXCEEDED(429, "Rate limit exceeded"),
+    /**
+     * internalServerError
+     */
+    INTERNAL_SERVER_ERROR(500, "Internal Server Error"),
+    /**
+     * serviceUnavailable
+     */
+    SERVICE_UNAVAILABLE(503, "Service Unavailable"),
+    /**
+     * unknownError
+     */
+    UNKNOWN_ERROR(0, "Unknown Error"),
 
 
     ;

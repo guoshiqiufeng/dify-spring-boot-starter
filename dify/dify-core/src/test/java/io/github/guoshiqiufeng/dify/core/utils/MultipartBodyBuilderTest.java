@@ -17,6 +17,8 @@ package io.github.guoshiqiufeng.dify.core.utils;
 
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -208,6 +210,27 @@ class MultipartBodyBuilderTest {
     }
 
     @Test
+    void testAddPartWithHeadersNull() {
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        builder.part("file", "content")
+                .header("Content-Type", "text/plain")
+                .headers("params", "param1", "param2")
+                .header("null-key", null)
+                .header("Content-Disposition", "form-data; name=\"file\"");
+
+        Map<String, MultipartBodyBuilder.Part> parts = builder.build();
+
+        MultipartBodyBuilder.Part part = parts.get("file");
+        assertNotNull(part);
+        assertNull(part.getHeader("null-key"));
+        assertNull(part.getHeader("empty-key"));
+
+        assertEquals("param1", part.getHeader("params"));
+        assertEquals("text/plain", part.getHeader("Content-Type"));
+        assertEquals("form-data; name=\"file\"", part.getHeader("Content-Disposition"));
+    }
+
+    @Test
     void testOverwritePart() {
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         builder.part("field", "value1");
@@ -217,6 +240,69 @@ class MultipartBodyBuilderTest {
 
         assertEquals(1, parts.size());
         assertEquals("value2", parts.get("field").getValue());
+    }
+
+    @Test
+    void testGetHeaderWithMultipleValues() {
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        builder.part("field", "value")
+                .header("X-Custom", "first")
+                .header("X-Custom", "second")
+                .header("X-Custom", "third");
+
+        MultipartBodyBuilder.Part part = builder.build().get("field");
+
+        // getHeader should return the first value
+        assertEquals("first", part.getHeader("X-Custom"));
+
+        // getHeaderValues should return all values
+        List<String> allValues = part.getHeaderValues("X-Custom");
+        assertEquals(3, allValues.size());
+        assertEquals("first", allValues.get(0));
+        assertEquals("second", allValues.get(1));
+        assertEquals("third", allValues.get(2));
+    }
+
+    @Test
+    void testGetHeaderEdgeCases() {
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        MultipartBodyBuilder.Part part = builder.part("field", "value").build();
+
+        // Test with null header name (should handle gracefully)
+        assertNull(part.getHeader(null));
+
+        // Test with empty string header name
+        assertNull(part.getHeader(""));
+
+        // Test getHeaderValues with null
+        List<String> nullValues = part.getHeaderValues(null);
+        assertNotNull(nullValues);
+        assertTrue(nullValues.isEmpty());
+    }
+
+    @Test
+    void testGetHeaderWithEmptyList() throws Exception {
+        // This test uses reflection to test the edge case where a header exists but has an empty list
+        // This scenario cannot be achieved through the public API, but we test it for complete branch coverage
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        MultipartBodyBuilder.Part part = builder.part("field", "value").build();
+
+        // Use reflection to access the private headers field
+        Field headersField = MultipartBodyBuilder.Part.class.getDeclaredField("headers");
+        headersField.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        Map<String, List<String>> headers = (Map<String, List<String>>) headersField.get(part);
+
+        // Add an empty list for a header (this simulates the edge case)
+        headers.put("EmptyHeader", new ArrayList<>());
+
+        // getHeader should return null for an empty list
+        assertNull(part.getHeader("EmptyHeader"));
+
+        // getHeaderValues should return an empty list
+        List<String> values = part.getHeaderValues("EmptyHeader");
+        assertNotNull(values);
+        assertTrue(values.isEmpty());
     }
 
     private static class TestObject {

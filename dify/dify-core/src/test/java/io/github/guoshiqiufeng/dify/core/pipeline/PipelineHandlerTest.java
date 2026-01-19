@@ -159,4 +159,42 @@ class PipelineHandlerTest {
         pipelineHandler.setTemplateConfig(templateConfig);
         assertEquals(templateConfig, pipelineHandler.getTemplateConfig());
     }
+
+    @Test
+    void testProcessWithNullProcessList() {
+        Map<String, PipelineTemplate<? extends PipelineModel>> templateConfig = new HashMap<>();
+        PipelineTemplate<TestPipelineModel> template = new PipelineTemplate<>();
+        // Explicitly set processList to null
+        template.setProcessList(null);
+        templateConfig.put("testCode", template);
+        pipelineHandler.setTemplateConfig(templateConfig);
+
+        context.setCode("testCode");
+        context.getModel().setTestData("initial");
+
+        PipelineContext<TestPipelineModel> result = pipelineHandler.process(context);
+
+        // Should return context unchanged when processList is null
+        assertEquals("initial", result.getModel().getTestData());
+        assertFalse(result.getModel().isProcessed());
+    }
+
+    @Test
+    void testProcessWithEmptyProcessList() {
+        Map<String, PipelineTemplate<? extends PipelineModel>> templateConfig = new HashMap<>();
+        PipelineTemplate<TestPipelineModel> template = new PipelineTemplate<>();
+        // Set processList to an empty list
+        template.setProcessList(new ArrayList<>());
+        templateConfig.put("testCode", template);
+        pipelineHandler.setTemplateConfig(templateConfig);
+
+        context.setCode("testCode");
+        context.getModel().setTestData("initial");
+
+        PipelineContext<TestPipelineModel> result = pipelineHandler.process(context);
+
+        // Should return context unchanged when processList is empty
+        assertEquals("initial", result.getModel().getTestData());
+        assertFalse(result.getModel().isProcessed());
+    }
 }
