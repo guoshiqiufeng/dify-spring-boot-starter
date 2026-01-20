@@ -20,7 +20,6 @@ import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.springboot.common.autoconfigure.DifyCodecAutoConfiguration;
 import io.github.guoshiqiufeng.dify.springboot.common.autoconfigure.DifyPropertiesAutoConfiguration;
-import io.github.guoshiqiufeng.dify.springboot.common.autoconfigure.DifyStatusAutoConfiguration;
 import io.github.guoshiqiufeng.dify.status.cache.StatusCacheService;
 import io.github.guoshiqiufeng.dify.status.cache.impl.InMemoryStatusCacheService;
 import io.github.guoshiqiufeng.dify.status.checker.DifyChatStatusChecker;
