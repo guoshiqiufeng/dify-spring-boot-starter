@@ -16,20 +16,16 @@
 package io.github.guoshiqiufeng.dify.springboot2.autoconfigure;
 
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
-import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
 import io.github.guoshiqiufeng.dify.client.integration.spring.http.SpringHttpClientFactory;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
-import io.github.guoshiqiufeng.dify.server.DifyServer;
-import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
-import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
-import io.github.guoshiqiufeng.dify.server.impl.DifyServerClientImpl;
+import io.github.guoshiqiufeng.dify.springboot.common.autoconfigure.AbstractDifyServerAutoConfiguration;
+import io.github.guoshiqiufeng.dify.springboot.common.autoconfigure.DifyCodecAutoConfiguration;
+import io.github.guoshiqiufeng.dify.springboot.common.autoconfigure.DifyServerRedisTokenAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -40,35 +36,21 @@ import org.springframework.web.reactive.function.client.WebClient;
  */
 @Slf4j
 @Configuration
-@AutoConfigureAfter(DifyServerRedisTokenAutoConfiguration.class)
+@AutoConfigureAfter({DifyServerRedisTokenAutoConfiguration.class, DifyCodecAutoConfiguration.class})
 @ConditionalOnClass({DifyServerClient.class})
-public class DifyServerAutoConfiguration {
+public class DifyServerAutoConfiguration extends AbstractDifyServerAutoConfiguration {
 
-    @Bean
-    @ConditionalOnMissingBean(BaseDifyServerToken.class)
-    public BaseDifyServerToken difyServerToken() {
-        log.info("Redis token storage not available, using default in-memory token storage. " +
-                "For production environments, consider configuring Redis for distributed token management.");
-        return new DifyServerTokenDefault();
+    private final ObjectProvider<WebClient.Builder> webClientBuilderProvider;
+
+    public DifyServerAutoConfiguration(ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
+        this.webClientBuilderProvider = webClientBuilderProvider;
     }
 
-    @Bean
-    @ConditionalOnMissingBean(DifyServerClient.class)
-    public DifyServerClient difyServerClient(DifyProperties properties,
-                                             BaseDifyServerToken difyServerToken,
-                                             JsonMapper jsonMapper,
-                                             ObjectProvider<WebClient.Builder> webClientBuilderProvider) {
-        SpringHttpClientFactory httpClientFactory = new SpringHttpClientFactory(
+    @Override
+    protected SpringHttpClientFactory createHttpClientFactory(DifyProperties properties, JsonMapper jsonMapper) {
+        return new SpringHttpClientFactory(
                 webClientBuilderProvider.getIfAvailable(WebClient::builder),
                 null,
                 jsonMapper);
-        HttpClient httpClient = httpClientFactory.createClient(properties.getUrl(), properties.getClientConfig());
-        return new io.github.guoshiqiufeng.dify.support.impl.server.DifyServerDefaultClient(httpClient, properties.getServer(), difyServerToken);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean({DifyServer.class})
-    public DifyServerClientImpl difyServerHandler(DifyServerClient difyServerClient) {
-        return new DifyServerClientImpl(difyServerClient);
     }
 }

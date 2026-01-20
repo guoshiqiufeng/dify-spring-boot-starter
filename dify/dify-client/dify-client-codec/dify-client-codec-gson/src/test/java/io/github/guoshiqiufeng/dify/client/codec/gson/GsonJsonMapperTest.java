@@ -15,7 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.client.codec.gson;
 
-import io.github.guoshiqiufeng.dify.client.core.codec.JsonException;
+import io.github.guoshiqiufeng.dify.client.core.codec.exception.JsonException;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonNode;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 import lombok.Getter;

@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Dify Codec 自动配置
+ * Dify Codec 自动配置基类
  * <p>
  * 默认初始化 Jackson 的 JsonMapper 实现
  * Jackson 支持 @JsonProperty, @JsonAlias 等注解，与项目中的 DTO 定义兼容

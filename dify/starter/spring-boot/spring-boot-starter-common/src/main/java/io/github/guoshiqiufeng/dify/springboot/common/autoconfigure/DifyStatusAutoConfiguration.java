@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.springboot.autoconfigure;
+package io.github.guoshiqiufeng.dify.springboot.common.autoconfigure;
 
 import io.github.guoshiqiufeng.dify.chat.DifyChat;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;

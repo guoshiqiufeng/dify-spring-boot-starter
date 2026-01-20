@@ -15,9 +15,11 @@
  */
 package io.github.guoshiqiufeng.dify.support.impl.server;
 
+import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
 import io.github.guoshiqiufeng.dify.client.core.map.LinkedMultiValueMap;
 import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
+import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
 import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
@@ -34,7 +36,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -70,6 +71,16 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         serverConfig.setEmail("test@example.com");
         serverConfig.setPassword("password123");
         client = new DifyServerDefaultClient(httpClientMock, serverConfig, new DifyServerTokenDefault());
+    }
+
+    @Test
+    public void testConstructor() {
+        HttpClientFactory httpClientFactory = mock(HttpClientFactory.class);
+        DifyProperties.Server serverConfig = new DifyProperties.Server();
+        serverConfig.setEmail("test@example.com");
+        serverConfig.setPassword("password123");
+        new DifyServerDefaultClient(httpClientMock, null, null);
+        new DifyServerDefaultClient(serverConfig, "http://127.0.0.1", new DifyProperties.ClientConfig(), httpClientFactory);
     }
 
     @Test
@@ -296,6 +307,40 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).get();
         verify(responseSpecMock).body(AppsResponseResult.class);
+    }
+
+    @Test
+    public void testAppsWithEmptyData() {
+        // Prepare test data with empty values to test filtering
+        String mode = "";
+        String name = "";
+
+        // We need to mock the UriBuilder for the queryParam functionality
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("page"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("limit"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("mode"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("name"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build()).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
+
+        // Set up the response mock to return our expected response
+        when(responseSpecMock.body(AppsResponseResult.class)).thenReturn(null);
+
+        // Execute the method
+        List<AppsResponse> actualResponse = client.apps(mode, name);
+
+        // Verify WebClient interactions
+        verify(httpClientMock).get();
     }
 
     @Test
@@ -748,6 +793,10 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(httpClientMock).get();
         verify(requestHeadersUriSpecMock).uri(any(Function.class));
         verify(responseSpecMock).body(any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class));
+
+        when(responseSpecMock.body(any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class))).thenReturn(null);
+        client.dailyConversations(appId, start, end);
+
     }
 
     @Test
@@ -800,6 +849,10 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(httpClientMock).get();
         verify(requestHeadersUriSpecMock).uri(any(Function.class));
         verify(responseSpecMock).body(any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class));
+
+        // Set up the response mock to return our expected response
+        when(responseSpecMock.body(any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class))).thenReturn(null);
+        client.dailyEndUsers(appId, start, end);
     }
 
     @Test
@@ -852,6 +905,10 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(httpClientMock).get();
         verify(requestHeadersUriSpecMock).uri(any(Function.class));
         verify(responseSpecMock).body(any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class));
+
+        when(responseSpecMock.body(any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class))).thenReturn(null);
+
+        client.averageSessionInteractions(appId, start, end);
     }
 
     @Test
@@ -904,6 +961,10 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(httpClientMock).get();
         verify(requestHeadersUriSpecMock).uri(any(Function.class));
         verify(responseSpecMock).body(any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class));
+
+        when(responseSpecMock.body(any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class))).thenReturn(null);
+
+        client.tokensPerSecond(appId, start, end);
     }
 
     @Test
@@ -956,6 +1017,10 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(httpClientMock).get();
         verify(requestHeadersUriSpecMock).uri(any(Function.class));
         verify(responseSpecMock).body(any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class));
+
+        when(responseSpecMock.body(any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class))).thenReturn(null);
+
+        client.userSatisfactionRate(appId, start, end);
     }
 
     @Test
@@ -1012,6 +1077,11 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(httpClientMock).get();
         verify(requestHeadersUriSpecMock).uri(any(Function.class));
         verify(responseSpecMock).body(any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class));
+
+        // Set up the response mock to return our expected response
+        when(responseSpecMock.body(any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class))).thenReturn(null);
+
+        client.tokenCosts(appId, start, end);
     }
 
     @Test
@@ -1064,6 +1134,10 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(httpClientMock).get();
         verify(requestHeadersUriSpecMock).uri(any(Function.class));
         verify(responseSpecMock).body(any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class));
+
+        when(responseSpecMock.body(any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class))).thenReturn(null);
+
+        client.dailyMessages(appId, start, end);
     }
 
     @Test
@@ -1317,7 +1391,6 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         // Cookies are added via the cookies method in the client
         verify(requestHeadersSpecMock).cookies(any());
     }
-
 
 
     @Test
@@ -1715,5 +1788,343 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(requestBodySpecMock).headers(any());
         verify(requestBodySpecMock).body(any(Map.class));
         verify(responseSpecMock).toBodilessEntity();
+    }
+
+    @Test
+    @DisplayName("Test apps method with pagination (hasMore=true)")
+    public void testAppsWithPagination() {
+        // Prepare test data
+        String mode = "completion";
+        String name = "Test";
+
+        // We need to mock the UriBuilder for the queryParam functionality
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("page"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("limit"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("mode"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("name"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build()).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
+
+        // Create expected response for first page with hasMore=true
+        AppsResponseResult resultResponsePage1 = new AppsResponseResult();
+        List<AppsResponse> appsPage1 = new ArrayList<>();
+
+        AppsResponse app1 = new AppsResponse();
+        app1.setId("app-123456");
+        app1.setName("Test App 1");
+        app1.setMode(mode);
+        appsPage1.add(app1);
+
+        resultResponsePage1.setData(appsPage1);
+        resultResponsePage1.setHasMore(true); // This will trigger pagination
+
+        // Create expected response for second page with hasMore=false
+        AppsResponseResult resultResponsePage2 = new AppsResponseResult();
+        List<AppsResponse> appsPage2 = new ArrayList<>();
+
+        AppsResponse app2 = new AppsResponse();
+        app2.setId("app-789012");
+        app2.setName("Test App 2");
+        app2.setMode(mode);
+        appsPage2.add(app2);
+
+        resultResponsePage2.setData(appsPage2);
+        resultResponsePage2.setHasMore(false); // No more pages
+
+        // Set up the response mock to return different responses for each call
+        when(responseSpecMock.body(AppsResponseResult.class))
+                .thenReturn(resultResponsePage1)
+                .thenReturn(resultResponsePage2);
+
+        // Execute the method
+        List<AppsResponse> actualResponse = client.apps(mode, name);
+
+        // Verify the result contains apps from both pages
+        assertNotNull(actualResponse);
+        assertEquals(2, actualResponse.size());
+        assertEquals(app1.getId(), actualResponse.get(0).getId());
+        assertEquals(app1.getName(), actualResponse.get(0).getName());
+        assertEquals(app2.getId(), actualResponse.get(1).getId());
+        assertEquals(app2.getName(), actualResponse.get(1).getName());
+
+        // Verify WebClient interactions - should be called twice (once for each page)
+        verify(httpClientMock, times(2)).get();
+        verify(responseSpecMock, times(2)).body(AppsResponseResult.class);
+    }
+
+    @Test
+    @DisplayName("Test apps method with null data in response")
+    public void testAppsWithNullData() {
+        // Prepare test data
+        String mode = "completion";
+        String name = "Test";
+
+        // We need to mock the UriBuilder for the queryParam functionality
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("page"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("limit"), anyInt())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("mode"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParamIfPresent(eq("name"), any(Optional.class))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build()).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
+
+        // Create expected response with null data
+        AppsResponseResult resultResponse = new AppsResponseResult();
+        resultResponse.setData(null); // Null data to test the branch
+        resultResponse.setHasMore(false);
+
+        // Set up the response mock to return our expected response
+        when(responseSpecMock.body(AppsResponseResult.class)).thenReturn(resultResponse);
+
+        // Execute the method
+        List<AppsResponse> actualResponse = client.apps(mode, name);
+
+        // Verify the result is empty (no apps added when data is null)
+        assertNotNull(actualResponse);
+        assertEquals(0, actualResponse.size());
+
+        // Verify WebClient interactions
+        verify(httpClientMock).get();
+        verify(responseSpecMock).body(AppsResponseResult.class);
+    }
+
+    @Test
+    @DisplayName("Test login with password encryption disabled")
+    public void testLoginWithPasswordEncryptionDisabled() {
+        // Create server properties with password encryption disabled
+        DifyProperties.Server serverProperties = new DifyProperties.Server();
+        serverProperties.setEmail("test@example.com");
+        serverProperties.setPassword("password123");
+        serverProperties.setPasswordEncryption(false); // Disable encryption
+        client = new DifyServerDefaultClient(httpClientMock, serverProperties, difyServerTokenMock);
+
+        // Mock the login response
+        LoginResultResponse mockLoginResult = new LoginResultResponse();
+        mockLoginResult.setResult(DifyResult.SUCCESS);
+        LoginResponse mockLoginData = new LoginResponse();
+        mockLoginData.setAccessToken("test-access-token");
+        mockLoginData.setRefreshToken("test-refresh-token");
+        mockLoginResult.setData(mockLoginData);
+
+        // Create a HttpResponse with the mock result
+        HttpResponse<LoginResultResponse> responseEntity = HttpResponse.<LoginResultResponse>builder()
+                .statusCode(200)
+                .body(mockLoginResult)
+                .build();
+
+        // Mock the toEntity method to return the response entity
+        when(responseSpecMock.toEntity(LoginResultResponse.class)).thenReturn(responseEntity);
+
+        // Call the method to test
+        LoginResponse response = client.login();
+
+        // Verify the response
+        assertNotNull(response);
+        assertEquals("test-access-token", response.getAccessToken());
+        assertEquals("test-refresh-token", response.getRefreshToken());
+
+        // Verify interactions with mocks
+        verify(requestBodyUriSpecMock).uri("/console/api/login");
+
+        // Capture and verify the request body - password should NOT be encrypted
+        ArgumentCaptor<DifyLoginRequest> bodyCaptor = ArgumentCaptor.forClass(DifyLoginRequest.class);
+        verify(requestBodySpecMock).body(bodyCaptor.capture());
+
+        DifyLoginRequest capturedBody = bodyCaptor.getValue();
+        assertEquals("test@example.com", capturedBody.getEmail());
+        assertEquals("password123", capturedBody.getPassword()); // Should be plain text
+    }
+
+    @Test
+    @DisplayName("Test login with empty password")
+    public void testLoginWithEmptyPassword() {
+        // Create server properties with empty password
+        DifyProperties.Server serverProperties = new DifyProperties.Server();
+        serverProperties.setEmail("test@example.com");
+        serverProperties.setPassword(""); // Empty password
+        serverProperties.setPasswordEncryption(true);
+        client = new DifyServerDefaultClient(httpClientMock, serverProperties, difyServerTokenMock);
+
+        // Mock the login response
+        LoginResultResponse mockLoginResult = new LoginResultResponse();
+        mockLoginResult.setResult(DifyResult.SUCCESS);
+        LoginResponse mockLoginData = new LoginResponse();
+        mockLoginData.setAccessToken("test-access-token");
+        mockLoginData.setRefreshToken("test-refresh-token");
+        mockLoginResult.setData(mockLoginData);
+
+        // Create a HttpResponse with the mock result
+        HttpResponse<LoginResultResponse> responseEntity = HttpResponse.<LoginResultResponse>builder()
+                .statusCode(200)
+                .body(mockLoginResult)
+                .build();
+
+        // Mock the toEntity method to return the response entity
+        when(responseSpecMock.toEntity(LoginResultResponse.class)).thenReturn(responseEntity);
+
+        // Call the method to test
+        LoginResponse response = client.login();
+
+        // Verify the response
+        assertNotNull(response);
+        assertEquals("test-access-token", response.getAccessToken());
+        assertEquals("test-refresh-token", response.getRefreshToken());
+
+        // Verify interactions with mocks
+        verify(requestBodyUriSpecMock).uri("/console/api/login");
+
+        // Capture and verify the request body - password should remain empty
+        ArgumentCaptor<DifyLoginRequest> bodyCaptor = ArgumentCaptor.forClass(DifyLoginRequest.class);
+        verify(requestBodySpecMock).body(bodyCaptor.capture());
+
+        DifyLoginRequest capturedBody = bodyCaptor.getValue();
+        assertEquals("test@example.com", capturedBody.getEmail());
+        assertEquals("", capturedBody.getPassword()); // Should remain empty
+    }
+
+    @Test
+    @DisplayName("Test extractToken with __Host- prefix")
+    public void testExtractTokenWithHostPrefix() {
+        // Use reflection to access the private method
+        try {
+            java.lang.reflect.Method method = DifyServerDefaultClient.class
+                    .getDeclaredMethod("extractToken", String.class, String.class);
+            method.setAccessible(true);
+
+            // Test extracting token with __Host- prefix
+            String cookieHeader = "__Host-access_token=secure_token_value; Path=/; Secure; HttpOnly";
+            String result = (String) method.invoke(client, cookieHeader, "access_token");
+            assertEquals("secure_token_value", result);
+
+            // Test extracting refresh token with __Host- prefix
+            String cookieHeader2 = "__Host-refresh_token=secure_refresh_value; Path=/; Secure";
+            String result2 = (String) method.invoke(client, cookieHeader2, "refresh_token");
+            assertEquals("secure_refresh_value", result2);
+
+            // Test extracting csrf token with __Host- prefix
+            String cookieHeader3 = "__Host-csrf_token=secure_csrf_value; Path=/";
+            String result3 = (String) method.invoke(client, cookieHeader3, "csrf_token");
+            assertEquals("secure_csrf_value", result3);
+
+        } catch (Exception e) {
+            fail("Failed to test extractToken method with __Host- prefix: " + e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("Test extractToken with empty value")
+    public void testExtractTokenWithEmptyValue() {
+        // Use reflection to access the private method
+        try {
+            java.lang.reflect.Method method = DifyServerDefaultClient.class
+                    .getDeclaredMethod("extractToken", String.class, String.class);
+            method.setAccessible(true);
+
+            // Test extracting token with empty value (should return null)
+            String cookieHeader = "access_token=; Path=/; HttpOnly";
+            String result = (String) method.invoke(client, cookieHeader, "access_token");
+            assertNull(result); // Empty value should return null
+
+            // Test with __Host- prefix and empty value
+            String cookieHeader2 = "__Host-refresh_token=; Path=/; Secure";
+            String result2 = (String) method.invoke(client, cookieHeader2, "refresh_token");
+            assertNull(result2); // Empty value should return null
+
+        } catch (Exception e) {
+            fail("Failed to test extractToken method with empty value: " + e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("Test extractTokenValue without semicolon at end")
+    public void testExtractTokenValueWithoutSemicolon() {
+        // Use reflection to access the private method
+        try {
+            java.lang.reflect.Method method = DifyServerDefaultClient.class
+                    .getDeclaredMethod("extractTokenValue", String.class, String.class);
+            method.setAccessible(true);
+
+            // Test extracting token value when there's no semicolon at the end
+            String cookieHeader = "access_token=token_at_end";
+            String result = (String) method.invoke(client, cookieHeader, "access_token=");
+            assertEquals("token_at_end", result);
+
+            // Test with __Host- prefix and no semicolon
+            String cookieHeader2 = "__Host-refresh_token=refresh_at_end";
+            String result2 = (String) method.invoke(client, cookieHeader2, "__Host-refresh_token=");
+            assertEquals("refresh_at_end", result2);
+
+        } catch (Exception e) {
+            fail("Failed to test extractTokenValue method without semicolon: " + e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("Test processLoginResult with null response and null cookie headers")
+    public void testProcessLoginResultWithBothNull() {
+        // Test with both null response and null cookie headers
+        try {
+            java.lang.reflect.Method method = DifyServerDefaultClient.class
+                    .getDeclaredMethod("processLoginResult", LoginResultResponse.class, List.class);
+            method.setAccessible(true);
+
+            LoginResponse result = (LoginResponse) method.invoke(client, null, null);
+
+            // Verify the result is null since both are null
+            assertNull(result);
+        } catch (Exception e) {
+            fail("Failed to test processLoginResult method with both null: " + e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("Test processLoginResult with success response and null cookie headers")
+    public void testProcessLoginResultWithSuccessAndNullCookies() {
+        // Create a mock LoginResultResponse with success result
+        LoginResultResponse loginResult = new LoginResultResponse();
+        loginResult.setResult(DifyResult.SUCCESS);
+
+        LoginResponse loginData = new LoginResponse();
+        loginData.setAccessToken("test-access-token-from-data");
+        loginData.setRefreshToken("test-refresh-token-from-data");
+        loginData.setCsrfToken("test-csrf-token-from-data");
+
+        loginResult.setData(loginData);
+
+        // Test with null cookie headers
+        try {
+            java.lang.reflect.Method method = DifyServerDefaultClient.class
+                    .getDeclaredMethod("processLoginResult", LoginResultResponse.class, List.class);
+            method.setAccessible(true);
+
+            LoginResponse result = (LoginResponse) method.invoke(client, loginResult, null);
+
+            // Verify the result uses data from the response (cookie headers are null)
+            assertNotNull(result);
+            assertEquals("test-access-token-from-data", result.getAccessToken());
+            assertEquals("test-refresh-token-from-data", result.getRefreshToken());
+            assertEquals("test-csrf-token-from-data", result.getCsrfToken());
+        } catch (Exception e) {
+            fail("Failed to test processLoginResult method with success and null cookies: " + e.getMessage());
+        }
     }
 }

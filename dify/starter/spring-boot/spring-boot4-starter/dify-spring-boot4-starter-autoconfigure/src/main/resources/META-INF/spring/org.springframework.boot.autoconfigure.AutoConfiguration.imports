@@ -1,4 +1,4 @@
-io.github.guoshiqiufeng.dify.springboot4.autoconfigure.DifyPropertiesAutoConfiguration
+io.github.guoshiqiufeng.dify.springboot.common.autoconfigure.DifyPropertiesAutoConfiguration
 io.github.guoshiqiufeng.dify.springboot4.autoconfigure.DifyCodecAutoConfiguration
 io.github.guoshiqiufeng.dify.springboot4.autoconfigure.DifyChatAutoConfiguration
 io.github.guoshiqiufeng.dify.springboot4.autoconfigure.DifyDatasetAutoConfiguration

@@ -243,7 +243,8 @@ subprojects {
 static String getSpringBootVersionForProject(Project project) {
     if (project.name.contains("core") || project.name.contains("client")
             || project.name.contains("support") || project.name.contains("status")
-            || project.name.contains("spring-boot2-starter") || project.name.contains("java-starter")) {
+            || project.name.contains("spring-boot2-starter")
+            || project.name.contains("spring-boot-starter-common") || project.name.contains("java-starter")) {
         return "springBoot2"
     } else if (project.name.contains("spring-boot4-starter")) {
         return "springBoot4"

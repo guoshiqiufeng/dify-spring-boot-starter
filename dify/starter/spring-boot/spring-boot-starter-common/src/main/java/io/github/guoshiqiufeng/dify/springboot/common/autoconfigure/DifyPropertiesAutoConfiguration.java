@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.springboot4.autoconfigure;
+package io.github.guoshiqiufeng.dify.springboot.common.autoconfigure;
 
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -23,6 +23,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
+ * Dify Properties 自动配置基类
+ *
  * @author yanghq
  * @version 1.0
  * @since 2025/3/18 17:29
@@ -37,7 +39,6 @@ public class DifyPropertiesAutoConfiguration {
     public DifyProperties difyProperties() {
         return new DifyProperties();
     }
-
 
     @Bean
     @ConditionalOnMissingBean(DifyConnectionDetails.class)
@@ -57,7 +58,5 @@ public class DifyPropertiesAutoConfiguration {
         public String getUrl() {
             return this.properties.getUrl();
         }
-
     }
-
 }

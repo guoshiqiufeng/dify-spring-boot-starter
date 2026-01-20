@@ -22,11 +22,10 @@ import io.github.guoshiqiufeng.dify.chat.enums.StreamEventEnum;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserializer;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonNode;
+import io.github.guoshiqiufeng.dify.client.core.codec.utils.JsonNodeUtils;
 import io.github.guoshiqiufeng.dify.core.bean.BeanUtils;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -118,7 +117,7 @@ public class ChatMessageSendCompletionResponseDeserializer implements JsonDeseri
         }
         if (root.has(TOOL_LABELS)) {
             JsonNode toolLabelsNode = root.get(TOOL_LABELS);
-            Map<String, Object> toolLabels = convertToMap(toolLabelsNode);
+            Map<String, Object> toolLabels = JsonNodeUtils.convertToMap(toolLabelsNode);
             chatMessageSendCompletionResponse.setToolLabels(toolLabels);
         }
         if (root.has(TOOL_INPUT)) {
@@ -126,7 +125,7 @@ public class ChatMessageSendCompletionResponseDeserializer implements JsonDeseri
         }
         if (root.has(MESSAGE_FILES)) {
             JsonNode messageFilesNode = root.get(MESSAGE_FILES);
-            List<String> messageFiles = convertToStringList(messageFilesNode);
+            List<String> messageFiles = JsonNodeUtils.convertToStringList(messageFilesNode);
             chatMessageSendCompletionResponse.setMessageFiles(messageFiles);
         }
 
@@ -145,68 +144,9 @@ public class ChatMessageSendCompletionResponseDeserializer implements JsonDeseri
         return chatMessageSendCompletionResponse;
     }
 
-    /**
-     * 将 JsonNode 转换为 Map
-     */
-    private static Map<String, Object> convertToMap(JsonNode node) {
-        Map<String, Object> map = new LinkedHashMap<>();
-        if (node == null || !node.isObject()) {
-            return map;
-        }
 
-        java.util.Iterator<String> fieldNames = node.fieldNames();
-        while (fieldNames.hasNext()) {
-            String fieldName = fieldNames.next();
-            JsonNode value = node.get(fieldName);
-            map.put(fieldName, convertToObject(value));
-        }
-        return map;
-    }
 
-    /**
-     * 将 JsonNode 转换为 List<String>
-     */
-    private static List<String> convertToStringList(JsonNode node) {
-        List<String> list = new ArrayList<>();
-        if (node == null || !node.isArray()) {
-            return list;
-        }
 
-        java.util.Iterator<JsonNode> elements = node.elements();
-        while (elements.hasNext()) {
-            JsonNode element = elements.next();
-            list.add(element.asText());
-        }
-        return list;
-    }
 
-    /**
-     * 将 JsonNode 转换为 Java 对象
-     */
-    private static Object convertToObject(JsonNode node) {
-        if (node == null || node.isNull()) {
-            return null;
-        }
-        if (node.isTextual()) {
-            return node.asText();
-        }
-        if (node.isNumber()) {
-            return node.asDouble();
-        }
-        if (node.isBoolean()) {
-            return node.asBoolean();
-        }
-        if (node.isArray()) {
-            List<Object> list = new ArrayList<>();
-            java.util.Iterator<JsonNode> elements = node.elements();
-            while (elements.hasNext()) {
-                list.add(convertToObject(elements.next()));
-            }
-            return list;
-        }
-        if (node.isObject()) {
-            return convertToMap(node);
-        }
-        return node.asText();
-    }
+
 }

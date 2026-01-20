@@ -17,24 +17,20 @@ package io.github.guoshiqiufeng.dify.springboot.autoconfigure;
 
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
-import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
-import io.github.guoshiqiufeng.dify.support.impl.dataset.DifyDatasetDefaultClient;
 import io.github.guoshiqiufeng.dify.client.integration.spring.http.SpringHttpClientFactory;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
-import io.github.guoshiqiufeng.dify.dataset.DifyDataset;
 import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;
-import io.github.guoshiqiufeng.dify.dataset.impl.DifyDatasetClientImpl;
+import io.github.guoshiqiufeng.dify.springboot.common.autoconfigure.AbstractDifyDatasetAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 
 /**
+ * Spring Boot 3 Dataset 自动配置
+ *
  * @author yanghq
  * @version 1.0
  * @since 2025/3/18 16:17
@@ -42,28 +38,23 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Slf4j
 @Configuration
 @ConditionalOnClass({DifyDatasetClient.class})
-public class DifyDatasetAutoConfiguration {
+public class DifyDatasetAutoConfiguration extends AbstractDifyDatasetAutoConfiguration {
 
-    @Bean
-    @ConditionalOnMissingBean(DifyDatasetClient.class)
-    public DifyDatasetClient difyDatasetClient(DifyProperties properties,
-                                               JsonMapper jsonMapper,
-                                               ObjectProvider<WebClient.Builder> webClientBuilderProvider,
-                                               ObjectProvider<RestClient.Builder> restClientBuilderProvider) {
-        String apikey = "Bearer " + properties.getDataset().getApiKey();
-        HttpClientFactory httpClientFactory = new SpringHttpClientFactory(
+    private final ObjectProvider<WebClient.Builder> webClientBuilderProvider;
+    private final ObjectProvider<RestClient.Builder> restClientBuilderProvider;
+
+    public DifyDatasetAutoConfiguration(
+            ObjectProvider<WebClient.Builder> webClientBuilderProvider,
+            ObjectProvider<RestClient.Builder> restClientBuilderProvider) {
+        this.webClientBuilderProvider = webClientBuilderProvider;
+        this.restClientBuilderProvider = restClientBuilderProvider;
+    }
+
+    @Override
+    protected HttpClientFactory createHttpClientFactory(DifyProperties properties, JsonMapper jsonMapper) {
+        return new SpringHttpClientFactory(
                 webClientBuilderProvider.getIfAvailable(WebClient::builder),
                 restClientBuilderProvider.getIfAvailable(RestClient::builder),
-                jsonMapper).defaultHeader(HttpHeaders.AUTHORIZATION, apikey);
-        HttpClient httpClient = httpClientFactory.createClient(properties.getUrl(), properties.getClientConfig());
-        return new DifyDatasetDefaultClient(httpClient);
+                jsonMapper);
     }
-
-    @Bean
-    @ConditionalOnMissingBean({DifyDataset.class})
-    public DifyDatasetClientImpl difyDataset(DifyDatasetClient difyDatasetClient) {
-        return new DifyDatasetClientImpl(difyDatasetClient);
-    }
-
-
 }

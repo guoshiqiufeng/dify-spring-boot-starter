@@ -40,7 +40,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 
 /**
- * Dify status auto-configuration
+ * Dify status auto-configuration for Spring Boot 4
  *
  * @author yanghq
  * @version 1.7.0
@@ -100,7 +100,7 @@ public class DifyStatusAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(DifyHealthIndicator.class)
     @ConditionalOnProperty(name = "dify.status.health-indicator-enabled", havingValue = "true")
-    @ConditionalOnClass(name = "org.springframework.boot.actuate.health.HealthIndicator")
+    @ConditionalOnClass(name = "org.springframework.boot.health.contributor.HealthIndicator")
     public DifyHealthIndicator difyHealthIndicator(
             DifyStatusService statusService,
             DifyProperties properties) {

@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.client.codec.jackson3;
 
 import io.github.guoshiqiufeng.dify.client.core.codec.*;
+import io.github.guoshiqiufeng.dify.client.core.codec.exception.JsonException;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 import org.junit.jupiter.api.Test;
 
