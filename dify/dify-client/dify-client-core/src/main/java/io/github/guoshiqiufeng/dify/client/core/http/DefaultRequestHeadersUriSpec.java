@@ -19,7 +19,7 @@ import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
 import io.github.guoshiqiufeng.dify.client.core.web.client.RequestHeadersUriSpec;
 import io.github.guoshiqiufeng.dify.client.core.web.client.ResponseSpec;
 import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
-import io.github.guoshiqiufeng.dify.client.core.web.util.UriUtils;
+import io.github.guoshiqiufeng.dify.client.core.web.util.UriUtil;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -87,7 +87,7 @@ public class DefaultRequestHeadersUriSpec implements RequestHeadersUriSpec<Defau
 
         // Extract variable names from URI template and build array in order
         List<Object> orderedValues = new ArrayList<>();
-        Matcher matcher = UriUtils.URI_VARIABLE_PATTERN.matcher(uri);
+        Matcher matcher = UriUtil.URI_VARIABLE_PATTERN.matcher(uri);
 
         while (matcher.find()) {
             String variableName = matcher.group(1);
@@ -113,19 +113,14 @@ public class DefaultRequestHeadersUriSpec implements RequestHeadersUriSpec<Defau
         }
 
         requestBuilder.uri(uriBuilder -> {
-            // First set the path with variables
             uriBuilder.path(uri);
-
-            // Apply the custom function for additional URI building (e.g., query params)
-            uriFunction.apply(uriBuilder);
+            if (uriVariables != null && uriVariables.length > 0) {
+                uriFunction.apply(uriBuilder);
+                uriBuilder.build(uriVariables);
+            } else {
+                uriFunction.apply(uriBuilder);
+            }
         });
-
-        // If there are URI variables, we need to apply them
-        if (uriVariables != null && uriVariables.length > 0) {
-            // This is a limitation of the current adapter approach
-            // The variables should ideally be passed through the Consumer
-            // For now, we'll document this limitation
-        }
 
         return this;
     }
@@ -136,10 +131,8 @@ public class DefaultRequestHeadersUriSpec implements RequestHeadersUriSpec<Defau
             throw new IllegalArgumentException("URI function must not be null");
         }
 
-        requestBuilder.uri(uriBuilder -> {
-            // Apply the function and let it build the complete URI
-            uriFunction.apply(uriBuilder);
-        });
+        // Apply the function and let it build the complete URI
+        requestBuilder.uri(uriFunction::apply);
         return this;
     }
 

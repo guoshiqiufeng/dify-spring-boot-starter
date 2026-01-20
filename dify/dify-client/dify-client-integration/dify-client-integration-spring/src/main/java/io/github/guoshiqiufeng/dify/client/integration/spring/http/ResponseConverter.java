@@ -19,6 +19,7 @@ import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.SpringStatusCodeExtractor;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
@@ -131,31 +132,9 @@ class ResponseConverter {
         });
 
         return new HttpResponse<>(
-                getStatusCodeValue(responseEntity),
+                SpringStatusCodeExtractor.getStatusCodeValue(responseEntity),
                 headers,
                 responseBody
         );
-    }
-
-    /**
-     * Get status code value from ResponseEntity in a Spring version-agnostic way.
-     * Uses reflection to avoid method signature binding at compile time.
-     *
-     * @param responseEntity the response entity
-     * @return status code value
-     */
-    private int getStatusCodeValue(ResponseEntity<?> responseEntity) {
-        try {
-            // Call getStatusCode() using reflection to avoid compile-time method signature binding
-            java.lang.reflect.Method getStatusCodeMethod = ResponseEntity.class.getMethod("getStatusCode");
-            Object statusCode = getStatusCodeMethod.invoke(responseEntity);
-
-            // Call value() on the result (works for both HttpStatus and HttpStatusCode)
-            java.lang.reflect.Method valueMethod = statusCode.getClass().getMethod("value");
-            return (int) valueMethod.invoke(statusCode);
-        } catch (Exception e) {
-            // Fallback: try direct call (this works if compiled with Spring 6+)
-            return responseEntity.getStatusCode().value();
-        }
     }
 }

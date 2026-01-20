@@ -18,7 +18,7 @@ package io.github.guoshiqiufeng.dify.support.impl.dto.workflow;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserializer;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonNode;
-import io.github.guoshiqiufeng.dify.client.core.codec.utils.JsonNodeUtils;
+import io.github.guoshiqiufeng.dify.client.core.codec.util.JsonNodeUtil;
 import io.github.guoshiqiufeng.dify.workflow.dto.response.WorkflowRunStreamResponse;
 import io.github.guoshiqiufeng.dify.workflow.enums.StreamEventEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -74,7 +74,7 @@ public class WorkflowRunStreamResponseDeserializer implements JsonDeserializer<W
             if (dataNode != null && !dataNode.isNull()) {
                 Object data;
                 if (dataClass == Map.class) {
-                    data = JsonNodeUtils.convertToMap(dataNode);
+                    data = JsonNodeUtil.convertToMap(dataNode);
                 } else {
                     data = jsonMapper.treeToValue(dataNode, dataClass);
                 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.client.core.codec.utils;
+package io.github.guoshiqiufeng.dify.client.core.codec.util;
 
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonNode;
 import org.junit.jupiter.api.Test;
@@ -24,11 +24,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class JsonNodeUtilsTest {
+class JsonNodeUtilTest {
 
     @Test
     void testConvertToMapWithNull() {
-        Map<String, Object> result = JsonNodeUtils.convertToMap(null);
+        Map<String, Object> result = JsonNodeUtil.convertToMap(null);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
@@ -39,7 +39,7 @@ class JsonNodeUtilsTest {
         JsonNode node = mock(JsonNode.class);
         when(node.isObject()).thenReturn(false);
 
-        Map<String, Object> result = JsonNodeUtils.convertToMap(node);
+        Map<String, Object> result = JsonNodeUtil.convertToMap(node);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
@@ -51,7 +51,7 @@ class JsonNodeUtilsTest {
         when(node.isObject()).thenReturn(true);
         when(node.fieldNames()).thenReturn(Collections.emptyIterator());
 
-        Map<String, Object> result = JsonNodeUtils.convertToMap(node);
+        Map<String, Object> result = JsonNodeUtil.convertToMap(node);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
@@ -78,7 +78,7 @@ class JsonNodeUtilsTest {
         when(numberNode.isNumber()).thenReturn(true);
         when(numberNode.asDouble()).thenReturn(42.0);
 
-        Map<String, Object> result = JsonNodeUtils.convertToMap(node);
+        Map<String, Object> result = JsonNodeUtil.convertToMap(node);
 
         assertNotNull(result);
         assertEquals(2, result.size());
@@ -142,7 +142,7 @@ class JsonNodeUtilsTest {
         when(objectNode.isObject()).thenReturn(true);
         when(objectNode.fieldNames()).thenReturn(Collections.emptyIterator());
 
-        Map<String, Object> result = JsonNodeUtils.convertToMap(node);
+        Map<String, Object> result = JsonNodeUtil.convertToMap(node);
 
         assertNotNull(result);
         assertEquals(6, result.size());
@@ -156,7 +156,7 @@ class JsonNodeUtilsTest {
 
     @Test
     void testConvertToStringListWithNull() {
-        List<String> result = JsonNodeUtils.convertToStringList(null);
+        List<String> result = JsonNodeUtil.convertToStringList(null);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
@@ -167,7 +167,7 @@ class JsonNodeUtilsTest {
         JsonNode node = mock(JsonNode.class);
         when(node.isArray()).thenReturn(false);
 
-        List<String> result = JsonNodeUtils.convertToStringList(node);
+        List<String> result = JsonNodeUtil.convertToStringList(node);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
@@ -179,7 +179,7 @@ class JsonNodeUtilsTest {
         when(node.isArray()).thenReturn(true);
         when(node.elements()).thenReturn(Collections.emptyIterator());
 
-        List<String> result = JsonNodeUtils.convertToStringList(node);
+        List<String> result = JsonNodeUtil.convertToStringList(node);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
@@ -198,7 +198,7 @@ class JsonNodeUtilsTest {
         when(element2.asText()).thenReturn("second");
         when(element3.asText()).thenReturn("third");
 
-        List<String> result = JsonNodeUtils.convertToStringList(node);
+        List<String> result = JsonNodeUtil.convertToStringList(node);
 
         assertNotNull(result);
         assertEquals(3, result.size());
@@ -209,7 +209,7 @@ class JsonNodeUtilsTest {
 
     @Test
     void testConvertToObjectWithNull() {
-        Object result = JsonNodeUtils.convertToObject(null);
+        Object result = JsonNodeUtil.convertToObject(null);
 
         assertNull(result);
     }
@@ -219,7 +219,7 @@ class JsonNodeUtilsTest {
         JsonNode node = mock(JsonNode.class);
         when(node.isNull()).thenReturn(true);
 
-        Object result = JsonNodeUtils.convertToObject(node);
+        Object result = JsonNodeUtil.convertToObject(node);
 
         assertNull(result);
     }
@@ -231,7 +231,7 @@ class JsonNodeUtilsTest {
         when(node.isTextual()).thenReturn(true);
         when(node.asText()).thenReturn("text value");
 
-        Object result = JsonNodeUtils.convertToObject(node);
+        Object result = JsonNodeUtil.convertToObject(node);
 
         assertEquals("text value", result);
     }
@@ -244,7 +244,7 @@ class JsonNodeUtilsTest {
         when(node.isNumber()).thenReturn(true);
         when(node.asDouble()).thenReturn(99.99);
 
-        Object result = JsonNodeUtils.convertToObject(node);
+        Object result = JsonNodeUtil.convertToObject(node);
 
         assertEquals(99.99, result);
     }
@@ -258,7 +258,7 @@ class JsonNodeUtilsTest {
         when(node.isBoolean()).thenReturn(true);
         when(node.asBoolean()).thenReturn(false);
 
-        Object result = JsonNodeUtils.convertToObject(node);
+        Object result = JsonNodeUtil.convertToObject(node);
 
         assertEquals(false, result);
     }
@@ -284,7 +284,7 @@ class JsonNodeUtilsTest {
         when(element2.isTextual()).thenReturn(true);
         when(element2.asText()).thenReturn("item2");
 
-        Object result = JsonNodeUtils.convertToObject(node);
+        Object result = JsonNodeUtil.convertToObject(node);
 
         assertInstanceOf(List.class, result);
         @SuppressWarnings("unchecked")
@@ -312,7 +312,7 @@ class JsonNodeUtilsTest {
         when(fieldNode.isTextual()).thenReturn(true);
         when(fieldNode.asText()).thenReturn("fieldValue");
 
-        Object result = JsonNodeUtils.convertToObject(node);
+        Object result = JsonNodeUtil.convertToObject(node);
 
         assertInstanceOf(Map.class, result);
         @SuppressWarnings("unchecked")
@@ -333,7 +333,7 @@ class JsonNodeUtilsTest {
         when(node.isObject()).thenReturn(false);
         when(node.asText()).thenReturn("fallback");
 
-        Object result = JsonNodeUtils.convertToObject(node);
+        Object result = JsonNodeUtil.convertToObject(node);
 
         assertEquals("fallback", result);
     }
@@ -375,7 +375,7 @@ class JsonNodeUtilsTest {
         when(nestedField.isTextual()).thenReturn(true);
         when(nestedField.asText()).thenReturn("nestedValue");
 
-        Object result = JsonNodeUtils.convertToObject(node);
+        Object result = JsonNodeUtil.convertToObject(node);
 
         assertInstanceOf(Map.class, result);
         @SuppressWarnings("unchecked")
@@ -396,7 +396,7 @@ class JsonNodeUtilsTest {
         when(node.fieldNames()).thenReturn(Collections.singletonList("nullField").iterator());
         when(node.get("nullField")).thenReturn(null);
 
-        Map<String, Object> result = JsonNodeUtils.convertToMap(node);
+        Map<String, Object> result = JsonNodeUtil.convertToMap(node);
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -417,7 +417,7 @@ class JsonNodeUtilsTest {
 
         when(nullElement.isNull()).thenReturn(true);
 
-        Object result = JsonNodeUtils.convertToObject(node);
+        Object result = JsonNodeUtil.convertToObject(node);
 
         assertInstanceOf(List.class, result);
         @SuppressWarnings("unchecked")

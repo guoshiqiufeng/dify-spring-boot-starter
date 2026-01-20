@@ -351,4 +351,16 @@ class LinkedMultiValueMapTest {
         stringMap.add("key1", 2);
         assertEquals(2, stringMap.get("key1").size());
     }
+
+    @Test
+    void testToSingleValueMapWithNullList() {
+        LinkedMultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.put("key1", null);
+        map.add("key2", "value2");
+
+        Map<String, String> singleValueMap = map.toSingleValueMap();
+        assertEquals(1, singleValueMap.size());
+        assertFalse(singleValueMap.containsKey("key1"));
+        assertEquals("value2", singleValueMap.get("key2"));
+    }
 }

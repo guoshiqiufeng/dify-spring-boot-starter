@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.client.core.codec.utils;
+package io.github.guoshiqiufeng.dify.client.core.codec.util;
 
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonNode;
 import lombok.experimental.UtilityClass;
@@ -29,7 +29,7 @@ import java.util.Map;
  * @since 2026/1/20 09:45
  */
 @UtilityClass
-public class JsonNodeUtils {
+public class JsonNodeUtil {
 
     /**
      * 将 JsonNode 转换为 Map

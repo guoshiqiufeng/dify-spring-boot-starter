@@ -15,6 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.client.core.web.util;
 
+import lombok.experimental.UtilityClass;
+
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
@@ -27,7 +29,8 @@ import java.util.regex.Pattern;
  * @version 2.0.0
  * @since 2025-12-31
  */
-public final class UriUtils {
+@UtilityClass
+public class UriUtil {
 
     /**
      * Pattern for matching URI variables in the format {variableName}.
@@ -38,10 +41,6 @@ public final class UriUtils {
      * Regex pattern for URI variable placeholders used in replaceFirst operations.
      */
     private static final String URI_PLACEHOLDER_REGEX = "\\{[^}]+\\}";
-
-    private UriUtils() {
-        // Utility class, no instantiation
-    }
 
     /**
      * Replace URI path variables with provided values in order.

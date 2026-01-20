@@ -2240,4 +2240,396 @@ class OkHttpRequestBuilderIntegrationTest {
         }
     }
 
+    @Test
+    void testHeadersConsumerWithNullAndEmptyList() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"test\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        TestResponse result = getBuilder(client.get()
+                .uri("/api/test")
+                .headers(headers -> {
+                    headers.add("X-Header-1", "value1");
+                    headers.put("X-Header-2", null);
+                }))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void testCookiesConsumerWithNullAndEmptyList() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"test\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        TestResponse result = getBuilder(client.get()
+                .uri("/api/test")
+                .cookies(cookies -> {
+                    cookies.add("cookie1", "value1");
+                    cookies.put("cookie2", null);
+                }))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void testRequestWithNullUri() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"test\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        OkHttpRequestBuilder builder = new OkHttpRequestBuilder(client, new GsonJsonMapper(), "GET");
+        // Don't set uri, it will be null
+        TestResponse result = builder.execute(TestResponse.class);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void testUrlBuildingWithBaseUrlEndingSlashAndPathStartingSlash() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"test\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        TestResponse result = getBuilder(client.get()
+                .uri("/api/test"))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        assertFalse(request.getPath().contains("//"));
+    }
+
+    @Test
+    void testUrlBuildingWithBaseUrlNotEndingSlashAndPathNotStartingSlash() throws Exception {
+        // Create client with base URL not ending with /
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        String baseUrlWithoutSlash = mockServer.url("").toString();
+        if (baseUrlWithoutSlash.endsWith("/")) {
+            baseUrlWithoutSlash = baseUrlWithoutSlash.substring(0, baseUrlWithoutSlash.length() - 1);
+        }
+        JavaHttpClient clientNoSlash = new JavaHttpClient(
+                baseUrlWithoutSlash,
+                config,
+                null,
+                new GsonJsonMapper(),
+                null
+        );
+
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"test\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        TestResponse result = getBuilder(clientNoSlash.get()
+                .uri("api/test"))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void testUrlBuildingWithBaseUrlEndingSlashAndPathNotStartingSlash() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"test\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        TestResponse result = getBuilder(client.get()
+                .uri("api/test"))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void testHeadersConsumerWithEmptyValuesList() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"test\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        TestResponse result = getBuilder(client.get()
+                .uri("/api/test")
+                .headers(headers -> {
+                    // Add header with empty list
+                    headers.put("X-Empty", new java.util.ArrayList<>());
+                    headers.add("X-Valid", "value");
+                }))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void testCookiesConsumerWithEmptyValuesList() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"test\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        TestResponse result = getBuilder(client.get()
+                .uri("/api/test")
+                .cookies(cookies -> {
+                    // Add cookie with empty list
+                    cookies.put("emptyCookie", new java.util.ArrayList<>());
+                    cookies.add("validCookie", "value");
+                }))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void testRequestWithEmptyCookies() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"test\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        TestResponse result = getBuilder(client.get()
+                .uri("/api/test")
+                .cookies(cookies -> {
+                    // Don't add any cookies - should result in empty cookie header
+                }))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        assertNull(request.getHeader("Cookie"));
+    }
+
+    @Test
+    void testRetrieveToEntityWithErrorResponse() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(404)
+                .setBody("{\"error\":\"Not found\"}"));
+
+        HttpResponse<TestResponse> response = getBuilder(client.get()
+                .uri("/api/notfound"))
+                .retrieve()
+                .toEntity(TestResponse.class);
+
+        assertNotNull(response);
+        assertEquals(404, response.getStatusCode());
+    }
+
+    @Test
+    void testRetrieveToEntityWithErrorResponseTypeReference() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(500)
+                .setBody("{\"error\":\"Server error\"}"));
+
+        HttpResponse<List<TestResponse>> response = getBuilder(client.get()
+                .uri("/api/error"))
+                .retrieve()
+                .toEntity(new TypeReference<List<TestResponse>>() {});
+
+        assertNotNull(response);
+        assertEquals(500, response.getStatusCode());
+    }
+
+    @Test
+    void testRetrieveBodyWithErrorResponse() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(404)
+                .setBody("{\"error\":\"Not found\"}"));
+
+        assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/notfound"))
+                        .retrieve()
+                        .onStatus(io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler.onStatus(
+                                status -> status == 404,
+                                response -> {
+                                    throw new HttpClientException(response.getStatusCode(), "Not found");
+                                }))
+                        .body(TestResponse.class)
+        );
+    }
+
+    @Test
+    void testHeadersConsumerWithNullValues() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"test\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        TestResponse result = getBuilder(client.get()
+                .uri("/api/test")
+                .headers(headers -> {
+                    headers.put("X-Null-Header", null);
+                    headers.add("X-Valid", "value");
+                }))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void testCookiesConsumerWithNullValues() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"test\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        TestResponse result = getBuilder(client.get()
+                .uri("/api/test")
+                .cookies(cookies -> {
+                    cookies.put("nullCookie", null);
+                    cookies.add("validCookie", "value");
+                }))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void testUrlBuildingWithBaseUrlNotEndingSlash() throws Exception {
+        // Create a client with base URL not ending with /
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        String baseUrl = mockServer.url("").toString();
+        // Remove trailing slash if present
+        if (baseUrl.endsWith("/")) {
+            baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+        }
+        JavaHttpClient clientNoSlash = new JavaHttpClient(
+                baseUrl,
+                config,
+                null,
+                new GsonJsonMapper(),
+                null
+        );
+
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"test\",\"id\":123}")
+                .setHeader("Content-Type", "application/json"));
+
+        // Test with path not starting with /
+        TestResponse result = getBuilder(clientNoSlash.get()
+                .uri("api/test"))
+                .execute(TestResponse.class);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void testRetrieveToEntityWithNonSuccessfulResponseAndNoErrorHandler() throws Exception {
+        // This tests the case where checkError=false and response is not successful
+        // In retrieve().toEntity(), checkError is false initially
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(400)
+                .setBody("Bad request"));
+
+        HttpResponse<String> response = getBuilder(client.get()
+                .uri("/api/bad"))
+                .retrieve()
+                .toEntity(String.class);
+
+        assertNotNull(response);
+        assertEquals(400, response.getStatusCode());
+        assertEquals("Bad request", response.getBody());
+    }
+
+    @Test
+    void testRetrieveToEntityTypeReferenceWithNonSuccessfulResponse() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(400)
+                .setBody("Bad request"));
+
+        HttpResponse<List<TestResponse>> response = getBuilder(client.get()
+                .uri("/api/bad"))
+                .retrieve()
+                .toEntity(new TypeReference<List<TestResponse>>() {});
+
+        assertNotNull(response);
+        assertEquals(400, response.getStatusCode());
+    }
+
+    @Test
+    void testExecuteForStatusWithSuccessfulResponse() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"result\":\"ok\"}"));
+
+        int statusCode = getBuilder(client.get()
+                .uri("/api/status"))
+                .executeForStatus();
+
+        assertEquals(200, statusCode);
+    }
+
+    @Test
+    void testExecuteForStatusWithUnsuccessfulResponse() {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(500)
+                .setBody("{\"error\":\"Internal error\"}"));
+
+        assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/error"))
+                        .executeForStatus()
+        );
+    }
+
+    @Test
+    void testExecuteWithUnsuccessfulResponse() {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(404)
+                .setBody("{\"error\":\"Not found\"}"));
+
+        assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/notfound"))
+                        .execute(TestResponse.class)
+        );
+    }
+
+    @Test
+    void testExecuteTypeReferenceWithUnsuccessfulResponse() {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(500)
+                .setBody("{\"error\":\"Server error\"}"));
+
+        assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/error"))
+                        .execute(new TypeReference<List<TestResponse>>() {})
+        );
+    }
+
+    @Test
+    void testExecuteForResponseWithUnsuccessfulResponse() {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(400)
+                .setBody("{\"error\":\"Bad request\"}"));
+
+        assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/bad"))
+                        .executeForResponse(TestResponse.class)
+        );
+    }
+
+    @Test
+    void testExecuteForResponseTypeReferenceWithUnsuccessfulResponse() {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(403)
+                .setBody("{\"error\":\"Forbidden\"}"));
+
+        assertThrows(HttpClientException.class, () ->
+                getBuilder(client.get()
+                        .uri("/api/forbidden"))
+                        .executeForResponse(new TypeReference<List<TestResponse>>() {})
+        );
+    }
+
 }
+

@@ -16,9 +16,17 @@
 package io.github.guoshiqiufeng.dify.client.integration.spring.http;
 
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
+import io.github.guoshiqiufeng.dify.client.core.codec.util.JsonSerializationHelper;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
+import io.github.guoshiqiufeng.dify.client.core.http.util.HttpStatusValidator;
+import io.github.guoshiqiufeng.dify.client.core.http.util.MultipartBodyProcessor;
 import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.HttpHeaderConverter;
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.SpringErrorResponseExtractor;
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.SpringMultipartBodyBuilder;
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.SpringRequestParameterApplier;
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.SpringStatusCodeExtractor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -127,8 +135,8 @@ class RestClientExecutor {
             // For error responses (non-2xx), don't attempt deserialization
             // Return the raw error message as the body (cast to T)
             // Use reflection to get status code to avoid Spring version compatibility issues
-            int statusCode = getStatusCodeValue(responseEntity);
-            if (statusCode >= 200 && statusCode < 300) {
+            int statusCode = SpringStatusCodeExtractor.getStatusCodeValue(responseEntity);
+            if (HttpStatusValidator.isSuccessful(statusCode)) {
                 // Success response - deserialize normally
                 return responseConverter.convert(responseEntity, responseType);
             } else {
@@ -138,7 +146,7 @@ class RestClientExecutor {
                 T errorBody = (T) responseEntity.getBody();
                 return HttpResponse.<T>builder()
                         .statusCode(statusCode)
-                        .headers(convertHeaders(responseEntity.getHeaders()))
+                        .headers(HttpHeaderConverter.fromSpringHeaders(responseEntity.getHeaders()))
                         .body(errorBody)
                         .build();
             }
@@ -168,8 +176,8 @@ class RestClientExecutor {
             // For error responses (non-2xx), don't attempt deserialization
             // Return the raw error message as the body (cast to T)
             // Use reflection to get status code to avoid Spring version compatibility issues
-            int statusCode = getStatusCodeValue(responseEntity);
-            if (statusCode >= 200 && statusCode < 300) {
+            int statusCode = SpringStatusCodeExtractor.getStatusCodeValue(responseEntity);
+            if (HttpStatusValidator.isSuccessful(statusCode)) {
                 // Success response - deserialize normally
                 return responseConverter.convert(responseEntity, typeReference);
             } else {
@@ -179,26 +187,13 @@ class RestClientExecutor {
                 T errorBody = (T) responseEntity.getBody();
                 return HttpResponse.<T>builder()
                         .statusCode(statusCode)
-                        .headers(convertHeaders(responseEntity.getHeaders()))
+                        .headers(HttpHeaderConverter.fromSpringHeaders(responseEntity.getHeaders()))
                         .body(errorBody)
                         .build();
             }
         } catch (Exception e) {
             throw new HttpClientException("RestClient request failed: " + getExceptionMessage(e), unwrapException(e));
         }
-    }
-
-    /**
-     * Convert Spring HttpHeaders to our HttpHeaders format.
-     */
-    private io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders convertHeaders(org.springframework.http.HttpHeaders springHeaders) {
-        io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders headers = new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders();
-        springHeaders.forEach((key, values) -> {
-            for (String value : values) {
-                headers.add(key, value);
-            }
-        });
-        return headers;
     }
 
     /**
@@ -226,79 +221,38 @@ class RestClientExecutor {
             requestSpec = uriMethod.invoke(requestSpec, uri);
         }
 
-        // Set headers
-        for (Map.Entry<String, String> entry : headers.entrySet()) {
-            java.lang.reflect.Method headerMethod = findMethod(requestSpec.getClass(), "header", String.class, String[].class);
-            headerMethod.setAccessible(true);
-            requestSpec = headerMethod.invoke(requestSpec, entry.getKey(), new String[]{entry.getValue()});
-        }
-
-        // Set cookies
-        for (Map.Entry<String, String> entry : cookies.entrySet()) {
-            java.lang.reflect.Method cookieMethod = findMethod(requestSpec.getClass(), "cookie", String.class, String.class);
-            cookieMethod.setAccessible(true);
-            requestSpec = cookieMethod.invoke(requestSpec, entry.getKey(), entry.getValue());
-        }
+        // Set headers and cookies
+        requestSpec = SpringRequestParameterApplier.applyHeadersReflection(requestSpec, headers);
+        requestSpec = SpringRequestParameterApplier.applyCookiesReflection(requestSpec, cookies);
 
         // Set body - handle multipart or JSON based on Content-Type header
         if (body != null) {
             // Check if Content-Type is multipart/form-data
             String contentType = headers.get("Content-Type");
-            boolean isMultipart = contentType != null && contentType.toLowerCase().contains("multipart/form-data");
+            boolean isMultipart = MultipartBodyProcessor.isMultipartRequest(contentType);
 
             if (isMultipart && body instanceof Map) {
                 Map<?, ?> bodyMap = (Map<?, ?>) body;
                 // Check if it's a multipart body by inspecting the first value
-                if (!bodyMap.isEmpty()) {
-                    Object firstValue = bodyMap.values().iterator().next();
-                    if (firstValue instanceof io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part) {
-                        // Handle multipart data
-                        org.springframework.util.LinkedMultiValueMap<String, Object> multipartData =
-                            new org.springframework.util.LinkedMultiValueMap<>();
+                if (MultipartBodyProcessor.isMultipartBodyMap(bodyMap)) {
+                    // Handle multipart data
+                    @SuppressWarnings("unchecked")
+                    Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> parts =
+                        (Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part>) bodyMap;
 
-                        @SuppressWarnings("unchecked")
-                        Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> parts =
-                            (Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part>) bodyMap;
+                    org.springframework.util.LinkedMultiValueMap<String, Object> multipartData =
+                        SpringMultipartBodyBuilder.buildMultipartBody(parts, jsonMapper, skipNull);
 
-                        for (Map.Entry<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> entry : parts.entrySet()) {
-                            io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part part = entry.getValue();
-                            Object partValue = part.getValue();
-
-                            // Convert byte[] to Spring's ByteArrayResource for file uploads
-                            if (partValue instanceof byte[]) {
-                                byte[] bytes = (byte[]) partValue;
-                                String filename = extractFilename(part.getHeader("Content-Disposition"));
-
-                                org.springframework.core.io.ByteArrayResource resource =
-                                    new org.springframework.core.io.ByteArrayResource(bytes) {
-                                        @Override
-                                        public String getFilename() {
-                                            return filename;
-                                        }
-                                    };
-
-                                multipartData.add(entry.getKey(), resource);
-                            } else if (partValue instanceof String || partValue instanceof Number || partValue instanceof Boolean) {
-                                // For simple types, add directly
-                                multipartData.add(entry.getKey(), partValue);
-                            } else {
-                                // For complex objects, serialize to JSON
-                                String jsonValue = skipNull ? jsonMapper.toJsonIgnoreNull(partValue) : jsonMapper.toJson(partValue);
-                                multipartData.add(entry.getKey(), jsonValue);
-                            }
-                        }
-
-                        // Set multipart body using reflection
-                        Method bodyMethod = findMethod(requestSpec.getClass(), "body", Object.class);
-                        bodyMethod.setAccessible(true);
-                        requestSpec = bodyMethod.invoke(requestSpec, multipartData);
-                        return requestSpec;
-                    }
+                    // Set multipart body using reflection
+                    Method bodyMethod = findMethod(requestSpec.getClass(), "body", Object.class);
+                    bodyMethod.setAccessible(true);
+                    requestSpec = bodyMethod.invoke(requestSpec, multipartData);
+                    return requestSpec;
                 }
             }
 
             // Default: serialize to JSON
-            String jsonBody = skipNull ? jsonMapper.toJsonIgnoreNull(body) : jsonMapper.toJson(body);
+            String jsonBody = JsonSerializationHelper.serialize(body, jsonMapper, skipNull);
 
             Method bodyMethod = findMethod(requestSpec.getClass(), "body", Object.class);
             bodyMethod.setAccessible(true);
@@ -306,31 +260,6 @@ class RestClientExecutor {
         }
 
         return requestSpec;
-    }
-
-    /**
-     * Extract filename from Content-Disposition header.
-     *
-     * @param contentDisposition Content-Disposition header value
-     * @return filename, or "file" if not found
-     */
-    private String extractFilename(String contentDisposition) {
-        if (contentDisposition == null) {
-            return "file";
-        }
-
-        // Parse: form-data; name="file"; filename="test.txt"
-        int filenameIndex = contentDisposition.indexOf("filename=\"");
-        if (filenameIndex != -1) {
-            // length of "filename=\""
-            int start = filenameIndex + 10;
-            int end = contentDisposition.indexOf("\"", start);
-            if (end != -1) {
-                return contentDisposition.substring(start, end);
-            }
-        }
-
-        return "file";
     }
 
     /**
@@ -413,7 +342,7 @@ class RestClientExecutor {
             // Since we called toEntity(String.class), we can safely cast to ResponseEntity<String>
             ResponseEntity<?> rawEntity = (ResponseEntity<?>) result;
             // Use int status code to avoid Spring version compatibility issues
-            return ResponseEntity.status(getStatusCodeValue(rawEntity))
+            return ResponseEntity.status(SpringStatusCodeExtractor.getStatusCodeValue(rawEntity))
                     .headers(rawEntity.getHeaders())
                     .body((String) rawEntity.getBody());
         } catch (java.lang.reflect.InvocationTargetException e) {
@@ -427,28 +356,6 @@ class RestClientExecutor {
                 }
             }
             throw e;
-        }
-    }
-
-    /**
-     * Get status code value from ResponseEntity in a Spring version-agnostic way.
-     * Uses reflection to avoid method signature binding at compile time.
-     *
-     * @param responseEntity the response entity
-     * @return status code value
-     */
-    private int getStatusCodeValue(ResponseEntity<?> responseEntity) {
-        try {
-            // Call getStatusCode() using reflection to avoid compile-time method signature binding
-            java.lang.reflect.Method getStatusCodeMethod = ResponseEntity.class.getMethod("getStatusCode");
-            Object statusCode = getStatusCodeMethod.invoke(responseEntity);
-
-            // Call value() on the result (works for both HttpStatus and HttpStatusCode)
-            java.lang.reflect.Method valueMethod = statusCode.getClass().getMethod("value");
-            return (int) valueMethod.invoke(statusCode);
-        } catch (Exception e) {
-            // Fallback: try direct call (this works if compiled with Spring 6+)
-            return responseEntity.getStatusCode().value();
         }
     }
 
@@ -486,302 +393,7 @@ class RestClientExecutor {
      * @return ResponseEntity with error details, or null if extraction fails
      */
     private ResponseEntity<String> extractErrorResponse(Throwable throwable) {
-        try {
-            // Check if it's a Spring HTTP exception
-            Class<?> exceptionClass = throwable.getClass();
-            String className = exceptionClass.getName();
-
-            log.debug("Extracting error response from exception: {}", className);
-
-            // Handle Spring HTTP exceptions (works for Spring 5, 6, and 7)
-            if (className.contains("RestClientResponseException") ||
-                    className.contains("HttpClientErrorException") ||
-                    className.contains("HttpServerErrorException") ||
-                    className.contains("HttpStatusCodeException")) {
-
-                // Extract status code using reflection only (to avoid Spring version compatibility issues)
-                int statusCode = extractStatusCodeViaReflection(throwable, exceptionClass);
-                log.debug("Extracted status code: {}", statusCode);
-
-                // Extract response body using reflection only
-                String responseBody = extractResponseBodyViaReflection(throwable, exceptionClass);
-                log.debug("Extracted response body length: {}", responseBody != null ? responseBody.length() : 0);
-
-                // Extract headers using reflection only
-                org.springframework.http.HttpHeaders headers = extractHeadersViaReflection(throwable, exceptionClass);
-
-                // Build ResponseEntity
-                return ResponseEntity.status(statusCode)
-                        .headers(headers)
-                        .body(responseBody);
-            }
-        } catch (Exception e) {
-            // If extraction fails, return null to let the original exception propagate
-            log.warn("Failed to extract error response from {}: {}", throwable.getClass().getName(), e.getMessage(), e);
-        }
-        return null;
+        return SpringErrorResponseExtractor.extractErrorResponse(throwable);
     }
 
-    /**
-     * Extract status code via reflection (fallback method).
-     */
-    private int extractStatusCodeViaReflection(Throwable throwable, Class<?> exceptionClass) throws Exception {
-        log.debug("Attempting to extract status code via reflection from: {}", exceptionClass.getName());
-
-        // Try getStatusCode().value()
-        try {
-            java.lang.reflect.Method getStatusCodeMethod = exceptionClass.getMethod("getStatusCode");
-            getStatusCodeMethod.setAccessible(true);
-            Object statusCode = getStatusCodeMethod.invoke(throwable);
-            log.debug("getStatusCode() returned: {} (type: {})", statusCode, statusCode != null ? statusCode.getClass().getName() : "null");
-
-            if (statusCode instanceof Integer) {
-                return (Integer) statusCode;
-            }
-            // Try calling value() on the result
-            java.lang.reflect.Method valueMethod = statusCode.getClass().getMethod("value");
-            valueMethod.setAccessible(true);
-            int value = (int) valueMethod.invoke(statusCode);
-            log.debug("Extracted status code via value(): {}", value);
-            return value;
-        } catch (Exception e) {
-            log.debug("Failed to extract via getStatusCode(): {}", e.getMessage());
-        }
-
-        // Try getRawStatusCode() (Spring 6+)
-        try {
-            java.lang.reflect.Method getRawStatusCodeMethod = exceptionClass.getMethod("getRawStatusCode");
-            getRawStatusCodeMethod.setAccessible(true);
-            int value = (int) getRawStatusCodeMethod.invoke(throwable);
-            log.debug("Extracted status code via getRawStatusCode(): {}", value);
-            return value;
-        } catch (Exception e) {
-            log.debug("Failed to extract via getRawStatusCode(): {}", e.getMessage());
-        }
-
-        throw new Exception("Unable to extract status code from exception: " + exceptionClass.getName());
-    }
-
-    /**
-     * Extract response body via reflection (fallback method).
-     */
-    private String extractResponseBodyViaReflection(Throwable throwable, Class<?> exceptionClass) throws Exception {
-        String extractedBody = null;
-
-        // Try getResponseBodyAsString()
-        try {
-            java.lang.reflect.Method getResponseBodyMethod = exceptionClass.getMethod("getResponseBodyAsString");
-            getResponseBodyMethod.setAccessible(true);
-            Object result = getResponseBodyMethod.invoke(throwable);
-            if (result != null) {
-                extractedBody = (String) result;
-                log.debug("Extracted response body via getResponseBodyAsString(): {} chars", extractedBody.length());
-                if (!extractedBody.isEmpty()) {
-                    return extractedBody;
-                }
-            } else {
-                log.debug("getResponseBodyAsString() returned null");
-            }
-        } catch (NoSuchMethodException e) {
-            log.debug("Method getResponseBodyAsString() not found");
-        } catch (Exception e) {
-            log.debug("Failed to extract via getResponseBodyAsString(): {} - {}",
-                    e.getClass().getSimpleName(), e.getMessage());
-        }
-
-        // Try getResponseBodyAsByteArray()
-        try {
-            java.lang.reflect.Method getResponseBodyMethod = exceptionClass.getMethod("getResponseBodyAsByteArray");
-            getResponseBodyMethod.setAccessible(true);
-            Object result = getResponseBodyMethod.invoke(throwable);
-            if (result != null) {
-                byte[] bodyBytes = (byte[]) result;
-                if (bodyBytes.length > 0) {
-                    extractedBody = new String(bodyBytes, java.nio.charset.StandardCharsets.UTF_8);
-                    log.debug("Extracted response body via getResponseBodyAsByteArray(): {} chars", extractedBody.length());
-                    return extractedBody;
-                } else {
-                    log.debug("getResponseBodyAsByteArray() returned empty byte array");
-                }
-            } else {
-                log.debug("getResponseBodyAsByteArray() returned null");
-            }
-        } catch (NoSuchMethodException e) {
-            log.debug("Method getResponseBodyAsByteArray() not found");
-        } catch (Exception e) {
-            log.debug("Failed to extract via getResponseBodyAsByteArray(): {} - {}",
-                    e.getClass().getSimpleName(), e.getMessage());
-        }
-
-        // If body is empty or null, use exception message as fallback
-        // This provides useful information like "401 Unauthorized: [no body]"
-        String message = throwable.getMessage();
-        if (message != null && !message.isEmpty()) {
-            log.debug("Using exception message as response body: ", message);
-            return message;
-        }
-
-        // Return extracted body even if empty (to distinguish from null)
-        log.debug("No response body could be extracted, returning: '{}'", extractedBody != null ? extractedBody : "");
-        return extractedBody != null ? extractedBody : "";
-    }
-
-    /**
-     * Extract headers via reflection (fallback method).
-     */
-    private org.springframework.http.HttpHeaders extractHeadersViaReflection(Throwable throwable, Class<?> exceptionClass) throws Exception {
-        try {
-            java.lang.reflect.Method getHeadersMethod = exceptionClass.getMethod("getResponseHeaders");
-            getHeadersMethod.setAccessible(true);
-            Object headers = getHeadersMethod.invoke(throwable);
-            if (headers instanceof org.springframework.http.HttpHeaders) {
-                return (org.springframework.http.HttpHeaders) headers;
-            }
-        } catch (Exception e) {
-            log.debug("Failed to extract headers: {}", e.getMessage());
-        }
-        return new org.springframework.http.HttpHeaders();
-    }
-
-    /**
-     * Extract status code from exception using reflection.
-     *
-     * @param throwable      the exception
-     * @param exceptionClass the exception class
-     * @return status code
-     * @throws Exception if extraction fails
-     */
-    private int extractStatusCode(Throwable throwable, Class<?> exceptionClass) throws Exception {
-        log.debug("Attempting to extract status code from: {}", exceptionClass.getName());
-
-        // Try multiple methods in order of preference
-        // 1. Try getStatusCode().value() (works for both Spring 5 and 6)
-        try {
-            java.lang.reflect.Method getStatusCodeMethod = findMethodInHierarchy(exceptionClass, "getStatusCode");
-            if (getStatusCodeMethod != null) {
-                log.debug("Found getStatusCode() method");
-                getStatusCodeMethod.setAccessible(true);
-                Object statusCode = getStatusCodeMethod.invoke(throwable);
-                log.debug("getStatusCode() returned: {} (type: {})", statusCode, statusCode != null ? statusCode.getClass().getName() : "null");
-
-                if (statusCode instanceof Integer) {
-                    return (Integer) statusCode;
-                }
-                // Try calling value() on the result
-                try {
-                    java.lang.reflect.Method valueMethod = statusCode.getClass().getMethod("value");
-                    valueMethod.setAccessible(true);
-                    int value = (int) valueMethod.invoke(statusCode);
-                    log.debug("Extracted status code via value(): {}", value);
-                    return value;
-                } catch (NoSuchMethodException e) {
-                    log.debug("No value() method found on status code object");
-                    // Continue to next method
-                }
-            } else {
-                log.debug("getStatusCode() method not found");
-            }
-        } catch (Exception e) {
-            log.debug("Failed to extract via getStatusCode(): {}", e.getMessage());
-            // Continue to next method
-        }
-
-        // 2. Try getRawStatusCode() (Spring 6+)
-        try {
-            java.lang.reflect.Method getRawStatusCodeMethod = findMethodInHierarchy(exceptionClass, "getRawStatusCode");
-            if (getRawStatusCodeMethod != null) {
-                log.debug("Found getRawStatusCode() method");
-                getRawStatusCodeMethod.setAccessible(true);
-                int value = (int) getRawStatusCodeMethod.invoke(throwable);
-                log.debug("Extracted status code via getRawStatusCode(): {}", value);
-                return value;
-            } else {
-                log.debug("getRawStatusCode() method not found");
-            }
-        } catch (Exception e) {
-            log.debug("Failed to extract via getRawStatusCode(): {}", e.getMessage());
-            // Continue to next method
-        }
-
-        // 3. Try getStatusCodeValue() (older Spring versions)
-        try {
-            java.lang.reflect.Method getStatusCodeValueMethod = findMethodInHierarchy(exceptionClass, "getStatusCodeValue");
-            if (getStatusCodeValueMethod != null) {
-                log.debug("Found getStatusCodeValue() method");
-                getStatusCodeValueMethod.setAccessible(true);
-                int value = (int) getStatusCodeValueMethod.invoke(throwable);
-                log.debug("Extracted status code via getStatusCodeValue(): {}", value);
-                return value;
-            } else {
-                log.debug("getStatusCodeValue() method not found");
-            }
-        } catch (Exception e) {
-            log.debug("Failed to extract via getStatusCodeValue(): {}", e.getMessage());
-            // All methods failed
-        }
-
-        throw new Exception("Unable to extract status code from exception: " + exceptionClass.getName());
-    }
-
-    /**
-     * Find method in class hierarchy (including superclasses).
-     *
-     * @param clazz      the class to search
-     * @param methodName the method name
-     * @return the method, or null if not found
-     */
-    private java.lang.reflect.Method findMethodInHierarchy(Class<?> clazz, String methodName) {
-        Class<?> currentClass = clazz;
-        while (currentClass != null && currentClass != Object.class) {
-            // Try public methods first
-            try {
-                java.lang.reflect.Method method = currentClass.getMethod(methodName);
-                log.debug("Found method {} in class {}", methodName, currentClass.getName());
-                return method;
-            } catch (NoSuchMethodException e) {
-                // Method not found in public methods, try declared methods
-            }
-
-            // Try declared methods (including private/protected)
-            try {
-                java.lang.reflect.Method method = currentClass.getDeclaredMethod(methodName);
-                log.debug("Found declared method {} in class {}", methodName, currentClass.getName());
-                return method;
-            } catch (NoSuchMethodException e) {
-                // Method not found in this class, continue to superclass
-            }
-
-            // Move to superclass
-            currentClass = currentClass.getSuperclass();
-        }
-
-        log.debug("Method {} not found in class hierarchy of {}", methodName, clazz.getName());
-        return null;
-    }
-
-    /**
-     * Extract response body from exception using reflection.
-     *
-     * @param throwable      the exception
-     * @param exceptionClass the exception class
-     * @return response body as String
-     * @throws Exception if extraction fails
-     */
-    private String extractResponseBody(Throwable throwable, Class<?> exceptionClass) throws Exception {
-        // This method is now deprecated - use extractResponseBodyViaReflection instead
-        return extractResponseBodyViaReflection(throwable, exceptionClass);
-    }
-
-    /**
-     * Extract headers from exception using reflection.
-     *
-     * @param throwable      the exception
-     * @param exceptionClass the exception class
-     * @return HTTP headers
-     * @throws Exception if extraction fails
-     */
-    private org.springframework.http.HttpHeaders extractHeaders(Throwable throwable, Class<?> exceptionClass) throws Exception {
-        // This method is now deprecated - use extractHeadersViaReflection instead
-        return extractHeadersViaReflection(throwable, exceptionClass);
-    }
 }

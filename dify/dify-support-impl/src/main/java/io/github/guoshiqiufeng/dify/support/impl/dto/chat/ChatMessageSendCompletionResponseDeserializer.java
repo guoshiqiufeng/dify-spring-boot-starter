@@ -22,7 +22,7 @@ import io.github.guoshiqiufeng.dify.chat.enums.StreamEventEnum;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonDeserializer;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonNode;
-import io.github.guoshiqiufeng.dify.client.core.codec.utils.JsonNodeUtils;
+import io.github.guoshiqiufeng.dify.client.core.codec.util.JsonNodeUtil;
 import io.github.guoshiqiufeng.dify.core.bean.BeanUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -117,7 +117,7 @@ public class ChatMessageSendCompletionResponseDeserializer implements JsonDeseri
         }
         if (root.has(TOOL_LABELS)) {
             JsonNode toolLabelsNode = root.get(TOOL_LABELS);
-            Map<String, Object> toolLabels = JsonNodeUtils.convertToMap(toolLabelsNode);
+            Map<String, Object> toolLabels = JsonNodeUtil.convertToMap(toolLabelsNode);
             chatMessageSendCompletionResponse.setToolLabels(toolLabels);
         }
         if (root.has(TOOL_INPUT)) {
@@ -125,7 +125,7 @@ public class ChatMessageSendCompletionResponseDeserializer implements JsonDeseri
         }
         if (root.has(MESSAGE_FILES)) {
             JsonNode messageFilesNode = root.get(MESSAGE_FILES);
-            List<String> messageFiles = JsonNodeUtils.convertToStringList(messageFilesNode);
+            List<String> messageFiles = JsonNodeUtil.convertToStringList(messageFilesNode);
             chatMessageSendCompletionResponse.setMessageFiles(messageFiles);
         }
 

@@ -53,18 +53,6 @@ class WebClientExecutorTest {
         executor = new WebClientExecutor(webClient, jsonMapper);
     }
 
-//    @Test
-//    void testExecute() {
-//        URI uri = URI.create("http://localhost:8080/api/test");
-//        Map<String, String> headers = new HashMap<>();
-//        headers.put("Content-Type", "application/json");
-//        Map<String, String> cookies = new HashMap<>();
-//
-//        String jsonResponse = "{\"name\":\"test\",\"value\":123}";
-//        TestDto expectedDto = new TestDto("test", 123);
-//        Object get = executor.execute("GET", uri, headers, cookies, null, null, TestDto.class);
-//    }
-
     @Test
     void testConstructorWithTwoParameters() {
         // Act
@@ -150,71 +138,6 @@ class WebClientExecutorTest {
         assertFalse((Boolean) method.invoke(executor, (String) null));
         assertFalse((Boolean) method.invoke(executor, ""));
         assertFalse((Boolean) method.invoke(executor, "   "));
-    }
-
-    @Test
-    void testExtractFilenameFromContentDisposition() throws Exception {
-        // Arrange
-        Method method = WebClientExecutor.class.getDeclaredMethod("extractFilename", String.class);
-        method.setAccessible(true);
-
-        // Act & Assert
-        assertEquals("test.txt", method.invoke(executor, "form-data; name=\"file\"; filename=\"test.txt\""));
-        assertEquals("document.pdf", method.invoke(executor, "attachment; filename=\"document.pdf\""));
-        assertEquals("file", method.invoke(executor, "form-data; name=\"file\""));
-        assertEquals("file", method.invoke(executor, (String) null));
-        assertEquals("file", method.invoke(executor, ""));
-    }
-
-    @Test
-    void testExtractFilenameWithSpecialCharacters() throws Exception {
-        // Arrange
-        Method method = WebClientExecutor.class.getDeclaredMethod("extractFilename", String.class);
-        method.setAccessible(true);
-
-        // Act & Assert
-        assertEquals("test file.txt", method.invoke(executor, "form-data; name=\"file\"; filename=\"test file.txt\""));
-        assertEquals("test-file_123.txt", method.invoke(executor, "form-data; name=\"file\"; filename=\"test-file_123.txt\""));
-    }
-
-    @Test
-    void testConvertHeadersWithNullHeaders() throws Exception {
-        // Arrange
-        Method method = WebClientExecutor.class.getDeclaredMethod("convertHeaders", org.springframework.http.HttpHeaders.class);
-        method.setAccessible(true);
-
-        // Act
-        var result = method.invoke(executor, (org.springframework.http.HttpHeaders) null);
-
-        // Assert
-        assertNotNull(result);
-    }
-
-    @Test
-    void testConvertHeadersWithMultipleValues() throws Exception {
-        // Arrange
-        Method method = WebClientExecutor.class.getDeclaredMethod("convertHeaders", org.springframework.http.HttpHeaders.class);
-        method.setAccessible(true);
-
-        org.springframework.http.HttpHeaders springHeaders = new org.springframework.http.HttpHeaders();
-        springHeaders.add("Content-Type", "application/json");
-        springHeaders.add("Authorization", "Bearer token");
-
-        // Act
-        var result = method.invoke(executor, springHeaders);
-
-        // Assert
-        assertNotNull(result);
-    }
-
-    @Test
-    void testExtractFilenameWithMissingClosingQuote() throws Exception {
-        // Arrange
-        Method method = WebClientExecutor.class.getDeclaredMethod("extractFilename", String.class);
-        method.setAccessible(true);
-
-        // Act & Assert - missing closing quote should return "file"
-        assertEquals("file", method.invoke(executor, "filename=\"test.txt"));
     }
 
     /**

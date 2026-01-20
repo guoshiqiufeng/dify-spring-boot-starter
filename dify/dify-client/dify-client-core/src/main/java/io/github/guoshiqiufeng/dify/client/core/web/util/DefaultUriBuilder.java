@@ -72,7 +72,7 @@ public class DefaultUriBuilder implements UriBuilder {
 
         // Replace path variables if any using UriUtils
         Object[] varsToUse = (uriVariables != null && uriVariables.length > 0) ? uriVariables : this.uriVariables;
-        processedPath = UriUtils.replacePlaceholders(processedPath, varsToUse);
+        processedPath = UriUtil.replacePlaceholders(processedPath, varsToUse);
 
 
         if (queryParams.isEmpty()) {
@@ -87,9 +87,9 @@ public class DefaultUriBuilder implements UriBuilder {
             if (!first) {
                 uri.append("&");
             }
-            uri.append(UriUtils.encodeQueryParam(entry.getKey()))
+            uri.append(UriUtil.encodeQueryParam(entry.getKey()))
                     .append("=")
-                    .append(UriUtils.encodeQueryParam(entry.getValue()));
+                    .append(UriUtil.encodeQueryParam(entry.getValue()));
             first = false;
         }
 

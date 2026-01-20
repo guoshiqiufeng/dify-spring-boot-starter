@@ -20,7 +20,7 @@ import io.github.guoshiqiufeng.dify.client.core.web.client.RequestBodySpec;
 import io.github.guoshiqiufeng.dify.client.core.web.client.RequestBodyUriSpec;
 import io.github.guoshiqiufeng.dify.client.core.web.client.ResponseSpec;
 import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
-import io.github.guoshiqiufeng.dify.client.core.web.util.UriUtils;
+import io.github.guoshiqiufeng.dify.client.core.web.util.UriUtil;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -86,7 +86,7 @@ public class DefaultRequestBodyUriSpec implements RequestBodyUriSpec {
 
         // Extract variable names from URI template and build array in order
         List<Object> orderedValues = new ArrayList<>();
-        Matcher matcher = UriUtils.URI_VARIABLE_PATTERN.matcher(uri);
+        Matcher matcher = UriUtil.URI_VARIABLE_PATTERN.matcher(uri);
 
         while (matcher.find()) {
             String variableName = matcher.group(1);
@@ -112,19 +112,14 @@ public class DefaultRequestBodyUriSpec implements RequestBodyUriSpec {
         }
 
         requestBuilder.uri(uriBuilder -> {
-            // First set the path with variables
             uriBuilder.path(uri);
-
-            // Apply the custom function for additional URI building (e.g., query params)
-            uriFunction.apply(uriBuilder);
+            if (uriVariables != null && uriVariables.length > 0) {
+                uriFunction.apply(uriBuilder);
+                uriBuilder.build(uriVariables);
+            } else {
+                uriFunction.apply(uriBuilder);
+            }
         });
-
-        // If there are URI variables, we need to apply them
-        if (uriVariables != null && uriVariables.length > 0) {
-            // This is a limitation of the current adapter approach
-            // The variables should ideally be passed through the Consumer
-            // For now, we'll document this limitation
-        }
 
         return this;
     }
