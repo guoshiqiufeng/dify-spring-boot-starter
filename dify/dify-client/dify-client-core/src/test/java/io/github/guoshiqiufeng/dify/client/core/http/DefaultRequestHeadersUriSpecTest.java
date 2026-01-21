@@ -39,6 +39,7 @@ import static org.mockito.Mockito.*;
  * @version 2.0.0
  * @since 2026/01/12
  */
+@SuppressWarnings("unchecked")
 class DefaultRequestHeadersUriSpecTest {
 
     private HttpRequestBuilder mockRequestBuilder;
@@ -133,6 +134,16 @@ class DefaultRequestHeadersUriSpecTest {
     }
 
     @Test
+    void testUriWithNullMap() {
+        String uri = "/users";
+
+        DefaultRequestHeadersUriSpec result = spec.uri(uri, (Map<String, Object>) null);
+
+        assertSame(spec, result);
+        verify(mockRequestBuilder).uri(uri);
+    }
+
+    @Test
     void testUriWithMapMissingVariable() {
         String uri = "/users/{id}/posts/{postId}";
         Map<String, Object> variables = new HashMap<>();
@@ -145,6 +156,7 @@ class DefaultRequestHeadersUriSpecTest {
     }
 
     @Test
+    @SuppressWarnings("all")
     void testUriWithFunction() {
         Function<UriBuilder, URI> uriFunction = builder -> {
             builder.path("/users");
@@ -177,19 +189,78 @@ class DefaultRequestHeadersUriSpecTest {
             return builder.build();
         };
 
+        doAnswer(invocation -> {
+            Consumer<UriBuilder> consumer = invocation.getArgument(0);
+            UriBuilder mockBuilder = mock(UriBuilder.class);
+            when(mockBuilder.path(anyString())).thenReturn(mockBuilder);
+            when(mockBuilder.build(any())).thenReturn(URI.create("http://example.com"));
+            consumer.accept(mockBuilder);
+            verify(mockBuilder).path(uri);
+            verify(mockBuilder).build(variables);
+            return null;
+        }).when(mockRequestBuilder).uri(any(Consumer.class));
+
         DefaultRequestHeadersUriSpec result = spec.uri(uri, variables, uriFunction);
 
         assertSame(spec, result);
-        @SuppressWarnings("unchecked")
-        ArgumentCaptor<Consumer<UriBuilder>> captor = ArgumentCaptor.forClass((Class) Consumer.class);
-        verify(mockRequestBuilder).uri(captor.capture());
-        assertNotNull(captor.getValue());
+        verify(mockRequestBuilder).uri(any(Consumer.class));
+    }
+
+    @Test
+    void testUriWithNullVariablesAndFunction() {
+        String uri = "/users";
+        Function<UriBuilder, URI> uriFunction = builder -> {
+            builder.queryParam("page", "1");
+            return builder.build();
+        };
+
+        doAnswer(invocation -> {
+            Consumer<UriBuilder> consumer = invocation.getArgument(0);
+            UriBuilder mockBuilder = mock(UriBuilder.class);
+            when(mockBuilder.path(anyString())).thenReturn(mockBuilder);
+            when(mockBuilder.build()).thenReturn(URI.create("http://example.com"));
+            consumer.accept(mockBuilder);
+            verify(mockBuilder).path(uri);
+            verify(mockBuilder, never()).build(any(Object[].class));
+            return null;
+        }).when(mockRequestBuilder).uri(any(Consumer.class));
+
+        DefaultRequestHeadersUriSpec result = spec.uri(uri, null, uriFunction);
+
+        assertSame(spec, result);
+        verify(mockRequestBuilder).uri(any(Consumer.class));
+    }
+
+    @Test
+    void testUriWithEmptyVariablesAndFunction() {
+        String uri = "/users";
+        Object[] variables = {};
+        Function<UriBuilder, URI> uriFunction = builder -> {
+            builder.queryParam("page", "1");
+            return builder.build();
+        };
+
+        doAnswer(invocation -> {
+            Consumer<UriBuilder> consumer = invocation.getArgument(0);
+            UriBuilder mockBuilder = mock(UriBuilder.class);
+            when(mockBuilder.path(anyString())).thenReturn(mockBuilder);
+            when(mockBuilder.build()).thenReturn(URI.create("http://example.com"));
+            consumer.accept(mockBuilder);
+            verify(mockBuilder).path(uri);
+            verify(mockBuilder, never()).build(any(Object[].class));
+            return null;
+        }).when(mockRequestBuilder).uri(any(Consumer.class));
+
+        DefaultRequestHeadersUriSpec result = spec.uri(uri, variables, uriFunction);
+
+        assertSame(spec, result);
+        verify(mockRequestBuilder).uri(any(Consumer.class));
     }
 
     @Test
     void testUriWithVariablesAndFunctionNullUri() {
         Object[] variables = {123};
-        Function<UriBuilder, URI> uriFunction = builder -> builder.build();
+        Function<UriBuilder, URI> uriFunction = UriBuilder::build;
 
         assertThrows(IllegalArgumentException.class, () -> {
             spec.uri(null, variables, uriFunction);
@@ -273,6 +344,7 @@ class DefaultRequestHeadersUriSpecTest {
     }
 
     @Test
+    @SuppressWarnings("all")
     void testCookie() {
         String name = "sessionId";
         String value = "abc123";
@@ -447,6 +519,7 @@ class DefaultRequestHeadersUriSpecTest {
     }
 
     @Test
+    @SuppressWarnings("all")
     void testUriWithQueryParameters() {
         Function<UriBuilder, URI> uriFunction = builder -> {
             builder.path("/api/users");
@@ -465,6 +538,7 @@ class DefaultRequestHeadersUriSpecTest {
     }
 
     @Test
+    @SuppressWarnings("all")
     void testMultipleCookies() {
         spec.cookie("sessionId", "abc123")
             .cookie("token", "xyz789")

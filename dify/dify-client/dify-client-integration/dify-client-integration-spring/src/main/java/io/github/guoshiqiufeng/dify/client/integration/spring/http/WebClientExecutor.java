@@ -16,9 +16,15 @@
 package io.github.guoshiqiufeng.dify.client.integration.spring.http;
 
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
+import io.github.guoshiqiufeng.dify.client.core.codec.util.JsonSerializationHelper;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
+import io.github.guoshiqiufeng.dify.client.core.http.util.HttpStatusValidator;
+import io.github.guoshiqiufeng.dify.client.core.http.util.MultipartBodyProcessor;
+import io.github.guoshiqiufeng.dify.client.core.http.util.RequestParameterProcessor;
 import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.HttpHeaderConverter;
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.SpringMultipartBodyBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -32,7 +38,6 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Executor for Spring WebClient.
@@ -154,7 +159,7 @@ class WebClientExecutor {
 
             // For success responses (2xx), deserialize normally
             int statusCode = responseEntity.getStatusCode().value();
-            if (statusCode >= 200 && statusCode < 300) {
+            if (HttpStatusValidator.isSuccessful(statusCode)) {
                 return responseConverter.convert(responseEntity, responseType);
             } else {
                 // For error responses, return raw error message as body
@@ -163,7 +168,7 @@ class WebClientExecutor {
                 T errorBody = (T) responseEntity.getBody();
                 return HttpResponse.<T>builder()
                         .statusCode(statusCode)
-                        .headers(convertHeaders(responseEntity.getHeaders()))
+                        .headers(HttpHeaderConverter.fromSpringHeaders(responseEntity.getHeaders()))
                         .body(errorBody)
                         .build();
             }
@@ -180,7 +185,7 @@ class WebClientExecutor {
             T typedErrorBody = (T) errorBody;
             return HttpResponse.<T>builder()
                     .statusCode(statusCode)
-                    .headers(convertHeaders(e.getHeaders()))
+                    .headers(HttpHeaderConverter.fromSpringHeaders(e.getHeaders()))
                     .body(typedErrorBody)
                     .build();
         }
@@ -217,7 +222,7 @@ class WebClientExecutor {
 
             // For success responses (2xx), deserialize normally
             int statusCode = responseEntity.getStatusCode().value();
-            if (statusCode >= 200 && statusCode < 300) {
+            if (HttpStatusValidator.isSuccessful(statusCode)) {
                 return responseConverter.convert(responseEntity, typeReference);
             } else {
                 // For error responses, return raw error message as body
@@ -226,7 +231,7 @@ class WebClientExecutor {
                 T errorBody = (T) responseEntity.getBody();
                 return HttpResponse.<T>builder()
                         .statusCode(statusCode)
-                        .headers(convertHeaders(responseEntity.getHeaders()))
+                        .headers(HttpHeaderConverter.fromSpringHeaders(responseEntity.getHeaders()))
                         .body(errorBody)
                         .build();
             }
@@ -243,25 +248,10 @@ class WebClientExecutor {
             T typedErrorBody = (T) errorBody;
             return HttpResponse.<T>builder()
                     .statusCode(statusCode)
-                    .headers(convertHeaders(e.getHeaders()))
+                    .headers(HttpHeaderConverter.fromSpringHeaders(e.getHeaders()))
                     .body(typedErrorBody)
                     .build();
         }
-    }
-
-    /**
-     * Convert Spring HttpHeaders to our HttpHeaders format.
-     */
-    private io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders convertHeaders(org.springframework.http.HttpHeaders springHeaders) {
-        io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders headers = new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders();
-        if (springHeaders != null) {
-            springHeaders.forEach((key, values) -> {
-                for (String value : values) {
-                    headers.add(key, value);
-                }
-            });
-        }
-        return headers;
     }
 
     /**
@@ -436,9 +426,7 @@ class WebClientExecutor {
         }
 
         if (!cookies.isEmpty()) {
-            String cookieHeader = cookies.entrySet().stream()
-                    .map(entry -> entry.getKey() + "=" + entry.getValue())
-                    .collect(Collectors.joining("; "));
+            String cookieHeader = RequestParameterProcessor.buildCookieHeader(cookies);
             headers.put("Cookie", cookieHeader);
         }
 
@@ -457,88 +445,33 @@ class WebClientExecutor {
             try {
                 // Check if Content-Type is multipart/form-data
                 String contentType = headers.get("Content-Type");
-                boolean isMultipart = contentType != null && contentType.toLowerCase().contains("multipart/form-data");
+                boolean isMultipart = MultipartBodyProcessor.isMultipartRequest(contentType);
 
                 if (isMultipart && body instanceof Map) {
                     Map<?, ?> bodyMap = (Map<?, ?>) body;
                     // Check if it's a multipart body by inspecting the first value
-                    if (!bodyMap.isEmpty()) {
-                        Object firstValue = bodyMap.values().iterator().next();
-                        if (firstValue instanceof io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part) {
-                            // Handle multipart data
-                            org.springframework.util.LinkedMultiValueMap<String, Object> multipartData =
-                                new org.springframework.util.LinkedMultiValueMap<>();
+                    if (MultipartBodyProcessor.isMultipartBodyMap(bodyMap)) {
+                        // Handle multipart data
+                        @SuppressWarnings("unchecked")
+                        Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> parts =
+                            (Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part>) bodyMap;
 
-                            @SuppressWarnings("unchecked")
-                            Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> parts =
-                                (Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part>) bodyMap;
+                        org.springframework.util.LinkedMultiValueMap<String, Object> multipartData =
+                            SpringMultipartBodyBuilder.buildMultipartBody(parts, jsonMapper, skipNull);
 
-                            for (Map.Entry<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> entry : parts.entrySet()) {
-                                io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part part = entry.getValue();
-                                Object partValue = part.getValue();
-
-                                // Convert byte[] to Spring's ByteArrayResource for file uploads
-                                if (partValue instanceof byte[]) {
-                                    byte[] bytes = (byte[]) partValue;
-                                    String filename = extractFilename(part.getHeader("Content-Disposition"));
-
-                                    org.springframework.core.io.ByteArrayResource resource =
-                                        new org.springframework.core.io.ByteArrayResource(bytes) {
-                                            @Override
-                                            public String getFilename() {
-                                                return filename;
-                                            }
-                                        };
-
-                                    multipartData.add(entry.getKey(), resource);
-                                } else if (partValue instanceof String || partValue instanceof Number || partValue instanceof Boolean) {
-                                    // For simple types, add directly
-                                    multipartData.add(entry.getKey(), partValue);
-                                } else {
-                                    // For complex objects, serialize to JSON
-                                    String jsonValue = skipNull ? jsonMapper.toJsonIgnoreNull(partValue) : jsonMapper.toJson(partValue);
-                                    multipartData.add(entry.getKey(), jsonValue);
-                                }
-                            }
-
-                            bodySpec.body(org.springframework.web.reactive.function.BodyInserters.fromMultipartData(multipartData));
-                            return bodySpec;
-                        }
+                        bodySpec.body(org.springframework.web.reactive.function.BodyInserters.fromMultipartData(multipartData));
+                        return bodySpec;
                     }
                 }
 
                 // Default: serialize to JSON
                 bodySpec.contentType(MediaType.APPLICATION_JSON);
-                bodySpec.bodyValue(skipNull ? jsonMapper.toJsonIgnoreNull(body) : jsonMapper.toJson(body));
+                bodySpec.bodyValue(JsonSerializationHelper.serialize(body, jsonMapper, skipNull));
             } catch (Exception e) {
                 throw new HttpClientException("Failed to serialize request body", e);
             }
         }
 
         return bodySpec;
-    }
-
-    /**
-     * Extract filename from Content-Disposition header.
-     *
-     * @param contentDisposition Content-Disposition header value
-     * @return filename, or "file" if not found
-     */
-    private String extractFilename(String contentDisposition) {
-        if (contentDisposition == null) {
-            return "file";
-        }
-
-        // Parse: form-data; name="file"; filename="test.txt"
-        int filenameIndex = contentDisposition.indexOf("filename=\"");
-        if (filenameIndex != -1) {
-            int start = filenameIndex + 10; // length of "filename=\""
-            int end = contentDisposition.indexOf("\"", start);
-            if (end != -1) {
-                return contentDisposition.substring(start, end);
-            }
-        }
-
-        return "file";
     }
 }

@@ -267,12 +267,37 @@ SpringHttpClientFactory httpClientFactory = new SpringHttpClientFactory(
 
 ### 4. 改进的测试覆盖率
 
-通过全面的单元测试和集成测试增强所有模块的测试覆盖率:
-- 所有新模块的全面单元测试
-- HTTP 客户端的集成测试
-- 编解码器序列化/反序列化测试
+通过全面的单元测试和集成测试增强所有模块的测试覆盖率，新增 40,000+ 行测试代码:
+
+**HTTP 客户端测试:**
+- OkHttp 集成测试 (2,635+ 行)
+- WebClient 集成测试 (1,033+ 行)
+- RestClient 集成测试 (1,175+ 行)
+- 跨版本的 Spring HTTP 客户端测试 (Spring 5/6)
+
+**编解码器测试:**
+- Gson 序列化/反序列化测试
+- Jackson 2.x 和 3.x 测试
+- JSON 节点操作测试
+- 自定义反序列化器测试
+
+**工具类测试:**
+- BeanUtils、CollUtil、StrUtil、Assert 测试 (1,800+ 行)
+- HTTP 工具测试 (MultipartBodyProcessor、RequestParameterProcessor、HttpStatusValidator)
+- Spring 工具测试 (ErrorResponseExtractor、MultipartBodyBuilder、RequestParameterApplier)
+- URI 构建和操作测试
+
+**客户端实现测试:**
+- Chat 客户端测试 (1,467+ 行)
+- Dataset 客户端测试 (2,198+ 行)
+- Server 客户端测试 (2,130+ 行)
+- Workflow 客户端测试 (433+ 行)
+
+**其他测试:**
 - 构建器模式测试
-- 测试总数显著增加
+- 错误处理和异常测试
+- 日志和拦截器测试
+- 健康指标测试
 
 ### 5. 构建配置
 
@@ -420,10 +445,14 @@ DifyChatClient client = DifyChatBuilder.builder()
 ## 统计数据
 
 - **开发范围**: 从 1.x 到 2.0.0 的重大架构重构
-- **变更文件数**: 848+ 个文件
-- **代码变更**: 通过重构显著减少代码行数
-- **净变化**: -11,574 行(通过消除重复提高了代码效率)
-- **测试覆盖率**: 通过专门的测试增强提交持续改进
+- **变更文件数**: 1,100+ 个文件(包括最近改进的 255+ 个文件)
+- **代码变更**: 通过战略性代码精简和测试扩展进行重大重构
+- **生产代码**: 通过消除重复净减少约 12,000 行
+- **测试代码**: 新增 40,000+ 行全面的测试覆盖
+- **代码重复减少**:
+  - Spring Boot 启动器模块减少 28%(删除 508 行)
+  - 消除 Spring 版本之间 85-90% 的重复
+- **测试覆盖率**: 通过所有模块的广泛单元测试和集成测试显著提高
 
 ## 致谢
 

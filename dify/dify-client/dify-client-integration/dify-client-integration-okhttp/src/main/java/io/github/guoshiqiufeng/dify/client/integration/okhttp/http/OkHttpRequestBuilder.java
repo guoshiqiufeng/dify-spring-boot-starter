@@ -18,17 +18,22 @@ package io.github.guoshiqiufeng.dify.client.integration.okhttp.http;
 import io.github.guoshiqiufeng.dify.client.core.enums.HttpMethod;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
+import io.github.guoshiqiufeng.dify.client.core.codec.util.JsonSerializationHelper;
 import io.github.guoshiqiufeng.dify.client.core.web.util.DefaultUriBuilder;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpRequestBuilder;
 import io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler;
+import io.github.guoshiqiufeng.dify.client.core.http.util.HttpStatusValidator;
+import io.github.guoshiqiufeng.dify.client.core.http.util.MultipartBodyProcessor;
+import io.github.guoshiqiufeng.dify.client.core.http.util.RequestParameterProcessor;
 import io.github.guoshiqiufeng.dify.client.core.map.LinkedMultiValueMap;
 import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
 import io.github.guoshiqiufeng.dify.client.core.web.client.ResponseSpec;
 import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
 import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.integration.okhttp.http.util.OkHttpMultipartBodyBuilder;
+import io.github.guoshiqiufeng.dify.client.integration.okhttp.http.util.OkHttpResponseProcessor;
 import io.github.guoshiqiufeng.dify.client.integration.okhttp.publisher.OkHttpStreamPublisher;
-import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -262,7 +267,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
                 int statusCode = response.code();
 
                 // For success responses (2xx), deserialize normally
-                if (statusCode >= 200 && statusCode < 300) {
+                if (HttpStatusValidator.isSuccessful(statusCode)) {
                     T responseBody = handleResponse(response, responseType, false);
                     HttpResponse<T> httpResponse = buildHttpResponse(response, responseBody);
                     handleErrors(httpResponse);
@@ -291,7 +296,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
                 int statusCode = response.code();
 
                 // For success responses (2xx), deserialize normally
-                if (statusCode >= 200 && statusCode < 300) {
+                if (HttpStatusValidator.isSuccessful(statusCode)) {
                     T responseBody = handleResponse(response, typeReference, false);
                     HttpResponse<T> httpResponse = buildHttpResponse(response, responseBody);
                     handleErrors(httpResponse);
@@ -364,9 +369,14 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
         // Build URL - handle potential double slash when baseUrl ends with / and uri starts with /
         String baseUrl = client.getBaseUrl();
         String path = uri != null ? uri.toString() : "";
-        String fullUrl = baseUrl.endsWith("/") && path.startsWith("/")
-            ? baseUrl + path.substring(1)
-            : baseUrl + path;
+        String fullUrl;
+        if (baseUrl.endsWith("/") && path.startsWith("/")) {
+            fullUrl = baseUrl + path.substring(1);
+        } else if (!baseUrl.endsWith("/") && !path.isEmpty() && !path.startsWith("/")) {
+            fullUrl = baseUrl + "/" + path;
+        } else {
+            fullUrl = baseUrl + path;
+        }
         HttpUrl.Builder urlBuilder = HttpUrl.parse(fullUrl).newBuilder();
         for (Map.Entry<String, String> entry : queryParams.entrySet()) {
             urlBuilder.addQueryParameter(entry.getKey(), entry.getValue());
@@ -390,10 +400,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
 
         // Add cookies as Cookie header
         if (!cookies.isEmpty()) {
-            String cookieHeader = cookies.entrySet().stream()
-                    .filter(entry -> entry.getValue() != null)
-                    .map(entry -> entry.getKey() + "=" + entry.getValue())
-                    .collect(java.util.stream.Collectors.joining("; "));
+            String cookieHeader = RequestParameterProcessor.buildCookieHeader(cookies);
             if (!cookieHeader.isEmpty()) {
                 requestBuilder.addHeader("Cookie", cookieHeader);
             }
@@ -410,16 +417,13 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
     private RequestBody buildRequestBody() {
         // Check if Content-Type is multipart/form-data
         String contentType = headers.get("Content-Type");
-        boolean isMultipart = contentType != null && contentType.toLowerCase().contains("multipart/form-data");
+        boolean isMultipart = MultipartBodyProcessor.isMultipartRequest(contentType);
 
         if (isMultipart && body instanceof Map) {
             // Handle multipart data from MultipartBodyBuilder
             Map<?, ?> bodyMap = (Map<?, ?>) body;
-            if (!bodyMap.isEmpty()) {
-                Object firstValue = bodyMap.values().iterator().next();
-                if (firstValue instanceof io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part) {
-                    return buildMultipartBodyFromParts(bodyMap);
-                }
+            if (MultipartBodyProcessor.isMultipartBodyMap(bodyMap)) {
+                return buildMultipartBodyFromParts(bodyMap);
             }
         }
 
@@ -442,67 +446,11 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
      * @return RequestBody
      */
     private RequestBody buildMultipartBodyFromParts(Map<?, ?> bodyMap) {
-        MultipartBody.Builder builder = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM);
-
         @SuppressWarnings("unchecked")
         Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> parts =
             (Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part>) bodyMap;
 
-        for (Map.Entry<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> entry : parts.entrySet()) {
-            io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part part = entry.getValue();
-            Object partValue = part.getValue();
-
-            if (partValue instanceof byte[]) {
-                // Handle file upload
-                byte[] bytes = (byte[]) partValue;
-                String filename = extractFilename(part.getHeader("Content-Disposition"));
-                String partContentType = part.getHeader("Content-Type");
-                MediaType mediaType = partContentType != null ?
-                    MediaType.parse(partContentType) : MediaType.parse("application/octet-stream");
-
-                builder.addFormDataPart(entry.getKey(), filename,
-                    RequestBody.create(bytes, mediaType));
-            } else if (partValue instanceof String) {
-                builder.addFormDataPart(entry.getKey(), (String) partValue);
-            } else if (partValue instanceof Number || partValue instanceof Boolean) {
-                builder.addFormDataPart(entry.getKey(), String.valueOf(partValue));
-            } else {
-                // For complex objects, serialize to JSON
-                try {
-                    String json = client.getSkipNull() ? jsonMapper.toJsonIgnoreNull(partValue) : jsonMapper.toJson(partValue);
-                    builder.addFormDataPart(entry.getKey(), json);
-                } catch (Exception e) {
-                    throw new HttpClientException("Failed to serialize multipart field to JSON: " + entry.getKey(), e);
-                }
-            }
-        }
-
-        return builder.build();
-    }
-
-    /**
-     * Extract filename from Content-Disposition header.
-     *
-     * @param contentDisposition Content-Disposition header value
-     * @return filename, or "file" if not found
-     */
-    private String extractFilename(String contentDisposition) {
-        if (contentDisposition == null) {
-            return "file";
-        }
-
-        // Parse: form-data; name="file"; filename="test.txt"
-        int filenameIndex = contentDisposition.indexOf("filename=\"");
-        if (filenameIndex != -1) {
-            int start = filenameIndex + 10; // length of "filename=\""
-            int end = contentDisposition.indexOf("\"", start);
-            if (end != -1) {
-                return contentDisposition.substring(start, end);
-            }
-        }
-
-        return "file";
+        return OkHttpMultipartBodyBuilder.buildMultipartBody(parts, jsonMapper, client.getSkipNull());
     }
 
     /**
@@ -512,7 +460,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
      */
     private RequestBody buildJsonBody() {
         try {
-            String json = client.getSkipNull() ? jsonMapper.toJsonIgnoreNull(body) : jsonMapper.toJson(body);
+            String json = JsonSerializationHelper.serialize(body, jsonMapper, client.getSkipNull());
             return RequestBody.create(json, JSON_MEDIA_TYPE);
         } catch (Exception e) {
             throw new HttpClientException("Failed to serialize request body to JSON", e);
@@ -539,7 +487,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
             } else {
                 // Convert to JSON string
                 try {
-                    String json = client.getSkipNull() ? jsonMapper.toJsonIgnoreNull(value) : jsonMapper.toJson(value);
+                    String json = JsonSerializationHelper.serialize(value, jsonMapper, client.getSkipNull());
                     builder.addFormDataPart(key, json);
                 } catch (Exception e) {
                     throw new HttpClientException("Failed to serialize multipart field to JSON: " + key, e);
@@ -674,16 +622,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
      * @return HttpResponse
      */
     private <T> HttpResponse<T> buildHttpResponse(Response response, T responseBody) {
-        Map<String, List<String>> headers = new HashMap<>(response.headers().names().size());
-        for (String name : response.headers().names()) {
-            headers.put(name, response.headers().values(name));
-        }
-
-        return HttpResponse.<T>builder()
-                .statusCode(response.code())
-                .headers(headers)
-                .body(responseBody)
-                .build();
+        return OkHttpResponseProcessor.buildHttpResponse(response, responseBody);
     }
 
     /**

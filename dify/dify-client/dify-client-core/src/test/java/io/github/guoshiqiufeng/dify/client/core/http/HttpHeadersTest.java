@@ -433,4 +433,95 @@ class HttpHeadersTest {
         headers.getFirst("AUTHORIZATION-empty");
         headers.getFirst("AUTHORIZATION-null");
     }
+
+    @Test
+    void testGetContentType() {
+        HttpHeaders headers = new HttpHeaders();
+        assertNull(headers.getContentType());
+
+        headers.setContentType("application/json");
+        assertEquals("application/json", headers.getContentType());
+    }
+
+    @Test
+    void testGetContentLength() {
+        HttpHeaders headers = new HttpHeaders();
+        assertNull(headers.getContentLength());
+
+        headers.setContentLength(1024);
+        assertEquals("1024", headers.getContentLength());
+    }
+
+    @Test
+    void testGetContentDisposition() {
+        HttpHeaders headers = new HttpHeaders();
+        assertNull(headers.getContentDisposition());
+
+        ContentDisposition disposition = ContentDisposition.attachment().filename("test.txt").build();
+        headers.setContentDisposition(disposition);
+        assertNotNull(headers.getContentDisposition());
+    }
+
+    @Test
+    void testGetFirstWithEmptyList() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Empty-Header", new ArrayList<>());
+        assertNull(headers.getFirst("Empty-Header"));
+    }
+
+    @Test
+    void testAddAllToExistingKey() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Accept", "text/html");
+        headers.addAll("accept", Arrays.asList("application/json", "application/xml"));
+
+        List<String> values = headers.get("Accept");
+        assertEquals(3, values.size());
+    }
+
+    @Test
+    void testToSingleValueMapWithNullValues() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Null-Header", null);
+        headers.add("Valid-Header", "value");
+
+        Map<String, String> map = headers.toSingleValueMap();
+        assertFalse(map.containsKey("Null-Header"));
+        assertEquals("value", map.get("Valid-Header"));
+    }
+
+    @Test
+    void testToSingleValueMapWithEmptyList() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Empty-Header", new ArrayList<>());
+        headers.add("Valid-Header", "value");
+
+        Map<String, String> map = headers.toSingleValueMap();
+        assertFalse(map.containsKey("Empty-Header"));
+        assertEquals("value", map.get("Valid-Header"));
+    }
+
+    @Test
+    void testGetReturnsNullForNullValues() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Test-Header", null);
+
+        assertNull(headers.get("Test-Header"));
+    }
+
+    @Test
+    void testPutWithSameKey() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "text/plain");
+        headers.put("Content-Type", Collections.singletonList("application/json"));
+
+        assertEquals(1, headers.size());
+        assertEquals("application/json", headers.getFirst("Content-Type"));
+    }
+
+    @Test
+    void testRemoveNonExistingKey() {
+        HttpHeaders headers = new HttpHeaders();
+        assertNull(headers.remove("Non-Existing"));
+    }
 }

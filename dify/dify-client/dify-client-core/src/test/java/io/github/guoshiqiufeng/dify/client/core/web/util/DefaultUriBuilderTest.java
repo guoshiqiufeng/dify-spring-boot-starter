@@ -284,4 +284,28 @@ class DefaultUriBuilderTest {
         // The second call should overwrite the first (assuming map-based storage)
         assertEquals("/users?tag=spring", uri.toString());
     }
+
+    @Test
+    void testBuildWithStoredVariables() {
+        DefaultUriBuilder builder = new DefaultUriBuilder();
+        builder.path("/users/{id}/posts/{postId}");
+
+        // First build with variables - this stores them
+        URI uri1 = builder.build(123, 456);
+        assertEquals("/users/123/posts/456", uri1.toString());
+
+        // Second build without variables - should use stored ones
+        URI uri2 = builder.build();
+        assertEquals("/users/123/posts/456", uri2.toString());
+    }
+
+    @Test
+    void testBuildWithoutVariablesWhenNoneStored() {
+        DefaultUriBuilder builder = new DefaultUriBuilder();
+        builder.path("/users");
+
+        // Build without variables when none are stored
+        URI uri = builder.build();
+        assertEquals("/users", uri.toString());
+    }
 }

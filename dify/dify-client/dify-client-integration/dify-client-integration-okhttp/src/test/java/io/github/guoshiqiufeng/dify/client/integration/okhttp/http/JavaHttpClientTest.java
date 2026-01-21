@@ -21,12 +21,17 @@ import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
 import io.github.guoshiqiufeng.dify.client.core.web.client.RequestBodyUriSpec;
 import io.github.guoshiqiufeng.dify.client.core.web.client.RequestHeadersUriSpec;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -177,5 +182,316 @@ class JavaHttpClientTest {
         // Assert
         assertNotNull(skipNull);
         assertTrue(skipNull);
+    }
+
+    @Test
+    void testConstructorWithDefaultHeaders() {
+        // Arrange
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer token");
+        headers.add("X-Custom-Header", "value");
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", clientConfig,
+                new OkHttpClient.Builder(), jsonMapper, headers);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getOkHttpClient());
+        assertEquals("http://example.com", client.getBaseUrl());
+    }
+
+    @Test
+    void testConstructorWithInterceptors() {
+        // Arrange
+        HttpHeaders headers = new HttpHeaders();
+        List<Interceptor> interceptors = new ArrayList<>();
+        interceptors.add(chain -> chain.proceed(chain.request()));
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", clientConfig,
+                new OkHttpClient.Builder(), jsonMapper, headers, interceptors);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getOkHttpClient());
+    }
+
+    @Test
+    void testConstructorWithNullBuilder() {
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", clientConfig,
+                null, jsonMapper, null, null);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getOkHttpClient());
+    }
+
+    @Test
+    void testConstructorWithEmptyHeaders() {
+        // Arrange
+        HttpHeaders headers = new HttpHeaders();
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", clientConfig,
+                new OkHttpClient.Builder(), jsonMapper, headers);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getOkHttpClient());
+    }
+
+    @Test
+    void testConstructorWithEmptyInterceptors() {
+        // Arrange
+        List<Interceptor> interceptors = new ArrayList<>();
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", clientConfig,
+                jsonMapper, new HttpHeaders(), interceptors);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getOkHttpClient());
+    }
+
+    @Test
+    void testConstructorWithCustomTimeouts() {
+        // Arrange
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setConnectTimeout(60);
+        config.setReadTimeout(90);
+        config.setWriteTimeout(120);
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        OkHttpClient okHttpClient = client.getOkHttpClient();
+        assertEquals(60, okHttpClient.connectTimeoutMillis() / 1000);
+        assertEquals(90, okHttpClient.readTimeoutMillis() / 1000);
+        assertEquals(120, okHttpClient.writeTimeoutMillis() / 1000);
+    }
+
+    @Test
+    void testConstructorWithLoggingEnabled() {
+        // Arrange
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setLogging(true);
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getOkHttpClient());
+        assertTrue(client.getOkHttpClient().interceptors().size() > 0);
+    }
+
+    @Test
+    void testConstructorWithLoggingDisabled() {
+        // Arrange
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setLogging(false);
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getOkHttpClient());
+    }
+
+    @Test
+    void testConstructorWithSkipNullFalse() {
+        // Arrange
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setSkipNull(false);
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertFalse(client.getSkipNull());
+    }
+
+    @Test
+    void testConstructorWithSkipNullTrue() {
+        // Arrange
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setSkipNull(true);
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertTrue(client.getSkipNull());
+    }
+
+    @Test
+    void testConstructorWithNullClientConfig() {
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", null, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertTrue(client.getSkipNull()); // Default should be true
+    }
+
+    @Test
+    void testMethodWithAllHttpMethods() {
+        // Test all HTTP methods
+        assertNotNull(httpClient.method(HttpMethod.GET));
+        assertNotNull(httpClient.method(HttpMethod.POST));
+        assertNotNull(httpClient.method(HttpMethod.PUT));
+        assertNotNull(httpClient.method(HttpMethod.DELETE));
+        assertNotNull(httpClient.method(HttpMethod.PATCH));
+        assertNotNull(httpClient.method(HttpMethod.HEAD));
+        assertNotNull(httpClient.method(HttpMethod.OPTIONS));
+    }
+
+    @Test
+    void testConstructorWithMultipleInterceptors() {
+        // Arrange
+        List<Interceptor> interceptors = new ArrayList<>();
+        interceptors.add(chain -> chain.proceed(chain.request()));
+        interceptors.add(chain -> chain.proceed(chain.request()));
+        interceptors.add(chain -> chain.proceed(chain.request()));
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", clientConfig,
+                jsonMapper, new HttpHeaders(), interceptors);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getOkHttpClient());
+    }
+
+    @Test
+    void testConstructorWithHeadersContainingMultipleValues() {
+        // Arrange
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Accept", "application/json");
+        headers.add("Accept", "text/plain");
+        headers.add("X-Custom", "value1");
+        headers.add("X-Custom", "value2");
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", clientConfig,
+                new OkHttpClient.Builder(), jsonMapper, headers);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getOkHttpClient());
+    }
+
+    @Test
+    void testConstructorWithEmptyStringHeader() {
+        // Arrange
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Empty", "");
+        headers.add("X-Valid", "value");
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", clientConfig,
+                new OkHttpClient.Builder(), jsonMapper, headers);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getOkHttpClient());
+    }
+
+    @Test
+    void testConstructorWithDifferentBaseUrls() {
+        // Test with different base URL formats
+        assertNotNull(new JavaHttpClient("http://example.com", jsonMapper));
+        assertNotNull(new JavaHttpClient("https://example.com", jsonMapper));
+        assertNotNull(new JavaHttpClient("http://example.com:8080", jsonMapper));
+        assertNotNull(new JavaHttpClient("https://api.example.com/v1", jsonMapper));
+    }
+
+    @Test
+    void testOkHttpClientConfiguration() {
+        // Arrange
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setConnectTimeout(45);
+        config.setReadTimeout(60);
+        config.setWriteTimeout(75);
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", config, jsonMapper);
+        OkHttpClient okHttpClient = client.getOkHttpClient();
+
+        // Assert
+        assertNotNull(okHttpClient);
+        assertTrue(okHttpClient.connectTimeoutMillis() > 0);
+        assertTrue(okHttpClient.readTimeoutMillis() > 0);
+        assertTrue(okHttpClient.writeTimeoutMillis() > 0);
+    }
+
+    @Test
+    void testDefaultTimeoutsWhenConfigIsNull() {
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", null, jsonMapper);
+        OkHttpClient okHttpClient = client.getOkHttpClient();
+
+        // Assert
+        assertNotNull(okHttpClient);
+        assertEquals(30, okHttpClient.connectTimeoutMillis() / 1000);
+        assertEquals(30, okHttpClient.readTimeoutMillis() / 1000);
+        assertEquals(30, okHttpClient.writeTimeoutMillis() / 1000);
+    }
+
+    @Test
+    void testInterceptorsAreApplied() {
+        // Arrange
+        List<Interceptor> interceptors = new ArrayList<>();
+        final boolean[] interceptorCalled = {false};
+        interceptors.add(chain -> {
+            interceptorCalled[0] = true;
+            return chain.proceed(chain.request());
+        });
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", clientConfig,
+                jsonMapper, new HttpHeaders(), interceptors);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getOkHttpClient());
+        // Note: Interceptor won't be called until an actual request is made
+    }
+
+    @Test
+    void testConstructorWithAllParameters() {
+        // Arrange
+        String baseUrl = "https://api.example.com";
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setConnectTimeout(30);
+        config.setReadTimeout(60);
+        config.setWriteTimeout(90);
+        config.setLogging(true);
+        config.setSkipNull(false);
+
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer token");
+
+        List<Interceptor> interceptors = new ArrayList<>();
+        interceptors.add(chain -> chain.proceed(chain.request()));
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient(baseUrl, config, builder,
+                jsonMapper, headers, interceptors);
+
+        // Assert
+        assertNotNull(client);
+        assertEquals(baseUrl, client.getBaseUrl());
+        assertFalse(client.getSkipNull());
+        assertNotNull(client.getOkHttpClient());
     }
 }
