@@ -369,9 +369,14 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
         // Build URL - handle potential double slash when baseUrl ends with / and uri starts with /
         String baseUrl = client.getBaseUrl();
         String path = uri != null ? uri.toString() : "";
-        String fullUrl = baseUrl.endsWith("/") && path.startsWith("/")
-            ? baseUrl + path.substring(1)
-            : baseUrl + path;
+        String fullUrl;
+        if (baseUrl.endsWith("/") && path.startsWith("/")) {
+            fullUrl = baseUrl + path.substring(1);
+        } else if (!baseUrl.endsWith("/") && !path.isEmpty() && !path.startsWith("/")) {
+            fullUrl = baseUrl + "/" + path;
+        } else {
+            fullUrl = baseUrl + path;
+        }
         HttpUrl.Builder urlBuilder = HttpUrl.parse(fullUrl).newBuilder();
         for (Map.Entry<String, String> entry : queryParams.entrySet()) {
             urlBuilder.addQueryParameter(entry.getKey(), entry.getValue());
