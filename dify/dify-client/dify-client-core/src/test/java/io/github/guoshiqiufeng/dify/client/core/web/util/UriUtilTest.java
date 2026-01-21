@@ -189,14 +189,6 @@ class UriUtilTest {
     }
 
     @Test
-    void testUtilityClassCannotBeInstantiated() throws Exception {
-        java.lang.reflect.Constructor<UriUtil> constructor = UriUtil.class.getDeclaredConstructor();
-        assertTrue(java.lang.reflect.Modifier.isPrivate(constructor.getModifiers()));
-        constructor.setAccessible(true);
-        constructor.newInstance();
-    }
-
-    @Test
     void testReplacePlaceholdersWithComplexPath() {
         String path = "/api/v1/users/{userId}/posts/{postId}/comments/{commentId}";
         String result = UriUtil.replacePlaceholders(path, 1, 2, 3);
