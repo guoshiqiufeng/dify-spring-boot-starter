@@ -736,7 +736,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 .body(audioData);
 
         // Mock response
-        when(responseSpec.body(any(ParameterizedTypeReference.class)))
+        when(responseSpec.toEntity(byte[].class))
                 .thenReturn(expectedResponse);
 
         // Execute the method
@@ -751,7 +751,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         verify(restClient).post();
         verify(requestBodyUriSpec).uri(ChatUriConstant.V1_TEXT_TO_AUDIO_URI);
         verify(requestBodySpec).body(any(Map.class));
-        verify(responseSpec).body(any(ParameterizedTypeReference.class));
+        verify(responseSpec).toEntity(byte[].class);
     }
 
     @Test
