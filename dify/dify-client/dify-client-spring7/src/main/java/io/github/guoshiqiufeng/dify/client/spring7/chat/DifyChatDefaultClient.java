@@ -50,10 +50,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author yanghq
@@ -241,31 +238,39 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
                 .body(requestBody)
                 .retrieve()
                 .onStatus(responseErrorHandler)
-                .body(new ParameterizedTypeReference<ResponseEntity<byte[]>>() {
-                });
+                .toEntity(byte[].class);
     }
 
     @Override
     public DifyTextVO audioToText(AudioToTextRequest request) {
         Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
         MultipartFile file = request.getFile();
-        BodyInserters.MultipartInserter fromMultipartData = BodyInserters.fromMultipartData(
-                new LinkedMultiValueMap<>() {{
-                    try {
-                        add("file", new MultipartInputStreamFileResource(
-                                file.getInputStream(),
-                                file.getOriginalFilename()
-                        ));
-                    } catch (IOException e) {
-                        throw new RuntimeException("file getInputStream error", e);
-                    }
-                }}
-        );
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+
+        try {
+            // Get file content and type
+            byte[] fileContent = file.getBytes();
+            String contentType = file.getContentType();
+            Set<String> supportedAudioTypes = Set.of(
+                    "audio/mp3", "audio/m4a", "audio/wav", "audio/amr", "audio/mpga"
+            );
+            contentType = Optional.ofNullable(file.getContentType())
+                    .filter(supportedAudioTypes::contains)
+                    .orElse("audio/mp3");
+            // Add file part
+            builder.part("file", fileContent)
+                    .header("Content-Disposition",
+                            "form-data; name=\"file\"; filename=\"" + request.getFile().getOriginalFilename() + "\"")
+                    .header("Content-Type", contentType);
+            ;
+        } catch (IOException e) {
+            throw new DiftChatException(DiftChatExceptionEnum.DIFY_DATA_PARSING_FAILURE);
+        }
         return this.restClient.post()
                 .uri(ChatUriConstant.V1_AUDIO_TO_TEXT_URI)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + request.getApiKey())
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(fromMultipartData)
+                .body(builder.build())
                 .retrieve()
                 .onStatus(responseErrorHandler)
                 .body(DifyTextVO.class);
