@@ -233,14 +233,13 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
                 .body(requestBody)
                 .retrieve()
                 .onStatus(responseErrorHandler)
-                .body(new TypeReference<HttpResponse<byte[]>>() {
-                });
+                .toEntity(byte[].class);
     }
 
     @Override
     public DifyTextVO audioToText(AudioToTextRequest request) {
         Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
-        MultipartBodyBuilder builder = MultipartBodyUtil.getMultipartBodyBuilder(request.getFile());
+        MultipartBodyBuilder builder = MultipartBodyUtil.getMultipartBodyBuilderForAudio(request.getFile());
 
         return this.httpClient.post()
                 .uri(ChatUriConstant.V1_AUDIO_TO_TEXT_URI)

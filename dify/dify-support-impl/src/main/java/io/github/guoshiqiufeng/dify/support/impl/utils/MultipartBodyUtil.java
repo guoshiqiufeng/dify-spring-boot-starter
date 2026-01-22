@@ -23,6 +23,10 @@ import io.github.guoshiqiufeng.dify.dataset.dto.request.file.FileOperation;
 import io.github.guoshiqiufeng.dify.dataset.exception.DiftDatasetException;
 import io.github.guoshiqiufeng.dify.dataset.exception.DiftDatasetExceptionEnum;
 
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
 /**
  * Utility class for building multipart body requests
  *
@@ -54,6 +58,35 @@ public class MultipartBodyUtil {
         byte[] fileContent = file.getContent();
         String contentType = file.getContentType();
         contentType = (StrUtil.isEmpty(contentType)) ? MediaType.TEXT_PLAIN : contentType;
+
+        // Add file part
+        builder.part("file", fileContent)
+                .header("Content-Disposition",
+                        "form-data; name=\"file\"; filename=\"" + file.getFilename() + "\"")
+                .header("Content-Type", contentType);
+
+        return builder;
+    }
+
+    public static MultipartBodyBuilder getMultipartBodyBuilderForAudio(DifyFile file) {
+        if (file == null) {
+            throw new DiftDatasetException(DiftDatasetExceptionEnum.DIFY_DATA_PARSING_FAILURE);
+        }
+
+        Set<String> supportedAudioTypes = new HashSet<>();
+        supportedAudioTypes.add("audio/mp3");
+        supportedAudioTypes.add("audio/m4a");
+        supportedAudioTypes.add("audio/wav");
+        supportedAudioTypes.add("audio/amr");
+        supportedAudioTypes.add("audio/mpga");
+
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+
+        // Get file content and type
+        byte[] fileContent = file.getContent();
+        String contentType = Optional.ofNullable(file.getContentType())
+                .filter(supportedAudioTypes::contains)
+                .orElse("audio/mp3");
 
         // Add file part
         builder.part("file", fileContent)
