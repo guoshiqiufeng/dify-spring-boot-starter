@@ -135,8 +135,11 @@ export default defineUserConfig({
                         text: `v${version}`,
                         children: [
                             {
-                                text: 'v1.x-SNAPSHOT',
-                                link: 'https://guoshiqiufeng.github.io/dify-spring-boot-starter-doc/v1.x-SNAPSHOT/',
+                                text: 'v2.x-SNAPSHOT',
+                                link: 'https://guoshiqiufeng.github.io/dify-spring-boot-starter-doc/v2.x-SNAPSHOT/',
+                            }, {
+                                text: 'v1.x',
+                                link: 'https://guoshiqiufeng.github.io/dify-spring-boot-starter-doc/v1.x/',
                             }, {
                                 text: 'v0.x',
                                 link: 'https://guoshiqiufeng.github.io/dify-spring-boot-starter-doc/v0.x/',
@@ -248,8 +251,11 @@ export default defineUserConfig({
                         text: `v${version}`,
                         children: [
                             {
-                                text: 'v1.x-SNAPSHOT',
-                                link: 'https://guoshiqiufeng.github.io/dify-spring-boot-starter-doc/v1.x-SNAPSHOT/',
+                                text: 'v2.x-SNAPSHOT',
+                                link: 'https://guoshiqiufeng.github.io/dify-spring-boot-starter-doc/v2.x-SNAPSHOT/',
+                            }, {
+                                text: 'v1.x',
+                                link: 'https://guoshiqiufeng.github.io/dify-spring-boot-starter-doc/v1.x/',
                             }, {
                                 text: 'v0.x',
                                 link: 'https://guoshiqiufeng.github.io/dify-spring-boot-starter-doc/v0.x/',
