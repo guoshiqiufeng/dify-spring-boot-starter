@@ -15,26 +15,23 @@
  */
 package io.github.guoshiqiufeng.dify.client.integration.okhttp.http;
 
-import io.github.guoshiqiufeng.dify.client.core.enums.HttpMethod;
-import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.codec.util.JsonSerializationHelper;
-import io.github.guoshiqiufeng.dify.client.core.web.util.DefaultUriBuilder;
-import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
-import io.github.guoshiqiufeng.dify.client.core.http.HttpRequestBuilder;
-import io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler;
+import io.github.guoshiqiufeng.dify.client.core.http.*;
 import io.github.guoshiqiufeng.dify.client.core.http.util.HttpStatusValidator;
 import io.github.guoshiqiufeng.dify.client.core.http.util.MultipartBodyProcessor;
 import io.github.guoshiqiufeng.dify.client.core.http.util.RequestParameterProcessor;
-import io.github.guoshiqiufeng.dify.client.core.map.LinkedMultiValueMap;
-import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
-import io.github.guoshiqiufeng.dify.client.core.web.client.ResponseSpec;
-import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
 import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
+import io.github.guoshiqiufeng.dify.client.core.util.LinkedMultiValueMap;
+import io.github.guoshiqiufeng.dify.client.core.util.MultiValueMap;
+import io.github.guoshiqiufeng.dify.client.core.web.client.ResponseSpec;
+import io.github.guoshiqiufeng.dify.client.core.web.util.DefaultUriBuilder;
+import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
 import io.github.guoshiqiufeng.dify.client.integration.okhttp.http.util.OkHttpMultipartBodyBuilder;
 import io.github.guoshiqiufeng.dify.client.integration.okhttp.http.util.OkHttpResponseProcessor;
 import io.github.guoshiqiufeng.dify.client.integration.okhttp.publisher.OkHttpStreamPublisher;
 import okhttp3.*;
+import okhttp3.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
@@ -448,7 +445,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
     private RequestBody buildMultipartBodyFromParts(Map<?, ?> bodyMap) {
         @SuppressWarnings("unchecked")
         Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> parts =
-            (Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part>) bodyMap;
+                (Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part>) bodyMap;
 
         return OkHttpMultipartBodyBuilder.buildMultipartBody(parts, jsonMapper, client.getSkipNull());
     }
@@ -560,7 +557,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
         try {
             return jsonMapper.fromJson(bodyString, responseType);
         } catch (Exception e) {
-            if(log.isErrorEnabled()) {
+            if (log.isErrorEnabled()) {
                 log.error("Failed to deserialize response body error:{}", e.getMessage(), e);
             }
             throw new HttpClientException("Failed to deserialize response body", e);

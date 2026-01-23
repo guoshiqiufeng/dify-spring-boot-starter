@@ -28,9 +28,6 @@ import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
 import java.io.IOException;
-import java.time.Duration;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for OkHttpStreamPublisher

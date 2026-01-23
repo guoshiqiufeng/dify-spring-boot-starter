@@ -97,9 +97,9 @@ public interface UriSpec<S extends RequestHeadersSpec<S>> {
      *     .body(User.class);
      * </pre>
      *
-     * @param uri         the URI path with placeholders
+     * @param uri          the URI path with placeholders
      * @param uriVariables path variable values
-     * @param uriFunction function to further customize the URI
+     * @param uriFunction  function to further customize the URI
      * @return the next stage of the request specification
      */
     S uri(String uri, Object[] uriVariables, Function<UriBuilder, URI> uriFunction);

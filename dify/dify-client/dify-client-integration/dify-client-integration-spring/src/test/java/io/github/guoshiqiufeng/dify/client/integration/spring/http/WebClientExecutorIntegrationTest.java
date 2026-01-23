@@ -29,7 +29,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -186,7 +185,8 @@ class WebClientExecutorIntegrationTest {
 
         // Act
         List<TestDto> result = executor.execute("GET", uri, new HashMap<>(), new HashMap<>(),
-                new HashMap<>(), null, new TypeReference<List<TestDto>>() {});
+                new HashMap<>(), null, new TypeReference<List<TestDto>>() {
+                });
 
         // Assert
         assertNotNull(result);
@@ -207,7 +207,8 @@ class WebClientExecutorIntegrationTest {
 
         // Act
         Map<String, String> result = executor.execute("GET", uri, new HashMap<>(), new HashMap<>(),
-                new HashMap<>(), null, new TypeReference<Map<String, String>>() {});
+                new HashMap<>(), null, new TypeReference<Map<String, String>>() {
+                });
 
         // Assert
         assertNotNull(result);
@@ -354,7 +355,8 @@ class WebClientExecutorIntegrationTest {
 
         // Act
         ResponseEntity<List<TestDto>> response = executor.executeForEntity("GET", uri, new HashMap<>(),
-                new HashMap<>(), new HashMap<>(), null, new TypeReference<List<TestDto>>() {});
+                new HashMap<>(), new HashMap<>(), null, new TypeReference<List<TestDto>>() {
+                });
 
         // Assert
         assertNotNull(response);
@@ -375,7 +377,8 @@ class WebClientExecutorIntegrationTest {
 
         // Act
         ResponseEntity<Map<String, String>> response = executor.executeForEntity("GET", uri, new HashMap<>(),
-                new HashMap<>(), new HashMap<>(), null, new TypeReference<Map<String, String>>() {});
+                new HashMap<>(), new HashMap<>(), null, new TypeReference<Map<String, String>>() {
+                });
 
         // Assert
         assertEquals("test", response.getHeaders().getFirst("X-Custom"));
@@ -392,7 +395,8 @@ class WebClientExecutorIntegrationTest {
 
         // Act
         ResponseEntity<List<TestDto>> response = executor.executeForEntity("GET", uri, new HashMap<>(),
-                new HashMap<>(), new HashMap<>(), null, new TypeReference<List<TestDto>>() {});
+                new HashMap<>(), new HashMap<>(), null, new TypeReference<List<TestDto>>() {
+                });
 
         // Assert
         assertNotNull(response);
@@ -411,7 +415,8 @@ class WebClientExecutorIntegrationTest {
 
         // Act
         ResponseEntity<String> response = executor.executeForEntity("GET", uri, new HashMap<>(),
-                new HashMap<>(), new HashMap<>(), null, new TypeReference<String>() {});
+                new HashMap<>(), new HashMap<>(), null, new TypeReference<String>() {
+                });
 
         // Assert
         assertNotNull(response);
@@ -478,7 +483,8 @@ class WebClientExecutorIntegrationTest {
 
         // Act
         Flux<Map<String, String>> flux = executor.executeStream("GET", uri, new HashMap<>(),
-                new HashMap<>(), new HashMap<>(), null, new TypeReference<Map<String, String>>() {});
+                new HashMap<>(), new HashMap<>(), null, new TypeReference<Map<String, String>>() {
+                });
 
         // Assert
         StepVerifier.create(flux)
@@ -527,7 +533,8 @@ class WebClientExecutorIntegrationTest {
 
         // Act
         Flux<Map<String, String>> flux = executor.executeStream("GET", uri, new HashMap<>(),
-                new HashMap<>(), new HashMap<>(), null, new TypeReference<Map<String, String>>() {});
+                new HashMap<>(), new HashMap<>(), null, new TypeReference<Map<String, String>>() {
+                });
 
         // Assert
         StepVerifier.create(flux)

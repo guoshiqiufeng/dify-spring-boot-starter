@@ -26,7 +26,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -294,7 +293,7 @@ class SpringHttpRequestBuilderTest {
         executorField.set(builder, mockExecutor);
 
         when(mockExecutor.execute(anyString(), any(URI.class), any(), any(), any(), any(), eq(String.class)))
-            .thenReturn("test response");
+                .thenReturn("test response");
 
         // Act
         String result = builder.execute(String.class);
@@ -316,7 +315,7 @@ class SpringHttpRequestBuilderTest {
             executorField.set(builder, mockExecutor);
 
             when(mockExecutor.execute(anyString(), any(URI.class), any(), any(), any(), any(), eq(Void.class)))
-                .thenReturn(null);
+                    .thenReturn(null);
 
             // Act
             int status = builder.executeForStatus();
@@ -334,7 +333,8 @@ class SpringHttpRequestBuilderTest {
         // Arrange
         builder.uri("/api/test");
         io.github.guoshiqiufeng.dify.client.core.http.TypeReference<String> typeRef =
-            new io.github.guoshiqiufeng.dify.client.core.http.TypeReference<String>() {};
+                new io.github.guoshiqiufeng.dify.client.core.http.TypeReference<String>() {
+                };
 
         java.lang.reflect.Field executorField = SpringHttpRequestBuilder.class.getDeclaredField("webClientExecutor");
         executorField.setAccessible(true);
@@ -342,8 +342,8 @@ class SpringHttpRequestBuilderTest {
         executorField.set(builder, mockExecutor);
 
         when(mockExecutor.execute(anyString(), any(URI.class), any(), any(), any(), any(),
-            any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class)))
-            .thenReturn("test response");
+                any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class)))
+                .thenReturn("test response");
 
         // Act
         String result = builder.execute(typeRef);
@@ -363,7 +363,7 @@ class SpringHttpRequestBuilderTest {
         executorField.set(builder, mockExecutor);
 
         when(mockExecutor.execute(anyString(), any(URI.class), any(), any(), any(), any(), eq(String.class)))
-            .thenReturn("test body");
+                .thenReturn("test body");
 
         // Act
         var response = builder.executeForResponse(String.class);
@@ -380,7 +380,8 @@ class SpringHttpRequestBuilderTest {
         // Arrange
         builder.uri("/api/test");
         io.github.guoshiqiufeng.dify.client.core.http.TypeReference<String> typeRef =
-            new io.github.guoshiqiufeng.dify.client.core.http.TypeReference<String>() {};
+                new io.github.guoshiqiufeng.dify.client.core.http.TypeReference<String>() {
+                };
 
         java.lang.reflect.Field executorField = SpringHttpRequestBuilder.class.getDeclaredField("webClientExecutor");
         executorField.setAccessible(true);
@@ -388,8 +389,8 @@ class SpringHttpRequestBuilderTest {
         executorField.set(builder, mockExecutor);
 
         when(mockExecutor.execute(anyString(), any(URI.class), any(), any(), any(), any(),
-            any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class)))
-            .thenReturn("test body");
+                any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class)))
+                .thenReturn("test body");
 
         // Act
         var response = builder.executeForResponse(typeRef);
@@ -405,12 +406,12 @@ class SpringHttpRequestBuilderTest {
         // Arrange
         var responseSpec = builder.retrieve();
         io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler errorHandler =
-            io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler.onStatus(
-                status -> status >= 400,
-                response -> {
-                    // Error handler logic
-                }
-            );
+                io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler.onStatus(
+                        status -> status >= 400,
+                        response -> {
+                            // Error handler logic
+                        }
+                );
 
         // Act
         var result = responseSpec.onStatus(errorHandler);
@@ -432,12 +433,12 @@ class SpringHttpRequestBuilderTest {
         executorField.set(builder, mockExecutor);
 
         io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity<String> mockResponse =
-            mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class);
+                mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class);
         when(mockResponse.getStatusCode()).thenReturn(200);
         when(mockResponse.getBody()).thenReturn("test body");
 
         when(mockExecutor.executeForEntity(anyString(), any(URI.class), any(), any(), any(), any(), eq(String.class)))
-            .thenReturn(mockResponse);
+                .thenReturn(mockResponse);
 
         // Act
         var responseSpec = builder.retrieve();
@@ -461,18 +462,19 @@ class SpringHttpRequestBuilderTest {
         executorField.set(builder, mockExecutor);
 
         io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity<String> mockResponse =
-            mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class);
+                mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class);
         when(mockResponse.getStatusCode()).thenReturn(200);
         when(mockResponse.getBody()).thenReturn("test body");
 
         when(mockExecutor.executeForEntity(anyString(), any(URI.class), any(), any(), any(), any(),
-            any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class)))
-            .thenReturn(mockResponse);
+                any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class)))
+                .thenReturn(mockResponse);
 
         // Act
         var responseSpec = builder.retrieve();
         io.github.guoshiqiufeng.dify.client.core.http.TypeReference<String> typeRef =
-            new io.github.guoshiqiufeng.dify.client.core.http.TypeReference<String>() {};
+                new io.github.guoshiqiufeng.dify.client.core.http.TypeReference<String>() {
+                };
         var result = responseSpec.toEntity(typeRef);
 
         // Assert
@@ -493,11 +495,11 @@ class SpringHttpRequestBuilderTest {
         executorField.set(builder, mockExecutor);
 
         io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity<Void> mockResponse =
-            mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class);
+                mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class);
         when(mockResponse.getStatusCode()).thenReturn(204);
 
         when(mockExecutor.executeForEntity(anyString(), any(URI.class), any(), any(), any(), any(), eq(Void.class)))
-            .thenReturn(mockResponse);
+                .thenReturn(mockResponse);
 
         // Act
         var responseSpec = builder.retrieve();
@@ -520,7 +522,7 @@ class SpringHttpRequestBuilderTest {
 
         reactor.core.publisher.Flux<String> mockFlux = reactor.core.publisher.Flux.just("item1", "item2");
         when(mockExecutor.executeStream(anyString(), any(URI.class), any(), any(), any(), any(), eq(String.class)))
-            .thenReturn(mockFlux);
+                .thenReturn(mockFlux);
 
         // Act
         var responseSpec = builder.retrieve();
@@ -543,13 +545,14 @@ class SpringHttpRequestBuilderTest {
 
         reactor.core.publisher.Flux<String> mockFlux = reactor.core.publisher.Flux.just("item1", "item2");
         when(mockExecutor.executeStream(anyString(), any(URI.class), any(), any(), any(), any(),
-            any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class)))
-            .thenReturn(mockFlux);
+                any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class)))
+                .thenReturn(mockFlux);
 
         // Act
         var responseSpec = builder.retrieve();
         io.github.guoshiqiufeng.dify.client.core.http.TypeReference<String> typeRef =
-            new io.github.guoshiqiufeng.dify.client.core.http.TypeReference<String>() {};
+                new io.github.guoshiqiufeng.dify.client.core.http.TypeReference<String>() {
+                };
         var result = responseSpec.bodyToFlux(typeRef);
 
         // Assert
@@ -570,7 +573,7 @@ class SpringHttpRequestBuilderTest {
 
         reactor.core.publisher.Flux<String> mockFlux = reactor.core.publisher.Flux.just("data1", "data2");
         when(mockExecutor.executeStream(anyString(), any(URI.class), any(), any(), any(), any(), eq(String.class)))
-            .thenReturn(mockFlux);
+                .thenReturn(mockFlux);
 
         // Act
         var result = builder.stream(String.class);
@@ -592,12 +595,12 @@ class SpringHttpRequestBuilderTest {
         executorField.set(builder, mockExecutor);
 
         io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity<String> mockResponse =
-            mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class, withSettings().lenient());
+                mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class, withSettings().lenient());
         when(mockResponse.getStatusCode()).thenReturn(200);
         when(mockResponse.getBody()).thenReturn("response body");
 
         when(mockExecutor.executeForEntity(anyString(), any(URI.class), any(), any(), any(), any(), eq(String.class)))
-            .thenReturn(mockResponse);
+                .thenReturn(mockResponse);
 
         // Act
         var responseSpec = builder.retrieve();
@@ -619,18 +622,19 @@ class SpringHttpRequestBuilderTest {
         executorField.set(builder, mockExecutor);
 
         io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity<String> mockResponse =
-            mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class, withSettings().lenient());
+                mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class, withSettings().lenient());
         when(mockResponse.getStatusCode()).thenReturn(200);
         when(mockResponse.getBody()).thenReturn("response body");
 
         when(mockExecutor.executeForEntity(anyString(), any(URI.class), any(), any(), any(), any(),
-            any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class)))
-            .thenReturn(mockResponse);
+                any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class)))
+                .thenReturn(mockResponse);
 
         // Act
         var responseSpec = builder.retrieve();
         io.github.guoshiqiufeng.dify.client.core.http.TypeReference<String> typeRef =
-            new io.github.guoshiqiufeng.dify.client.core.http.TypeReference<String>() {};
+                new io.github.guoshiqiufeng.dify.client.core.http.TypeReference<String>() {
+                };
         String result = responseSpec.body(typeRef);
 
         // Assert
@@ -649,22 +653,22 @@ class SpringHttpRequestBuilderTest {
         executorField.set(builder, mockExecutor);
 
         io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity<String> mockResponse =
-            mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class, withSettings().lenient());
+                mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class, withSettings().lenient());
         when(mockResponse.getStatusCode()).thenReturn(404);
         when(mockResponse.getBody()).thenReturn("Not Found");
 
         when(mockExecutor.executeForEntity(anyString(), any(URI.class), any(), any(), any(), any(), eq(String.class)))
-            .thenReturn(mockResponse);
+                .thenReturn(mockResponse);
 
         // Act & Assert
         var responseSpec = builder.retrieve();
         responseSpec.onStatus(
-            io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler.onStatus(
-                status -> status == 404,
-                response -> {
-                    throw new RuntimeException("Not found error");
-                }
-            )
+                io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler.onStatus(
+                        status -> status == 404,
+                        response -> {
+                            throw new RuntimeException("Not found error");
+                        }
+                )
         );
 
         assertThrows(RuntimeException.class, () -> responseSpec.toEntity(String.class));
@@ -682,29 +686,29 @@ class SpringHttpRequestBuilderTest {
         executorField.set(builder, mockExecutor);
 
         io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity<String> mockResponse =
-            mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class, withSettings().lenient());
+                mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class, withSettings().lenient());
         when(mockResponse.getStatusCode()).thenReturn(500);
         when(mockResponse.getBody()).thenReturn("Server Error");
 
         when(mockExecutor.executeForEntity(anyString(), any(URI.class), any(), any(), any(), any(), eq(String.class)))
-            .thenReturn(mockResponse);
+                .thenReturn(mockResponse);
 
         // Act & Assert
         var responseSpec = builder.retrieve();
         responseSpec.onStatus(
-            io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler.onStatus(
-                status -> status == 404,
-                response -> {
-                    throw new RuntimeException("Not found");
-                }
-            )
+                io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler.onStatus(
+                        status -> status == 404,
+                        response -> {
+                            throw new RuntimeException("Not found");
+                        }
+                )
         ).onStatus(
-            io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler.onStatus(
-                status -> status >= 500,
-                response -> {
-                    throw new RuntimeException("Server error");
-                }
-            )
+                io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler.onStatus(
+                        status -> status >= 500,
+                        response -> {
+                            throw new RuntimeException("Server error");
+                        }
+                )
         );
 
         assertThrows(RuntimeException.class, () -> responseSpec.toEntity(String.class));
@@ -722,22 +726,22 @@ class SpringHttpRequestBuilderTest {
         executorField.set(builder, mockExecutor);
 
         io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity<String> mockResponse =
-            mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class);
+                mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class);
         when(mockResponse.getStatusCode()).thenReturn(200);
         when(mockResponse.getBody()).thenReturn("Success");
 
         when(mockExecutor.executeForEntity(anyString(), any(URI.class), any(), any(), any(), any(), eq(String.class)))
-            .thenReturn(mockResponse);
+                .thenReturn(mockResponse);
 
         // Act
         var responseSpec = builder.retrieve();
         responseSpec.onStatus(
-            io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler.onStatus(
-                status -> status >= 400,
-                response -> {
-                    throw new RuntimeException("Error");
-                }
-            )
+                io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler.onStatus(
+                        status -> status >= 400,
+                        response -> {
+                            throw new RuntimeException("Error");
+                        }
+                )
         );
 
         var result = responseSpec.toEntity(String.class);
@@ -865,7 +869,7 @@ class SpringHttpRequestBuilderTest {
         restExecutorField.set(builderWithRestClient, mockRestExecutor);
 
         when(mockRestExecutor.execute(anyString(), any(URI.class), any(), any(), any(), eq(String.class)))
-            .thenReturn("rest client response");
+                .thenReturn("rest client response");
 
         // Act
         String result = builderWithRestClient.execute(String.class);
@@ -892,11 +896,12 @@ class SpringHttpRequestBuilderTest {
         restExecutorField.set(builderWithRestClient, mockRestExecutor);
 
         io.github.guoshiqiufeng.dify.client.core.http.TypeReference<String> typeRef =
-            new io.github.guoshiqiufeng.dify.client.core.http.TypeReference<String>() {};
+                new io.github.guoshiqiufeng.dify.client.core.http.TypeReference<String>() {
+                };
 
         when(mockRestExecutor.execute(anyString(), any(URI.class), any(), any(), any(),
-            any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class)))
-            .thenReturn("rest client response");
+                any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class)))
+                .thenReturn("rest client response");
 
         // Act
         String result = builderWithRestClient.execute(typeRef);
@@ -917,25 +922,25 @@ class SpringHttpRequestBuilderTest {
         executorField.set(builder, mockExecutor);
 
         io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity<String> mockResponse =
-            mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class, withSettings().lenient());
+                mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class, withSettings().lenient());
         when(mockResponse.getStatusCode()).thenReturn(400);
         when(mockResponse.getBody()).thenReturn("Bad Request");
 
         when(mockExecutor.executeForEntity(anyString(), any(URI.class), any(), any(), any(), any(), eq(String.class)))
-            .thenReturn(mockResponse);
+                .thenReturn(mockResponse);
 
         // Act & Assert
         var responseSpec = builder.retrieve();
         responseSpec.onStatus(
-            io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler.onStatus(
-                status -> status == 400,
-                response -> {
-                    throw new Exception("Checked exception");
-                }
-            )
+                io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler.onStatus(
+                        status -> status == 400,
+                        response -> {
+                            throw new Exception("Checked exception");
+                        }
+                )
         );
 
         assertThrows(io.github.guoshiqiufeng.dify.client.core.http.HttpClientException.class,
-            () -> responseSpec.toEntity(String.class));
+                () -> responseSpec.toEntity(String.class));
     }
 }

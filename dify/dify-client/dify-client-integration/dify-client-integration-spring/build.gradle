@@ -102,8 +102,8 @@ tasks.named('test') {
 tasks.named('jacocoTestReport') {
     // Include execution data from both test suites
     executionData.from = files(
-        "${buildDir}/jacoco/test.exec",
-        "${buildDir}/jacoco/spring6Test.exec"
+            "${buildDir}/jacoco/test.exec",
+            "${buildDir}/jacoco/spring6Test.exec"
     )
 
     // Aggregate reports from both test suites

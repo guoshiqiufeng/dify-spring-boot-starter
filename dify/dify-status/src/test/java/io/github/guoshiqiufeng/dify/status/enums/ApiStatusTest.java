@@ -17,7 +17,7 @@ package io.github.guoshiqiufeng.dify.status.enums;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * ApiStatus enum test

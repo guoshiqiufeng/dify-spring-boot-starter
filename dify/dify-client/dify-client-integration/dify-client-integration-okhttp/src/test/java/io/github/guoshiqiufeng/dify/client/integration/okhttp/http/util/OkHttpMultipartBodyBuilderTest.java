@@ -26,7 +26,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -400,7 +399,7 @@ class OkHttpMultipartBodyBuilderTest {
         builder.part("user", userData);
         Map<String, MultipartBodyBuilder.Part> parts = builder.build();
 
-        assertThrows(HttpClientException.class, ()-> {
+        assertThrows(HttpClientException.class, () -> {
             OkHttpMultipartBodyBuilder.buildMultipartBody(parts, jsonMapper, false);
         });
     }

@@ -15,8 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.support.impl.utils;
 
-import io.github.guoshiqiufeng.dify.core.utils.StrUtil;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
+import io.github.guoshiqiufeng.dify.core.utils.StrUtil;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.BaseDatasetRequest;
 
 import java.util.function.Consumer;

@@ -389,7 +389,7 @@ class SpringRequestParameterApplierTest {
         headers.put("Content-Type", "application/json");
 
         assertThrows(Exception.class, () ->
-            SpringRequestParameterApplier.applyHeadersReflection(invalidSpec, headers)
+                SpringRequestParameterApplier.applyHeadersReflection(invalidSpec, headers)
         );
     }
 
@@ -400,7 +400,7 @@ class SpringRequestParameterApplierTest {
         cookies.put("sessionId", "abc123");
 
         assertThrows(Exception.class, () ->
-            SpringRequestParameterApplier.applyCookiesReflection(invalidSpec, cookies)
+                SpringRequestParameterApplier.applyCookiesReflection(invalidSpec, cookies)
         );
     }
 

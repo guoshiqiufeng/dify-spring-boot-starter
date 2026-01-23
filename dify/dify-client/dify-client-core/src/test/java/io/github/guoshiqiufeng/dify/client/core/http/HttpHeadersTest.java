@@ -15,8 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.client.core.http;
 
-import io.github.guoshiqiufeng.dify.client.core.map.LinkedMultiValueMap;
-import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
+import io.github.guoshiqiufeng.dify.client.core.util.LinkedMultiValueMap;
+import io.github.guoshiqiufeng.dify.client.core.util.MultiValueMap;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;

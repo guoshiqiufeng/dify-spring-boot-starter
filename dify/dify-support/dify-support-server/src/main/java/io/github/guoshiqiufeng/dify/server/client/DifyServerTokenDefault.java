@@ -53,7 +53,7 @@ public class DifyServerTokenDefault extends BaseDifyServerToken {
     }
 
     @Override
-    public void addAuthorizationCookies(io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap<String, String> cookies, DifyServerClient difyServerClient) {
+    public void addAuthorizationCookies(io.github.guoshiqiufeng.dify.client.core.util.MultiValueMap<String, String> cookies, DifyServerClient difyServerClient) {
         String token = accessToken;
         if (token == null) {
             token = obtainTokenIfNeeded(difyServerClient);

@@ -15,33 +15,29 @@
  */
 package io.github.guoshiqiufeng.dify.support.impl.chat;
 
-import io.github.guoshiqiufeng.dify.core.bean.BeanUtils;
-import io.github.guoshiqiufeng.dify.core.utils.Assert;
-import io.github.guoshiqiufeng.dify.core.utils.CollUtil;
-import io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder;
-import io.github.guoshiqiufeng.dify.core.utils.StrUtil;
 import io.github.guoshiqiufeng.dify.chat.client.DifyChatClient;
 import io.github.guoshiqiufeng.dify.chat.constant.ChatUriConstant;
 import io.github.guoshiqiufeng.dify.chat.dto.request.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.*;
-import io.github.guoshiqiufeng.dify.client.core.constant.MediaType;
-import io.github.guoshiqiufeng.dify.client.core.enums.HttpMethod;
-import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
-import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
-import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
-import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
-import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
+import io.github.guoshiqiufeng.dify.client.core.http.*;
 import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
-import io.github.guoshiqiufeng.dify.support.impl.base.BaseDifyDefaultClient;
-import io.github.guoshiqiufeng.dify.support.impl.dto.chat.ChatMessageSendCompletionResponseDto;
-import io.github.guoshiqiufeng.dify.support.impl.utils.DatasetHeaderUtils;
+import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
+import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
+import io.github.guoshiqiufeng.dify.core.bean.BeanUtils;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.enums.ResponseModeEnum;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
 import io.github.guoshiqiufeng.dify.core.pojo.request.ChatMessageVO;
 import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
+import io.github.guoshiqiufeng.dify.core.utils.Assert;
+import io.github.guoshiqiufeng.dify.core.utils.CollUtil;
+import io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder;
+import io.github.guoshiqiufeng.dify.core.utils.StrUtil;
 import io.github.guoshiqiufeng.dify.dataset.constant.DatasetUriConstant;
+import io.github.guoshiqiufeng.dify.support.impl.base.BaseDifyDefaultClient;
+import io.github.guoshiqiufeng.dify.support.impl.dto.chat.ChatMessageSendCompletionResponseDto;
+import io.github.guoshiqiufeng.dify.support.impl.utils.DatasetHeaderUtils;
 import io.github.guoshiqiufeng.dify.support.impl.utils.MultipartBodyUtil;
 import reactor.core.publisher.Flux;
 

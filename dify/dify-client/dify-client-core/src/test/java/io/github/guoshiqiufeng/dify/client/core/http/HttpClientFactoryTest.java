@@ -46,7 +46,7 @@ class HttpClientFactoryTest {
         HttpClient mockClient = mock(HttpClient.class);
 
         when(factory.createClient(eq(baseUrl), any(DifyProperties.ClientConfig.class)))
-            .thenReturn(mockClient);
+                .thenReturn(mockClient);
 
         HttpClient result = factory.createClient(baseUrl);
 
@@ -61,13 +61,13 @@ class HttpClientFactoryTest {
         HttpClient mockClient = mock(HttpClient.class);
 
         when(factory.createClient(eq(baseUrl), any(DifyProperties.ClientConfig.class)))
-            .thenReturn(mockClient);
+                .thenReturn(mockClient);
 
         factory.createClient(baseUrl);
 
         // Verify that a ClientConfig was created and passed
         verify(factory).createClient(eq(baseUrl), argThat(config ->
-            config != null && config instanceof DifyProperties.ClientConfig
+                config != null && config instanceof DifyProperties.ClientConfig
         ));
     }
 
@@ -77,9 +77,9 @@ class HttpClientFactoryTest {
         HttpClient mockClient2 = mock(HttpClient.class);
 
         when(factory.createClient(eq("https://api1.example.com"), any(DifyProperties.ClientConfig.class)))
-            .thenReturn(mockClient1);
+                .thenReturn(mockClient1);
         when(factory.createClient(eq("https://api2.example.com"), any(DifyProperties.ClientConfig.class)))
-            .thenReturn(mockClient2);
+                .thenReturn(mockClient2);
 
         HttpClient result1 = factory.createClient("https://api1.example.com");
         HttpClient result2 = factory.createClient("https://api2.example.com");
@@ -95,7 +95,7 @@ class HttpClientFactoryTest {
         HttpClient mockClient = mock(HttpClient.class);
 
         when(factory.createClient(eq(baseUrl), any(DifyProperties.ClientConfig.class)))
-            .thenReturn(mockClient);
+                .thenReturn(mockClient);
 
         HttpClient result = factory.createClient(baseUrl);
 

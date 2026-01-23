@@ -16,7 +16,7 @@
 package io.github.guoshiqiufeng.dify.client.core.web.client;
 
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
-import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
+import io.github.guoshiqiufeng.dify.client.core.util.MultiValueMap;
 
 import java.util.function.Consumer;
 

@@ -38,9 +38,9 @@ import io.github.guoshiqiufeng.dify.chat.dto.response.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.parameter.Enabled;
 import io.github.guoshiqiufeng.dify.chat.enums.AnnotationReplyActionEnum;
 import io.github.guoshiqiufeng.dify.chat.enums.IconTypeEnum;
-import io.github.guoshiqiufeng.dify.client.core.constant.MediaType;
 import io.github.guoshiqiufeng.dify.client.core.http.ContentDisposition;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
+import io.github.guoshiqiufeng.dify.client.core.http.MediaType;
 import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyFile;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
@@ -276,7 +276,7 @@ class DifyChatClientImplTest {
         request.setText("Convert this text to speech");
 
         byte[] mockAudioData = "audio data".getBytes();
-        ResponseEntity<byte[]> expectedResponse = new ResponseEntity<>(200, new HttpHeaders() ,mockAudioData);
+        ResponseEntity<byte[]> expectedResponse = new ResponseEntity<>(200, new HttpHeaders(), mockAudioData);
 
         when(difyChatClient.textToAudio(any(TextToAudioRequest.class))).thenReturn(expectedResponse);
 

@@ -15,11 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.support.impl.dataset;
 
-import io.github.guoshiqiufeng.dify.client.core.constant.MediaType;
-import io.github.guoshiqiufeng.dify.client.core.enums.HttpMethod;
-import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
-import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
-import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
+import io.github.guoshiqiufeng.dify.client.core.http.*;
 import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
 import io.github.guoshiqiufeng.dify.client.integration.spring.file.DifyFileConverter;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
@@ -451,7 +447,7 @@ public class DifyDatasetDefaultClientTest extends BaseClientTest {
         // Execute the captured consumer to increase coverage
         headersCaptor.getValue().accept(mock(HttpHeaders.class));
 
-        verify(requestBodySpecMock).contentType(io.github.guoshiqiufeng.dify.client.core.constant.MediaType.MULTIPART_FORM_DATA);
+        verify(requestBodySpecMock).contentType(io.github.guoshiqiufeng.dify.client.core.http.MediaType.MULTIPART_FORM_DATA);
         verify(requestBodySpecMock).body(any());
         verify(responseSpecMock).body(DocumentCreateResponse.class);
     }

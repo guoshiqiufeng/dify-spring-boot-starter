@@ -455,10 +455,10 @@ class WebClientExecutor {
                         // Handle multipart data
                         @SuppressWarnings("unchecked")
                         Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> parts =
-                            (Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part>) bodyMap;
+                                (Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part>) bodyMap;
 
                         MultiValueMap<String, HttpEntity<?>> multipartData =
-                            SpringMultipartBodyBuilder.buildMultipartBody(parts, jsonMapper, skipNull);
+                                SpringMultipartBodyBuilder.buildMultipartBody(parts, jsonMapper, skipNull);
 
                         bodySpec.bodyValue(multipartData);
                         return bodySpec;

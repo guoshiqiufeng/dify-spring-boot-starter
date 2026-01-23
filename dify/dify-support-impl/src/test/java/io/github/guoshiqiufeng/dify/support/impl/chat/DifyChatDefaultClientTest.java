@@ -20,11 +20,7 @@ import io.github.guoshiqiufeng.dify.chat.dto.request.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.*;
 import io.github.guoshiqiufeng.dify.chat.enums.AnnotationReplyActionEnum;
 import io.github.guoshiqiufeng.dify.chat.enums.IconTypeEnum;
-import io.github.guoshiqiufeng.dify.client.core.constant.MediaType;
-import io.github.guoshiqiufeng.dify.client.core.enums.HttpMethod;
-import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
-import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
-import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
+import io.github.guoshiqiufeng.dify.client.core.http.*;
 import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
 import io.github.guoshiqiufeng.dify.client.core.web.client.ResponseSpec;
@@ -307,7 +303,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         // Verify interactions with mocks
         verify(requestBodyUriSpecMock).uri(ChatUriConstant.V1_CHAT_MESSAGES_URI);
         verify(requestBodySpecMock).header(HttpHeaders.AUTHORIZATION, "Bearer " + TEST_API_KEY);
-        verify(requestBodySpecMock).contentType(io.github.guoshiqiufeng.dify.client.core.constant.MediaType.APPLICATION_JSON);
+        verify(requestBodySpecMock).contentType(io.github.guoshiqiufeng.dify.client.core.http.MediaType.APPLICATION_JSON);
         verify(requestBodySpecMock).body(any(ChatMessageVO.class));
     }
 
@@ -704,7 +700,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         byte[] audioData = "mock audio data".getBytes();
         ResponseEntity<byte[]> expectedResponse = ResponseEntity.<byte[]>builder()
                 .statusCode(200)
-                .header("Content-Type", io.github.guoshiqiufeng.dify.client.core.constant.MediaType.APPLICATION_OCTET_STREAM)
+                .header("Content-Type", io.github.guoshiqiufeng.dify.client.core.http.MediaType.APPLICATION_OCTET_STREAM)
                 .body(audioData)
                 .build();
 

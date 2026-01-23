@@ -16,17 +16,15 @@
 package io.github.guoshiqiufeng.dify.client.integration.okhttp.http;
 
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
+import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
 import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
-import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Factory for creating Java HTTP client instances using OkHttp.

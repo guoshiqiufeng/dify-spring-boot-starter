@@ -15,7 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.client.core.http;
 
-import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
+import io.github.guoshiqiufeng.dify.client.core.util.MultiValueMap;
 
 import java.io.Serializable;
 import java.util.*;

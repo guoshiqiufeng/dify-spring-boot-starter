@@ -18,7 +18,8 @@ package io.github.guoshiqiufeng.dify.client.core.response;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
 import lombok.Getter;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 /**
  * HTTP response wrapper that encapsulates status code, headers, and body.
@@ -33,7 +34,7 @@ public class ResponseEntity<T> {
 
     /**
      * -- GETTER --
-     *  Get the HTTP status code.
+     * Get the HTTP status code.
      *
      * @return status code
      */
@@ -42,7 +43,7 @@ public class ResponseEntity<T> {
     private final HttpHeaders headers;
     /**
      * -- GETTER --
-     *  Get the response body.
+     * Get the response body.
      *
      * @return response body
      */

@@ -15,9 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.server.client;
 
-import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
-import io.github.guoshiqiufeng.dify.core.exception.DifyClientException;
 import io.github.guoshiqiufeng.dify.core.exception.DiftClientExceptionEnum;
+import io.github.guoshiqiufeng.dify.core.exception.DifyClientException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -224,7 +223,7 @@ class BaseDifyServerTokenTest {
         }
 
         @Override
-        public void addAuthorizationCookies(io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap<String, String> cookies, DifyServerClient difyServerClient) {
+        public void addAuthorizationCookies(io.github.guoshiqiufeng.dify.client.core.util.MultiValueMap<String, String> cookies, DifyServerClient difyServerClient) {
 
         }
 

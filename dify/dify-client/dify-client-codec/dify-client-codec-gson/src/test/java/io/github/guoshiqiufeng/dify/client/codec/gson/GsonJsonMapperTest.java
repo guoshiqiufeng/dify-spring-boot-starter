@@ -15,8 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.client.codec.gson;
 
-import io.github.guoshiqiufeng.dify.client.core.codec.exception.JsonException;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonNode;
+import io.github.guoshiqiufeng.dify.client.core.codec.exception.JsonException;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 import lombok.Getter;
 import lombok.Setter;
@@ -103,7 +103,8 @@ class GsonJsonMapperTest {
     @Test
     void testFromJsonWithTypeReference() {
         String json = "[\"a\",\"b\",\"c\"]";
-        List<String> list = mapper.fromJson(json, new TypeReference<List<String>>() {});
+        List<String> list = mapper.fromJson(json, new TypeReference<List<String>>() {
+        });
         assertNotNull(list);
         assertEquals(3, list.size());
         assertEquals("a", list.get(0));
@@ -114,7 +115,8 @@ class GsonJsonMapperTest {
     @Test
     void testFromJsonMapWithTypeReference() {
         String json = "{\"key1\":\"value1\",\"key2\":\"value2\"}";
-        Map<String, String> map = mapper.fromJson(json, new TypeReference<Map<String, String>>() {});
+        Map<String, String> map = mapper.fromJson(json, new TypeReference<Map<String, String>>() {
+        });
         assertNotNull(map);
         assertEquals(2, map.size());
         assertEquals("value1", map.get("key1"));
@@ -124,7 +126,8 @@ class GsonJsonMapperTest {
     @Test
     void testFromJsonComplexTypeReference() {
         String json = "[{\"name\":\"John\",\"age\":30},{\"name\":\"Jane\",\"age\":25}]";
-        List<TestPojo> list = mapper.fromJson(json, new TypeReference<List<TestPojo>>() {});
+        List<TestPojo> list = mapper.fromJson(json, new TypeReference<List<TestPojo>>() {
+        });
         assertNotNull(list);
         assertEquals(2, list.size());
         assertEquals("John", list.get(0).getName());
@@ -260,7 +263,8 @@ class GsonJsonMapperTest {
     @Test
     void testFromJsonWithTypeReferenceInvalidJson() {
         assertThrows(JsonException.class, () -> {
-            mapper.fromJson("{invalid}", new TypeReference<List<String>>() {});
+            mapper.fromJson("{invalid}", new TypeReference<List<String>>() {
+            });
         });
     }
 

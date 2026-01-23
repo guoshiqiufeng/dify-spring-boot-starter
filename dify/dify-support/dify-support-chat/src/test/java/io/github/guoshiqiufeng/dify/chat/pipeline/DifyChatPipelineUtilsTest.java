@@ -15,9 +15,9 @@
  */
 package io.github.guoshiqiufeng.dify.chat.pipeline;
 
+import io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendCompletionResponse;
 import io.github.guoshiqiufeng.dify.core.exception.UtilException;
 import io.github.guoshiqiufeng.dify.core.extra.spring.SpringUtil;
-import io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendCompletionResponse;
 import io.github.guoshiqiufeng.dify.core.pipeline.PipelineContext;
 import io.github.guoshiqiufeng.dify.core.pipeline.PipelineHandler;
 import io.github.guoshiqiufeng.dify.core.pipeline.PipelineProcess;

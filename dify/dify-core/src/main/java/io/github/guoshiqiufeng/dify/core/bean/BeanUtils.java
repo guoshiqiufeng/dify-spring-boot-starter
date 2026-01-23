@@ -18,13 +18,7 @@ package io.github.guoshiqiufeng.dify.core.bean;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Bean utilities for property copying similar to Spring BeanUtils
@@ -53,8 +47,8 @@ public class BeanUtils {
      * <p>Creates new instances of the target class for each source object
      * and copies properties using {@link #copyProperties(Object, Object)}.
      *
-     * @param <T> the target object type
-     * @param sourceList the source object list
+     * @param <T>         the target object type
+     * @param sourceList  the source object list
      * @param targetClass the target class
      * @return list of target objects, or empty list if sourceList is null or empty
      * @throws IllegalArgumentException if targetClass is null
@@ -67,9 +61,9 @@ public class BeanUtils {
      * Copy a list of source objects to a list of target objects,
      * ignoring the specified properties.
      *
-     * @param <T> the target object type
-     * @param sourceList the source object list
-     * @param targetClass the target class
+     * @param <T>              the target object type
+     * @param sourceList       the source object list
+     * @param targetClass      the target class
      * @param ignoreProperties property names to ignore (can be null)
      * @return list of target objects, or empty list if sourceList is null or empty
      * @throws IllegalArgumentException if targetClass is null
@@ -103,8 +97,8 @@ public class BeanUtils {
      * Copy property values from the source bean to the target bean,
      * ignoring the specified properties.
      *
-     * @param source the source bean
-     * @param target the target bean
+     * @param source           the source bean
+     * @param target           the target bean
      * @param ignoreProperties property names to ignore (can be null)
      * @throws IllegalArgumentException if source or target is null
      */
@@ -117,8 +111,8 @@ public class BeanUtils {
         }
 
         Set<String> ignorePropsSet = ignoreProperties != null
-            ? new HashSet<>(Arrays.asList(ignoreProperties))
-            : new HashSet<>();
+                ? new HashSet<>(Arrays.asList(ignoreProperties))
+                : new HashSet<>();
 
         Class<?> sourceClass = source.getClass();
         Class<?> targetClass = target.getClass();
@@ -170,7 +164,7 @@ public class BeanUtils {
                 writeMethod.invoke(target, value);
             } catch (Exception ex) {
                 throw new RuntimeException("Could not copy property '" + propertyName +
-                    "' from source to target", ex);
+                        "' from source to target", ex);
             }
         }
     }
@@ -194,7 +188,7 @@ public class BeanUtils {
      * Find a PropertyDescriptor by name from an array of descriptors.
      *
      * @param descriptors the array to search
-     * @param name the property name to find
+     * @param name        the property name to find
      * @return the matching PropertyDescriptor, or null if not found
      */
     private static PropertyDescriptor findPropertyDescriptor(PropertyDescriptor[] descriptors, String name) {

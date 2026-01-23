@@ -15,19 +15,19 @@
  */
 package io.github.guoshiqiufeng.dify.support.impl.workflow;
 
-import io.github.guoshiqiufeng.dify.core.bean.BeanUtils;
-import io.github.guoshiqiufeng.dify.core.utils.CollUtil;
-import io.github.guoshiqiufeng.dify.core.utils.StrUtil;
-import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
-import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
+import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
-import io.github.guoshiqiufeng.dify.support.impl.base.BaseDifyDefaultClient;
-import io.github.guoshiqiufeng.dify.support.impl.dto.workflow.WorkflowRunStreamResponseDto;
+import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
+import io.github.guoshiqiufeng.dify.core.bean.BeanUtils;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.enums.ResponseModeEnum;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.request.ChatMessageVO;
+import io.github.guoshiqiufeng.dify.core.utils.CollUtil;
+import io.github.guoshiqiufeng.dify.core.utils.StrUtil;
+import io.github.guoshiqiufeng.dify.support.impl.base.BaseDifyDefaultClient;
+import io.github.guoshiqiufeng.dify.support.impl.dto.workflow.WorkflowRunStreamResponseDto;
 import io.github.guoshiqiufeng.dify.workflow.client.DifyWorkflowClient;
 import io.github.guoshiqiufeng.dify.workflow.constant.WorkflowConstant;
 import io.github.guoshiqiufeng.dify.workflow.dto.request.WorkflowLogsRequest;

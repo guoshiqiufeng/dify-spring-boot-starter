@@ -41,7 +41,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 

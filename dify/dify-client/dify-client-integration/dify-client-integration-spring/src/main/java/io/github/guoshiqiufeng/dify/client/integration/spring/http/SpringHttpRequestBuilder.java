@@ -17,9 +17,9 @@ package io.github.guoshiqiufeng.dify.client.integration.spring.http;
 
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.http.*;
-import io.github.guoshiqiufeng.dify.client.core.map.LinkedMultiValueMap;
-import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
 import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
+import io.github.guoshiqiufeng.dify.client.core.util.LinkedMultiValueMap;
+import io.github.guoshiqiufeng.dify.client.core.util.MultiValueMap;
 import io.github.guoshiqiufeng.dify.client.core.web.client.ResponseSpec;
 import io.github.guoshiqiufeng.dify.client.core.web.util.DefaultUriBuilder;
 import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;

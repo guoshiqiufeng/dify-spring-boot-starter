@@ -17,7 +17,6 @@ package io.github.guoshiqiufeng.dify.client.integration.spring.http.util;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.nio.charset.StandardCharsets;

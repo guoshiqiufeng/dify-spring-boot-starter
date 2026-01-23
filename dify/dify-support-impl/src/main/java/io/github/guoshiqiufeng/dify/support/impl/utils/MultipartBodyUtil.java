@@ -15,10 +15,10 @@
  */
 package io.github.guoshiqiufeng.dify.support.impl.utils;
 
-import io.github.guoshiqiufeng.dify.core.utils.StrUtil;
-import io.github.guoshiqiufeng.dify.client.core.constant.MediaType;
+import io.github.guoshiqiufeng.dify.client.core.http.MediaType;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyFile;
 import io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder;
+import io.github.guoshiqiufeng.dify.core.utils.StrUtil;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.file.FileOperation;
 import io.github.guoshiqiufeng.dify.dataset.exception.DiftDatasetException;
 import io.github.guoshiqiufeng.dify.dataset.exception.DiftDatasetExceptionEnum;
@@ -43,7 +43,7 @@ public class MultipartBodyUtil {
     /**
      * Creates a MultipartBodyBuilder with file and request data
      *
-     * @param file    The file to upload
+     * @param file The file to upload
      * @return Configured MultipartBodyBuilder instance
      * @throws DiftDatasetException if file processing fails
      */

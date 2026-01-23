@@ -264,7 +264,8 @@ class RestClientExecutorIntegrationTest {
                 headers,
                 cookies,
                 null,
-                new TypeReference<List<TestResponse>>() {}
+                new TypeReference<List<TestResponse>>() {
+                }
         );
 
         // Assert
@@ -292,7 +293,8 @@ class RestClientExecutorIntegrationTest {
                 headers,
                 cookies,
                 null,
-                new TypeReference<Map<String, String>>() {}
+                new TypeReference<Map<String, String>>() {
+                }
         );
 
         // Assert
@@ -320,7 +322,8 @@ class RestClientExecutorIntegrationTest {
                         headers,
                         cookies,
                         null,
-                        new TypeReference<List<TestResponse>>() {}
+                        new TypeReference<List<TestResponse>>() {
+                        }
                 )
         );
     }
@@ -511,7 +514,8 @@ class RestClientExecutorIntegrationTest {
                 headers,
                 cookies,
                 null,
-                new TypeReference<List<TestResponse>>() {}
+                new TypeReference<List<TestResponse>>() {
+                }
         );
 
         // Assert
@@ -539,7 +543,8 @@ class RestClientExecutorIntegrationTest {
                 headers,
                 cookies,
                 null,
-                new TypeReference<Map<String, String>>() {}
+                new TypeReference<Map<String, String>>() {
+                }
         );
 
         // Assert
@@ -563,7 +568,8 @@ class RestClientExecutorIntegrationTest {
                 headers,
                 cookies,
                 null,
-                new TypeReference<List<TestResponse>>() {}
+                new TypeReference<List<TestResponse>>() {
+                }
         );
 
         // Assert - executeForEntity returns response even for errors

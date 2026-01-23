@@ -21,7 +21,7 @@ import io.github.guoshiqiufeng.dify.workflow.DifyWorkflow;
 import io.github.guoshiqiufeng.dify.workflow.client.DifyWorkflowClient;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 /**

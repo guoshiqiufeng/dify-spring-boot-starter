@@ -674,7 +674,8 @@ class OkHttpRequestBuilderResponseSpecTest {
                             handlerCalled.set(true);
                             throw new RuntimeException("Not found");
                         }))
-                        .toEntity(new TypeReference<List<TestResponse>>() {})
+                        .toEntity(new TypeReference<List<TestResponse>>() {
+                        })
         );
 
         assertTrue(handlerCalled.get());
@@ -859,7 +860,8 @@ class OkHttpRequestBuilderResponseSpecTest {
                     handlerCalled.set(true);
                     // Don't throw
                 }))
-                .toEntity(new TypeReference<List<TestResponse>>() {});
+                .toEntity(new TypeReference<List<TestResponse>>() {
+                });
 
         assertTrue(handlerCalled.get());
         assertNotNull(response);
@@ -1131,7 +1133,8 @@ class OkHttpRequestBuilderResponseSpecTest {
         ResponseEntity<List<TestResponse>> response = client.get()
                 .uri("/api/nocontent")
                 .retrieve()
-                .toEntity(new TypeReference<List<TestResponse>>() {});
+                .toEntity(new TypeReference<List<TestResponse>>() {
+                });
 
         assertNotNull(response);
         assertEquals(204, response.getStatusCode());
@@ -1149,7 +1152,8 @@ class OkHttpRequestBuilderResponseSpecTest {
         ResponseEntity<List<TestResponse>> response = client.get()
                 .uri("/api/empty")
                 .retrieve()
-                .toEntity(new TypeReference<List<TestResponse>>() {});
+                .toEntity(new TypeReference<List<TestResponse>>() {
+                });
 
         assertNotNull(response);
         assertEquals(200, response.getStatusCode());
@@ -1168,7 +1172,8 @@ class OkHttpRequestBuilderResponseSpecTest {
                 client.get()
                         .uri("/api/invalid")
                         .retrieve()
-                        .toEntity(new TypeReference<List<TestResponse>>() {})
+                        .toEntity(new TypeReference<List<TestResponse>>() {
+                        })
         );
     }
 

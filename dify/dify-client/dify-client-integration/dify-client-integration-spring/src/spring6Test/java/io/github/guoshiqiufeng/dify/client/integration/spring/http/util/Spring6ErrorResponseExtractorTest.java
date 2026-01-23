@@ -198,7 +198,7 @@ class Spring6ErrorResponseExtractorTest {
         RuntimeException exception = new RuntimeException("test");
 
         assertThrows(Exception.class, () ->
-            SpringErrorResponseExtractor.extractStatusCode(exception, exception.getClass())
+                SpringErrorResponseExtractor.extractStatusCode(exception, exception.getClass())
         );
     }
 
@@ -248,13 +248,13 @@ class Spring6ErrorResponseExtractorTest {
     void testExtractErrorResponseWithDifferentStatusCodes() {
         // Test various status codes
         HttpStatus[] statuses = {
-            HttpStatus.BAD_REQUEST,
-            HttpStatus.UNAUTHORIZED,
-            HttpStatus.FORBIDDEN,
-            HttpStatus.NOT_FOUND,
-            HttpStatus.INTERNAL_SERVER_ERROR,
-            HttpStatus.BAD_GATEWAY,
-            HttpStatus.SERVICE_UNAVAILABLE
+                HttpStatus.BAD_REQUEST,
+                HttpStatus.UNAUTHORIZED,
+                HttpStatus.FORBIDDEN,
+                HttpStatus.NOT_FOUND,
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.BAD_GATEWAY,
+                HttpStatus.SERVICE_UNAVAILABLE
         };
 
         for (HttpStatus status : statuses) {

@@ -16,10 +16,8 @@
 package io.github.guoshiqiufeng.dify.server.client;
 
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
-import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
+import io.github.guoshiqiufeng.dify.client.core.util.MultiValueMap;
 import io.github.guoshiqiufeng.dify.core.exception.DifyClientException;
-import io.github.guoshiqiufeng.dify.core.exception.DifyClientException;
-import io.github.guoshiqiufeng.dify.server.exception.DifyServerException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -63,7 +61,7 @@ public abstract class BaseDifyServerToken {
                 return supplier.get();
             } catch (Exception e) {
                 boolean noLogin = false;
-                if(e instanceof DifyClientException) {
+                if (e instanceof DifyClientException) {
                     noLogin = ((DifyClientException) e).noLogin();
                 } else if (e.getMessage() != null && e.getMessage().contains("[401]")) {
                     noLogin = true;

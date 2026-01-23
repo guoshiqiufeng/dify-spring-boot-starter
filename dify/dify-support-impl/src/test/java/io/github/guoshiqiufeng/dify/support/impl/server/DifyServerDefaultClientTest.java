@@ -17,9 +17,9 @@ package io.github.guoshiqiufeng.dify.support.impl.server;
 
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
-import io.github.guoshiqiufeng.dify.client.core.map.LinkedMultiValueMap;
-import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
 import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
+import io.github.guoshiqiufeng.dify.client.core.util.LinkedMultiValueMap;
+import io.github.guoshiqiufeng.dify.client.core.util.MultiValueMap;
 import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;

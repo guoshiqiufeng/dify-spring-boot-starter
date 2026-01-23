@@ -61,10 +61,10 @@ public class OkHttpMultipartBodyBuilder {
                 String filename = MultipartBodyProcessor.extractFilename(part.getHeader("Content-Disposition"));
                 String partContentType = part.getHeader("Content-Type");
                 MediaType mediaType = partContentType != null ?
-                    MediaType.parse(partContentType) : MediaType.parse("application/octet-stream");
+                        MediaType.parse(partContentType) : MediaType.parse("application/octet-stream");
 
                 builder.addFormDataPart(entry.getKey(), filename,
-                    RequestBody.create(bytes, mediaType));
+                        RequestBody.create(bytes, mediaType));
             } else if (partValue instanceof String) {
                 builder.addFormDataPart(entry.getKey(), (String) partValue);
             } else if (partValue instanceof Number || partValue instanceof Boolean) {

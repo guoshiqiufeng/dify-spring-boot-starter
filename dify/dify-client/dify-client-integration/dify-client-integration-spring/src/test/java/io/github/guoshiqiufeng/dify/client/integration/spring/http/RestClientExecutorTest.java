@@ -20,7 +20,10 @@ import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,11 +33,13 @@ import org.springframework.http.HttpStatus;
 
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.mockito.ArgumentMatchers.*;
 
 /**
  * Unit tests for RestClientExecutor
@@ -95,7 +100,7 @@ class RestClientExecutorTest {
 
         Exception cause = new RuntimeException("Original cause");
         java.lang.reflect.InvocationTargetException wrappedException =
-            new java.lang.reflect.InvocationTargetException(cause);
+                new java.lang.reflect.InvocationTargetException(cause);
 
         // Act
         Throwable result = (Throwable) method.invoke(executor, wrappedException);
@@ -156,7 +161,7 @@ class RestClientExecutorTest {
         method.setAccessible(true);
 
         java.lang.reflect.InvocationTargetException exceptionWithNullCause =
-            new java.lang.reflect.InvocationTargetException(null);
+                new java.lang.reflect.InvocationTargetException(null);
 
         // Act
         Throwable result = (Throwable) method.invoke(executor, exceptionWithNullCause);
@@ -294,7 +299,8 @@ class RestClientExecutorTest {
                 new TestDto("test2", 2)
         );
 
-        TypeReference<List<TestDto>> typeRef = new TypeReference<List<TestDto>>() {};
+        TypeReference<List<TestDto>> typeRef = new TypeReference<List<TestDto>>() {
+        };
 
         RestClientExecutor testExecutor = new RestClientExecutor(restClient, jsonMapper) {
             @Override
@@ -321,7 +327,8 @@ class RestClientExecutorTest {
         URI uri = URI.create("http://localhost:8080/api/test");
         Map<String, String> headers = new HashMap<>();
         Map<String, String> cookies = new HashMap<>();
-        TypeReference<List<TestDto>> typeRef = new TypeReference<List<TestDto>>() {};
+        TypeReference<List<TestDto>> typeRef = new TypeReference<List<TestDto>>() {
+        };
 
         RestClientExecutor testExecutor = new RestClientExecutor(restClient, jsonMapper) {
             @Override
@@ -354,7 +361,7 @@ class RestClientExecutorTest {
         RestClientExecutor testExecutor = new RestClientExecutor(restClient, jsonMapper) {
             @Override
             <T> ResponseEntity<T> executeForEntity(String method, URI uri, Map<String, String> headers,
-                                                                                                     Map<String, String> cookies, Object body, Class<T> responseType) {
+                                                   Map<String, String> cookies, Object body, Class<T> responseType) {
                 T responseBody = null;
                 try {
                     responseBody = jsonMapper.fromJson(jsonResponse, responseType);
@@ -389,7 +396,7 @@ class RestClientExecutorTest {
         RestClientExecutor testExecutor = new RestClientExecutor(restClient, jsonMapper) {
             @Override
             <T> ResponseEntity<T> executeForEntity(String method, URI uri, Map<String, String> headers,
-                                                  Map<String, String> cookies, Object body, Class<T> responseType) {
+                                                   Map<String, String> cookies, Object body, Class<T> responseType) {
                 return ResponseEntity.<T>builder()
                         .statusCode(404)
                         .headers(new HashMap<>())
@@ -412,7 +419,8 @@ class RestClientExecutorTest {
         URI uri = URI.create("http://localhost:8080/api/test");
         Map<String, String> headers = new HashMap<>();
         Map<String, String> cookies = new HashMap<>();
-        TypeReference<List<TestDto>> typeRef = new TypeReference<List<TestDto>>() {};
+        TypeReference<List<TestDto>> typeRef = new TypeReference<List<TestDto>>() {
+        };
 
         RestClientExecutor testExecutor = getRestClientExecutor();
 
@@ -432,7 +440,7 @@ class RestClientExecutorTest {
         return new RestClientExecutor(restClient, jsonMapper) {
             @Override
             <T> ResponseEntity<T> executeForEntity(String method, URI uri, Map<String, String> headers,
-                                                  Map<String, String> cookies, Object body, TypeReference<T> typeReference) {
+                                                   Map<String, String> cookies, Object body, TypeReference<T> typeReference) {
                 return (ResponseEntity<T>) ResponseEntity.builder()
                         .statusCode(200)
                         .headers(new HashMap<>())
@@ -512,7 +520,8 @@ class RestClientExecutorTest {
 
         String jsonResponse = "[{\"name\":\"test1\",\"value\":1}]";
         List<TestDto> expectedList = List.of(new TestDto("test1", 1));
-        TypeReference<List<TestDto>> typeRef = new TypeReference<List<TestDto>>() {};
+        TypeReference<List<TestDto>> typeRef = new TypeReference<List<TestDto>>() {
+        };
 
         when(jsonMapper.fromJson(eq(jsonResponse), any(TypeReference.class))).thenReturn(expectedList);
 
@@ -553,7 +562,7 @@ class RestClientExecutorTest {
         RestClientExecutor testExecutor = new RestClientExecutor(restClient, jsonMapper) {
             @Override
             <T> ResponseEntity<T> executeForEntity(String method, URI uri, Map<String, String> headers,
-                                                  Map<String, String> cookies, Object body, Class<T> responseType) {
+                                                   Map<String, String> cookies, Object body, Class<T> responseType) {
                 T responseBody = null;
                 try {
                     responseBody = jsonMapper.fromJson(jsonResponse, responseType);
@@ -591,7 +600,7 @@ class RestClientExecutorTest {
         RestClientExecutor testExecutor = new RestClientExecutor(restClient, jsonMapper) {
             @Override
             <T> ResponseEntity<T> executeForEntity(String method, URI uri, Map<String, String> headers,
-                                                  Map<String, String> cookies, Object body, Class<T> responseType) {
+                                                   Map<String, String> cookies, Object body, Class<T> responseType) {
                 @SuppressWarnings("unchecked")
                 T errorBody = (T) errorResponse;
                 return ResponseEntity.<T>builder()
@@ -620,7 +629,8 @@ class RestClientExecutorTest {
 
         String jsonResponse = "[{\"name\":\"test1\",\"value\":1}]";
         List<TestDto> expectedList = List.of(new TestDto("test1", 1));
-        TypeReference<List<TestDto>> typeRef = new TypeReference<List<TestDto>>() {};
+        TypeReference<List<TestDto>> typeRef = new TypeReference<List<TestDto>>() {
+        };
 
         when(jsonMapper.fromJson(eq(jsonResponse), any(TypeReference.class))).thenReturn(expectedList);
 
@@ -628,7 +638,7 @@ class RestClientExecutorTest {
         RestClientExecutor testExecutor = new RestClientExecutor(restClient, jsonMapper) {
             @Override
             <T> ResponseEntity<T> executeForEntity(String method, URI uri, Map<String, String> headers,
-                                                  Map<String, String> cookies, Object body, TypeReference<T> typeReference) {
+                                                   Map<String, String> cookies, Object body, TypeReference<T> typeReference) {
                 try {
                     T responseBody = jsonMapper.fromJson(jsonResponse, typeReference);
                     return ResponseEntity.<T>builder()
@@ -660,13 +670,14 @@ class RestClientExecutorTest {
         Map<String, String> cookies = new HashMap<>();
 
         String errorResponse = "Internal Server Error";
-        TypeReference<List<TestDto>> typeRef = new TypeReference<List<TestDto>>() {};
+        TypeReference<List<TestDto>> typeRef = new TypeReference<List<TestDto>>() {
+        };
 
         // Create a test executor that overrides the executeForEntity method to return error response
         RestClientExecutor testExecutor = new RestClientExecutor(restClient, jsonMapper) {
             @Override
             <T> ResponseEntity<T> executeForEntity(String method, URI uri, Map<String, String> headers,
-                                                  Map<String, String> cookies, Object body, TypeReference<T> typeReference) {
+                                                   Map<String, String> cookies, Object body, TypeReference<T> typeReference) {
                 @SuppressWarnings("unchecked")
                 T errorBody = (T) errorResponse;
                 return ResponseEntity.<T>builder()

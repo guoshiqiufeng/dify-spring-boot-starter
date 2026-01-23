@@ -252,23 +252,23 @@ class DifyServerClientImplTest {
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
 
         DailyConversationsResponse dailyStat1 =
-            new DailyConversationsResponse();
+                new DailyConversationsResponse();
         dailyStat1.setDate("2025-10-23");
         dailyStat1.setConversationCount(10);
 
         DailyConversationsResponse dailyStat2 =
-            new DailyConversationsResponse();
+                new DailyConversationsResponse();
         dailyStat2.setDate("2025-10-24");
         dailyStat2.setConversationCount(15);
 
         List<DailyConversationsResponse> expectedStats =
-            Arrays.asList(dailyStat1, dailyStat2);
+                Arrays.asList(dailyStat1, dailyStat2);
 
         when(difyServerClient.dailyConversations(appId, start, end)).thenReturn(expectedStats);
 
         // Act
         List<DailyConversationsResponse> actualStats =
-            difyServerClientImpl.dailyConversations(appId, start, end);
+                difyServerClientImpl.dailyConversations(appId, start, end);
 
         // Assert
         assertNotNull(actualStats);
@@ -286,23 +286,23 @@ class DifyServerClientImplTest {
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
 
         DailyEndUsersResponse dailyStat1 =
-            new DailyEndUsersResponse();
+                new DailyEndUsersResponse();
         dailyStat1.setDate("2025-10-23");
         dailyStat1.setTerminalCount(5);
 
         DailyEndUsersResponse dailyStat2 =
-            new DailyEndUsersResponse();
+                new DailyEndUsersResponse();
         dailyStat2.setDate("2025-10-24");
         dailyStat2.setTerminalCount(8);
 
         List<DailyEndUsersResponse> expectedStats =
-            Arrays.asList(dailyStat1, dailyStat2);
+                Arrays.asList(dailyStat1, dailyStat2);
 
         when(difyServerClient.dailyEndUsers(appId, start, end)).thenReturn(expectedStats);
 
         // Act
         List<DailyEndUsersResponse> actualStats =
-            difyServerClientImpl.dailyEndUsers(appId, start, end);
+                difyServerClientImpl.dailyEndUsers(appId, start, end);
 
         // Assert
         assertNotNull(actualStats);
@@ -320,23 +320,23 @@ class DifyServerClientImplTest {
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
 
         AverageSessionInteractionsResponse dailyStat1 =
-            new AverageSessionInteractionsResponse();
+                new AverageSessionInteractionsResponse();
         dailyStat1.setDate("2025-10-23");
         dailyStat1.setInteractions(2.5);
 
         AverageSessionInteractionsResponse dailyStat2 =
-            new AverageSessionInteractionsResponse();
+                new AverageSessionInteractionsResponse();
         dailyStat2.setDate("2025-10-24");
         dailyStat2.setInteractions(3.0);
 
         List<AverageSessionInteractionsResponse> expectedStats =
-            Arrays.asList(dailyStat1, dailyStat2);
+                Arrays.asList(dailyStat1, dailyStat2);
 
         when(difyServerClient.averageSessionInteractions(appId, start, end)).thenReturn(expectedStats);
 
         // Act
         List<AverageSessionInteractionsResponse> actualStats =
-            difyServerClientImpl.averageSessionInteractions(appId, start, end);
+                difyServerClientImpl.averageSessionInteractions(appId, start, end);
 
         // Assert
         assertNotNull(actualStats);
@@ -354,23 +354,23 @@ class DifyServerClientImplTest {
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
 
         TokensPerSecondResponse dailyStat1 =
-            new TokensPerSecondResponse();
+                new TokensPerSecondResponse();
         dailyStat1.setDate("2025-10-23");
         dailyStat1.setTps(30.8603);
 
         TokensPerSecondResponse dailyStat2 =
-            new TokensPerSecondResponse();
+                new TokensPerSecondResponse();
         dailyStat2.setDate("2025-10-24");
         dailyStat2.setTps(45.12);
 
         List<TokensPerSecondResponse> expectedStats =
-            Arrays.asList(dailyStat1, dailyStat2);
+                Arrays.asList(dailyStat1, dailyStat2);
 
         when(difyServerClient.tokensPerSecond(appId, start, end)).thenReturn(expectedStats);
 
         // Act
         List<TokensPerSecondResponse> actualStats =
-            difyServerClientImpl.tokensPerSecond(appId, start, end);
+                difyServerClientImpl.tokensPerSecond(appId, start, end);
 
         // Assert
         assertNotNull(actualStats);
@@ -388,23 +388,23 @@ class DifyServerClientImplTest {
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
 
         UserSatisfactionRateResponse dailyStat1 =
-            new UserSatisfactionRateResponse();
+                new UserSatisfactionRateResponse();
         dailyStat1.setDate("2025-10-23");
         dailyStat1.setRate(95.5);
 
         UserSatisfactionRateResponse dailyStat2 =
-            new UserSatisfactionRateResponse();
+                new UserSatisfactionRateResponse();
         dailyStat2.setDate("2025-10-24");
         dailyStat2.setRate(98.0);
 
         List<UserSatisfactionRateResponse> expectedStats =
-            Arrays.asList(dailyStat1, dailyStat2);
+                Arrays.asList(dailyStat1, dailyStat2);
 
         when(difyServerClient.userSatisfactionRate(appId, start, end)).thenReturn(expectedStats);
 
         // Act
         List<UserSatisfactionRateResponse> actualStats =
-            difyServerClientImpl.userSatisfactionRate(appId, start, end);
+                difyServerClientImpl.userSatisfactionRate(appId, start, end);
 
         // Assert
         assertNotNull(actualStats);
@@ -422,27 +422,27 @@ class DifyServerClientImplTest {
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
 
         TokenCostsResponse dailyStat1 =
-            new TokenCostsResponse();
+                new TokenCostsResponse();
         dailyStat1.setDate("2025-10-23");
         dailyStat1.setTokenCount(1000);
         dailyStat1.setTotalPrice("0.00123");
         dailyStat1.setCurrency("USD");
 
         TokenCostsResponse dailyStat2 =
-            new TokenCostsResponse();
+                new TokenCostsResponse();
         dailyStat2.setDate("2025-10-24");
         dailyStat2.setTokenCount(2500);
         dailyStat2.setTotalPrice("0.003075");
         dailyStat2.setCurrency("USD");
 
         List<TokenCostsResponse> expectedStats =
-            Arrays.asList(dailyStat1, dailyStat2);
+                Arrays.asList(dailyStat1, dailyStat2);
 
         when(difyServerClient.tokenCosts(appId, start, end)).thenReturn(expectedStats);
 
         // Act
         List<TokenCostsResponse> actualStats =
-            difyServerClientImpl.tokenCosts(appId, start, end);
+                difyServerClientImpl.tokenCosts(appId, start, end);
 
         // Assert
         assertNotNull(actualStats);
@@ -462,23 +462,23 @@ class DifyServerClientImplTest {
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
 
         DailyMessagesResponse dailyStat1 =
-            new DailyMessagesResponse();
+                new DailyMessagesResponse();
         dailyStat1.setDate("2025-10-23");
         dailyStat1.setMessageCount(15);
 
         DailyMessagesResponse dailyStat2 =
-            new DailyMessagesResponse();
+                new DailyMessagesResponse();
         dailyStat2.setDate("2025-10-24");
         dailyStat2.setMessageCount(22);
 
         List<DailyMessagesResponse> expectedStats =
-            Arrays.asList(dailyStat1, dailyStat2);
+                Arrays.asList(dailyStat1, dailyStat2);
 
         when(difyServerClient.dailyMessages(appId, start, end)).thenReturn(expectedStats);
 
         // Act
         List<DailyMessagesResponse> actualStats =
-            difyServerClientImpl.dailyMessages(appId, start, end);
+                difyServerClientImpl.dailyMessages(appId, start, end);
 
         // Assert
         assertNotNull(actualStats);
@@ -600,7 +600,7 @@ class DifyServerClientImplTest {
 
         // Act
         DocumentIndexingStatusResponse.ProcessingStatus actualStatus =
-            difyServerClientImpl.getDocumentIndexingStatus(datasetId, documentId);
+                difyServerClientImpl.getDocumentIndexingStatus(datasetId, documentId);
 
         // Assert
         assertNotNull(actualStatus);

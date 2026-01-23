@@ -17,7 +17,6 @@ package io.github.guoshiqiufeng.dify.client.integration.okhttp.http;
 
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
-import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
 import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import okhttp3.Interceptor;

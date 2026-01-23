@@ -2429,7 +2429,8 @@ class OkHttpRequestBuilderIntegrationTest {
         ResponseEntity<List<TestResponse>> response = getBuilder(client.get()
                 .uri("/api/error"))
                 .retrieve()
-                .toEntity(new TypeReference<List<TestResponse>>() {});
+                .toEntity(new TypeReference<List<TestResponse>>() {
+                });
 
         assertNotNull(response);
         assertEquals(500, response.getStatusCode());
@@ -2547,7 +2548,8 @@ class OkHttpRequestBuilderIntegrationTest {
         ResponseEntity<List<TestResponse>> response = getBuilder(client.get()
                 .uri("/api/bad"))
                 .retrieve()
-                .toEntity(new TypeReference<List<TestResponse>>() {});
+                .toEntity(new TypeReference<List<TestResponse>>() {
+                });
 
         assertNotNull(response);
         assertEquals(400, response.getStatusCode());
@@ -2601,7 +2603,8 @@ class OkHttpRequestBuilderIntegrationTest {
         assertThrows(HttpClientException.class, () ->
                 getBuilder(client.get()
                         .uri("/api/error"))
-                        .execute(new TypeReference<List<TestResponse>>() {})
+                        .execute(new TypeReference<List<TestResponse>>() {
+                        })
         );
     }
 
@@ -2627,7 +2630,8 @@ class OkHttpRequestBuilderIntegrationTest {
         assertThrows(HttpClientException.class, () ->
                 getBuilder(client.get()
                         .uri("/api/forbidden"))
-                        .executeForResponse(new TypeReference<List<TestResponse>>() {})
+                        .executeForResponse(new TypeReference<List<TestResponse>>() {
+                        })
         );
     }
 

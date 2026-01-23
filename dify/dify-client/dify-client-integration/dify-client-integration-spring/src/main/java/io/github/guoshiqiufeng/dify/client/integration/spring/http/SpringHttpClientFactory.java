@@ -16,9 +16,9 @@
 package io.github.guoshiqiufeng.dify.client.integration.spring.http;
 
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
+import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
 import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
-import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -57,7 +57,7 @@ public class SpringHttpClientFactory implements HttpClientFactory {
     }
 
     private SpringHttpClientFactory(WebClient.Builder webClientBuilder, Object restClientBuilder, JsonMapper jsonMapper,
-                                   HttpHeaders defaultHeaders, List<Object> interceptors) {
+                                    HttpHeaders defaultHeaders, List<Object> interceptors) {
         this.webClientBuilder = webClientBuilder;
         this.restClientBuilder = restClientBuilder;
         this.jsonMapper = jsonMapper;

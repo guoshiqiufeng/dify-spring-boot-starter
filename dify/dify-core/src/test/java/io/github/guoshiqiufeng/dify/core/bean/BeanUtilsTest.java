@@ -17,7 +17,10 @@ package io.github.guoshiqiufeng.dify.core.bean;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -427,7 +430,7 @@ class BeanUtilsTest {
 
         // Should throw RuntimeException wrapping the getter exception
         RuntimeException exception = assertThrows(RuntimeException.class,
-            () -> BeanUtils.copyProperties(source, target));
+                () -> BeanUtils.copyProperties(source, target));
         assertTrue(exception.getMessage().contains("Could not copy property"));
     }
 
@@ -441,7 +444,7 @@ class BeanUtilsTest {
 
         // Should throw RuntimeException wrapping the setter exception
         RuntimeException exception = assertThrows(RuntimeException.class,
-            () -> BeanUtils.copyProperties(source, target));
+                () -> BeanUtils.copyProperties(source, target));
         assertTrue(exception.getMessage().contains("Could not copy property"));
     }
 
@@ -449,7 +452,7 @@ class BeanUtilsTest {
     void testGetPropertyDescriptorsWithMockException() throws Exception {
         // Test getPropertyDescriptors exception handling using reflection and mocking
         java.lang.reflect.Method method = BeanUtils.class.getDeclaredMethod(
-            "getPropertyDescriptors", Class.class);
+                "getPropertyDescriptors", Class.class);
         method.setAccessible(true);
 
         // Create a class that will cause introspection to fail

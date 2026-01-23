@@ -17,8 +17,8 @@ package io.github.guoshiqiufeng.dify.client.integration.spring.http;
 
 import io.github.guoshiqiufeng.dify.client.codec.gson.GsonJsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
-import io.github.guoshiqiufeng.dify.client.core.enums.HttpMethod;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
+import io.github.guoshiqiufeng.dify.client.core.http.HttpMethod;
 import io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler;
 import io.github.guoshiqiufeng.dify.client.core.web.client.RequestBodyUriSpec;
 import io.github.guoshiqiufeng.dify.client.core.web.client.RequestHeadersUriSpec;

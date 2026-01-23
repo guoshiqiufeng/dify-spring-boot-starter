@@ -27,7 +27,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +82,8 @@ class ResponseConverterTest {
     void testConvertWithTypeReference() {
         // Arrange
         String jsonBody = "[{\"name\":\"test1\"},{\"name\":\"test2\"}]";
-        TypeReference<List<TestDto>> typeRef = new TypeReference<List<TestDto>>() {};
+        TypeReference<List<TestDto>> typeRef = new TypeReference<List<TestDto>>() {
+        };
         List<TestDto> expectedList = List.of(new TestDto("test1", 1), new TestDto("test2", 2));
         ResponseEntity<String> responseEntity = new ResponseEntity<>(jsonBody, HttpStatus.OK);
 
@@ -192,7 +192,8 @@ class ResponseConverterTest {
     void testDeserializeWithTypeReference() {
         // Arrange
         String jsonBody = "{\"key\":\"value\"}";
-        TypeReference<Map<String, String>> typeRef = new TypeReference<Map<String, String>>() {};
+        TypeReference<Map<String, String>> typeRef = new TypeReference<Map<String, String>>() {
+        };
         Map<String, String> expectedMap = Map.of("key", "value");
         when(jsonMapper.fromJson(eq(jsonBody), any(TypeReference.class))).thenReturn(expectedMap);
 
@@ -206,7 +207,8 @@ class ResponseConverterTest {
     @Test
     void testDeserializeWithTypeReferenceNullBody() {
         // Arrange
-        TypeReference<Map<String, String>> typeRef = new TypeReference<Map<String, String>>() {};
+        TypeReference<Map<String, String>> typeRef = new TypeReference<Map<String, String>>() {
+        };
 
         // Act
         Map<String, String> result = responseConverter.deserialize(null, typeRef);
@@ -218,7 +220,8 @@ class ResponseConverterTest {
     @Test
     void testDeserializeWithTypeReferenceEmptyBody() {
         // Arrange
-        TypeReference<Map<String, String>> typeRef = new TypeReference<Map<String, String>>() {};
+        TypeReference<Map<String, String>> typeRef = new TypeReference<Map<String, String>>() {
+        };
 
         // Act
         Map<String, String> result = responseConverter.deserialize("", typeRef);
@@ -231,7 +234,8 @@ class ResponseConverterTest {
     void testDeserializeWithTypeReferenceStringType() {
         // Arrange
         String bodyString = "plain text";
-        TypeReference<String> typeRef = new TypeReference<String>() {};
+        TypeReference<String> typeRef = new TypeReference<String>() {
+        };
 
         // Act
         String result = responseConverter.deserialize(bodyString, typeRef);
@@ -244,7 +248,8 @@ class ResponseConverterTest {
     void testDeserializeWithTypeReferenceByteArrayType() {
         // Arrange
         String bodyString = "byte payload";
-        TypeReference<byte[]> typeRef = new TypeReference<byte[]>() {};
+        TypeReference<byte[]> typeRef = new TypeReference<byte[]>() {
+        };
 
         // Act
         byte[] result = responseConverter.deserialize(bodyString, typeRef);
@@ -256,7 +261,8 @@ class ResponseConverterTest {
     @Test
     void testDeserializeWithTypeReferenceVoidType() {
         // Arrange
-        TypeReference<Void> typeRef = new TypeReference<Void>() {};
+        TypeReference<Void> typeRef = new TypeReference<Void>() {
+        };
 
         // Act
         Void result = responseConverter.deserialize("ignored", typeRef);
@@ -287,7 +293,8 @@ class ResponseConverterTest {
     void testDeserializeWithTypeReferenceClassType() {
         // Arrange
         String jsonBody = "123";
-        TypeReference<Integer> typeRef = new TypeReference<Integer>() {};
+        TypeReference<Integer> typeRef = new TypeReference<Integer>() {
+        };
         Integer expectedValue = 123;
         when(jsonMapper.fromJson(eq(jsonBody), any(TypeReference.class))).thenReturn(expectedValue);
 
@@ -313,7 +320,8 @@ class ResponseConverterTest {
     void testDeserializeWithTypeReferenceThrowsException() {
         // Arrange
         String invalidJson = "invalid";
-        TypeReference<Map<String, String>> typeRef = new TypeReference<Map<String, String>>() {};
+        TypeReference<Map<String, String>> typeRef = new TypeReference<Map<String, String>>() {
+        };
         when(jsonMapper.fromJson(eq(invalidJson), any(TypeReference.class)))
                 .thenThrow(new RuntimeException("Parse error"));
 

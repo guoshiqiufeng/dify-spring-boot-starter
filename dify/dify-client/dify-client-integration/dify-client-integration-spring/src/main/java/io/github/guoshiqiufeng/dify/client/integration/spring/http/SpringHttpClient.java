@@ -25,18 +25,13 @@ import io.github.guoshiqiufeng.dify.client.integration.spring.logging.DifyLoggin
 import io.github.guoshiqiufeng.dify.client.integration.spring.logging.DifyRestLoggingInterceptor;
 import io.github.guoshiqiufeng.dify.client.integration.spring.version.SpringVersionDetector;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
-import io.github.guoshiqiufeng.dify.core.exception.DiftClientExceptionEnum;
-import io.github.guoshiqiufeng.dify.core.exception.DifyClientException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Spring-based HTTP client implementation.
@@ -416,7 +411,7 @@ public class SpringHttpClient implements HttpClient {
     }
 
     @Override
-    public RequestBodyUriSpec method(io.github.guoshiqiufeng.dify.client.core.enums.HttpMethod httpMethod) {
+    public RequestBodyUriSpec method(io.github.guoshiqiufeng.dify.client.core.http.HttpMethod httpMethod) {
         return new io.github.guoshiqiufeng.dify.client.core.http.DefaultRequestBodyUriSpec(
                 new SpringHttpRequestBuilder(this, httpMethod.name(), jsonMapper, defaultHeaders));
     }

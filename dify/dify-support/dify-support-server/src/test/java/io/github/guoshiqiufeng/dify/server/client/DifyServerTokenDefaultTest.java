@@ -16,7 +16,7 @@
 package io.github.guoshiqiufeng.dify.server.client;
 
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
-import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
+import io.github.guoshiqiufeng.dify.client.core.util.MultiValueMap;
 import io.github.guoshiqiufeng.dify.core.exception.DiftClientExceptionEnum;
 import io.github.guoshiqiufeng.dify.core.exception.DifyClientException;
 import io.github.guoshiqiufeng.dify.server.dto.response.LoginResponse;
@@ -218,7 +218,7 @@ class DifyServerTokenDefaultTest {
 
         // Setup refresh to throw exception (simulating 401 Unauthorized)
         when(difyServerClient.refreshToken("initial-refresh-token"))
-            .thenThrow(new DifyClientException(DiftClientExceptionEnum.UNAUTHORIZED));
+                .thenThrow(new DifyClientException(DiftClientExceptionEnum.UNAUTHORIZED));
 
         // Setup new login response
         LoginResponse newLoginResponse = new LoginResponse();
@@ -241,19 +241,19 @@ class DifyServerTokenDefaultTest {
         accessTokenField.setAccessible(true);
         String accessToken = (String) accessTokenField.get(tokenDefault);
         assertEquals("new-access-token-after-exception", accessToken,
-            "Access token should be updated with new token from login after refresh exception");
+                "Access token should be updated with new token from login after refresh exception");
 
         Field refreshTokenField = DifyServerTokenDefault.class.getDeclaredField("refreshToken");
         refreshTokenField.setAccessible(true);
         String storedRefreshToken = (String) refreshTokenField.get(tokenDefault);
         assertEquals("new-refresh-token-after-exception", storedRefreshToken,
-            "Refresh token should be updated with new token from login after refresh exception");
+                "Refresh token should be updated with new token from login after refresh exception");
 
         Field csrfTokenField = DifyServerTokenDefault.class.getDeclaredField("csrfToken");
         csrfTokenField.setAccessible(true);
         String csrfToken = (String) csrfTokenField.get(tokenDefault);
         assertEquals("new-csrf-token-after-exception", csrfToken,
-            "CSRF token should be updated with new token from login after refresh exception");
+                "CSRF token should be updated with new token from login after refresh exception");
     }
 
     @Test

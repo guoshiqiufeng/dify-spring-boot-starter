@@ -22,7 +22,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFunction;
@@ -97,9 +96,9 @@ class DifyLoggingFilterTest {
         // Assert - streaming responses should not have body logged
         StepVerifier.create(result)
                 .expectNextMatches(response ->
-                    response.statusCode().equals(HttpStatus.OK) &&
-                    response.headers().contentType().isPresent() &&
-                    response.headers().contentType().get().toString().contains("text/event-stream")
+                        response.statusCode().equals(HttpStatus.OK) &&
+                                response.headers().contentType().isPresent() &&
+                                response.headers().contentType().get().toString().contains("text/event-stream")
                 )
                 .verifyComplete();
     }
@@ -218,8 +217,8 @@ class DifyLoggingFilterTest {
             // Assert
             StepVerifier.create(result)
                     .expectNextMatches(response ->
-                        response.statusCode().equals(HttpStatus.OK) &&
-                        response.headers().contentType().isPresent()
+                            response.statusCode().equals(HttpStatus.OK) &&
+                                    response.headers().contentType().isPresent()
                     )
                     .verifyComplete();
         }

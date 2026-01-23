@@ -16,8 +16,8 @@
 package io.github.guoshiqiufeng.dify.client.integration.spring.http;
 
 import io.github.guoshiqiufeng.dify.client.codec.jackson.JacksonJsonMapper;
-import io.github.guoshiqiufeng.dify.client.core.enums.HttpMethod;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
+import io.github.guoshiqiufeng.dify.client.core.http.HttpMethod;
 import io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler;
 import io.github.guoshiqiufeng.dify.client.core.web.client.RequestBodyUriSpec;
 import io.github.guoshiqiufeng.dify.client.core.web.client.RequestHeadersUriSpec;
@@ -389,7 +389,7 @@ class Spring6HttpClientIntegrationTest {
                 .uri("/test")
                 .retrieve()
                 .body(String.class)
-                ;
+        ;
 
         // Assert
         RecordedRequest request = mockServer.takeRequest();
@@ -412,7 +412,7 @@ class Spring6HttpClientIntegrationTest {
                 .uri("/test")
                 .retrieve()
                 .body(String.class)
-                ;
+        ;
 
         // Assert
         RecordedRequest request = mockServer.takeRequest();
@@ -480,7 +480,7 @@ class Spring6HttpClientIntegrationTest {
                 .uri("/test")
                 .retrieve()
                 .body(String.class)
-                ;
+        ;
 
         // Assert
         assertTrue(interceptorCalled[0]);
@@ -518,7 +518,7 @@ class Spring6HttpClientIntegrationTest {
                 .uri("/test")
                 .retrieve()
                 .body(String.class)
-                ;
+        ;
 
         // Assert
         assertEquals(2, callCount[0]);
@@ -538,7 +538,7 @@ class Spring6HttpClientIntegrationTest {
                     .uri("/test")
                     .retrieve()
                     .body(String.class)
-                    ;
+            ;
         });
     }
 
@@ -560,7 +560,7 @@ class Spring6HttpClientIntegrationTest {
                         throw new RuntimeException("Internal Server Error");
                     }))
                     .body(String.class)
-                    ;
+            ;
         });
     }
 
@@ -582,7 +582,7 @@ class Spring6HttpClientIntegrationTest {
                         throw new RuntimeException("Not Found");
                     }))
                     .body(String.class)
-                    ;
+            ;
         });
     }
 
@@ -602,8 +602,7 @@ class Spring6HttpClientIntegrationTest {
         String response = client.get()
                 .uri("/api/test")
                 .retrieve()
-                .body(String.class)
-                ;
+                .body(String.class);
 
         // Assert
         assertNotNull(response);
@@ -629,8 +628,7 @@ class Spring6HttpClientIntegrationTest {
                 .uri("/api/create")
                 .body("{\"name\":\"test\"}")
                 .retrieve()
-                .body(String.class)
-                ;
+                .body(String.class);
 
         // Assert
         assertNotNull(response);
@@ -658,7 +656,7 @@ class Spring6HttpClientIntegrationTest {
                 .header("X-Request-ID", "req-456")
                 .retrieve()
                 .body(String.class)
-                ;
+        ;
 
         // Assert
         RecordedRequest request = mockServer.takeRequest();
@@ -679,8 +677,7 @@ class Spring6HttpClientIntegrationTest {
         String response = client.get()
                 .uri("/api/empty")
                 .retrieve()
-                .body(String.class)
-                ;
+                .body(String.class);
 
         // Assert - 204 No Content should return null or empty
         // The behavior depends on the WebClient configuration

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.client.integration.spring.utils;
+package io.github.guoshiqiufeng.dify.client.integration.spring.util;
 
 import lombok.experimental.UtilityClass;
 import org.springframework.core.io.buffer.DataBuffer;
