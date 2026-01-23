@@ -21,6 +21,7 @@ import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.SpringStatusCodeExtractor;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -85,6 +86,14 @@ class ResponseConverter {
             return null;
         }
 
+        if (responseType == Void.class || responseType == void.class) {
+            return null;
+        }
+
+        if (responseType == byte[].class) {
+            return responseType.cast(bodyString.getBytes(StandardCharsets.UTF_8));
+        }
+
         if (responseType == String.class) {
             return responseType.cast(bodyString);
         }
@@ -107,6 +116,27 @@ class ResponseConverter {
     <T> T deserialize(String bodyString, TypeReference<T> typeReference) {
         if (bodyString == null || bodyString.isEmpty()) {
             return null;
+        }
+
+        if (typeReference == null) {
+            throw new HttpClientException("Failed to deserialize response: type reference is null");
+        }
+
+        if (typeReference.getType() instanceof Class<?>) {
+            Class<?> targetType = (Class<?>) typeReference.getType();
+            if (targetType == Void.class || targetType == void.class) {
+                return null;
+            }
+            if (targetType == byte[].class) {
+                @SuppressWarnings("unchecked")
+                T result = (T) bodyString.getBytes(StandardCharsets.UTF_8);
+                return result;
+            }
+            if (targetType == String.class) {
+                @SuppressWarnings("unchecked")
+                T result = (T) bodyString;
+                return result;
+            }
         }
 
         try {

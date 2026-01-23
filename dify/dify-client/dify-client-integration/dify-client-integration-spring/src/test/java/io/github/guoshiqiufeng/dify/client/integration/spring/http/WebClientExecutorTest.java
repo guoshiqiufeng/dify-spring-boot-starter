@@ -16,6 +16,8 @@
 package io.github.guoshiqiufeng.dify.client.integration.spring.http;
 
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
+import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
+import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,11 +26,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Method;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for WebClientExecutor
@@ -138,6 +149,72 @@ class WebClientExecutorTest {
         assertFalse((Boolean) method.invoke(executor, (String) null));
         assertFalse((Boolean) method.invoke(executor, ""));
         assertFalse((Boolean) method.invoke(executor, "   "));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testExecuteForEntityWithNullResponseEntityThrowsException() {
+        // Arrange
+        WebClient.RequestBodyUriSpec requestSpec = mock(WebClient.RequestBodyUriSpec.class);
+        WebClient.RequestBodySpec bodySpec = mock(WebClient.RequestBodySpec.class);
+        WebClient.ResponseSpec responseSpec = mock(WebClient.ResponseSpec.class);
+
+        when(webClient.method(HttpMethod.GET)).thenReturn(requestSpec);
+        when(requestSpec.uri(any(Function.class))).thenReturn(bodySpec);
+        when(bodySpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.toEntity(String.class)).thenReturn(Mono.empty());
+
+        // Act & Assert
+        HttpClientException exception = assertThrows(
+                HttpClientException.class,
+                () -> executor.executeForEntity("GET", URI.create("http://localhost/test"),
+                        new HashMap<>(), new HashMap<>(), new HashMap<>(), null, String.class)
+        );
+        assertTrue(exception.getMessage().contains("Response entity is null"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testExecuteForEntityWithTypeReferenceNullResponseEntityThrowsException() {
+        // Arrange
+        WebClient.RequestBodyUriSpec requestSpec = mock(WebClient.RequestBodyUriSpec.class);
+        WebClient.RequestBodySpec bodySpec = mock(WebClient.RequestBodySpec.class);
+        WebClient.ResponseSpec responseSpec = mock(WebClient.ResponseSpec.class);
+
+        when(webClient.method(HttpMethod.GET)).thenReturn(requestSpec);
+        when(requestSpec.uri(any(Function.class))).thenReturn(bodySpec);
+        when(bodySpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.toEntity(String.class)).thenReturn(Mono.empty());
+
+        // Act & Assert
+        HttpClientException exception = assertThrows(
+                HttpClientException.class,
+                () -> executor.executeForEntity("GET", URI.create("http://localhost/test"),
+                        new HashMap<>(), new HashMap<>(), new HashMap<>(), null, new TypeReference<String>() {})
+        );
+        assertTrue(exception.getMessage().contains("Response entity is null"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testBuildRequestThrowsWhenSerializationFails() {
+        // Arrange
+        WebClient.RequestBodyUriSpec requestSpec = mock(WebClient.RequestBodyUriSpec.class);
+        WebClient.RequestBodySpec bodySpec = mock(WebClient.RequestBodySpec.class);
+        JsonMapper failingMapper = mock(JsonMapper.class);
+        WebClientExecutor failingExecutor = new WebClientExecutor(webClient, failingMapper, true);
+
+        when(webClient.method(HttpMethod.POST)).thenReturn(requestSpec);
+        when(requestSpec.uri(any(Function.class))).thenReturn(bodySpec);
+        when(failingMapper.toJsonIgnoreNull(any())).thenThrow(new RuntimeException("serialize error"));
+
+        // Act & Assert
+        HttpClientException exception = assertThrows(
+                HttpClientException.class,
+                () -> failingExecutor.buildRequest("POST", URI.create("http://localhost/test"),
+                        new HashMap<>(), new HashMap<>(), new HashMap<>(), Map.of("key", "value"))
+        );
+        assertTrue(exception.getMessage().contains("Failed to serialize request body"));
     }
 
     /**

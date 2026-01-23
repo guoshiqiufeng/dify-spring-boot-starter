@@ -28,6 +28,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -142,6 +143,36 @@ class ResponseConverterTest {
     }
 
     @Test
+    void testDeserializeByteArrayType() {
+        // Arrange
+        String bodyString = "binary payload";
+
+        // Act
+        byte[] result = responseConverter.deserialize(bodyString, byte[].class);
+
+        // Assert
+        assertArrayEquals(bodyString.getBytes(StandardCharsets.UTF_8), result);
+    }
+
+    @Test
+    void testDeserializeVoidType() {
+        // Act
+        Void result = responseConverter.deserialize("ignored", Void.class);
+
+        // Assert
+        assertNull(result);
+    }
+
+    @Test
+    void testDeserializeVoidPrimitiveType() {
+        // Act
+        Void result = responseConverter.deserialize("ignored", void.class);
+
+        // Assert
+        assertNull(result);
+    }
+
+    @Test
     void testDeserializeThrowsException() {
         // Arrange
         String invalidJson = "invalid json";
@@ -194,6 +225,87 @@ class ResponseConverterTest {
 
         // Assert
         assertNull(result);
+    }
+
+    @Test
+    void testDeserializeWithTypeReferenceStringType() {
+        // Arrange
+        String bodyString = "plain text";
+        TypeReference<String> typeRef = new TypeReference<String>() {};
+
+        // Act
+        String result = responseConverter.deserialize(bodyString, typeRef);
+
+        // Assert
+        assertEquals(bodyString, result);
+    }
+
+    @Test
+    void testDeserializeWithTypeReferenceByteArrayType() {
+        // Arrange
+        String bodyString = "byte payload";
+        TypeReference<byte[]> typeRef = new TypeReference<byte[]>() {};
+
+        // Act
+        byte[] result = responseConverter.deserialize(bodyString, typeRef);
+
+        // Assert
+        assertArrayEquals(bodyString.getBytes(StandardCharsets.UTF_8), result);
+    }
+
+    @Test
+    void testDeserializeWithTypeReferenceVoidType() {
+        // Arrange
+        TypeReference<Void> typeRef = new TypeReference<Void>() {};
+
+        // Act
+        Void result = responseConverter.deserialize("ignored", typeRef);
+
+        // Assert
+        assertNull(result);
+    }
+
+    @Test
+    void testDeserializeWithTypeReferenceVoidPrimitiveType() {
+        // Arrange
+        TypeReference<Void> typeRef = new TypeReference<Void>() {
+            @Override
+            public java.lang.reflect.Type getType() {
+                return void.class;
+            }
+        };
+
+        // Act
+        Void result = responseConverter.deserialize("ignored", typeRef);
+
+        // Assert
+        assertNull(result);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testDeserializeWithTypeReferenceClassType() {
+        // Arrange
+        String jsonBody = "123";
+        TypeReference<Integer> typeRef = new TypeReference<Integer>() {};
+        Integer expectedValue = 123;
+        when(jsonMapper.fromJson(eq(jsonBody), any(TypeReference.class))).thenReturn(expectedValue);
+
+        // Act
+        Integer result = responseConverter.deserialize(jsonBody, typeRef);
+
+        // Assert
+        assertEquals(expectedValue, result);
+    }
+
+    @Test
+    void testDeserializeWithTypeReferenceNullType() {
+        // Act & Assert
+        HttpClientException exception = assertThrows(
+                HttpClientException.class,
+                () -> responseConverter.deserialize("payload", (TypeReference<Object>) null)
+        );
+        assertTrue(exception.getMessage().contains("type reference is null"));
     }
 
     @Test

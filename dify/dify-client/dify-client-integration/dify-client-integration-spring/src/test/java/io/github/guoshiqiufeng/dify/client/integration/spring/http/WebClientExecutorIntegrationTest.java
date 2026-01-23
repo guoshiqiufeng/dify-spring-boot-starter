@@ -17,7 +17,6 @@ package io.github.guoshiqiufeng.dify.client.integration.spring.http;
 
 import io.github.guoshiqiufeng.dify.client.codec.gson.GsonJsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
-import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import lombok.AllArgsConstructor;
@@ -400,6 +399,26 @@ class WebClientExecutorIntegrationTest {
         assertEquals(403, response.getStatusCode());
     }
 
+    @Test
+    void testExecuteForEntityTypeReferenceRedirect() throws Exception {
+        // Arrange
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(302)
+                .setBody("Redirecting...")
+                .setHeader("Location", "http://example.com/new-location"));
+
+        URI uri = mockServer.url("/api/redirect").uri();
+
+        // Act
+        ResponseEntity<String> response = executor.executeForEntity("GET", uri, new HashMap<>(),
+                new HashMap<>(), new HashMap<>(), null, new TypeReference<String>() {});
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(302, response.getStatusCode());
+        assertEquals("http://example.com/new-location", response.getHeaders().getFirst("Location"));
+    }
+
     // ========== executeStream() Tests ==========
 
     @Test
@@ -465,6 +484,54 @@ class WebClientExecutorIntegrationTest {
         StepVerifier.create(flux)
                 .expectNextMatches(map -> "value1".equals(map.get("key")))
                 .expectNextMatches(map -> "value2".equals(map.get("key")))
+                .verifyComplete();
+    }
+
+    @Test
+    void testExecuteStreamFiltersInvalidEvents() throws Exception {
+        // Arrange
+        String sseData = "data:\n\n" +
+                "data: {\"name\":\"broken\"\n\n" +
+                "data: \"invalid\"\n\n" +
+                "data: {\"name\":\"ok\",\"value\":1}\n\n";
+
+        mockServer.enqueue(new MockResponse()
+                .setBody(sseData)
+                .setHeader("Content-Type", "text/event-stream"));
+
+        URI uri = mockServer.url("/api/stream-invalid").uri();
+
+        // Act
+        Flux<TestDto> flux = executor.executeStream("GET", uri, new HashMap<>(),
+                new HashMap<>(), new HashMap<>(), null, TestDto.class);
+
+        // Assert
+        StepVerifier.create(flux)
+                .expectNextMatches(event -> event.getValue() == 1)
+                .verifyComplete();
+    }
+
+    @Test
+    void testExecuteStreamTypeReferenceFiltersInvalidEvents() throws Exception {
+        // Arrange
+        String sseData = "data:\n\n" +
+                "data: {\"key\":\"broken\"\n\n" +
+                "data: \"invalid\"\n\n" +
+                "data: {\"key\":\"value\"}\n\n";
+
+        mockServer.enqueue(new MockResponse()
+                .setBody(sseData)
+                .setHeader("Content-Type", "text/event-stream"));
+
+        URI uri = mockServer.url("/api/stream-invalid-map").uri();
+
+        // Act
+        Flux<Map<String, String>> flux = executor.executeStream("GET", uri, new HashMap<>(),
+                new HashMap<>(), new HashMap<>(), null, new TypeReference<Map<String, String>>() {});
+
+        // Assert
+        StepVerifier.create(flux)
+                .expectNextMatches(map -> "value".equals(map.get("key")))
                 .verifyComplete();
     }
 
@@ -584,6 +651,47 @@ class WebClientExecutorIntegrationTest {
         assertNotNull(result);
         RecordedRequest request = mockServer.takeRequest();
         assertEquals("PUT", request.getMethod());
+    }
+
+    @Test
+    void testExecuteWithNullUriUsesBaseUrl() throws Exception {
+        // Arrange
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"root\",\"value\":10}")
+                .setHeader("Content-Type", "application/json"));
+
+        // Act
+        TestDto result = executor.execute("GET", null, new HashMap<>(), new HashMap<>(),
+                new HashMap<>(), null, TestDto.class);
+
+        // Assert
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        assertEquals("/", request.getPath());
+    }
+
+    @Test
+    void testRequestWithQueryFlagAndNullPath() throws Exception {
+        // Arrange
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"query\",\"value\":11}")
+                .setHeader("Content-Type", "application/json"));
+
+        URI uri = new URI("http", null, mockServer.getHostName(), mockServer.getPort(),
+                null, "flag&key=value", null);
+
+        // Act
+        TestDto result = executor.execute("GET", uri, new HashMap<>(), new HashMap<>(),
+                new HashMap<>(), null, TestDto.class);
+
+        // Assert
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        String path = request.getPath();
+        assertTrue(path.contains("flag="));
+        assertTrue(path.contains("key=value"));
     }
 
     // ========== Helper Method Tests ==========
@@ -790,6 +898,31 @@ class WebClientExecutorIntegrationTest {
         String contentType = request.getHeader("Content-Type");
         assertNotNull(contentType);
         assertTrue(contentType.contains("multipart"));
+    }
+
+    @Test
+    void testRequestWithMultipartHeaderAndJsonBody() throws Exception {
+        // Arrange
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{\"name\":\"json\",\"value\":12}")
+                .setHeader("Content-Type", "application/json"));
+
+        URI uri = mockServer.url("/api/multipart-json").uri();
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "multipart/form-data");
+
+        TestData body = new TestData("json", 12, null);
+
+        // Act
+        TestDto result = executor.execute("POST", uri, headers, new HashMap<>(),
+                new HashMap<>(), body, TestDto.class);
+
+        // Assert
+        assertNotNull(result);
+        RecordedRequest request = mockServer.takeRequest();
+        assertTrue(request.getBody().readUtf8().contains("\"name\""));
+        assertTrue(request.getHeader("Content-Type").contains("application/json"));
     }
 
     @Test
