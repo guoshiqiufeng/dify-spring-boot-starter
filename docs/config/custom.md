@@ -45,30 +45,12 @@ public RestClient.Builder restClientBuilder() {
 
 ### JSON 编解码器自定义
 
-#### 使用自定义 ObjectMapper (Jackson)
+#### 使用自定义 JsonMapper (Jackson)
 
 ```java
 @Bean
-@Primary
-public ObjectMapper objectMapper() {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-    mapper.registerModule(new JavaTimeModule());
-    return mapper;
-}
-```
-
-#### 使用自定义 Gson
-
-```java
-@Bean
-@Primary
-public Gson gson() {
-    return new GsonBuilder()
-            .setDateFormat("yyyy-MM-dd HH:mm:ss")
-            .serializeNulls()
-            .create();
+public JsonMapper jsonMapper() {
+    return JacksonJsonMapper.getInstance();
 }
 ```
 
@@ -91,20 +73,14 @@ public class DifyCustomConfiguration {
     }
 
     @Bean
-    @ConditionalOnClass(name = "org.springframework.web.client.RestClient")
     public RestClient.Builder restClientBuilder() {
         return RestClient.builder()
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
     }
 
     @Bean
-    @Primary
-    public ObjectMapper objectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        mapper.registerModule(new JavaTimeModule());
-        return mapper;
+    public JsonMapper jsonMapper() {
+        return JacksonJsonMapper.getInstance();
     }
 }
 ```

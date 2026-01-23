@@ -45,30 +45,12 @@ public RestClient.Builder restClientBuilder() {
 
 ### JSON Codec Customization
 
-#### Using Custom ObjectMapper (Jackson)
+#### Using Custom JsonMapper (Jackson)
 
 ```java
 @Bean
-@Primary
-public ObjectMapper objectMapper() {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-    mapper.registerModule(new JavaTimeModule());
-    return mapper;
-}
-```
-
-#### Using Custom Gson
-
-```java
-@Bean
-@Primary
-public Gson gson() {
-    return new GsonBuilder()
-            .setDateFormat("yyyy-MM-dd HH:mm:ss")
-            .serializeNulls()
-            .create();
+public JsonMapper jsonMapper() {
+    return JacksonJsonMapper.getInstance();
 }
 ```
 
@@ -98,13 +80,8 @@ public class DifyCustomConfiguration {
     }
 
     @Bean
-    @Primary
-    public ObjectMapper objectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        mapper.registerModule(new JavaTimeModule());
-        return mapper;
+    public JsonMapper jsonMapper() {
+        return JacksonJsonMapper.getInstance();
     }
 }
 ```
