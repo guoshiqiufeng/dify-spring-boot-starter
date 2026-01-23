@@ -17,7 +17,7 @@ package io.github.guoshiqiufeng.dify.client.core.web.client;
 
 import io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import reactor.core.publisher.Flux;
 
 /**
@@ -125,7 +125,7 @@ public interface ResponseSpec {
      * @param <T>          the response body type
      * @return the HTTP response with status, headers, and body
      */
-    <T> HttpResponse<T> toEntity(Class<T> responseType);
+    <T> ResponseEntity<T> toEntity(Class<T> responseType);
 
     /**
      * Return an {@code HttpResponse} with the body decoded to an Object of
@@ -142,7 +142,7 @@ public interface ResponseSpec {
      * @param <T>           the response body type
      * @return the HTTP response with status, headers, and body
      */
-    <T> HttpResponse<T> toEntity(TypeReference<T> typeReference);
+    <T> ResponseEntity<T> toEntity(TypeReference<T> typeReference);
 
     /**
      * Return an {@code HttpResponse} without a body.
@@ -162,7 +162,7 @@ public interface ResponseSpec {
      *
      * @return the HTTP response with status and headers, but no body
      */
-    HttpResponse<Void> toBodilessEntity();
+    ResponseEntity<Void> toBodilessEntity();
 
     /**
      * Extract the response body as a Flux stream.

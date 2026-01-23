@@ -15,7 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.client.core.http;
 
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -62,7 +62,7 @@ class ResponseErrorHandlerTest {
             statusCode.set(response.getStatusCode());
         });
 
-        HttpResponse<String> response = new HttpResponse<>(404, new HttpHeaders(), "Not Found");
+        ResponseEntity<String> response = new ResponseEntity<>(404, new HttpHeaders(), "Not Found");
         handler.handle(response);
 
         assertEquals(404, statusCode.get());
@@ -97,7 +97,7 @@ class ResponseErrorHandlerTest {
             statusCode.set(response.getStatusCode());
         });
 
-        HttpResponse<String> response = new HttpResponse<>(503, new HttpHeaders(), "Service Unavailable");
+        ResponseEntity<String> response = new ResponseEntity<>(503, new HttpHeaders(), "Service Unavailable");
         handler.handle(response);
 
         assertEquals(503, statusCode.get());
@@ -133,7 +133,7 @@ class ResponseErrorHandlerTest {
                 response -> statusCode.set(response.getStatusCode())
         );
 
-        HttpResponse<String> response = new HttpResponse<>(429, new HttpHeaders(), "Too Many Requests");
+        ResponseEntity<String> response = new ResponseEntity<>(429, new HttpHeaders(), "Too Many Requests");
         handler.handle(response);
 
         assertEquals(429, statusCode.get());
@@ -145,7 +145,7 @@ class ResponseErrorHandlerTest {
             throw new RuntimeException("Handler error");
         });
 
-        HttpResponse<String> response = new HttpResponse<>(404, new HttpHeaders(), "Not Found");
+        ResponseEntity<String> response = new ResponseEntity<>(404, new HttpHeaders(), "Not Found");
 
         assertThrows(RuntimeException.class, () -> handler.handle(response));
     }
@@ -164,7 +164,7 @@ class ResponseErrorHandlerTest {
         );
 
         // Test 4xx response
-        HttpResponse<String> response404 = new HttpResponse<>(404, new HttpHeaders(), "Not Found");
+        ResponseEntity<String> response404 = new ResponseEntity<>(404, new HttpHeaders(), "Not Found");
         if (handler1.getStatusPredicate().test(404)) {
             handler1.handle(response404);
         }
@@ -176,7 +176,7 @@ class ResponseErrorHandlerTest {
         assertEquals(0, handler2Called.get());
 
         // Test 5xx response
-        HttpResponse<String> response500 = new HttpResponse<>(500, new HttpHeaders(), "Internal Server Error");
+        ResponseEntity<String> response500 = new ResponseEntity<>(500, new HttpHeaders(), "Internal Server Error");
         if (handler1.getStatusPredicate().test(500)) {
             handler1.handle(response500);
         }
@@ -229,7 +229,7 @@ class ResponseErrorHandlerTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
-        HttpResponse<String> response = new HttpResponse<>(404, headers, "Error message");
+        ResponseEntity<String> response = new ResponseEntity<>(404, headers, "Error message");
 
         handler.handle(response);
 
@@ -270,11 +270,11 @@ class ResponseErrorHandlerTest {
             }
         });
 
-        HttpResponse<String> response404 = new HttpResponse<>(404, new HttpHeaders(), "Not Found");
+        ResponseEntity<String> response404 = new ResponseEntity<>(404, new HttpHeaders(), "Not Found");
         assertThrows(IllegalStateException.class, () -> handler.handle(response404));
         assertEquals(1, callCount.get());
 
-        HttpResponse<String> response400 = new HttpResponse<>(400, new HttpHeaders(), "Bad Request");
+        ResponseEntity<String> response400 = new ResponseEntity<>(400, new HttpHeaders(), "Bad Request");
         assertDoesNotThrow(() -> handler.handle(response400));
         assertEquals(2, callCount.get());
     }

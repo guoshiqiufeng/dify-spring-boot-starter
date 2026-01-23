@@ -19,7 +19,10 @@ import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
 import io.github.guoshiqiufeng.dify.client.core.http.util.MultipartBodyProcessor;
 import lombok.experimental.UtilityClass;
-import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.util.MultiValueMap;
 
 import java.util.Map;
 
@@ -41,49 +44,77 @@ public class SpringMultipartBodyBuilder {
      * @param bodyMap    map of multipart parts
      * @param jsonMapper JSON mapper for serialization
      * @param skipNull   whether to skip null values in JSON serialization
-     * @return Spring LinkedMultiValueMap for multipart body
+     * @return MultiValueMap for multipart body
      */
-    public static LinkedMultiValueMap<String, Object> buildMultipartBody(
+    public static MultiValueMap<String, HttpEntity<?>> buildMultipartBody(
             Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> bodyMap,
             JsonMapper jsonMapper,
             Boolean skipNull) {
 
-        LinkedMultiValueMap<String, Object> multipartData = new LinkedMultiValueMap<>();
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
 
         for (Map.Entry<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> entry : bodyMap.entrySet()) {
             io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part part = entry.getValue();
             Object partValue = part.getValue();
+            MultipartBodyBuilder.PartBuilder partBuilder;
+            String contentType = part.getHeader("Content-Type");
+            MediaType mediaType = null;
 
-            // Convert byte[] to Spring's ByteArrayResource for file uploads
+            if (contentType != null && !contentType.isEmpty()) {
+                mediaType = MediaType.parseMediaType(contentType);
+            }
+
             if (partValue instanceof byte[]) {
                 byte[] bytes = (byte[]) partValue;
                 String filename = MultipartBodyProcessor.extractFilename(part.getHeader("Content-Disposition"));
 
                 org.springframework.core.io.ByteArrayResource resource =
-                    new org.springframework.core.io.ByteArrayResource(bytes) {
-                        @Override
-                        public String getFilename() {
-                            return filename;
-                        }
-                    };
+                        new org.springframework.core.io.ByteArrayResource(bytes) {
+                            @Override
+                            public String getFilename() {
+                                return filename;
+                            }
+                        };
 
-                multipartData.add(entry.getKey(), resource);
+                partBuilder = builder.part(entry.getKey(), resource);
+                if (mediaType != null) {
+                    partBuilder.contentType(mediaType);
+                }
             } else if (partValue instanceof String || partValue instanceof Number || partValue instanceof Boolean) {
-                // For simple types, add directly
-                multipartData.add(entry.getKey(), partValue);
+                Object simpleValue = (partValue instanceof String) ? partValue : String.valueOf(partValue);
+                partBuilder = builder.part(entry.getKey(), simpleValue);
+                if (mediaType != null) {
+                    partBuilder.contentType(mediaType);
+                }
             } else {
-                // For complex objects, serialize to JSON
                 try {
                     String jsonValue = (skipNull != null && skipNull) ?
-                        jsonMapper.toJsonIgnoreNull(partValue) :
-                        jsonMapper.toJson(partValue);
-                    multipartData.add(entry.getKey(), jsonValue);
+                            jsonMapper.toJsonIgnoreNull(partValue) :
+                            jsonMapper.toJson(partValue);
+                    partBuilder = builder.part(entry.getKey(), jsonValue);
+                    if (mediaType != null) {
+                        partBuilder.contentType(mediaType);
+                    } else {
+                        partBuilder.contentType(MediaType.APPLICATION_JSON);
+                    }
                 } catch (Exception e) {
                     throw new HttpClientException("Failed to serialize multipart field to JSON: " + entry.getKey(), e);
                 }
             }
+
+            for (Map.Entry<String, java.util.List<String>> headerEntry : part.getHeaders().entrySet()) {
+                String headerName = headerEntry.getKey();
+                if ("Content-Type".equalsIgnoreCase(headerName) ||
+                        "Content-Disposition".equalsIgnoreCase(headerName)) {
+                    continue;
+                }
+                for (String headerValue : headerEntry.getValue()) {
+                    partBuilder.header(headerName, headerValue);
+                }
+            }
         }
 
-        return multipartData;
+        return builder.build();
     }
+
 }

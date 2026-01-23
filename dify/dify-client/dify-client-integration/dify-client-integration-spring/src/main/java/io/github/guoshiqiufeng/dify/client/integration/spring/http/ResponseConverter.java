@@ -18,10 +18,10 @@ package io.github.guoshiqiufeng.dify.client.integration.spring.http;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.SpringStatusCodeExtractor;
-import org.springframework.http.ResponseEntity;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -55,7 +55,7 @@ class ResponseConverter {
      * @param <T>            response type
      * @return HttpResponse with deserialized body
      */
-    <T> HttpResponse<T> convert(ResponseEntity<String> responseEntity, Class<T> responseType) {
+    <T> ResponseEntity<T> convert(org.springframework.http.ResponseEntity<String> responseEntity, Class<T> responseType) {
         T responseBody = deserialize(responseEntity.getBody(), responseType);
         return buildHttpResponse(responseEntity, responseBody);
     }
@@ -68,7 +68,7 @@ class ResponseConverter {
      * @param <T>            response type
      * @return HttpResponse with deserialized body
      */
-    <T> HttpResponse<T> convert(ResponseEntity<String> responseEntity, TypeReference<T> typeReference) {
+    <T> ResponseEntity<T> convert(org.springframework.http.ResponseEntity<String> responseEntity, TypeReference<T> typeReference) {
         T responseBody = deserialize(responseEntity.getBody(), typeReference);
         return buildHttpResponse(responseEntity, responseBody);
     }
@@ -84,6 +84,14 @@ class ResponseConverter {
     <T> T deserialize(String bodyString, Class<T> responseType) {
         if (bodyString == null || bodyString.isEmpty()) {
             return null;
+        }
+
+        if (responseType == Void.class || responseType == void.class) {
+            return null;
+        }
+
+        if (responseType == byte[].class) {
+            return responseType.cast(bodyString.getBytes(StandardCharsets.UTF_8));
         }
 
         if (responseType == String.class) {
@@ -110,6 +118,27 @@ class ResponseConverter {
             return null;
         }
 
+        if (typeReference == null) {
+            throw new HttpClientException("Failed to deserialize response: type reference is null");
+        }
+
+        if (typeReference.getType() instanceof Class<?>) {
+            Class<?> targetType = (Class<?>) typeReference.getType();
+            if (targetType == Void.class || targetType == void.class) {
+                return null;
+            }
+            if (targetType == byte[].class) {
+                @SuppressWarnings("unchecked")
+                T result = (T) bodyString.getBytes(StandardCharsets.UTF_8);
+                return result;
+            }
+            if (targetType == String.class) {
+                @SuppressWarnings("unchecked")
+                T result = (T) bodyString;
+                return result;
+            }
+        }
+
         try {
             return jsonMapper.fromJson(bodyString, typeReference);
         } catch (Exception e) {
@@ -125,13 +154,13 @@ class ResponseConverter {
      * @param <T>            response type
      * @return HttpResponse
      */
-    private <T> HttpResponse<T> buildHttpResponse(ResponseEntity<String> responseEntity, T responseBody) {
+    private <T> ResponseEntity<T> buildHttpResponse(org.springframework.http.ResponseEntity<String> responseEntity, T responseBody) {
         Map<String, List<String>> headers = new HashMap<>();
         responseEntity.getHeaders().forEach((key, values) -> {
             headers.put(key, new ArrayList<>(values));
         });
 
-        return new HttpResponse<>(
+        return new ResponseEntity<>(
                 SpringStatusCodeExtractor.getStatusCodeValue(responseEntity),
                 headers,
                 responseBody

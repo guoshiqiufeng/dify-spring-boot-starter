@@ -33,7 +33,7 @@ public enum DocFormEnum {
     hierarchical_model,
 
     /**
-     * Q&A 模式：为分片文档生成 Q&A 对，然后对问题进行 embedding
+     * `Q&A 模式`：为分片文档生成 Q&A 对，然后对问题进行 embedding
      */
     qa_model;
 }

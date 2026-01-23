@@ -15,10 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.client.core.http;
 
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 
-import java.io.IOException;
-import java.net.URI;
 import java.util.function.Predicate;
 
 /**
@@ -45,7 +43,7 @@ public interface ResponseErrorHandler {
      * @param response the HTTP response
      * @throws Exception if error handling fails
      */
-    void handle(HttpResponse<?> response) throws Exception;
+    void handle(ResponseEntity<?> response) throws Exception;
 
     /**
      * Create an error handler for 4xx status codes.
@@ -61,7 +59,7 @@ public interface ResponseErrorHandler {
             }
 
             @Override
-            public void handle(HttpResponse<?> response) throws Exception {
+            public void handle(ResponseEntity<?> response) throws Exception {
                 handler.handle(response);
             }
         };
@@ -81,7 +79,7 @@ public interface ResponseErrorHandler {
             }
 
             @Override
-            public void handle(HttpResponse<?> response) throws Exception {
+            public void handle(ResponseEntity<?> response) throws Exception {
                 handler.handle(response);
             }
         };
@@ -102,7 +100,7 @@ public interface ResponseErrorHandler {
             }
 
             @Override
-            public void handle(HttpResponse<?> response) throws Exception {
+            public void handle(ResponseEntity<?> response) throws Exception {
                 handler.handle(response);
             }
         };
@@ -119,6 +117,6 @@ public interface ResponseErrorHandler {
          * @param response the HTTP response
          * @throws Exception if error handling fails
          */
-        void handle(HttpResponse<?> response) throws Exception;
+        void handle(ResponseEntity<?> response) throws Exception;
     }
 }

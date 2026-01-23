@@ -17,11 +17,10 @@ package io.github.guoshiqiufeng.dify.support.impl.base;
 
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
 import io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.exception.DifyClientException;
-import lombok.experimental.UtilityClass;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -178,7 +177,7 @@ class BaseDifyDefaultClientTest {
         // Arrange
         HttpClient mockHttpClient = mock(HttpClient.class);
         BaseDifyDefaultClient client = new BaseDifyDefaultClient(mockHttpClient);
-        HttpResponse<String> mockResponse = mock(HttpResponse.class);
+        ResponseEntity<String> mockResponse = mock(ResponseEntity.class);
 
         when(mockResponse.getStatusCode()).thenReturn(401);
         when(mockResponse.getBody()).thenReturn("Unauthorized");
@@ -196,7 +195,7 @@ class BaseDifyDefaultClientTest {
         // Arrange
         HttpClient mockHttpClient = mock(HttpClient.class);
         BaseDifyDefaultClient client = new BaseDifyDefaultClient(mockHttpClient);
-        HttpResponse<String> mockResponse = mock(HttpResponse.class);
+        ResponseEntity<String> mockResponse = mock(ResponseEntity.class);
 
         when(mockResponse.getStatusCode()).thenReturn(404);
         when(mockResponse.getBody()).thenReturn("Not Found");
@@ -214,7 +213,7 @@ class BaseDifyDefaultClientTest {
         // Arrange
         HttpClient mockHttpClient = mock(HttpClient.class);
         BaseDifyDefaultClient client = new BaseDifyDefaultClient(mockHttpClient);
-        HttpResponse<String> mockResponse = mock(HttpResponse.class);
+        ResponseEntity<String> mockResponse = mock(ResponseEntity.class);
 
         when(mockResponse.getStatusCode()).thenReturn(500);
         when(mockResponse.getBody()).thenReturn("Internal Server Error");
@@ -233,7 +232,7 @@ class BaseDifyDefaultClientTest {
         // Arrange
         HttpClient mockHttpClient = mock(HttpClient.class);
         BaseDifyDefaultClient client = new BaseDifyDefaultClient(mockHttpClient);
-        HttpResponse<?> mockResponse = mock(HttpResponse.class);
+        ResponseEntity<?> mockResponse = mock(ResponseEntity.class);
 
         when(mockResponse.getStatusCode()).thenReturn(500);
         when(mockResponse.getBody()).thenReturn(null);
@@ -252,7 +251,7 @@ class BaseDifyDefaultClientTest {
         // Arrange
         HttpClient mockHttpClient = mock(HttpClient.class);
         BaseDifyDefaultClient client = new BaseDifyDefaultClient(mockHttpClient);
-        HttpResponse<String> mockResponse = mock(HttpResponse.class);
+        ResponseEntity<String> mockResponse = mock(ResponseEntity.class);
 
         when(mockResponse.getStatusCode()).thenReturn(400);
         when(mockResponse.getBody()).thenReturn("Bad Request: Invalid parameters");
@@ -271,7 +270,7 @@ class BaseDifyDefaultClientTest {
         // Arrange
         HttpClient mockHttpClient = mock(HttpClient.class);
         BaseDifyDefaultClient client = new BaseDifyDefaultClient(mockHttpClient);
-        HttpResponse<String> mockResponse = mock(HttpResponse.class);
+        ResponseEntity<String> mockResponse = mock(ResponseEntity.class);
 
         when(mockResponse.getStatusCode()).thenReturn(403);
         when(mockResponse.getBody()).thenReturn("Forbidden");
@@ -291,7 +290,7 @@ class BaseDifyDefaultClientTest {
         // Arrange
         HttpClient mockHttpClient = mock(HttpClient.class);
         BaseDifyDefaultClient client = new BaseDifyDefaultClient(mockHttpClient);
-        HttpResponse<String> mockResponse = mock(HttpResponse.class);
+        ResponseEntity<String> mockResponse = mock(ResponseEntity.class);
 
         when(mockResponse.getStatusCode()).thenReturn(429);
         when(mockResponse.getBody()).thenReturn("Rate limit exceeded");
@@ -309,7 +308,7 @@ class BaseDifyDefaultClientTest {
         // Arrange
         HttpClient mockHttpClient = mock(HttpClient.class);
         BaseDifyDefaultClient client = new BaseDifyDefaultClient(mockHttpClient);
-        HttpResponse<String> mockResponse = mock(HttpResponse.class);
+        ResponseEntity<String> mockResponse = mock(ResponseEntity.class);
 
         when(mockResponse.getStatusCode()).thenReturn(503);
         when(mockResponse.getBody()).thenReturn("Service Unavailable");

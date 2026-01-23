@@ -19,7 +19,7 @@ import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
 import io.github.guoshiqiufeng.dify.client.core.map.LinkedMultiValueMap;
 import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
@@ -101,7 +101,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         mockLoginResult.setData(mockLoginData);
 
         // Create a HttpResponse with the mock result
-        HttpResponse<LoginResultResponse> responseEntity = HttpResponse.<LoginResultResponse>builder()
+        ResponseEntity<LoginResultResponse> responseEntity = ResponseEntity.<LoginResultResponse>builder()
                 .statusCode(200)
                 .body(mockLoginResult)
                 .build();
@@ -142,7 +142,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         mockRefreshResult.setData(mockRefreshData);
 
         // Create a HttpResponse with the mock result
-        HttpResponse<LoginResultResponse> responseEntity = HttpResponse.<LoginResultResponse>builder()
+        ResponseEntity<LoginResultResponse> responseEntity = ResponseEntity.<LoginResultResponse>builder()
                 .statusCode(200)
                 .body(mockRefreshResult)
                 .build();
@@ -1336,7 +1336,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         mockLoginResult.setData(mockLoginData);
 
         // Create a HttpResponse with the mock result
-        HttpResponse<LoginResultResponse> responseEntity = HttpResponse.<LoginResultResponse>builder()
+        ResponseEntity<LoginResultResponse> responseEntity = ResponseEntity.<LoginResultResponse>builder()
                 .statusCode(200)
                 .body(mockLoginResult)
                 .build();
@@ -1926,7 +1926,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         mockLoginResult.setData(mockLoginData);
 
         // Create a HttpResponse with the mock result
-        HttpResponse<LoginResultResponse> responseEntity = HttpResponse.<LoginResultResponse>builder()
+        ResponseEntity<LoginResultResponse> responseEntity = ResponseEntity.<LoginResultResponse>builder()
                 .statusCode(200)
                 .body(mockLoginResult)
                 .build();
@@ -1973,7 +1973,7 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         mockLoginResult.setData(mockLoginData);
 
         // Create a HttpResponse with the mock result
-        HttpResponse<LoginResultResponse> responseEntity = HttpResponse.<LoginResultResponse>builder()
+        ResponseEntity<LoginResultResponse> responseEntity = ResponseEntity.<LoginResultResponse>builder()
                 .statusCode(200)
                 .body(mockLoginResult)
                 .build();

@@ -200,7 +200,9 @@ public class SpringHttpClient implements HttpClient {
         if (defaultHeaders != null && !defaultHeaders.isEmpty()) {
             WebClient.Builder finalBuilder = builder;
             defaultHeaders.forEach((key, values) -> {
-                finalBuilder.defaultHeader(key, String.valueOf(values));
+                if (values != null && !values.isEmpty()) {
+                    finalBuilder.defaultHeader(key, values.get(0));
+                }
             });
         }
         if (clientConfig != null && clientConfig.getLogging()) {
@@ -320,9 +322,11 @@ public class SpringHttpClient implements HttpClient {
             if (defaultHeaders != null && !defaultHeaders.isEmpty()) {
                 for (Map.Entry<String, List<String>> entry : defaultHeaders.entrySet()) {
                     String key = entry.getKey();
-                    Object values = entry.getValue();
-                    restClientBuilder = builderClass.getMethod("defaultHeader", String.class, String[].class)
-                            .invoke(restClientBuilder, key, new String[]{String.valueOf(values)});
+                    List<String> values = entry.getValue();
+                    if (values != null && !values.isEmpty()) {
+                        restClientBuilder = builderClass.getMethod("defaultHeader", String.class, String[].class)
+                                .invoke(restClientBuilder, key, new String[]{values.get(0)});
+                    }
                 }
             }
 

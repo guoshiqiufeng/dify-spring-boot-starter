@@ -15,9 +15,6 @@
  */
 package io.github.guoshiqiufeng.dify.support.impl.chat;
 
-import io.github.guoshiqiufeng.dify.chat.exception.DiftChatException;
-import io.github.guoshiqiufeng.dify.chat.exception.DiftChatExceptionEnum;
-import io.github.guoshiqiufeng.dify.client.core.map.LinkedMultiValueMap;
 import io.github.guoshiqiufeng.dify.core.bean.BeanUtils;
 import io.github.guoshiqiufeng.dify.core.utils.Assert;
 import io.github.guoshiqiufeng.dify.core.utils.CollUtil;
@@ -34,7 +31,7 @@ import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.support.impl.base.BaseDifyDefaultClient;
 import io.github.guoshiqiufeng.dify.support.impl.dto.chat.ChatMessageSendCompletionResponseDto;
 import io.github.guoshiqiufeng.dify.support.impl.utils.DatasetHeaderUtils;
@@ -48,7 +45,6 @@ import io.github.guoshiqiufeng.dify.dataset.constant.DatasetUriConstant;
 import io.github.guoshiqiufeng.dify.support.impl.utils.MultipartBodyUtil;
 import reactor.core.publisher.Flux;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -222,7 +218,7 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
     }
 
     @Override
-    public HttpResponse<byte[]> textToAudio(TextToAudioRequest request) {
+    public ResponseEntity<byte[]> textToAudio(TextToAudioRequest request) {
         Map<String, String> requestBody = new HashMap<>(3);
         requestBody.put("user", request.getUserId());
         requestBody.put("text", request.getText());
@@ -313,7 +309,7 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
     }
 
     @Override
-    public HttpResponse<byte[]> filePreview(FilePreviewRequest request) {
+    public ResponseEntity<byte[]> filePreview(FilePreviewRequest request) {
         Assert.notNull(request, REQUEST_BODY_NULL_ERROR);
         Assert.notNull(request.getFileId(), "fileId must not be null");
         Assert.notNull(request.getApiKey(), "apiKey must not be null");

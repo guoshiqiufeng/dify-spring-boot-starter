@@ -18,7 +18,7 @@ package io.github.guoshiqiufeng.dify.support.impl.server;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
@@ -534,7 +534,7 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
             requestVO.setPassword(Base64.getEncoder().encodeToString(difyServerProperties.getPassword().getBytes()));
         }
         // 发送请求并获取完整 ResponseEntity
-        HttpResponse<LoginResultResponse> responseEntity = httpClient.post()
+        ResponseEntity<LoginResultResponse> responseEntity = httpClient.post()
                 .uri(ServerUriConstant.LOGIN)
                 .body(requestVO)
                 .retrieve()
@@ -551,7 +551,7 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
     public LoginResponse refreshToken(String refreshToken) {
         Map<String, String> requestVO = new HashMap<>(1);
         requestVO.put("refresh_token", refreshToken);
-        HttpResponse<LoginResultResponse> responseEntity = httpClient.post()
+        ResponseEntity<LoginResultResponse> responseEntity = httpClient.post()
                 .uri(ServerUriConstant.REFRESH_TOKEN)
                 // support Https
                 .cookie("__Host-refresh_token", refreshToken)

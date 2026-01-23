@@ -48,8 +48,10 @@ public abstract class AbstractDifyServerAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(BaseDifyServerToken.class)
     public BaseDifyServerToken difyServerToken() {
-        log.info("Redis token storage not available, using default in-memory token storage. " +
-                "For production environments, consider configuring Redis for distributed token management.");
+        if(log.isDebugEnabled()) {
+            log.debug("Redis token storage not available, using default in-memory token storage. " +
+                    "For production environments, consider configuring Redis for distributed token management.");
+        }
         return new DifyServerTokenDefault();
     }
 

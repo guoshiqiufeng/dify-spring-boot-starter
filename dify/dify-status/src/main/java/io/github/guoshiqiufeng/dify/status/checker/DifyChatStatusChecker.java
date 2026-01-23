@@ -16,7 +16,6 @@
 package io.github.guoshiqiufeng.dify.status.checker;
 
 import io.github.guoshiqiufeng.dify.chat.DifyChat;
-import io.github.guoshiqiufeng.dify.chat.client.DifyChatClient;
 import io.github.guoshiqiufeng.dify.chat.dto.request.*;
 import io.github.guoshiqiufeng.dify.status.dto.ApiStatusResult;
 import io.github.guoshiqiufeng.dify.status.dto.ClientStatusReport;

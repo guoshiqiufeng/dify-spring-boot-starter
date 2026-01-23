@@ -20,9 +20,8 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * @description:
- * @author: Adam
- * @create: 2025-08-14 10:31
+ * @author Adam
+ * @since 2025-08-14 10:31
  **/
 @Data
 public class DatasetStatusResponse implements Serializable {

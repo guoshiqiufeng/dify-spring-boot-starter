@@ -30,7 +30,7 @@ import io.github.guoshiqiufeng.dify.client.core.map.LinkedMultiValueMap;
 import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
 import io.github.guoshiqiufeng.dify.client.core.web.client.ResponseSpec;
 import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.client.integration.okhttp.http.util.OkHttpMultipartBodyBuilder;
 import io.github.guoshiqiufeng.dify.client.integration.okhttp.http.util.OkHttpResponseProcessor;
 import io.github.guoshiqiufeng.dify.client.integration.okhttp.publisher.OkHttpStreamPublisher;
@@ -186,7 +186,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
     }
 
     @Override
-    public <T> HttpResponse<T> executeForResponse(Class<T> responseType) {
+    public <T> ResponseEntity<T> executeForResponse(Class<T> responseType) {
         Request request = buildRequest();
         try (Response response = client.getOkHttpClient().newCall(request).execute()) {
             T responseBody = handleResponse(response, responseType);
@@ -197,7 +197,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
     }
 
     @Override
-    public <T> HttpResponse<T> executeForResponse(io.github.guoshiqiufeng.dify.client.core.http.TypeReference<T> typeReference) {
+    public <T> ResponseEntity<T> executeForResponse(io.github.guoshiqiufeng.dify.client.core.http.TypeReference<T> typeReference) {
         Request request = buildRequest();
         try (Response response = client.getOkHttpClient().newCall(request).execute()) {
             T responseBody = handleResponse(response, typeReference);
@@ -248,20 +248,20 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
 
         @Override
         public <T> T body(Class<T> responseType) {
-            HttpResponse<T> response = toEntity(responseType);
+            ResponseEntity<T> response = toEntity(responseType);
             handleErrors(response);
             return response.getBody();
         }
 
         @Override
         public <T> T body(io.github.guoshiqiufeng.dify.client.core.http.TypeReference<T> typeReference) {
-            HttpResponse<T> response = toEntity(typeReference);
+            ResponseEntity<T> response = toEntity(typeReference);
             handleErrors(response);
             return response.getBody();
         }
 
         @Override
-        public <T> HttpResponse<T> toEntity(Class<T> responseType) {
+        public <T> ResponseEntity<T> toEntity(Class<T> responseType) {
             Request request = buildRequest();
             try (Response response = client.getOkHttpClient().newCall(request).execute()) {
                 int statusCode = response.code();
@@ -269,7 +269,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
                 // For success responses (2xx), deserialize normally
                 if (HttpStatusValidator.isSuccessful(statusCode)) {
                     T responseBody = handleResponse(response, responseType, false);
-                    HttpResponse<T> httpResponse = buildHttpResponse(response, responseBody);
+                    ResponseEntity<T> httpResponse = buildHttpResponse(response, responseBody);
                     handleErrors(httpResponse);
                     return httpResponse;
                 } else {
@@ -280,7 +280,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
 
                     @SuppressWarnings("unchecked")
                     T typedErrorBody = (T) errorBody;
-                    HttpResponse<T> httpResponse = buildHttpResponse(response, typedErrorBody);
+                    ResponseEntity<T> httpResponse = buildHttpResponse(response, typedErrorBody);
                     handleErrors(httpResponse);
                     return httpResponse;
                 }
@@ -290,7 +290,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
         }
 
         @Override
-        public <T> HttpResponse<T> toEntity(io.github.guoshiqiufeng.dify.client.core.http.TypeReference<T> typeReference) {
+        public <T> ResponseEntity<T> toEntity(io.github.guoshiqiufeng.dify.client.core.http.TypeReference<T> typeReference) {
             Request request = buildRequest();
             try (Response response = client.getOkHttpClient().newCall(request).execute()) {
                 int statusCode = response.code();
@@ -298,7 +298,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
                 // For success responses (2xx), deserialize normally
                 if (HttpStatusValidator.isSuccessful(statusCode)) {
                     T responseBody = handleResponse(response, typeReference, false);
-                    HttpResponse<T> httpResponse = buildHttpResponse(response, responseBody);
+                    ResponseEntity<T> httpResponse = buildHttpResponse(response, responseBody);
                     handleErrors(httpResponse);
                     return httpResponse;
                 } else {
@@ -309,7 +309,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
 
                     @SuppressWarnings("unchecked")
                     T typedErrorBody = (T) errorBody;
-                    HttpResponse<T> httpResponse = buildHttpResponse(response, typedErrorBody);
+                    ResponseEntity<T> httpResponse = buildHttpResponse(response, typedErrorBody);
                     handleErrors(httpResponse);
                     return httpResponse;
                 }
@@ -319,8 +319,8 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
         }
 
         @Override
-        public HttpResponse<Void> toBodilessEntity() {
-            HttpResponse<Void> response = toEntity(Void.class);
+        public ResponseEntity<Void> toBodilessEntity() {
+            ResponseEntity<Void> response = toEntity(Void.class);
             handleErrors(response);
             return response;
         }
@@ -344,7 +344,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
          *
          * @param response the HTTP response
          */
-        private void handleErrors(HttpResponse<?> response) {
+        private void handleErrors(ResponseEntity<?> response) {
             for (ResponseErrorHandler handler : errorHandlers) {
                 if (handler.getStatusPredicate().test(response.getStatusCode())) {
                     try {
@@ -621,7 +621,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
      * @param <T>          response body type
      * @return HttpResponse
      */
-    private <T> HttpResponse<T> buildHttpResponse(Response response, T responseBody) {
+    private <T> ResponseEntity<T> buildHttpResponse(Response response, T responseBody) {
         return OkHttpResponseProcessor.buildHttpResponse(response, responseBody);
     }
 

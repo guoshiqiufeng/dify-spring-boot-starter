@@ -15,25 +15,15 @@
  */
 package io.github.guoshiqiufeng.dify.client.integration.spring.http;
 
-import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
-import io.github.guoshiqiufeng.dify.client.core.web.util.DefaultUriBuilder;
-import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
-import io.github.guoshiqiufeng.dify.client.core.http.HttpRequestBuilder;
-import io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler;
+import io.github.guoshiqiufeng.dify.client.core.http.*;
 import io.github.guoshiqiufeng.dify.client.core.map.LinkedMultiValueMap;
 import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.client.core.web.client.ResponseSpec;
-import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
+import io.github.guoshiqiufeng.dify.client.core.web.util.DefaultUriBuilder;
 import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -197,20 +187,20 @@ public class SpringHttpRequestBuilder implements HttpRequestBuilder {
     }
 
     @Override
-    public <T> HttpResponse<T> executeForResponse(Class<T> responseType) {
+    public <T> ResponseEntity<T> executeForResponse(Class<T> responseType) {
         T body = execute(responseType);
         // Note: We lose status code and headers information here
         // This is a limitation of the simplified approach
-        return HttpResponse.<T>builder()
+        return ResponseEntity.<T>builder()
                 .statusCode(200)
                 .body(body)
                 .build();
     }
 
     @Override
-    public <T> HttpResponse<T> executeForResponse(TypeReference<T> typeReference) {
+    public <T> ResponseEntity<T> executeForResponse(TypeReference<T> typeReference) {
         T body = execute(typeReference);
-        return HttpResponse.<T>builder()
+        return ResponseEntity.<T>builder()
                 .statusCode(200)
                 .body(body)
                 .build();
@@ -248,21 +238,21 @@ public class SpringHttpRequestBuilder implements HttpRequestBuilder {
 
         @Override
         public <T> T body(Class<T> responseType) {
-            HttpResponse<T> response = toEntity(responseType);
+            ResponseEntity<T> response = toEntity(responseType);
             handleErrors(response);
             return response.getBody();
         }
 
         @Override
         public <T> T body(TypeReference<T> typeReference) {
-            HttpResponse<T> response = toEntity(typeReference);
+            ResponseEntity<T> response = toEntity(typeReference);
             handleErrors(response);
             return response.getBody();
         }
 
         @Override
-        public <T> HttpResponse<T> toEntity(Class<T> responseType) {
-            HttpResponse<T> response;
+        public <T> ResponseEntity<T> toEntity(Class<T> responseType) {
+            ResponseEntity<T> response;
             if (restClientExecutor != null) {
                 response = restClientExecutor.executeForEntity(method, uri, headers, cookies, body, responseType);
             } else {
@@ -274,8 +264,8 @@ public class SpringHttpRequestBuilder implements HttpRequestBuilder {
         }
 
         @Override
-        public <T> HttpResponse<T> toEntity(TypeReference<T> typeReference) {
-            HttpResponse<T> response;
+        public <T> ResponseEntity<T> toEntity(TypeReference<T> typeReference) {
+            ResponseEntity<T> response;
             if (restClientExecutor != null) {
                 response = restClientExecutor.executeForEntity(method, uri, headers, cookies, body, typeReference);
             } else {
@@ -287,8 +277,8 @@ public class SpringHttpRequestBuilder implements HttpRequestBuilder {
         }
 
         @Override
-        public HttpResponse<Void> toBodilessEntity() {
-            HttpResponse<Void> response = toEntity(Void.class);
+        public ResponseEntity<Void> toBodilessEntity() {
+            ResponseEntity<Void> response = toEntity(Void.class);
             handleErrors(response);
             return response;
         }
@@ -308,7 +298,7 @@ public class SpringHttpRequestBuilder implements HttpRequestBuilder {
          *
          * @param response the HTTP response
          */
-        private void handleErrors(HttpResponse<?> response) {
+        private void handleErrors(ResponseEntity<?> response) {
             for (ResponseErrorHandler handler : errorHandlers) {
                 if (handler.getStatusPredicate().test(response.getStatusCode())) {
                     try {

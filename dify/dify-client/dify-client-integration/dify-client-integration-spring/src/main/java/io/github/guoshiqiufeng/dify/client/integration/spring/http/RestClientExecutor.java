@@ -21,15 +21,15 @@ import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 import io.github.guoshiqiufeng.dify.client.core.http.util.HttpStatusValidator;
 import io.github.guoshiqiufeng.dify.client.core.http.util.MultipartBodyProcessor;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.HttpHeaderConverter;
 import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.SpringErrorResponseExtractor;
 import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.SpringMultipartBodyBuilder;
 import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.SpringRequestParameterApplier;
 import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.SpringStatusCodeExtractor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -126,11 +126,11 @@ class RestClientExecutor {
      * @param <T>          response type
      * @return HttpResponse with status, headers, and body
      */
-    <T> HttpResponse<T> executeForEntity(String method, URI uri, Map<String, String> headers,
-                                         Map<String, String> cookies, Object body, Class<T> responseType) {
+    <T> ResponseEntity<T> executeForEntity(String method, URI uri, Map<String, String> headers,
+                                           Map<String, String> cookies, Object body, Class<T> responseType) {
         try {
             Object requestSpec = buildRequest(method, uri, headers, cookies, body);
-            ResponseEntity<String> responseEntity = retrieveEntity(requestSpec);
+            org.springframework.http.ResponseEntity<String> responseEntity = retrieveEntity(requestSpec);
 
             // For error responses (non-2xx), don't attempt deserialization
             // Return the raw error message as the body (cast to T)
@@ -144,7 +144,7 @@ class RestClientExecutor {
                 // The error handler will receive this and can process it
                 @SuppressWarnings("unchecked")
                 T errorBody = (T) responseEntity.getBody();
-                return HttpResponse.<T>builder()
+                return ResponseEntity.<T>builder()
                         .statusCode(statusCode)
                         .headers(HttpHeaderConverter.fromSpringHeaders(responseEntity.getHeaders()))
                         .body(errorBody)
@@ -167,11 +167,11 @@ class RestClientExecutor {
      * @param <T>           response type
      * @return HttpResponse with status, headers, and body
      */
-    <T> HttpResponse<T> executeForEntity(String method, URI uri, Map<String, String> headers,
-                                         Map<String, String> cookies, Object body, TypeReference<T> typeReference) {
+    <T> ResponseEntity<T> executeForEntity(String method, URI uri, Map<String, String> headers,
+                                           Map<String, String> cookies, Object body, TypeReference<T> typeReference) {
         try {
             Object requestSpec = buildRequest(method, uri, headers, cookies, body);
-            ResponseEntity<String> responseEntity = retrieveEntity(requestSpec);
+            org.springframework.http.ResponseEntity<String> responseEntity = retrieveEntity(requestSpec);
 
             // For error responses (non-2xx), don't attempt deserialization
             // Return the raw error message as the body (cast to T)
@@ -185,7 +185,7 @@ class RestClientExecutor {
                 // The error handler will receive this and can process it
                 @SuppressWarnings("unchecked")
                 T errorBody = (T) responseEntity.getBody();
-                return HttpResponse.<T>builder()
+                return ResponseEntity.<T>builder()
                         .statusCode(statusCode)
                         .headers(HttpHeaderConverter.fromSpringHeaders(responseEntity.getHeaders()))
                         .body(errorBody)
@@ -240,7 +240,7 @@ class RestClientExecutor {
                     Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> parts =
                         (Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part>) bodyMap;
 
-                    org.springframework.util.LinkedMultiValueMap<String, Object> multipartData =
+                    org.springframework.util.MultiValueMap<String, HttpEntity<?>> multipartData =
                         SpringMultipartBodyBuilder.buildMultipartBody(parts, jsonMapper, skipNull);
 
                     // Set multipart body using reflection
@@ -323,7 +323,7 @@ class RestClientExecutor {
      * @return ResponseEntity with String body
      * @throws Exception if reflection fails
      */
-    private ResponseEntity<String> retrieveEntity(Object requestSpec) throws Exception {
+    private org.springframework.http.ResponseEntity<String> retrieveEntity(Object requestSpec) throws Exception {
         // Execute and retrieve response entity: requestSpec.retrieve().toEntity(String.class)
         java.lang.reflect.Method retrieveMethod = findMethod(requestSpec.getClass(), "retrieve");
         retrieveMethod.setAccessible(true);
@@ -335,14 +335,14 @@ class RestClientExecutor {
         try {
             Object result = toEntityMethod.invoke(responseSpec, String.class);
 
-            if (!(result instanceof ResponseEntity)) {
+            if (!(result instanceof org.springframework.http.ResponseEntity)) {
                 throw new HttpClientException("Unexpected return type: " + (result != null ? result.getClass() : "null"));
             }
 
             // Since we called toEntity(String.class), we can safely cast to ResponseEntity<String>
-            ResponseEntity<?> rawEntity = (ResponseEntity<?>) result;
+            org.springframework.http.ResponseEntity<?> rawEntity = (org.springframework.http.ResponseEntity<?>) result;
             // Use int status code to avoid Spring version compatibility issues
-            return ResponseEntity.status(SpringStatusCodeExtractor.getStatusCodeValue(rawEntity))
+            return org.springframework.http.ResponseEntity.status(SpringStatusCodeExtractor.getStatusCodeValue(rawEntity))
                     .headers(rawEntity.getHeaders())
                     .body((String) rawEntity.getBody());
         } catch (java.lang.reflect.InvocationTargetException e) {
@@ -350,7 +350,7 @@ class RestClientExecutor {
             Throwable cause = e.getCause();
             if (cause != null) {
                 // Try to extract response information from Spring's RestClientResponseException
-                ResponseEntity<String> errorResponse = extractErrorResponse(cause);
+                org.springframework.http.ResponseEntity<String> errorResponse = extractErrorResponse(cause);
                 if (errorResponse != null) {
                     return errorResponse;
                 }
@@ -392,7 +392,7 @@ class RestClientExecutor {
      * @param throwable the exception thrown by RestClient
      * @return ResponseEntity with error details, or null if extraction fails
      */
-    private ResponseEntity<String> extractErrorResponse(Throwable throwable) {
+    private org.springframework.http.ResponseEntity<String> extractErrorResponse(Throwable throwable) {
         return SpringErrorResponseExtractor.extractErrorResponse(throwable);
     }
 

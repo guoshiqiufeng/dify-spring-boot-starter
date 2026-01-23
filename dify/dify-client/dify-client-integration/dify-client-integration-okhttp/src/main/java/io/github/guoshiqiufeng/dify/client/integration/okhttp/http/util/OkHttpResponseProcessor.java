@@ -15,7 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.client.integration.okhttp.http.util;
 
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import lombok.experimental.UtilityClass;
 import okhttp3.Response;
 
@@ -43,8 +43,8 @@ public class OkHttpResponseProcessor {
      * @param <T>          response body type
      * @return HttpResponse with status, headers, and body
      */
-    public static <T> HttpResponse<T> buildHttpResponse(Response response, T responseBody) {
-        return HttpResponse.<T>builder()
+    public static <T> ResponseEntity<T> buildHttpResponse(Response response, T responseBody) {
+        return ResponseEntity.<T>builder()
                 .statusCode(response.code())
                 .headers(extractHeaders(response))
                 .body(responseBody)

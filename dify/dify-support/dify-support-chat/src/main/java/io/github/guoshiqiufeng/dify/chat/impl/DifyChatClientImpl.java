@@ -20,7 +20,7 @@ import io.github.guoshiqiufeng.dify.chat.client.DifyChatClient;
 import io.github.guoshiqiufeng.dify.chat.dto.request.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.*;
 import io.github.guoshiqiufeng.dify.chat.pipeline.DifyChatPipelineUtils;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
 import lombok.extern.slf4j.Slf4j;
@@ -93,7 +93,7 @@ public class DifyChatClientImpl implements DifyChat {
     }
 
     @Override
-    public HttpResponse<byte[]> textToAudio(TextToAudioRequest request) {
+    public ResponseEntity<byte[]> textToAudio(TextToAudioRequest request) {
         return difyChatClient.textToAudio(request);
     }
 
@@ -108,7 +108,7 @@ public class DifyChatClientImpl implements DifyChat {
     }
 
     @Override
-    public HttpResponse<byte[]> filePreview(FilePreviewRequest request) {
+    public ResponseEntity<byte[]> filePreview(FilePreviewRequest request) {
         return difyChatClient.filePreview(request);
     }
 

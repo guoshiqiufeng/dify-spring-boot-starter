@@ -17,7 +17,7 @@ package io.github.guoshiqiufeng.dify.chat;
 
 import io.github.guoshiqiufeng.dify.chat.dto.request.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.*;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
 import reactor.core.publisher.Flux;
@@ -132,7 +132,7 @@ public interface DifyChat {
      * @param request 文本转语音请求对象，包含文本内容等信息
      * @return 语音文件流
      */
-    HttpResponse<byte[]> textToAudio(TextToAudioRequest request);
+    ResponseEntity<byte[]> textToAudio(TextToAudioRequest request);
 
     /**
      * 语音转文本
@@ -157,10 +157,10 @@ public interface DifyChat {
      * 文件只能在属于请求应用程序的消息范围内访问。
      *
      * @param request 文件预览请求对象，包含文件ID、下载方式等信息
-     * @return ResponseEntity<byte[]> 文件内容响应，包含适当的浏览器显示或下载标头
+     * @return `ResponseEntity<byte[]>` 文件内容响应，包含适当的浏览器显示或下载标头
      * @since 1.0.0
      */
-    HttpResponse<byte[]> filePreview(FilePreviewRequest request);
+    ResponseEntity<byte[]> filePreview(FilePreviewRequest request);
 
     /**
      * app info
