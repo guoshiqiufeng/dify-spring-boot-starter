@@ -15,8 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.client.core.http;
 
-import io.github.guoshiqiufeng.dify.client.core.map.LinkedMultiValueMap;
-import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
+import io.github.guoshiqiufeng.dify.client.core.util.LinkedMultiValueMap;
+import io.github.guoshiqiufeng.dify.client.core.util.MultiValueMap;
 import io.github.guoshiqiufeng.dify.client.core.web.client.ResponseSpec;
 import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
 import org.junit.jupiter.api.BeforeEach;
@@ -541,8 +541,8 @@ class DefaultRequestHeadersUriSpecTest {
     @SuppressWarnings("all")
     void testMultipleCookies() {
         spec.cookie("sessionId", "abc123")
-            .cookie("token", "xyz789")
-            .cookie("preference", "dark-mode");
+                .cookie("token", "xyz789")
+                .cookie("preference", "dark-mode");
 
         @SuppressWarnings("unchecked")
         ArgumentCaptor<Consumer<MultiValueMap<String, String>>> captor = ArgumentCaptor.forClass((Class) Consumer.class);

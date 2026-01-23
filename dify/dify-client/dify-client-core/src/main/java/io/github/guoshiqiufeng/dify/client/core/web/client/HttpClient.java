@@ -15,7 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.client.core.web.client;
 
-import io.github.guoshiqiufeng.dify.client.core.enums.HttpMethod;
+import io.github.guoshiqiufeng.dify.client.core.http.HttpMethod;
 
 /**
  * HTTP client interface for making HTTP requests.

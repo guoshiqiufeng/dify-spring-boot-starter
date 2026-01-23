@@ -73,8 +73,8 @@ public class SpringRequestParameterApplier {
      * @return the same request spec (for method chaining)
      */
     public static WebClient.RequestBodySpec applyHeadersAndCookies(WebClient.RequestBodySpec spec,
-                                                                    Map<String, String> headers,
-                                                                    Map<String, String> cookies) {
+                                                                   Map<String, String> headers,
+                                                                   Map<String, String> cookies) {
         // Apply headers first
         applyHeaders(spec, headers);
 

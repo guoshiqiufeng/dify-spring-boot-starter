@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.client.core.constant;
+package io.github.guoshiqiufeng.dify.client.core.http;
 
 /**
  * Common media type constants for HTTP requests and responses.

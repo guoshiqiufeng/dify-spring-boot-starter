@@ -23,9 +23,10 @@ import java.nio.file.Path;
  * Framework-independent file wrapper for file upload operations.
  * This class replaces Spring's MultipartFile to remove Spring dependency.
  * <p>
- *    File can use :<code>DifyFile.from(file)</code> <br>
- *    MultipartFile can use :<code>DifyFileConverter.from(file)</code>
+ * File can use :<code>DifyFile.from(file)</code> <br>
+ * MultipartFile can use :<code>DifyFileConverter.from(file)</code>
  * </p>
+ *
  * @author yanghq
  * @version 2.0.0
  * @since 2025/12/29

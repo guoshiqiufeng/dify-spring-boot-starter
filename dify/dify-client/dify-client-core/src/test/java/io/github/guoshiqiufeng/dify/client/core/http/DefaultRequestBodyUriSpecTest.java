@@ -15,8 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.client.core.http;
 
-import io.github.guoshiqiufeng.dify.client.core.map.LinkedMultiValueMap;
-import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
+import io.github.guoshiqiufeng.dify.client.core.util.LinkedMultiValueMap;
+import io.github.guoshiqiufeng.dify.client.core.util.MultiValueMap;
 import io.github.guoshiqiufeng.dify.client.core.web.client.RequestBodySpec;
 import io.github.guoshiqiufeng.dify.client.core.web.client.ResponseSpec;
 import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
@@ -477,7 +477,8 @@ class DefaultRequestBodyUriSpecTest {
     @Test
     void testBodyWithTypeReference() {
         TestPojo body = new TestPojo("John", 30);
-        TypeReference<TestPojo> typeRef = new TypeReference<TestPojo>() {};
+        TypeReference<TestPojo> typeRef = new TypeReference<TestPojo>() {
+        };
 
         RequestBodySpec result = spec.body(body, typeRef);
 
@@ -487,7 +488,8 @@ class DefaultRequestBodyUriSpecTest {
 
     @Test
     void testBodyWithTypeReferenceNullBody() {
-        TypeReference<TestPojo> typeRef = new TypeReference<TestPojo>() {};
+        TypeReference<TestPojo> typeRef = new TypeReference<TestPojo>() {
+        };
 
         assertThrows(IllegalArgumentException.class, () -> {
             spec.body(null, typeRef);

@@ -49,3 +49,5 @@ node_modules/**
 /dify/starter/spring-boot/spring-boot-starter/dify-spring-boot-starter/src/test/resources/application-test.yml
 /dify/starter/spring-boot/spring-boot2-starter/dify-spring-boot2-starter/src/test/resources/application-test.yml
 /dify/starter/spring-boot/spring-boot4-starter/dify-spring-boot4-starter/src/test/resources/application-test.yml
+
+.ace-tool/*

@@ -4,7 +4,8 @@
 
 ## 概述
 
-`DifyFileConverter` 工具类提供了 Spring `MultipartFile` 到 `DifyFile` 的转换功能，使得在 Spring 应用中可以方便地使用 Dify SDK 进行文件上传操作。
+`DifyFileConverter` 工具类提供了 Spring `MultipartFile` 到 `DifyFile` 的转换功能，使得在 Spring 应用中可以方便地使用 Dify
+SDK 进行文件上传操作。
 
 ## 依赖
 
@@ -128,12 +129,15 @@ public class DifyIntegrationController {
 将 Spring `MultipartFile` 转换为 `DifyFile`。
 
 **参数:**
+
 - `multipartFile`: Spring MultipartFile 实例
 
 **返回:**
+
 - `DifyFile`: 转换后的 DifyFile 实例
 
 **异常:**
+
 - `IllegalArgumentException`: 当 multipartFile 为 null 或为空时
 - `IOException`: 当文件读取失败时
 

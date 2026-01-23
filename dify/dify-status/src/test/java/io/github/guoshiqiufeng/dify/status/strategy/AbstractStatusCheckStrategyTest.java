@@ -169,7 +169,7 @@ class AbstractStatusCheckStrategyTest {
         assertNotNull(result.getStatus());
         assertNotNull(result.getErrorMessage());
         assertTrue(result.getErrorMessage().toLowerCase().contains("invalid") ||
-                   result.getErrorMessage().toLowerCase().contains("token"));
+                result.getErrorMessage().toLowerCase().contains("token"));
     }
 
     @Test

@@ -15,7 +15,6 @@
  */
 package io.github.guoshiqiufeng.dify.support.impl.workflow;
 
-import io.github.guoshiqiufeng.dify.chat.dto.request.ChatMessageSendRequest;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;

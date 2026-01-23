@@ -15,23 +15,23 @@
  */
 package io.github.guoshiqiufeng.dify.support.impl.dataset;
 
-import io.github.guoshiqiufeng.dify.client.core.constant.MediaType;
-import io.github.guoshiqiufeng.dify.client.core.enums.HttpMethod;
-import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
+import io.github.guoshiqiufeng.dify.client.core.http.HttpMethod;
+import io.github.guoshiqiufeng.dify.client.core.http.MediaType;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
-import io.github.guoshiqiufeng.dify.core.utils.Assert;
-import io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder;
-import io.github.guoshiqiufeng.dify.support.impl.base.BaseDifyDefaultClient;
-import io.github.guoshiqiufeng.dify.support.impl.dto.dataset.SegmentDataResponseDto;
-import io.github.guoshiqiufeng.dify.support.impl.utils.DatasetHeaderUtils;
+import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
+import io.github.guoshiqiufeng.dify.core.utils.Assert;
+import io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder;
 import io.github.guoshiqiufeng.dify.dataset.client.DifyDatasetClient;
 import io.github.guoshiqiufeng.dify.dataset.constant.DatasetUriConstant;
 import io.github.guoshiqiufeng.dify.dataset.dto.request.*;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.*;
 import io.github.guoshiqiufeng.dify.dataset.enums.document.DocActionEnum;
+import io.github.guoshiqiufeng.dify.support.impl.base.BaseDifyDefaultClient;
+import io.github.guoshiqiufeng.dify.support.impl.dto.dataset.SegmentDataResponseDto;
+import io.github.guoshiqiufeng.dify.support.impl.utils.DatasetHeaderUtils;
 import io.github.guoshiqiufeng.dify.support.impl.utils.MultipartBodyUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -329,7 +329,7 @@ public class DifyDatasetDefaultClient extends BaseDifyDefaultClient implements D
                 .retrieve()
                 .onStatus(responseErrorHandler)
                 .body(SegmentDataResponseDto.class);
-        if(body == null) {
+        if (body == null) {
             return null;
         }
         return body.getData();

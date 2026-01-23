@@ -34,7 +34,7 @@ public class MultipartBodyBuilder {
     /**
      * Adds a part to the multipart body.
      *
-     * @param name the name of the part
+     * @param name  the name of the part
      * @param value the value of the part (String, byte[], or other Object)
      * @return a PartBuilder for further configuration
      */
@@ -75,7 +75,7 @@ public class MultipartBodyBuilder {
         /**
          * Adds a header to this part.
          *
-         * @param headerName the header name
+         * @param headerName  the header name
          * @param headerValue the header value
          * @return this PartBuilder for method chaining
          */
@@ -87,7 +87,7 @@ public class MultipartBodyBuilder {
         /**
          * Adds multiple header values to this part.
          *
-         * @param headerName the header name
+         * @param headerName   the header name
          * @param headerValues the header values
          * @return this PartBuilder for method chaining
          */
@@ -114,7 +114,7 @@ public class MultipartBodyBuilder {
     public static class Part {
         /**
          * -- GETTER --
-         *  Gets the name of this part.
+         * Gets the name of this part.
          *
          * @return the part name
          */
@@ -122,7 +122,7 @@ public class MultipartBodyBuilder {
         private final String name;
         /**
          * -- GETTER --
-         *  Gets the value of this part.
+         * Gets the value of this part.
          *
          * @return the part value
          */
@@ -138,7 +138,7 @@ public class MultipartBodyBuilder {
         /**
          * Adds a header to this part.
          *
-         * @param headerName the header name
+         * @param headerName  the header name
          * @param headerValue the header value
          */
         public void addHeader(String headerName, String headerValue) {

@@ -35,7 +35,8 @@ class TypeReferenceTest {
 
     @Test
     void testSimpleTypeReference() {
-        TypeReference<String> typeRef = new TypeReference<String>() {};
+        TypeReference<String> typeRef = new TypeReference<String>() {
+        };
         Type type = typeRef.getType();
 
         assertNotNull(type);
@@ -44,7 +45,8 @@ class TypeReferenceTest {
 
     @Test
     void testListTypeReference() {
-        TypeReference<List<String>> typeRef = new TypeReference<List<String>>() {};
+        TypeReference<List<String>> typeRef = new TypeReference<List<String>>() {
+        };
         Type type = typeRef.getType();
 
         assertNotNull(type);
@@ -57,7 +59,8 @@ class TypeReferenceTest {
 
     @Test
     void testMapTypeReference() {
-        TypeReference<Map<String, Integer>> typeRef = new TypeReference<Map<String, Integer>>() {};
+        TypeReference<Map<String, Integer>> typeRef = new TypeReference<Map<String, Integer>>() {
+        };
         Type type = typeRef.getType();
 
         assertNotNull(type);
@@ -71,7 +74,8 @@ class TypeReferenceTest {
 
     @Test
     void testNestedGenericTypeReference() {
-        TypeReference<List<Map<String, Object>>> typeRef = new TypeReference<List<Map<String, Object>>>() {};
+        TypeReference<List<Map<String, Object>>> typeRef = new TypeReference<List<Map<String, Object>>>() {
+        };
         Type type = typeRef.getType();
 
         assertNotNull(type);
@@ -89,7 +93,8 @@ class TypeReferenceTest {
 
     @Test
     void testIntegerTypeReference() {
-        TypeReference<Integer> typeRef = new TypeReference<Integer>() {};
+        TypeReference<Integer> typeRef = new TypeReference<Integer>() {
+        };
         Type type = typeRef.getType();
 
         assertNotNull(type);
@@ -98,7 +103,8 @@ class TypeReferenceTest {
 
     @Test
     void testCustomClassTypeReference() {
-        TypeReference<CustomTestClass> typeRef = new TypeReference<CustomTestClass>() {};
+        TypeReference<CustomTestClass> typeRef = new TypeReference<CustomTestClass>() {
+        };
         Type type = typeRef.getType();
 
         assertNotNull(type);
@@ -107,7 +113,8 @@ class TypeReferenceTest {
 
     @Test
     void testListOfCustomClassTypeReference() {
-        TypeReference<List<CustomTestClass>> typeRef = new TypeReference<List<CustomTestClass>>() {};
+        TypeReference<List<CustomTestClass>> typeRef = new TypeReference<List<CustomTestClass>>() {
+        };
         Type type = typeRef.getType();
 
         assertNotNull(type);
@@ -123,7 +130,8 @@ class TypeReferenceTest {
         // This should throw an exception because TypeReference is not parameterized
         assertThrows(IllegalArgumentException.class, () -> {
             @SuppressWarnings("rawtypes")
-            TypeReference typeRef = new TypeReference() {};
+            TypeReference typeRef = new TypeReference() {
+            };
         });
     }
 
@@ -135,16 +143,20 @@ class TypeReferenceTest {
 
     @Test
     void testMultipleInstancesOfSameType() {
-        TypeReference<String> typeRef1 = new TypeReference<String>() {};
-        TypeReference<String> typeRef2 = new TypeReference<String>() {};
+        TypeReference<String> typeRef1 = new TypeReference<String>() {
+        };
+        TypeReference<String> typeRef2 = new TypeReference<String>() {
+        };
 
         assertEquals(typeRef1.getType(), typeRef2.getType());
     }
 
     @Test
     void testDifferentTypes() {
-        TypeReference<String> stringTypeRef = new TypeReference<String>() {};
-        TypeReference<Integer> integerTypeRef = new TypeReference<Integer>() {};
+        TypeReference<String> stringTypeRef = new TypeReference<String>() {
+        };
+        TypeReference<Integer> integerTypeRef = new TypeReference<Integer>() {
+        };
 
         assertNotEquals(stringTypeRef.getType(), integerTypeRef.getType());
     }

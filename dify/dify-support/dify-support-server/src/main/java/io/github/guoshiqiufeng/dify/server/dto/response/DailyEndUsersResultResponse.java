@@ -15,7 +15,6 @@
  */
 package io.github.guoshiqiufeng.dify.server.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 
 import java.util.List;

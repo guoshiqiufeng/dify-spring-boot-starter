@@ -86,7 +86,7 @@ public interface DifyServer {
     /**
      * 删除指定应用的API Key
      *
-     * @param appId 应用的唯一标识符，不能为空
+     * @param appId    应用的唯一标识符，不能为空
      * @param apiKeyId API Key的唯一标识符，不能为空
      * @throws NullPointerException 如果 appId 或 apiKeyId 为 null
      */
@@ -209,7 +209,7 @@ public interface DifyServer {
      *
      * @param datasetId 知识库的唯一标识符，不能为空
      * @return 返回封装了所有文档索引状态的 {@link DocumentIndexingStatusResponse} 对象，
-     *         包含正在索引、已完成、失败等状态的文档列表及其详细信息
+     * 包含正在索引、已完成、失败等状态的文档列表及其详细信息
      * @throws NullPointerException 如果 datasetId 为 null
      */
     DocumentIndexingStatusResponse getDatasetIndexingStatus(String datasetId);
@@ -221,7 +221,7 @@ public interface DifyServer {
      * @param datasetId  知识库的唯一标识符，不能为空
      * @param documentId 文档的唯一标识符，不能为空
      * @return 返回封装了文档索引处理状态的 {@link DocumentIndexingStatusResponse.ProcessingStatus} 对象，
-     *         包含索引进度、状态、错误信息（如果有）等详细信息
+     * 包含索引进度、状态、错误信息（如果有）等详细信息
      * @throws NullPointerException 如果 datasetId 或 documentId 为 null
      */
     DocumentIndexingStatusResponse.ProcessingStatus getDocumentIndexingStatus(String datasetId, String documentId);
@@ -232,7 +232,7 @@ public interface DifyServer {
      *
      * @param datasetId 知识库的唯一标识符，不能为空
      * @return 返回封装了错误文档列表的 {@link DatasetErrorDocumentsResponse} 对象，
-     *         包含失败文档的详细信息、错误原因、总数等
+     * 包含失败文档的详细信息、错误原因、总数等
      * @throws NullPointerException 如果 datasetId 为 null
      */
     DatasetErrorDocumentsResponse getDatasetErrorDocuments(String datasetId);
@@ -242,7 +242,7 @@ public interface DifyServer {
      * 对于索引失败的文档，通过调用此方法可以重新触发索引处理流程
      *
      * @param request 文档重试请求，封装了知识库ID和需要重试的文档ID列表，不能为null
-     * @throws NullPointerException 如果 request 为 null
+     * @throws NullPointerException     如果 request 为 null
      * @throws IllegalArgumentException 如果 request 中的 datasetId 或 documentIds 为空
      */
     void retryDocumentIndexing(DocumentRetryRequest request);

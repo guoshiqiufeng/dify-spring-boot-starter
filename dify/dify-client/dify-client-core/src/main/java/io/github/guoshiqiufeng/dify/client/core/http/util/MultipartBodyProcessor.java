@@ -34,15 +34,25 @@ public class MultipartBodyProcessor {
      * Enum representing different types of multipart parts.
      */
     public enum PartType {
-        /** Binary file data */
+        /**
+         * Binary file data
+         */
         FILE,
-        /** String value */
+        /**
+         * String value
+         */
         STRING,
-        /** Numeric value */
+        /**
+         * Numeric value
+         */
         NUMBER,
-        /** Boolean value */
+        /**
+         * Boolean value
+         */
         BOOLEAN,
-        /** Complex object (needs JSON serialization) */
+        /**
+         * Complex object (needs JSON serialization)
+         */
         OBJECT
     }
 
@@ -95,7 +105,7 @@ public class MultipartBodyProcessor {
 
         Object firstValue = bodyMap.values().iterator().next();
         return firstValue != null &&
-               firstValue.getClass().getName().contains("MultipartBodyBuilder$Part");
+                firstValue.getClass().getName().contains("MultipartBodyBuilder$Part");
     }
 
     /**

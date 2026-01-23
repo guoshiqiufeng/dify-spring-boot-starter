@@ -83,7 +83,7 @@ public class DifyProperties implements Serializable {
         /**
          * 密码加密
          * <p>dify 1.11.2以下需要关闭</p>
-         *
+         * <p>
          * `@version` 1.7.1
          */
         private Boolean passwordEncryption = true;

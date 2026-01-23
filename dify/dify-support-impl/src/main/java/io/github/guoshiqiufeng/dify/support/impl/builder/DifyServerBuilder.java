@@ -15,15 +15,15 @@
  */
 package io.github.guoshiqiufeng.dify.support.impl.builder;
 
-import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
-import io.github.guoshiqiufeng.dify.support.impl.server.DifyServerDefaultClient;
+import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
 import io.github.guoshiqiufeng.dify.server.impl.DifyServerClientImpl;
+import io.github.guoshiqiufeng.dify.support.impl.server.DifyServerDefaultClient;
 
 /**
  * Builder for creating DifyServer and DifyServerClient instances
@@ -50,7 +50,7 @@ public final class DifyServerBuilder {
     /**
      * Create a DifyServerClient with the given HTTP client and server properties
      *
-     * @param httpClient the HTTP client
+     * @param httpClient           the HTTP client
      * @param difyServerProperties the server properties
      * @return the DifyServerClient
      */
@@ -62,12 +62,12 @@ public final class DifyServerBuilder {
      * Create a DifyServerClient with server properties, base URL and HTTP client factory
      *
      * @param difyServerProperties the server properties
-     * @param baseUrl the base URL
-     * @param httpClientFactory the HTTP client factory
+     * @param baseUrl              the base URL
+     * @param httpClientFactory    the HTTP client factory
      * @return the DifyServerClient
      */
     public static DifyServerClient createClient(DifyProperties.Server difyServerProperties, String baseUrl,
-                                                 HttpClientFactory httpClientFactory) {
+                                                HttpClientFactory httpClientFactory) {
         return new DifyServerDefaultClient(difyServerProperties, new DifyServerTokenDefault(), baseUrl,
                 new DifyProperties.ClientConfig(), httpClientFactory);
     }
@@ -85,7 +85,7 @@ public final class DifyServerBuilder {
     /**
      * Create a DifyServerClient with the given HTTP client and token manager
      *
-     * @param httpClient the HTTP client
+     * @param httpClient      the HTTP client
      * @param difyServerToken the server token manager
      * @return the DifyServerClient
      */

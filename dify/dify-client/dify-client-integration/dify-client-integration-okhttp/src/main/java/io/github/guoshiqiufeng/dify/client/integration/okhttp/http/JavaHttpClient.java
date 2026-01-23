@@ -167,7 +167,7 @@ public class JavaHttpClient implements HttpClient {
                 defaultHeaders.forEach((key, values) -> {
                     if (!values.isEmpty()) {
                         values.forEach(value -> {
-                            if(StrUtil.isNotEmpty(value)) {
+                            if (StrUtil.isNotEmpty(value)) {
                                 requestBuilder.addHeader(key, value);
                             }
                         });
@@ -223,7 +223,7 @@ public class JavaHttpClient implements HttpClient {
     }
 
     @Override
-    public RequestBodyUriSpec method(io.github.guoshiqiufeng.dify.client.core.enums.HttpMethod httpMethod) {
+    public RequestBodyUriSpec method(io.github.guoshiqiufeng.dify.client.core.http.HttpMethod httpMethod) {
         return new io.github.guoshiqiufeng.dify.client.core.http.DefaultRequestBodyUriSpec(
                 new io.github.guoshiqiufeng.dify.client.integration.okhttp.http.OkHttpRequestBuilder(this, jsonMapper, httpMethod.name()));
     }

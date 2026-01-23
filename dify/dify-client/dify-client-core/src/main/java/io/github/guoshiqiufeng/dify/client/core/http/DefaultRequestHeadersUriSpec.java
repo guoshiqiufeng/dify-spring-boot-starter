@@ -15,7 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.client.core.http;
 
-import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
+import io.github.guoshiqiufeng.dify.client.core.util.MultiValueMap;
 import io.github.guoshiqiufeng.dify.client.core.web.client.RequestHeadersUriSpec;
 import io.github.guoshiqiufeng.dify.client.core.web.client.ResponseSpec;
 import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
@@ -94,7 +94,7 @@ public class DefaultRequestHeadersUriSpec implements RequestHeadersUriSpec<Defau
             Object value = uriVariables.get(variableName);
             if (value == null) {
                 throw new IllegalArgumentException(
-                    "URI variable '" + variableName + "' has no value in the provided map");
+                        "URI variable '" + variableName + "' has no value in the provided map");
             }
             orderedValues.add(value);
         }

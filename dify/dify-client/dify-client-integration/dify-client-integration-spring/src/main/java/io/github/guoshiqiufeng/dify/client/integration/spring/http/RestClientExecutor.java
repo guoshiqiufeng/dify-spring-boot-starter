@@ -22,11 +22,7 @@ import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 import io.github.guoshiqiufeng.dify.client.core.http.util.HttpStatusValidator;
 import io.github.guoshiqiufeng.dify.client.core.http.util.MultipartBodyProcessor;
 import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
-import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.HttpHeaderConverter;
-import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.SpringErrorResponseExtractor;
-import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.SpringMultipartBodyBuilder;
-import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.SpringRequestParameterApplier;
-import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.SpringStatusCodeExtractor;
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -238,10 +234,10 @@ class RestClientExecutor {
                     // Handle multipart data
                     @SuppressWarnings("unchecked")
                     Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> parts =
-                        (Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part>) bodyMap;
+                            (Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part>) bodyMap;
 
                     org.springframework.util.MultiValueMap<String, HttpEntity<?>> multipartData =
-                        SpringMultipartBodyBuilder.buildMultipartBody(parts, jsonMapper, skipNull);
+                            SpringMultipartBodyBuilder.buildMultipartBody(parts, jsonMapper, skipNull);
 
                     // Set multipart body using reflection
                     Method bodyMethod = findMethod(requestSpec.getClass(), "body", Object.class);

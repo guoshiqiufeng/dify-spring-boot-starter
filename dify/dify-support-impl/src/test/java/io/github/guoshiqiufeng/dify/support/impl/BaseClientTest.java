@@ -15,8 +15,6 @@
  */
 package io.github.guoshiqiufeng.dify.support.impl;
 
-import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
-import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
 import io.github.guoshiqiufeng.dify.client.core.web.client.*;
 
 import java.net.URI;

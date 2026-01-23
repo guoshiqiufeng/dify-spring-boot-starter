@@ -190,7 +190,8 @@ class WebClientExecutorTest {
         HttpClientException exception = assertThrows(
                 HttpClientException.class,
                 () -> executor.executeForEntity("GET", URI.create("http://localhost/test"),
-                        new HashMap<>(), new HashMap<>(), new HashMap<>(), null, new TypeReference<String>() {})
+                        new HashMap<>(), new HashMap<>(), new HashMap<>(), null, new TypeReference<String>() {
+                        })
         );
         assertTrue(exception.getMessage().contains("Response entity is null"));
     }

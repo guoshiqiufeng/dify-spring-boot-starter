@@ -199,8 +199,10 @@ class ResponseErrorHandlerTest {
 
     @Test
     void testBoundaryStatusCodes() {
-        ResponseErrorHandler handler4xx = ResponseErrorHandler.on4xxStatus(response -> {});
-        ResponseErrorHandler handler5xx = ResponseErrorHandler.on5xxStatus(response -> {});
+        ResponseErrorHandler handler4xx = ResponseErrorHandler.on4xxStatus(response -> {
+        });
+        ResponseErrorHandler handler5xx = ResponseErrorHandler.on5xxStatus(response -> {
+        });
 
         // Test boundary values for 4xx
         assertTrue(handler4xx.getStatusPredicate().test(400));
@@ -246,7 +248,8 @@ class ResponseErrorHandlerTest {
 
         ResponseErrorHandler handler = ResponseErrorHandler.onStatus(
                 complexPredicate,
-                response -> {}
+                response -> {
+                }
         );
 
         assertTrue(handler.getStatusPredicate().test(400));

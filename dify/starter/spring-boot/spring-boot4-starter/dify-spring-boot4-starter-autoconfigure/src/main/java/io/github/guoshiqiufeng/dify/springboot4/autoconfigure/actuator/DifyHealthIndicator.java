@@ -45,7 +45,7 @@ public class DifyHealthIndicator implements HealthIndicator {
     public Health health() {
         try {
             AggregatedStatusReport report;
-            if(statusConfig.getHealthIndicatorInitByServer()) {
+            if (statusConfig.getHealthIndicatorInitByServer()) {
                 report = statusService.checkAllClientsStatusByServer();
             } else {
                 report = statusService.checkAllClientsStatus(statusConfig);
@@ -62,7 +62,7 @@ public class DifyHealthIndicator implements HealthIndicator {
                         .build();
             } else {
                 Health.Builder healthBuilder;
-                if(report.getHealthyApis() > 0) {
+                if (report.getHealthyApis() > 0) {
                     healthBuilder = Health.up();
                 } else {
                     healthBuilder = Health.down();

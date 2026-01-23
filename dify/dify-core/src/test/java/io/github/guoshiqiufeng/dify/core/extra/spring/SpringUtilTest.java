@@ -107,7 +107,7 @@ class SpringUtilTest {
         field.set(null, null);
 
         UtilException exception = assertThrows(UtilException.class,
-            SpringUtil::getApplicationContext);
+                SpringUtil::getApplicationContext);
         assertEquals("ApplicationContext is not initialized", exception.getMessage());
     }
 
@@ -121,7 +121,7 @@ class SpringUtilTest {
     @Test
     void testGetBeanByTypeNotFound() {
         UtilException exception = assertThrows(UtilException.class,
-            () -> SpringUtil.getBean(String.class));
+                () -> SpringUtil.getBean(String.class));
         assertTrue(exception.getMessage().contains("Failed to get bean of type: java.lang.String"));
         assertInstanceOf(NoSuchBeanDefinitionException.class, exception.getCause());
     }
@@ -137,7 +137,7 @@ class SpringUtilTest {
     @Test
     void testGetBeanByNameNotFound() {
         UtilException exception = assertThrows(UtilException.class,
-            () -> SpringUtil.getBean("nonExistentBean"));
+                () -> SpringUtil.getBean("nonExistentBean"));
         assertTrue(exception.getMessage().contains("Failed to get bean with name: nonExistentBean"));
         assertInstanceOf(NoSuchBeanDefinitionException.class, exception.getCause());
     }
@@ -152,7 +152,7 @@ class SpringUtilTest {
     @Test
     void testGetBeanByNameAndTypeNotFound() {
         UtilException exception = assertThrows(UtilException.class,
-            () -> SpringUtil.getBean("nonExistentBean", TestBean.class));
+                () -> SpringUtil.getBean("nonExistentBean", TestBean.class));
         assertTrue(exception.getMessage().contains("Failed to get bean with name: nonExistentBean"));
         assertTrue(exception.getMessage().contains("type: " + TestBean.class.getName()));
         assertInstanceOf(NoSuchBeanDefinitionException.class, exception.getCause());

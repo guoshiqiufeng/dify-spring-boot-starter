@@ -134,7 +134,7 @@ public class DifyServerClientImpl implements DifyServer {
 
     @Override
     public DocumentIndexingStatusResponse.ProcessingStatus getDocumentIndexingStatus(String datasetId, String documentId) {
-        return difyServerClient.getDocumentIndexingStatus(datasetId,documentId);
+        return difyServerClient.getDocumentIndexingStatus(datasetId, documentId);
     }
 
     @Override

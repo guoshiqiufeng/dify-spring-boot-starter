@@ -15,7 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.client.core.http;
 
-import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
+import io.github.guoshiqiufeng.dify.client.core.util.MultiValueMap;
 import io.github.guoshiqiufeng.dify.client.core.web.client.RequestBodySpec;
 import io.github.guoshiqiufeng.dify.client.core.web.client.RequestBodyUriSpec;
 import io.github.guoshiqiufeng.dify.client.core.web.client.ResponseSpec;
@@ -93,7 +93,7 @@ public class DefaultRequestBodyUriSpec implements RequestBodyUriSpec {
             Object value = uriVariables.get(variableName);
             if (value == null) {
                 throw new IllegalArgumentException(
-                    "URI variable '" + variableName + "' has no value in the provided map");
+                        "URI variable '" + variableName + "' has no value in the provided map");
             }
             orderedValues.add(value);
         }

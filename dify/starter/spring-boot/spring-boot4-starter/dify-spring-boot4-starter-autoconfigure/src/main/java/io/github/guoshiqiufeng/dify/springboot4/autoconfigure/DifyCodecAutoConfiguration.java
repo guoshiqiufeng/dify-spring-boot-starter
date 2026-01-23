@@ -15,7 +15,6 @@
  */
 package io.github.guoshiqiufeng.dify.springboot4.autoconfigure;
 
-import io.github.guoshiqiufeng.dify.client.codec.jackson.JacksonJsonMapper;
 import io.github.guoshiqiufeng.dify.client.codec.jackson3.Jackson3JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import lombok.extern.slf4j.Slf4j;

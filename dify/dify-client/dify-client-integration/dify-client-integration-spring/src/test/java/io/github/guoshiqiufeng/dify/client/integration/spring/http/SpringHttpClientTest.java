@@ -16,7 +16,7 @@
 package io.github.guoshiqiufeng.dify.client.integration.spring.http;
 
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
-import io.github.guoshiqiufeng.dify.client.core.enums.HttpMethod;
+import io.github.guoshiqiufeng.dify.client.core.http.HttpMethod;
 import io.github.guoshiqiufeng.dify.client.core.web.client.RequestBodyUriSpec;
 import io.github.guoshiqiufeng.dify.client.core.web.client.RequestHeadersUriSpec;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
@@ -196,11 +196,11 @@ class SpringHttpClientTest {
     void testConstructorWithCustomWebClientBuilder() {
         // Arrange
         org.springframework.web.reactive.function.client.WebClient.Builder webClientBuilder =
-            org.springframework.web.reactive.function.client.WebClient.builder();
+                org.springframework.web.reactive.function.client.WebClient.builder();
 
         // Act
         SpringHttpClient client = new SpringHttpClient("http://test.com", clientConfig,
-            webClientBuilder, null, jsonMapper);
+                webClientBuilder, null, jsonMapper);
 
         // Assert
         assertNotNull(client);
@@ -211,14 +211,14 @@ class SpringHttpClientTest {
     void testConstructorWithCustomWebClientBuilderAndHeaders() {
         // Arrange
         org.springframework.web.reactive.function.client.WebClient.Builder webClientBuilder =
-            org.springframework.web.reactive.function.client.WebClient.builder();
+                org.springframework.web.reactive.function.client.WebClient.builder();
         io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders headers =
-            new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders();
+                new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders();
         headers.add("X-Custom-Header", "test-value");
 
         // Act
         SpringHttpClient client = new SpringHttpClient("http://test.com", clientConfig,
-            webClientBuilder, null, jsonMapper, headers);
+                webClientBuilder, null, jsonMapper, headers);
 
         // Assert
         assertNotNull(client);
@@ -229,15 +229,15 @@ class SpringHttpClientTest {
     void testConstructorWithCustomWebClientBuilderHeadersAndInterceptors() {
         // Arrange
         org.springframework.web.reactive.function.client.WebClient.Builder webClientBuilder =
-            org.springframework.web.reactive.function.client.WebClient.builder();
+                org.springframework.web.reactive.function.client.WebClient.builder();
         io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders headers =
-            new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders();
+                new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders();
         headers.add("X-Custom-Header", "test-value");
         java.util.List<Object> interceptors = new java.util.ArrayList<>();
 
         // Act
         SpringHttpClient client = new SpringHttpClient("http://test.com", clientConfig,
-            webClientBuilder, null, jsonMapper, headers, interceptors);
+                webClientBuilder, null, jsonMapper, headers, interceptors);
 
         // Assert
         assertNotNull(client);
@@ -294,7 +294,7 @@ class SpringHttpClientTest {
 
         // Act
         SpringHttpClient client = new SpringHttpClient("http://test.com", config,
-            null, null, jsonMapper, new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders(), interceptors);
+                null, null, jsonMapper, new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders(), interceptors);
 
         // Assert
         assertNotNull(client);
@@ -308,7 +308,7 @@ class SpringHttpClientTest {
 
         // Act
         SpringHttpClient client = new SpringHttpClient("http://test.com", config,
-            null, null, jsonMapper, new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders(), null);
+                null, null, jsonMapper, new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders(), null);
 
         // Assert
         assertNotNull(client);
@@ -320,11 +320,11 @@ class SpringHttpClientTest {
         // Arrange
         DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
         io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders emptyHeaders =
-            new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders();
+                new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders();
 
         // Act
         SpringHttpClient client = new SpringHttpClient("http://test.com", config,
-            null, null, jsonMapper, emptyHeaders, new java.util.ArrayList<>());
+                null, null, jsonMapper, emptyHeaders, new java.util.ArrayList<>());
 
         // Assert
         assertNotNull(client);
@@ -338,7 +338,7 @@ class SpringHttpClientTest {
 
         // Act
         SpringHttpClient client = new SpringHttpClient("http://test.com", config,
-            null, null, jsonMapper, null, new java.util.ArrayList<>());
+                null, null, jsonMapper, null, new java.util.ArrayList<>());
 
         // Assert
         assertNotNull(client);

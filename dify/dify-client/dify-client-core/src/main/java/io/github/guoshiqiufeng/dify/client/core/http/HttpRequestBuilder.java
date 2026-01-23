@@ -15,8 +15,8 @@
  */
 package io.github.guoshiqiufeng.dify.client.core.http;
 
-import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
 import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
+import io.github.guoshiqiufeng.dify.client.core.util.MultiValueMap;
 import io.github.guoshiqiufeng.dify.client.core.web.client.ResponseSpec;
 import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
 import reactor.core.publisher.Flux;
@@ -107,6 +107,7 @@ public interface HttpRequestBuilder {
 
     /**
      * Set the Bearer Auth header for the request.
+     *
      * @param token token
      * @return this builder
      */

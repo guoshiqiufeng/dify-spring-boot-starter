@@ -89,6 +89,7 @@ public class StatusCheckConfig {
 
     /**
      * Get the API key for chat client
+     *
      * @return chat API key or default API key
      */
     public List<String> getChatApiKey() {
@@ -97,6 +98,7 @@ public class StatusCheckConfig {
 
     /**
      * Get the API key for dataset client
+     *
      * @return dataset API key or default API key
      */
     public String getDatasetApiKey() {
@@ -105,6 +107,7 @@ public class StatusCheckConfig {
 
     /**
      * Get the API key for workflow client
+     *
      * @return workflow API key or default API key
      */
     public List<String> getWorkflowApiKey() {

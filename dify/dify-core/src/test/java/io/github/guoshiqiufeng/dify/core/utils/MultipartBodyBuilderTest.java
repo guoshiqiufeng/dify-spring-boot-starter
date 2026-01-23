@@ -154,7 +154,7 @@ class MultipartBodyBuilderTest {
 
         assertEquals(2, parts.size());
         assertThrows(UnsupportedOperationException.class, () ->
-            parts.put("field3", null)
+                parts.put("field3", null)
         );
     }
 
