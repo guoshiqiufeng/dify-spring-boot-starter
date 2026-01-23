@@ -27,9 +27,11 @@ import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.HttpHead
 import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.SpringMultipartBodyBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
@@ -455,10 +457,10 @@ class WebClientExecutor {
                         Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> parts =
                             (Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part>) bodyMap;
 
-                        org.springframework.util.LinkedMultiValueMap<String, Object> multipartData =
+                        MultiValueMap<String, HttpEntity<?>> multipartData =
                             SpringMultipartBodyBuilder.buildMultipartBody(parts, jsonMapper, skipNull);
 
-                        bodySpec.body(org.springframework.web.reactive.function.BodyInserters.fromMultipartData(multipartData));
+                        bodySpec.bodyValue(multipartData);
                         return bodySpec;
                     }
                 }

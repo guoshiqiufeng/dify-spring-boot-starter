@@ -28,6 +28,7 @@ import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.SpringMu
 import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.SpringRequestParameterApplier;
 import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.SpringStatusCodeExtractor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 
 import java.lang.reflect.Method;
@@ -239,7 +240,7 @@ class RestClientExecutor {
                     Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part> parts =
                         (Map<String, io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder.Part>) bodyMap;
 
-                    org.springframework.util.LinkedMultiValueMap<String, Object> multipartData =
+                    org.springframework.util.MultiValueMap<String, HttpEntity<?>> multipartData =
                         SpringMultipartBodyBuilder.buildMultipartBody(parts, jsonMapper, skipNull);
 
                     // Set multipart body using reflection
