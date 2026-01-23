@@ -28,6 +28,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -183,6 +184,25 @@ class SpringMultipartBodyBuilderTest {
     }
 
     @Test
+    void testBuildMultipartBodyWithComplexObjectAndContentType() {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("id", 1);
+
+        when(jsonMapper.toJson(any())).thenReturn("{\"id\":1}");
+
+        builder.part("payload", payload)
+                .header("Content-Type", "application/merge-patch+json");
+        Map<String, MultipartBodyBuilder.Part> parts = builder.build();
+
+        MultiValueMap<String, HttpEntity<?>> result = SpringMultipartBodyBuilder.buildMultipartBody(parts, jsonMapper, false);
+
+        assertNotNull(result);
+        HttpEntity<?> entity = getFirstEntity(result, "payload");
+        assertEquals("{\"id\":1}", entity.getBody());
+        assertEquals(MediaType.parseMediaType("application/merge-patch+json"), entity.getHeaders().getContentType());
+    }
+
+    @Test
     void testBuildMultipartBodyWithMixedTypes() {
         byte[] fileData = "file content".getBytes();
 
@@ -206,6 +226,24 @@ class SpringMultipartBodyBuilderTest {
         assertEquals("true", getFirstEntity(result, "active").getBody());
         assertTrue(getFirstEntity(result, "file").getBody() instanceof ByteArrayResource);
         assertEquals("{\"key\":\"value\"}", getFirstEntity(result, "metadata").getBody());
+    }
+
+    @Test
+    void testBuildMultipartBodyWithStringContentTypeAndCustomHeaders() {
+        builder.part("note", "hello")
+                .header("Content-Type", "text/plain")
+                .header("Content-Disposition", "form-data; name=\"note\"; filename=\"note.txt\"")
+                .headers("X-Meta", "v1", "v2");
+        Map<String, MultipartBodyBuilder.Part> parts = builder.build();
+
+        MultiValueMap<String, HttpEntity<?>> result = SpringMultipartBodyBuilder.buildMultipartBody(parts, jsonMapper, false);
+
+        assertNotNull(result);
+        HttpEntity<?> entity = getFirstEntity(result, "note");
+        assertEquals("hello", entity.getBody());
+        assertEquals(MediaType.parseMediaType("text/plain"), entity.getHeaders().getContentType());
+        assertEquals(Arrays.asList("v1", "v2"), entity.getHeaders().get("X-Meta"));
+        assertFalse(entity.getHeaders().containsKey("Content-Disposition"));
     }
 
     @Test
@@ -430,6 +468,23 @@ class SpringMultipartBodyBuilderTest {
         assertEquals(MediaType.parseMediaType("audio/mp3"), httpEntity.getHeaders().getContentType());
         assertNotNull(httpEntity.getBody());
         assertEquals("audio.mp3", httpEntity.getBody().getFilename());
+    }
+
+    @Test
+    void testBuildMultipartBodyWithEmptyContentTypeHeader() {
+        byte[] fileData = "file content".getBytes();
+        builder.part("file", fileData)
+                .header("Content-Disposition", "form-data; name=\"file\"; filename=\"document.txt\"")
+                .header("Content-Type", "");
+        Map<String, MultipartBodyBuilder.Part> parts = builder.build();
+
+        MultiValueMap<String, HttpEntity<?>> result = SpringMultipartBodyBuilder.buildMultipartBody(parts, jsonMapper, false);
+
+        assertNotNull(result);
+        HttpEntity<?> entity = getFirstEntity(result, "file");
+        assertTrue(entity.getBody() instanceof ByteArrayResource);
+        assertNull(entity.getHeaders().getContentType());
+        assertEquals("document.txt", ((ByteArrayResource) entity.getBody()).getFilename());
     }
 
     @Test
