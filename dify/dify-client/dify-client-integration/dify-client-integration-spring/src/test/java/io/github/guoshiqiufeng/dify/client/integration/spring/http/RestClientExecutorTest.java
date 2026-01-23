@@ -18,7 +18,7 @@ package io.github.guoshiqiufeng.dify.client.integration.spring.http;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder;
 import lombok.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,9 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -355,15 +353,15 @@ class RestClientExecutorTest {
 
         RestClientExecutor testExecutor = new RestClientExecutor(restClient, jsonMapper) {
             @Override
-            <T> HttpResponse<T> executeForEntity(String method, URI uri, Map<String, String> headers,
-                                                  Map<String, String> cookies, Object body, Class<T> responseType) {
+            <T> ResponseEntity<T> executeForEntity(String method, URI uri, Map<String, String> headers,
+                                                                                                     Map<String, String> cookies, Object body, Class<T> responseType) {
                 T responseBody = null;
                 try {
                     responseBody = jsonMapper.fromJson(jsonResponse, responseType);
                 } catch (Exception e) {
                     // ignore for test
                 }
-                return HttpResponse.<T>builder()
+                return ResponseEntity.<T>builder()
                         .statusCode(200)
                         .headers(new HashMap<>())
                         .body(responseBody)
@@ -372,7 +370,7 @@ class RestClientExecutorTest {
         };
 
         // Act
-        HttpResponse<TestDto> response = testExecutor.executeForEntity("GET", uri, headers, cookies, null, TestDto.class);
+        ResponseEntity<TestDto> response = testExecutor.executeForEntity("GET", uri, headers, cookies, null, TestDto.class);
 
         // Assert
         assertNotNull(response);
@@ -390,9 +388,9 @@ class RestClientExecutorTest {
 
         RestClientExecutor testExecutor = new RestClientExecutor(restClient, jsonMapper) {
             @Override
-            <T> HttpResponse<T> executeForEntity(String method, URI uri, Map<String, String> headers,
+            <T> ResponseEntity<T> executeForEntity(String method, URI uri, Map<String, String> headers,
                                                   Map<String, String> cookies, Object body, Class<T> responseType) {
-                return HttpResponse.<T>builder()
+                return ResponseEntity.<T>builder()
                         .statusCode(404)
                         .headers(new HashMap<>())
                         .body(responseType.cast("Not Found"))
@@ -401,7 +399,7 @@ class RestClientExecutorTest {
         };
 
         // Act
-        HttpResponse<String> response = testExecutor.executeForEntity("GET", uri, headers, cookies, null, String.class);
+        ResponseEntity<String> response = testExecutor.executeForEntity("GET", uri, headers, cookies, null, String.class);
 
         // Assert
         assertNotNull(response);
@@ -419,7 +417,7 @@ class RestClientExecutorTest {
         RestClientExecutor testExecutor = getRestClientExecutor();
 
         // Act
-        HttpResponse<List<TestDto>> response = testExecutor.executeForEntity("GET", uri, headers, cookies, null, typeRef);
+        ResponseEntity<List<TestDto>> response = testExecutor.executeForEntity("GET", uri, headers, cookies, null, typeRef);
 
         // Assert
         assertNotNull(response);
@@ -433,9 +431,9 @@ class RestClientExecutorTest {
 
         return new RestClientExecutor(restClient, jsonMapper) {
             @Override
-            <T> HttpResponse<T> executeForEntity(String method, URI uri, Map<String, String> headers,
+            <T> ResponseEntity<T> executeForEntity(String method, URI uri, Map<String, String> headers,
                                                   Map<String, String> cookies, Object body, TypeReference<T> typeReference) {
-                return (HttpResponse<T>) HttpResponse.builder()
+                return (ResponseEntity<T>) ResponseEntity.builder()
                         .statusCode(200)
                         .headers(new HashMap<>())
                         .body(expectedList)
@@ -554,7 +552,7 @@ class RestClientExecutorTest {
         // Create a test executor that overrides the executeForEntity method
         RestClientExecutor testExecutor = new RestClientExecutor(restClient, jsonMapper) {
             @Override
-            <T> HttpResponse<T> executeForEntity(String method, URI uri, Map<String, String> headers,
+            <T> ResponseEntity<T> executeForEntity(String method, URI uri, Map<String, String> headers,
                                                   Map<String, String> cookies, Object body, Class<T> responseType) {
                 T responseBody = null;
                 try {
@@ -562,7 +560,7 @@ class RestClientExecutorTest {
                 } catch (Exception e) {
                     // ignore for test
                 }
-                return HttpResponse.<T>builder()
+                return ResponseEntity.<T>builder()
                         .statusCode(200)
                         .headers(new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders())
                         .body(responseBody)
@@ -571,7 +569,7 @@ class RestClientExecutorTest {
         };
 
         // Act
-        HttpResponse<TestDto> response = testExecutor.executeForEntity("GET", uri, headers, cookies, null, TestDto.class);
+        ResponseEntity<TestDto> response = testExecutor.executeForEntity("GET", uri, headers, cookies, null, TestDto.class);
 
         // Assert
         assertNotNull(response);
@@ -592,11 +590,11 @@ class RestClientExecutorTest {
         // Create a test executor that overrides the executeForEntity method to return error response
         RestClientExecutor testExecutor = new RestClientExecutor(restClient, jsonMapper) {
             @Override
-            <T> HttpResponse<T> executeForEntity(String method, URI uri, Map<String, String> headers,
+            <T> ResponseEntity<T> executeForEntity(String method, URI uri, Map<String, String> headers,
                                                   Map<String, String> cookies, Object body, Class<T> responseType) {
                 @SuppressWarnings("unchecked")
                 T errorBody = (T) errorResponse;
-                return HttpResponse.<T>builder()
+                return ResponseEntity.<T>builder()
                         .statusCode(404)
                         .headers(new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders())
                         .body(errorBody)
@@ -605,7 +603,7 @@ class RestClientExecutorTest {
         };
 
         // Act
-        HttpResponse<String> response = testExecutor.executeForEntity("GET", uri, headers, cookies, null, String.class);
+        ResponseEntity<String> response = testExecutor.executeForEntity("GET", uri, headers, cookies, null, String.class);
 
         // Assert
         assertNotNull(response);
@@ -629,11 +627,11 @@ class RestClientExecutorTest {
         // Create a test executor that overrides the executeForEntity method
         RestClientExecutor testExecutor = new RestClientExecutor(restClient, jsonMapper) {
             @Override
-            <T> HttpResponse<T> executeForEntity(String method, URI uri, Map<String, String> headers,
+            <T> ResponseEntity<T> executeForEntity(String method, URI uri, Map<String, String> headers,
                                                   Map<String, String> cookies, Object body, TypeReference<T> typeReference) {
                 try {
                     T responseBody = jsonMapper.fromJson(jsonResponse, typeReference);
-                    return HttpResponse.<T>builder()
+                    return ResponseEntity.<T>builder()
                             .statusCode(200)
                             .headers(new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders())
                             .body(responseBody)
@@ -645,7 +643,7 @@ class RestClientExecutorTest {
         };
 
         // Act
-        HttpResponse<List<TestDto>> response = testExecutor.executeForEntity("GET", uri, headers, cookies, null, typeRef);
+        ResponseEntity<List<TestDto>> response = testExecutor.executeForEntity("GET", uri, headers, cookies, null, typeRef);
 
         // Assert
         assertNotNull(response);
@@ -667,11 +665,11 @@ class RestClientExecutorTest {
         // Create a test executor that overrides the executeForEntity method to return error response
         RestClientExecutor testExecutor = new RestClientExecutor(restClient, jsonMapper) {
             @Override
-            <T> HttpResponse<T> executeForEntity(String method, URI uri, Map<String, String> headers,
+            <T> ResponseEntity<T> executeForEntity(String method, URI uri, Map<String, String> headers,
                                                   Map<String, String> cookies, Object body, TypeReference<T> typeReference) {
                 @SuppressWarnings("unchecked")
                 T errorBody = (T) errorResponse;
-                return HttpResponse.<T>builder()
+                return ResponseEntity.<T>builder()
                         .statusCode(500)
                         .headers(new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders())
                         .body(errorBody)
@@ -680,7 +678,7 @@ class RestClientExecutorTest {
         };
 
         // Act
-        HttpResponse<List<TestDto>> response = testExecutor.executeForEntity("GET", uri, headers, cookies, null, typeRef);
+        ResponseEntity<List<TestDto>> response = testExecutor.executeForEntity("GET", uri, headers, cookies, null, typeRef);
 
         // Assert
         assertNotNull(response);

@@ -29,7 +29,7 @@ import java.util.*;
  * @version 2.0.0
  * @since 2025-12-26
  */
-public class HttpResponse<T> {
+public class ResponseEntity<T> {
 
     /**
      * -- GETTER --
@@ -56,7 +56,7 @@ public class HttpResponse<T> {
      * @param headers    HTTP headers
      * @param body       response body
      */
-    public HttpResponse(int statusCode, Map<String, List<String>> headers, T body) {
+    public ResponseEntity(int statusCode, Map<String, List<String>> headers, T body) {
         this.statusCode = statusCode;
         this.headers = new HttpHeaders(headers);
         this.body = body;
@@ -69,7 +69,7 @@ public class HttpResponse<T> {
      * @param headers    HTTP headers
      * @param body       response body
      */
-    public HttpResponse(int statusCode, HttpHeaders headers, T body) {
+    public ResponseEntity(int statusCode, HttpHeaders headers, T body) {
         this.statusCode = statusCode;
         this.headers = headers != null ? headers : new HttpHeaders();
         this.body = body;
@@ -217,8 +217,8 @@ public class HttpResponse<T> {
          *
          * @return a new HttpResponse instance
          */
-        public HttpResponse<T> build() {
-            return new HttpResponse<>(statusCode, headers, body);
+        public ResponseEntity<T> build() {
+            return new ResponseEntity<>(statusCode, headers, body);
         }
     }
 

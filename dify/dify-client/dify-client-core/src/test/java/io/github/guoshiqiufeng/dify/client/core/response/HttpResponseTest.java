@@ -40,7 +40,7 @@ class HttpResponseTest {
         String body = "test body";
 
         // Act
-        HttpResponse<String> response = new HttpResponse<>(200, headers, body);
+        ResponseEntity<String> response = new ResponseEntity<>(200, headers, body);
 
         // Assert
         assertEquals(200, response.getStatusCode());
@@ -60,7 +60,7 @@ class HttpResponseTest {
         String body = "test body";
 
         // Act
-        HttpResponse<String> response = new HttpResponse<>(201, headers, body);
+        ResponseEntity<String> response = new ResponseEntity<>(201, headers, body);
 
         // Assert
         assertEquals(201, response.getStatusCode());
@@ -75,7 +75,7 @@ class HttpResponseTest {
     @Test
     void testConstructorWithNullHeaders() {
         // Act
-        HttpResponse<String> response = new HttpResponse<>(200, (HttpHeaders) null, "body");
+        ResponseEntity<String> response = new ResponseEntity<>(200, (HttpHeaders) null, "body");
 
         // Assert
         assertEquals(200, response.getStatusCode());
@@ -89,7 +89,7 @@ class HttpResponseTest {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
         headers.add("Accept", "text/html");
-        HttpResponse<String> response = new HttpResponse<>(200, headers, "body");
+        ResponseEntity<String> response = new ResponseEntity<>(200, headers, "body");
 
         // Act & Assert
         List<String> contentType = response.getHeader("Content-Type");
@@ -106,7 +106,7 @@ class HttpResponseTest {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
-        HttpResponse<String> response = new HttpResponse<>(200, headers, "body");
+        ResponseEntity<String> response = new ResponseEntity<>(200, headers, "body");
 
         // Act & Assert
         assertEquals("application/json", response.getFirstHeader("content-type"));
@@ -119,7 +119,7 @@ class HttpResponseTest {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
-        HttpResponse<String> response = new HttpResponse<>(200, headers, "body");
+        ResponseEntity<String> response = new ResponseEntity<>(200, headers, "body");
 
         // Act & Assert
         List<String> existing = response.getOrEmpty("Content-Type");
@@ -137,7 +137,7 @@ class HttpResponseTest {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Set-Cookie", "session=abc");
         headers.add("Set-Cookie", "token=xyz");
-        HttpResponse<String> response = new HttpResponse<>(200, headers, "body");
+        ResponseEntity<String> response = new ResponseEntity<>(200, headers, "body");
 
         // Act & Assert
         assertEquals("session=abc", response.getFirstHeader("Set-Cookie"));
@@ -147,23 +147,23 @@ class HttpResponseTest {
     @Test
     void testIsSuccessful() {
         // 2xx status codes should be successful
-        assertTrue(new HttpResponse<>(200, new HttpHeaders(), null).isSuccessful());
-        assertTrue(new HttpResponse<>(201, new HttpHeaders(), null).isSuccessful());
-        assertTrue(new HttpResponse<>(204, new HttpHeaders(), null).isSuccessful());
-        assertTrue(new HttpResponse<>(299, new HttpHeaders(), null).isSuccessful());
+        assertTrue(new ResponseEntity<>(200, new HttpHeaders(), null).isSuccessful());
+        assertTrue(new ResponseEntity<>(201, new HttpHeaders(), null).isSuccessful());
+        assertTrue(new ResponseEntity<>(204, new HttpHeaders(), null).isSuccessful());
+        assertTrue(new ResponseEntity<>(299, new HttpHeaders(), null).isSuccessful());
 
         // Non-2xx status codes should not be successful
-        assertFalse(new HttpResponse<>(199, new HttpHeaders(), null).isSuccessful());
-        assertFalse(new HttpResponse<>(300, new HttpHeaders(), null).isSuccessful());
-        assertFalse(new HttpResponse<>(400, new HttpHeaders(), null).isSuccessful());
-        assertFalse(new HttpResponse<>(404, new HttpHeaders(), null).isSuccessful());
-        assertFalse(new HttpResponse<>(500, new HttpHeaders(), null).isSuccessful());
+        assertFalse(new ResponseEntity<>(199, new HttpHeaders(), null).isSuccessful());
+        assertFalse(new ResponseEntity<>(300, new HttpHeaders(), null).isSuccessful());
+        assertFalse(new ResponseEntity<>(400, new HttpHeaders(), null).isSuccessful());
+        assertFalse(new ResponseEntity<>(404, new HttpHeaders(), null).isSuccessful());
+        assertFalse(new ResponseEntity<>(500, new HttpHeaders(), null).isSuccessful());
     }
 
     @Test
     void testBuilder() {
         // Act
-        HttpResponse<String> response = HttpResponse.<String>builder()
+        ResponseEntity<String> response = ResponseEntity.<String>builder()
                 .statusCode(200)
                 .header("Content-Type", "application/json")
                 .header("Accept", "text/html")
@@ -180,7 +180,7 @@ class HttpResponseTest {
     @Test
     void testBuilderWithMultipleHeaderValues() {
         // Act
-        HttpResponse<String> response = HttpResponse.<String>builder()
+        ResponseEntity<String> response = ResponseEntity.<String>builder()
                 .statusCode(200)
                 .header("Set-Cookie", Arrays.asList("session=abc", "token=xyz"))
                 .body("test body")
@@ -201,7 +201,7 @@ class HttpResponseTest {
         headersMap.put("Accept", Collections.singletonList("text/html"));
 
         // Act
-        HttpResponse<String> response = HttpResponse.<String>builder()
+        ResponseEntity<String> response = ResponseEntity.<String>builder()
                 .statusCode(200)
                 .headers(headersMap)
                 .body("test body")
@@ -220,7 +220,7 @@ class HttpResponseTest {
         headers.add("Accept", "text/html");
 
         // Act
-        HttpResponse<String> response = HttpResponse.<String>builder()
+        ResponseEntity<String> response = ResponseEntity.<String>builder()
                 .statusCode(200)
                 .headers(headers)
                 .body("test body")
@@ -234,7 +234,7 @@ class HttpResponseTest {
     @Test
     void testBuilderDefaultStatusCode() {
         // Act
-        HttpResponse<String> response = HttpResponse.<String>builder()
+        ResponseEntity<String> response = ResponseEntity.<String>builder()
                 .body("test body")
                 .build();
 
@@ -246,7 +246,7 @@ class HttpResponseTest {
     @Test
     void testBuilderWithNullBody() {
         // Act
-        HttpResponse<String> response = HttpResponse.<String>builder()
+        ResponseEntity<String> response = ResponseEntity.<String>builder()
                 .statusCode(204)
                 .build();
 
@@ -258,7 +258,7 @@ class HttpResponseTest {
     @Test
     void testBuilderChaining() {
         // Act
-        HttpResponse<String> response = HttpResponse.<String>builder()
+        ResponseEntity<String> response = ResponseEntity.<String>builder()
                 .statusCode(201)
                 .header("Content-Type", "application/json")
                 .header("Location", "/api/users/123")
@@ -280,7 +280,7 @@ class HttpResponseTest {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
-        HttpResponse<String> response = new HttpResponse<>(200, headers, "test body");
+        ResponseEntity<String> response = new ResponseEntity<>(200, headers, "test body");
 
         // Act
         String result = response.toString();
@@ -294,13 +294,13 @@ class HttpResponseTest {
     @Test
     void testGenericTypes() {
         // Test with different body types
-        HttpResponse<Integer> intResponse = new HttpResponse<>(200, new HttpHeaders(), 42);
+        ResponseEntity<Integer> intResponse = new ResponseEntity<>(200, new HttpHeaders(), 42);
         assertEquals(42, intResponse.getBody());
 
-        HttpResponse<List<String>> listResponse = new HttpResponse<>(200, new HttpHeaders(), Arrays.asList("a", "b"));
+        ResponseEntity<List<String>> listResponse = new ResponseEntity<>(200, new HttpHeaders(), Arrays.asList("a", "b"));
         assertEquals(2, listResponse.getBody().size());
 
-        HttpResponse<Map<String, Object>> mapResponse = new HttpResponse<>(200, new HttpHeaders(), new HashMap<>());
+        ResponseEntity<Map<String, Object>> mapResponse = new ResponseEntity<>(200, new HttpHeaders(), new HashMap<>());
         assertNotNull(mapResponse.getBody());
     }
 }

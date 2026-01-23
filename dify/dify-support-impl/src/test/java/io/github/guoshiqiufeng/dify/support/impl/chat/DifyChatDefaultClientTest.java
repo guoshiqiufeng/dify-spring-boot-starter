@@ -25,7 +25,7 @@ import io.github.guoshiqiufeng.dify.client.core.enums.HttpMethod;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
 import io.github.guoshiqiufeng.dify.client.core.web.client.ResponseSpec;
 import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
@@ -702,7 +702,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
 
         // Create expected response
         byte[] audioData = "mock audio data".getBytes();
-        HttpResponse<byte[]> expectedResponse = HttpResponse.<byte[]>builder()
+        ResponseEntity<byte[]> expectedResponse = ResponseEntity.<byte[]>builder()
                 .statusCode(200)
                 .header("Content-Type", io.github.guoshiqiufeng.dify.client.core.constant.MediaType.APPLICATION_OCTET_STREAM)
                 .body(audioData)
@@ -713,7 +713,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
                 .thenReturn(expectedResponse);
 
         // Execute the method
-        HttpResponse<byte[]> actualResponse = client.textToAudio(request);
+        ResponseEntity<byte[]> actualResponse = client.textToAudio(request);
 
         // Verify results
         assertNotNull(actualResponse);
@@ -1161,7 +1161,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
 
         // Create expected response
         byte[] fileContent = "mock file content".getBytes();
-        HttpResponse<byte[]> expectedResponse = HttpResponse.<byte[]>builder()
+        ResponseEntity<byte[]> expectedResponse = ResponseEntity.<byte[]>builder()
                 .statusCode(200)
                 .header("Content-Type", "application/pdf")
                 .header("Content-Disposition", "attachment; filename=\"test.pdf\"")
@@ -1187,7 +1187,7 @@ public class DifyChatDefaultClientTest extends BaseClientTest {
         when(responseSpecMock.toEntity(byte[].class)).thenReturn(expectedResponse);
 
         // Execute the method
-        HttpResponse<byte[]> actualResponse = client.filePreview(request);
+        ResponseEntity<byte[]> actualResponse = client.filePreview(request);
 
         // Verify results
         assertNotNull(actualResponse);

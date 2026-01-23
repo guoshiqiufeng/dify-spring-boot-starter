@@ -19,7 +19,7 @@ import io.github.guoshiqiufeng.dify.client.codec.gson.GsonJsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -231,7 +231,7 @@ class WebClientExecutorIntegrationTest {
         URI uri = mockServer.url("/api/test").uri();
 
         // Act
-        HttpResponse<TestDto> response = executor.executeForEntity("GET", uri, new HashMap<>(),
+        ResponseEntity<TestDto> response = executor.executeForEntity("GET", uri, new HashMap<>(),
                 new HashMap<>(), new HashMap<>(), null, TestDto.class);
 
         // Assert
@@ -255,7 +255,7 @@ class WebClientExecutorIntegrationTest {
         URI uri = mockServer.url("/api/test").uri();
 
         // Act
-        HttpResponse<TestDto> response = executor.executeForEntity("GET", uri, new HashMap<>(),
+        ResponseEntity<TestDto> response = executor.executeForEntity("GET", uri, new HashMap<>(),
                 new HashMap<>(), new HashMap<>(), null, TestDto.class);
 
         // Assert
@@ -275,7 +275,7 @@ class WebClientExecutorIntegrationTest {
         URI uri = mockServer.url("/api/create").uri();
 
         // Act
-        HttpResponse<TestDto> response = executor.executeForEntity("POST", uri, new HashMap<>(),
+        ResponseEntity<TestDto> response = executor.executeForEntity("POST", uri, new HashMap<>(),
                 new HashMap<>(), new HashMap<>(), null, TestDto.class);
 
         // Assert
@@ -293,7 +293,7 @@ class WebClientExecutorIntegrationTest {
         URI uri = mockServer.url("/api/empty").uri();
 
         // Act
-        HttpResponse<TestDto> response = executor.executeForEntity("GET", uri, new HashMap<>(),
+        ResponseEntity<TestDto> response = executor.executeForEntity("GET", uri, new HashMap<>(),
                 new HashMap<>(), new HashMap<>(), null, TestDto.class);
 
         // Assert
@@ -311,7 +311,7 @@ class WebClientExecutorIntegrationTest {
         URI uri = mockServer.url("/api/bad").uri();
 
         // Act
-        HttpResponse<TestDto> response = executor.executeForEntity("GET", uri, new HashMap<>(),
+        ResponseEntity<TestDto> response = executor.executeForEntity("GET", uri, new HashMap<>(),
                 new HashMap<>(), new HashMap<>(), null, TestDto.class);
 
         // Assert
@@ -332,7 +332,7 @@ class WebClientExecutorIntegrationTest {
         URI uri = mockServer.url("/api/test").uri();
 
         // Act
-        HttpResponse<TestDto> response = executor.executeForEntity("GET", uri, new HashMap<>(),
+        ResponseEntity<TestDto> response = executor.executeForEntity("GET", uri, new HashMap<>(),
                 new HashMap<>(), new HashMap<>(), null, TestDto.class);
 
         // Assert
@@ -354,7 +354,7 @@ class WebClientExecutorIntegrationTest {
         URI uri = mockServer.url("/api/list").uri();
 
         // Act
-        HttpResponse<List<TestDto>> response = executor.executeForEntity("GET", uri, new HashMap<>(),
+        ResponseEntity<List<TestDto>> response = executor.executeForEntity("GET", uri, new HashMap<>(),
                 new HashMap<>(), new HashMap<>(), null, new TypeReference<List<TestDto>>() {});
 
         // Assert
@@ -375,7 +375,7 @@ class WebClientExecutorIntegrationTest {
         URI uri = mockServer.url("/api/map").uri();
 
         // Act
-        HttpResponse<Map<String, String>> response = executor.executeForEntity("GET", uri, new HashMap<>(),
+        ResponseEntity<Map<String, String>> response = executor.executeForEntity("GET", uri, new HashMap<>(),
                 new HashMap<>(), new HashMap<>(), null, new TypeReference<Map<String, String>>() {});
 
         // Assert
@@ -392,7 +392,7 @@ class WebClientExecutorIntegrationTest {
         URI uri = mockServer.url("/api/forbidden").uri();
 
         // Act
-        HttpResponse<List<TestDto>> response = executor.executeForEntity("GET", uri, new HashMap<>(),
+        ResponseEntity<List<TestDto>> response = executor.executeForEntity("GET", uri, new HashMap<>(),
                 new HashMap<>(), new HashMap<>(), null, new TypeReference<List<TestDto>>() {});
 
         // Assert
@@ -949,7 +949,7 @@ class WebClientExecutorIntegrationTest {
         URI uri = mockServer.url("/api/redirect").uri();
 
         // Act
-        HttpResponse<TestDto> response = executor.executeForEntity("GET", uri, new HashMap<>(),
+        ResponseEntity<TestDto> response = executor.executeForEntity("GET", uri, new HashMap<>(),
                 new HashMap<>(), new HashMap<>(), null, TestDto.class);
 
         // Assert
@@ -968,7 +968,7 @@ class WebClientExecutorIntegrationTest {
         URI uri = mockServer.url("/api/unavailable").uri();
 
         // Act
-        HttpResponse<TestDto> response = executor.executeForEntity("GET", uri, new HashMap<>(),
+        ResponseEntity<TestDto> response = executor.executeForEntity("GET", uri, new HashMap<>(),
                 new HashMap<>(), new HashMap<>(), null, TestDto.class);
 
         // Assert

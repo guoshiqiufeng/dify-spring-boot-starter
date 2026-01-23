@@ -19,7 +19,7 @@ import io.github.guoshiqiufeng.dify.client.codec.gson.GsonJsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.utils.MultipartBodyBuilder;
 import okhttp3.mockwebserver.MockResponse;
@@ -308,7 +308,7 @@ class OkHttpRequestBuilderIntegrationTest {
                 .setHeader("X-Custom-Header", "custom-value"));
 
         // Act
-        HttpResponse<TestResponse> response = getBuilder(client.get()
+        ResponseEntity<TestResponse> response = getBuilder(client.get()
                 .uri("/api/test"))
                 .executeForResponse(TestResponse.class);
 
@@ -331,7 +331,7 @@ class OkHttpRequestBuilderIntegrationTest {
                 .setHeader("X-Header-2", "value2"));
 
         // Act
-        HttpResponse<TestResponse> response = getBuilder(client.get()
+        ResponseEntity<TestResponse> response = getBuilder(client.get()
                 .uri("/api/test"))
                 .executeForResponse(TestResponse.class);
 
@@ -350,7 +350,7 @@ class OkHttpRequestBuilderIntegrationTest {
                 .setHeader("Content-Type", "application/json"));
 
         // Act
-        HttpResponse<TestResponse> response = getBuilder(client.get()
+        ResponseEntity<TestResponse> response = getBuilder(client.get()
                 .uri("/api/create"))
                 .executeForResponse(TestResponse.class);
 
@@ -367,7 +367,7 @@ class OkHttpRequestBuilderIntegrationTest {
                 .setHeader("Content-Type", "application/json"));
 
         // Act
-        HttpResponse<TestResponse> response = getBuilder(client.get()
+        ResponseEntity<TestResponse> response = getBuilder(client.get()
                 .uri("/api/empty"))
                 .executeForResponse(TestResponse.class);
 
@@ -402,7 +402,7 @@ class OkHttpRequestBuilderIntegrationTest {
                 .addHeader("Set-Cookie", "cookie2=value2"));
 
         // Act
-        HttpResponse<TestResponse> response = getBuilder(client.get()
+        ResponseEntity<TestResponse> response = getBuilder(client.get()
                 .uri("/api/test"))
                 .executeForResponse(TestResponse.class);
 
@@ -436,7 +436,7 @@ class OkHttpRequestBuilderIntegrationTest {
                 .setHeader("Content-Type", "application/json"));
 
         // Act
-        HttpResponse<List<TestResponse>> response = getBuilder(client.get()
+        ResponseEntity<List<TestResponse>> response = getBuilder(client.get()
                 .uri("/api/list"))
                 .executeForResponse(new TypeReference<List<TestResponse>>() {
                 });
@@ -457,7 +457,7 @@ class OkHttpRequestBuilderIntegrationTest {
                 .setHeader("X-Custom", "test"));
 
         // Act
-        HttpResponse<Map<String, String>> response = getBuilder(client.get()
+        ResponseEntity<Map<String, String>> response = getBuilder(client.get()
                 .uri("/api/map"))
                 .executeForResponse(new TypeReference<Map<String, String>>() {
                 });
@@ -1837,7 +1837,7 @@ class OkHttpRequestBuilderIntegrationTest {
                 .setResponseCode(204)
                 .setHeader("Content-Length", "0"));
 
-        HttpResponse<List<TestResponse>> response = getBuilder(client.get()
+        ResponseEntity<List<TestResponse>> response = getBuilder(client.get()
                 .uri("/api/nocontent"))
                 .executeForResponse(new TypeReference<List<TestResponse>>() {
                 });
@@ -1855,7 +1855,7 @@ class OkHttpRequestBuilderIntegrationTest {
                 .setBody("")
                 .setHeader("Content-Type", "application/json"));
 
-        HttpResponse<List<TestResponse>> response = getBuilder(client.get()
+        ResponseEntity<List<TestResponse>> response = getBuilder(client.get()
                 .uri("/api/empty"))
                 .executeForResponse(new TypeReference<List<TestResponse>>() {
                 });
@@ -2169,7 +2169,7 @@ class OkHttpRequestBuilderIntegrationTest {
         mockServer.enqueue(new MockResponse()
                 .setResponseCode(204));
 
-        HttpResponse<TestResponse> response = getBuilder(client.get()
+        ResponseEntity<TestResponse> response = getBuilder(client.get()
                 .uri("/api/nocontent"))
                 .executeForResponse(TestResponse.class);
 
@@ -2186,7 +2186,7 @@ class OkHttpRequestBuilderIntegrationTest {
                 .setBody("")
                 .setHeader("Content-Type", "application/json"));
 
-        HttpResponse<TestResponse> response = getBuilder(client.get()
+        ResponseEntity<TestResponse> response = getBuilder(client.get()
                 .uri("/api/empty"))
                 .executeForResponse(TestResponse.class);
 
@@ -2203,7 +2203,7 @@ class OkHttpRequestBuilderIntegrationTest {
                 .setBody("{\"result\":\"ok\"}")
                 .setHeader("Content-Type", "application/json"));
 
-        HttpResponse<Void> response = getBuilder(client.get()
+        ResponseEntity<Void> response = getBuilder(client.get()
                 .uri("/api/void"))
                 .executeForResponse(Void.class);
 
@@ -2411,7 +2411,7 @@ class OkHttpRequestBuilderIntegrationTest {
                 .setResponseCode(404)
                 .setBody("{\"error\":\"Not found\"}"));
 
-        HttpResponse<TestResponse> response = getBuilder(client.get()
+        ResponseEntity<TestResponse> response = getBuilder(client.get()
                 .uri("/api/notfound"))
                 .retrieve()
                 .toEntity(TestResponse.class);
@@ -2426,7 +2426,7 @@ class OkHttpRequestBuilderIntegrationTest {
                 .setResponseCode(500)
                 .setBody("{\"error\":\"Server error\"}"));
 
-        HttpResponse<List<TestResponse>> response = getBuilder(client.get()
+        ResponseEntity<List<TestResponse>> response = getBuilder(client.get()
                 .uri("/api/error"))
                 .retrieve()
                 .toEntity(new TypeReference<List<TestResponse>>() {});
@@ -2528,7 +2528,7 @@ class OkHttpRequestBuilderIntegrationTest {
                 .setResponseCode(400)
                 .setBody("Bad request"));
 
-        HttpResponse<String> response = getBuilder(client.get()
+        ResponseEntity<String> response = getBuilder(client.get()
                 .uri("/api/bad"))
                 .retrieve()
                 .toEntity(String.class);
@@ -2544,7 +2544,7 @@ class OkHttpRequestBuilderIntegrationTest {
                 .setResponseCode(400)
                 .setBody("Bad request"));
 
-        HttpResponse<List<TestResponse>> response = getBuilder(client.get()
+        ResponseEntity<List<TestResponse>> response = getBuilder(client.get()
                 .uri("/api/bad"))
                 .retrieve()
                 .toEntity(new TypeReference<List<TestResponse>>() {});

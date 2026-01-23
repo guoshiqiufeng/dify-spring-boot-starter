@@ -18,7 +18,7 @@ package io.github.guoshiqiufeng.dify.support.impl.base;
 import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
 import io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.core.client.BaseDifyClient;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.exception.DiftClientExceptionEnum;
@@ -65,7 +65,7 @@ public class BaseDifyDefaultClient implements BaseDifyClient {
         }
 
         @Override
-        public void handle(HttpResponse<?> response) throws Exception {
+        public void handle(ResponseEntity<?> response) throws Exception {
             int statusCode = response.getStatusCode();
             Object body = response.getBody();
             String message = body != null ? body.toString() : "";

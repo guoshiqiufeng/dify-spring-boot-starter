@@ -22,14 +22,13 @@ import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 import io.github.guoshiqiufeng.dify.client.core.http.util.HttpStatusValidator;
 import io.github.guoshiqiufeng.dify.client.core.http.util.MultipartBodyProcessor;
 import io.github.guoshiqiufeng.dify.client.core.http.util.RequestParameterProcessor;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.HttpHeaderConverter;
 import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.SpringMultipartBodyBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -141,17 +140,17 @@ class WebClientExecutor {
      * @param <T>          response type
      * @return HttpResponse with status, headers, and body
      */
-    <T> HttpResponse<T> executeForEntity(String method, URI uri, Map<String, String> headers,
-                                         Map<String, String> cookies, Map<String, String> queryParams,
-                                         Object body, Class<T> responseType) {
+    <T> ResponseEntity<T> executeForEntity(String method, URI uri, Map<String, String> headers,
+                                           Map<String, String> cookies, Map<String, String> queryParams,
+                                           Object body, Class<T> responseType) {
         WebClient.RequestBodySpec requestSpec = buildRequest(method, uri, headers, cookies, queryParams, body);
 
         try {
-            Mono<ResponseEntity<String>> responseMono = requestSpec
+            Mono<org.springframework.http.ResponseEntity<String>> responseMono = requestSpec
                     .retrieve()
                     .toEntity(String.class);
 
-            ResponseEntity<String> responseEntity = responseMono.block();
+            org.springframework.http.ResponseEntity<String> responseEntity = responseMono.block();
 
             if (responseEntity == null) {
                 throw new HttpClientException("Response entity is null");
@@ -166,7 +165,7 @@ class WebClientExecutor {
                 // The error handler will receive this and can process it
                 @SuppressWarnings("unchecked")
                 T errorBody = (T) responseEntity.getBody();
-                return HttpResponse.<T>builder()
+                return ResponseEntity.<T>builder()
                         .statusCode(statusCode)
                         .headers(HttpHeaderConverter.fromSpringHeaders(responseEntity.getHeaders()))
                         .body(errorBody)
@@ -183,7 +182,7 @@ class WebClientExecutor {
             // Let the upper layer handleErrors() process it
             @SuppressWarnings("unchecked")
             T typedErrorBody = (T) errorBody;
-            return HttpResponse.<T>builder()
+            return ResponseEntity.<T>builder()
                     .statusCode(statusCode)
                     .headers(HttpHeaderConverter.fromSpringHeaders(e.getHeaders()))
                     .body(typedErrorBody)
@@ -204,17 +203,17 @@ class WebClientExecutor {
      * @param <T>           response type
      * @return HttpResponse with status, headers, and body
      */
-    <T> HttpResponse<T> executeForEntity(String method, URI uri, Map<String, String> headers,
-                                         Map<String, String> cookies, Map<String, String> queryParams,
-                                         Object body, TypeReference<T> typeReference) {
+    <T> ResponseEntity<T> executeForEntity(String method, URI uri, Map<String, String> headers,
+                                           Map<String, String> cookies, Map<String, String> queryParams,
+                                           Object body, TypeReference<T> typeReference) {
         WebClient.RequestBodySpec requestSpec = buildRequest(method, uri, headers, cookies, queryParams, body);
 
         try {
-            Mono<ResponseEntity<String>> responseMono = requestSpec
+            Mono<org.springframework.http.ResponseEntity<String>> responseMono = requestSpec
                     .retrieve()
                     .toEntity(String.class);
 
-            ResponseEntity<String> responseEntity = responseMono.block();
+            org.springframework.http.ResponseEntity<String> responseEntity = responseMono.block();
 
             if (responseEntity == null) {
                 throw new HttpClientException("Response entity is null");
@@ -229,7 +228,7 @@ class WebClientExecutor {
                 // The error handler will receive this and can process it
                 @SuppressWarnings("unchecked")
                 T errorBody = (T) responseEntity.getBody();
-                return HttpResponse.<T>builder()
+                return ResponseEntity.<T>builder()
                         .statusCode(statusCode)
                         .headers(HttpHeaderConverter.fromSpringHeaders(responseEntity.getHeaders()))
                         .body(errorBody)
@@ -246,7 +245,7 @@ class WebClientExecutor {
             // Let the upper layer handleErrors() process it
             @SuppressWarnings("unchecked")
             T typedErrorBody = (T) errorBody;
-            return HttpResponse.<T>builder()
+            return ResponseEntity.<T>builder()
                     .statusCode(statusCode)
                     .headers(HttpHeaderConverter.fromSpringHeaders(e.getHeaders()))
                     .body(typedErrorBody)

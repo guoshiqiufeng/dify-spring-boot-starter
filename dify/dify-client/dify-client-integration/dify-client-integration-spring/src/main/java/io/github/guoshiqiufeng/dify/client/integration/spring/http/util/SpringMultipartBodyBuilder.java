@@ -19,6 +19,9 @@ import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
 import io.github.guoshiqiufeng.dify.client.core.http.util.MultipartBodyProcessor;
 import lombok.experimental.UtilityClass;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 
 import java.util.Map;
@@ -67,7 +70,16 @@ public class SpringMultipartBodyBuilder {
                         }
                     };
 
-                multipartData.add(entry.getKey(), resource);
+                // Extract Content-Type from part headers and wrap resource in HttpEntity
+                String contentType = part.getHeader("Content-Type");
+                if (contentType != null && !contentType.isEmpty()) {
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.setContentType(MediaType.parseMediaType(contentType));
+                    HttpEntity<org.springframework.core.io.ByteArrayResource> entity = new HttpEntity<>(resource, headers);
+                    multipartData.add(entry.getKey(), entity);
+                } else {
+                    multipartData.add(entry.getKey(), resource);
+                }
             } else if (partValue instanceof String || partValue instanceof Number || partValue instanceof Boolean) {
                 // For simple types, add directly
                 multipartData.add(entry.getKey(), partValue);

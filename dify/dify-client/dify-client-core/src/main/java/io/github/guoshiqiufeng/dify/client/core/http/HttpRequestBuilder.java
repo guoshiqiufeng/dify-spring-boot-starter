@@ -16,7 +16,7 @@
 package io.github.guoshiqiufeng.dify.client.core.http;
 
 import io.github.guoshiqiufeng.dify.client.core.map.MultiValueMap;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.client.core.web.client.ResponseSpec;
 import io.github.guoshiqiufeng.dify.client.core.web.util.UriBuilder;
 import reactor.core.publisher.Flux;
@@ -175,7 +175,7 @@ public interface HttpRequestBuilder {
      * @param <T>          the response body type
      * @return the HTTP response with status, headers, and body
      */
-    <T> HttpResponse<T> executeForResponse(Class<T> responseType);
+    <T> ResponseEntity<T> executeForResponse(Class<T> responseType);
 
     /**
      * Execute the request and return the full HTTP response with generic type support.
@@ -184,7 +184,7 @@ public interface HttpRequestBuilder {
      * @param <T>           the response body type
      * @return the HTTP response with status, headers, and body
      */
-    <T> HttpResponse<T> executeForResponse(TypeReference<T> typeReference);
+    <T> ResponseEntity<T> executeForResponse(TypeReference<T> typeReference);
 
     /**
      * Execute the request as a stream (for Server-Sent Events or streaming responses).

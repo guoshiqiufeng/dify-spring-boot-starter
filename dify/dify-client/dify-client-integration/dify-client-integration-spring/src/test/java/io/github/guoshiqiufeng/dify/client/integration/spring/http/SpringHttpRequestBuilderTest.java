@@ -431,8 +431,8 @@ class SpringHttpRequestBuilderTest {
         WebClientExecutor mockExecutor = mock(WebClientExecutor.class);
         executorField.set(builder, mockExecutor);
 
-        io.github.guoshiqiufeng.dify.client.core.response.HttpResponse<String> mockResponse =
-            mock(io.github.guoshiqiufeng.dify.client.core.response.HttpResponse.class);
+        io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity<String> mockResponse =
+            mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class);
         when(mockResponse.getStatusCode()).thenReturn(200);
         when(mockResponse.getBody()).thenReturn("test body");
 
@@ -460,8 +460,8 @@ class SpringHttpRequestBuilderTest {
         WebClientExecutor mockExecutor = mock(WebClientExecutor.class);
         executorField.set(builder, mockExecutor);
 
-        io.github.guoshiqiufeng.dify.client.core.response.HttpResponse<String> mockResponse =
-            mock(io.github.guoshiqiufeng.dify.client.core.response.HttpResponse.class);
+        io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity<String> mockResponse =
+            mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class);
         when(mockResponse.getStatusCode()).thenReturn(200);
         when(mockResponse.getBody()).thenReturn("test body");
 
@@ -492,8 +492,8 @@ class SpringHttpRequestBuilderTest {
         WebClientExecutor mockExecutor = mock(WebClientExecutor.class);
         executorField.set(builder, mockExecutor);
 
-        io.github.guoshiqiufeng.dify.client.core.response.HttpResponse<Void> mockResponse =
-            mock(io.github.guoshiqiufeng.dify.client.core.response.HttpResponse.class);
+        io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity<Void> mockResponse =
+            mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class);
         when(mockResponse.getStatusCode()).thenReturn(204);
 
         when(mockExecutor.executeForEntity(anyString(), any(URI.class), any(), any(), any(), any(), eq(Void.class)))
@@ -591,8 +591,8 @@ class SpringHttpRequestBuilderTest {
         WebClientExecutor mockExecutor = mock(WebClientExecutor.class, withSettings().lenient());
         executorField.set(builder, mockExecutor);
 
-        io.github.guoshiqiufeng.dify.client.core.response.HttpResponse<String> mockResponse =
-            mock(io.github.guoshiqiufeng.dify.client.core.response.HttpResponse.class, withSettings().lenient());
+        io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity<String> mockResponse =
+            mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class, withSettings().lenient());
         when(mockResponse.getStatusCode()).thenReturn(200);
         when(mockResponse.getBody()).thenReturn("response body");
 
@@ -618,8 +618,8 @@ class SpringHttpRequestBuilderTest {
         WebClientExecutor mockExecutor = mock(WebClientExecutor.class, withSettings().lenient());
         executorField.set(builder, mockExecutor);
 
-        io.github.guoshiqiufeng.dify.client.core.response.HttpResponse<String> mockResponse =
-            mock(io.github.guoshiqiufeng.dify.client.core.response.HttpResponse.class, withSettings().lenient());
+        io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity<String> mockResponse =
+            mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class, withSettings().lenient());
         when(mockResponse.getStatusCode()).thenReturn(200);
         when(mockResponse.getBody()).thenReturn("response body");
 
@@ -648,8 +648,8 @@ class SpringHttpRequestBuilderTest {
         WebClientExecutor mockExecutor = mock(WebClientExecutor.class, withSettings().lenient());
         executorField.set(builder, mockExecutor);
 
-        io.github.guoshiqiufeng.dify.client.core.response.HttpResponse<String> mockResponse =
-            mock(io.github.guoshiqiufeng.dify.client.core.response.HttpResponse.class, withSettings().lenient());
+        io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity<String> mockResponse =
+            mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class, withSettings().lenient());
         when(mockResponse.getStatusCode()).thenReturn(404);
         when(mockResponse.getBody()).thenReturn("Not Found");
 
@@ -681,8 +681,8 @@ class SpringHttpRequestBuilderTest {
         WebClientExecutor mockExecutor = mock(WebClientExecutor.class, withSettings().lenient());
         executorField.set(builder, mockExecutor);
 
-        io.github.guoshiqiufeng.dify.client.core.response.HttpResponse<String> mockResponse =
-            mock(io.github.guoshiqiufeng.dify.client.core.response.HttpResponse.class, withSettings().lenient());
+        io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity<String> mockResponse =
+            mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class, withSettings().lenient());
         when(mockResponse.getStatusCode()).thenReturn(500);
         when(mockResponse.getBody()).thenReturn("Server Error");
 
@@ -721,8 +721,8 @@ class SpringHttpRequestBuilderTest {
         WebClientExecutor mockExecutor = mock(WebClientExecutor.class);
         executorField.set(builder, mockExecutor);
 
-        io.github.guoshiqiufeng.dify.client.core.response.HttpResponse<String> mockResponse =
-            mock(io.github.guoshiqiufeng.dify.client.core.response.HttpResponse.class);
+        io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity<String> mockResponse =
+            mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class);
         when(mockResponse.getStatusCode()).thenReturn(200);
         when(mockResponse.getBody()).thenReturn("Success");
 
@@ -916,8 +916,8 @@ class SpringHttpRequestBuilderTest {
         WebClientExecutor mockExecutor = mock(WebClientExecutor.class, withSettings().lenient());
         executorField.set(builder, mockExecutor);
 
-        io.github.guoshiqiufeng.dify.client.core.response.HttpResponse<String> mockResponse =
-            mock(io.github.guoshiqiufeng.dify.client.core.response.HttpResponse.class, withSettings().lenient());
+        io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity<String> mockResponse =
+            mock(io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity.class, withSettings().lenient());
         when(mockResponse.getStatusCode()).thenReturn(400);
         when(mockResponse.getBody()).thenReturn("Bad Request");
 

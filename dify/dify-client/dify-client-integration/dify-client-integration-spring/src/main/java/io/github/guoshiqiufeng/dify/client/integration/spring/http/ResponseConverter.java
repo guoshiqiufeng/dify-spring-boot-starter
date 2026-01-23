@@ -18,9 +18,8 @@ package io.github.guoshiqiufeng.dify.client.integration.spring.http;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.SpringStatusCodeExtractor;
-import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,7 +54,7 @@ class ResponseConverter {
      * @param <T>            response type
      * @return HttpResponse with deserialized body
      */
-    <T> HttpResponse<T> convert(ResponseEntity<String> responseEntity, Class<T> responseType) {
+    <T> ResponseEntity<T> convert(org.springframework.http.ResponseEntity<String> responseEntity, Class<T> responseType) {
         T responseBody = deserialize(responseEntity.getBody(), responseType);
         return buildHttpResponse(responseEntity, responseBody);
     }
@@ -68,7 +67,7 @@ class ResponseConverter {
      * @param <T>            response type
      * @return HttpResponse with deserialized body
      */
-    <T> HttpResponse<T> convert(ResponseEntity<String> responseEntity, TypeReference<T> typeReference) {
+    <T> ResponseEntity<T> convert(org.springframework.http.ResponseEntity<String> responseEntity, TypeReference<T> typeReference) {
         T responseBody = deserialize(responseEntity.getBody(), typeReference);
         return buildHttpResponse(responseEntity, responseBody);
     }
@@ -125,13 +124,13 @@ class ResponseConverter {
      * @param <T>            response type
      * @return HttpResponse
      */
-    private <T> HttpResponse<T> buildHttpResponse(ResponseEntity<String> responseEntity, T responseBody) {
+    private <T> ResponseEntity<T> buildHttpResponse(org.springframework.http.ResponseEntity<String> responseEntity, T responseBody) {
         Map<String, List<String>> headers = new HashMap<>();
         responseEntity.getHeaders().forEach((key, values) -> {
             headers.put(key, new ArrayList<>(values));
         });
 
-        return new HttpResponse<>(
+        return new ResponseEntity<>(
                 SpringStatusCodeExtractor.getStatusCodeValue(responseEntity),
                 headers,
                 responseBody

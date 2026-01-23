@@ -24,6 +24,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 
 import java.util.HashMap;
@@ -402,5 +404,48 @@ class SpringMultipartBodyBuilderTest {
         Object resource = result.getFirst("file");
         assertTrue(resource instanceof ByteArrayResource);
         assertEquals("my document (1).pdf", ((ByteArrayResource) resource).getFilename());
+    }
+
+    @Test
+    void testBuildMultipartBodyWithContentType() {
+        byte[] fileData = "audio content".getBytes();
+        builder.part("file", fileData)
+                .header("Content-Disposition", "form-data; name=\"file\"; filename=\"audio.mp3\"")
+                .header("Content-Type", "audio/mp3");
+
+        Map<String, MultipartBodyBuilder.Part> parts = builder.build();
+
+        LinkedMultiValueMap<String, Object> result = SpringMultipartBodyBuilder.buildMultipartBody(parts, jsonMapper, false);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        Object entity = result.getFirst("file");
+        assertTrue(entity instanceof HttpEntity);
+
+        @SuppressWarnings("unchecked")
+        HttpEntity<ByteArrayResource> httpEntity = (HttpEntity<ByteArrayResource>) entity;
+        assertNotNull(httpEntity.getHeaders());
+        assertEquals(MediaType.parseMediaType("audio/mp3"), httpEntity.getHeaders().getContentType());
+        assertNotNull(httpEntity.getBody());
+        assertEquals("audio.mp3", httpEntity.getBody().getFilename());
+    }
+
+    @Test
+    void testBuildMultipartBodyWithoutContentType() {
+        byte[] fileData = "file content".getBytes();
+        builder.part("file", fileData)
+                .header("Content-Disposition", "form-data; name=\"file\"; filename=\"document.txt\"");
+
+        Map<String, MultipartBodyBuilder.Part> parts = builder.build();
+
+        LinkedMultiValueMap<String, Object> result = SpringMultipartBodyBuilder.buildMultipartBody(parts, jsonMapper, false);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        Object resource = result.getFirst("file");
+        // Without Content-Type header, should return ByteArrayResource directly
+        assertTrue(resource instanceof ByteArrayResource);
+        assertFalse(resource instanceof HttpEntity);
+        assertEquals("document.txt", ((ByteArrayResource) resource).getFilename());
     }
 }

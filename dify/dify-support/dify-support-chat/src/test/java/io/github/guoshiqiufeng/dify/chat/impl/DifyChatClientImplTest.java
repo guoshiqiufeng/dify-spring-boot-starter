@@ -41,7 +41,7 @@ import io.github.guoshiqiufeng.dify.chat.enums.IconTypeEnum;
 import io.github.guoshiqiufeng.dify.client.core.constant.MediaType;
 import io.github.guoshiqiufeng.dify.client.core.http.ContentDisposition;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyFile;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
@@ -276,12 +276,12 @@ class DifyChatClientImplTest {
         request.setText("Convert this text to speech");
 
         byte[] mockAudioData = "audio data".getBytes();
-        HttpResponse<byte[]> expectedResponse = new HttpResponse<>(200, new HttpHeaders() ,mockAudioData);
+        ResponseEntity<byte[]> expectedResponse = new ResponseEntity<>(200, new HttpHeaders() ,mockAudioData);
 
         when(difyChatClient.textToAudio(any(TextToAudioRequest.class))).thenReturn(expectedResponse);
 
         // Act
-        HttpResponse<byte[]> actualResponse = difyChat.textToAudio(request);
+        ResponseEntity<byte[]> actualResponse = difyChat.textToAudio(request);
 
         // Assert
         assertNotNull(actualResponse);
@@ -396,12 +396,12 @@ class DifyChatClientImplTest {
         headers.setContentType(MediaType.IMAGE_PNG);
         headers.setContentLength(expectedContent.length);
 
-        HttpResponse<byte[]> expectedResponse = new HttpResponse<>(200, headers, expectedContent);
+        ResponseEntity<byte[]> expectedResponse = new ResponseEntity<>(200, headers, expectedContent);
 
         when(difyChatClient.filePreview(any(FilePreviewRequest.class))).thenReturn(expectedResponse);
 
         // Act
-        HttpResponse<byte[]> actualResponse = difyChat.filePreview(request);
+        ResponseEntity<byte[]> actualResponse = difyChat.filePreview(request);
 
         // Assert
         assertNotNull(actualResponse);
@@ -424,12 +424,12 @@ class DifyChatClientImplTest {
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         headers.setContentDisposition(ContentDisposition.attachment().filename("test-file.pdf").build());
 
-        HttpResponse<byte[]> expectedResponse = new HttpResponse<>(200, headers, expectedContent);
+        ResponseEntity<byte[]> expectedResponse = new ResponseEntity<>(200, headers, expectedContent);
 
         when(difyChatClient.filePreview(any(FilePreviewRequest.class))).thenReturn(expectedResponse);
 
         // Act
-        HttpResponse<byte[]> actualResponse = difyChat.filePreview(request);
+        ResponseEntity<byte[]> actualResponse = difyChat.filePreview(request);
 
         // Assert
         assertNotNull(actualResponse);

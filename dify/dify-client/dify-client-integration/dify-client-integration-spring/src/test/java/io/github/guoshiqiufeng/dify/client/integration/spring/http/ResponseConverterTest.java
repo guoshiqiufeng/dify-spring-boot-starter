@@ -18,7 +18,6 @@ package io.github.guoshiqiufeng.dify.client.integration.spring.http;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +27,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -68,7 +68,7 @@ class ResponseConverterTest {
         when(jsonMapper.fromJson(jsonBody, TestDto.class)).thenReturn(expectedDto);
 
         // Act
-        HttpResponse<TestDto> result = responseConverter.convert(responseEntity, TestDto.class);
+        io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity<TestDto> result = responseConverter.convert(responseEntity, TestDto.class);
 
         // Assert
         assertNotNull(result);
@@ -89,7 +89,7 @@ class ResponseConverterTest {
         when(jsonMapper.fromJson(eq(jsonBody), any(TypeReference.class))).thenReturn(expectedList);
 
         // Act
-        HttpResponse<List<TestDto>> result = responseConverter.convert(responseEntity, typeRef);
+        io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity<List<TestDto>> result = responseConverter.convert(responseEntity, typeRef);
 
         // Assert
         assertNotNull(result);
@@ -226,7 +226,7 @@ class ResponseConverterTest {
         when(jsonMapper.fromJson(jsonBody, TestDto.class)).thenReturn(new TestDto("test", 1));
 
         // Act
-        HttpResponse<TestDto> result = responseConverter.convert(responseEntity, TestDto.class);
+        io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity<TestDto> result = responseConverter.convert(responseEntity, TestDto.class);
 
         // Assert
         assertEquals("application/json", result.getHeaders().get("Content-Type").get(0));
@@ -252,7 +252,7 @@ class ResponseConverterTest {
             when(jsonMapper.fromJson("{}", TestDto.class)).thenReturn(new TestDto("test", 1));
 
             // Act
-            HttpResponse<TestDto> result = responseConverter.convert(responseEntity, TestDto.class);
+            io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity<TestDto> result = responseConverter.convert(responseEntity, TestDto.class);
 
             // Assert
             assertEquals(status.value(), result.getStatusCode(),

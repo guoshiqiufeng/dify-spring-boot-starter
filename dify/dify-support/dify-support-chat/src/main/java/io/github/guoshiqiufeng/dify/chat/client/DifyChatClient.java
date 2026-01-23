@@ -17,7 +17,7 @@ package io.github.guoshiqiufeng.dify.chat.client;
 
 import io.github.guoshiqiufeng.dify.chat.dto.request.*;
 import io.github.guoshiqiufeng.dify.chat.dto.response.*;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.core.pojo.response.MessagesResponseVO;
 import reactor.core.publisher.Flux;
@@ -119,7 +119,7 @@ public interface DifyChatClient {
      * @param request The text to audio conversion request
      * @return HTTP response containing the audio data as byte array
      */
-    HttpResponse<byte[]> textToAudio(TextToAudioRequest request);
+    ResponseEntity<byte[]> textToAudio(TextToAudioRequest request);
 
     /**
      * Converts audio to text format
@@ -173,7 +173,7 @@ public interface DifyChatClient {
      * @return file content response with appropriate headers for browser display or download
      * @since 1.0.0
      */
-    HttpResponse<byte[]> filePreview(FilePreviewRequest request);
+    ResponseEntity<byte[]> filePreview(FilePreviewRequest request);
 
     /**
      * app info

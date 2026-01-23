@@ -19,7 +19,7 @@ import io.github.guoshiqiufeng.dify.client.codec.gson.GsonJsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
 import io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.client.core.web.client.ResponseSpec;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import lombok.Data;
@@ -221,7 +221,7 @@ class OkHttpRequestBuilderResponseSpecTest {
                 .setHeader("X-Custom-Header", "custom-value"));
 
         // Act
-        HttpResponse<TestResponse> response = client.get()
+        ResponseEntity<TestResponse> response = client.get()
                 .uri("/api/test")
                 .retrieve()
                 .toEntity(TestResponse.class);
@@ -283,7 +283,7 @@ class OkHttpRequestBuilderResponseSpecTest {
                 .setHeader("Content-Type", "application/json"));
 
         // Act
-        HttpResponse<Map<String, String>> response = client.get()
+        ResponseEntity<Map<String, String>> response = client.get()
                 .uri("/api/map")
                 .retrieve()
                 .toEntity(new TypeReference<Map<String, String>>() {
@@ -346,7 +346,7 @@ class OkHttpRequestBuilderResponseSpecTest {
                 .setHeader("Content-Length", "0"));
 
         // Act
-        HttpResponse<Void> response = client.delete()
+        ResponseEntity<Void> response = client.delete()
                 .uri("/api/delete")
                 .retrieve()
                 .toBodilessEntity();
@@ -793,7 +793,7 @@ class OkHttpRequestBuilderResponseSpecTest {
         AtomicBoolean handlerCalled = new AtomicBoolean(false);
 
         // Error handler that doesn't throw - just processes the error
-        HttpResponse<TestResponse> response = client.get()
+        ResponseEntity<TestResponse> response = client.get()
                 .uri("/api/notfound")
                 .retrieve()
                 .onStatus(ResponseErrorHandler.onStatus(status -> status == 404, httpResponse -> {
@@ -821,7 +821,7 @@ class OkHttpRequestBuilderResponseSpecTest {
         AtomicBoolean handler1Called = new AtomicBoolean(false);
         AtomicBoolean handler2Called = new AtomicBoolean(false);
 
-        HttpResponse<TestResponse> response = client.get()
+        ResponseEntity<TestResponse> response = client.get()
                 .uri("/api/error")
                 .retrieve()
                 .onStatus(ResponseErrorHandler.onStatus(status -> status >= 500, httpResponse -> {
@@ -852,7 +852,7 @@ class OkHttpRequestBuilderResponseSpecTest {
 
         AtomicBoolean handlerCalled = new AtomicBoolean(false);
 
-        HttpResponse<List<TestResponse>> response = client.get()
+        ResponseEntity<List<TestResponse>> response = client.get()
                 .uri("/api/bad")
                 .retrieve()
                 .onStatus(ResponseErrorHandler.onStatus(status -> status == 400, httpResponse -> {
@@ -876,7 +876,7 @@ class OkHttpRequestBuilderResponseSpecTest {
 
         AtomicBoolean handlerCalled = new AtomicBoolean(false);
 
-        HttpResponse<TestResponse> response = client.get()
+        ResponseEntity<TestResponse> response = client.get()
                 .uri("/api/test")
                 .retrieve()
                 .onStatus(ResponseErrorHandler.onStatus(status -> status >= 400, httpResponse -> {
@@ -901,7 +901,7 @@ class OkHttpRequestBuilderResponseSpecTest {
 
         AtomicBoolean handlerCalled = new AtomicBoolean(false);
 
-        HttpResponse<TestResponse> response = client.get()
+        ResponseEntity<TestResponse> response = client.get()
                 .uri("/api/error")
                 .retrieve()
                 .onStatus(ResponseErrorHandler.onStatus(status -> status >= 500, httpResponse -> {
@@ -925,7 +925,7 @@ class OkHttpRequestBuilderResponseSpecTest {
 
         AtomicBoolean handlerCalled = new AtomicBoolean(false);
 
-        HttpResponse<TestResponse> response = client.get()
+        ResponseEntity<TestResponse> response = client.get()
                 .uri("/api/error")
                 .retrieve()
                 .onStatus(ResponseErrorHandler.onStatus(status -> status >= 500, httpResponse -> {
@@ -952,7 +952,7 @@ class OkHttpRequestBuilderResponseSpecTest {
 
             AtomicBoolean handlerCalled = new AtomicBoolean(false);
 
-            HttpResponse<TestResponse> response = client.get()
+            ResponseEntity<TestResponse> response = client.get()
                     .uri("/api/error")
                     .retrieve()
                     .onStatus(ResponseErrorHandler.onStatus(status -> status >= 400, httpResponse -> {
@@ -976,7 +976,7 @@ class OkHttpRequestBuilderResponseSpecTest {
 
         AtomicBoolean bodyProcessed = new AtomicBoolean(false);
 
-        HttpResponse<TestResponse> response = client.get()
+        ResponseEntity<TestResponse> response = client.get()
                 .uri("/api/validate")
                 .retrieve()
                 .onStatus(ResponseErrorHandler.onStatus(status -> status == 400, httpResponse -> {
@@ -999,7 +999,7 @@ class OkHttpRequestBuilderResponseSpecTest {
         mockServer.enqueue(new MockResponse()
                 .setResponseCode(204));
 
-        HttpResponse<TestResponse> response = client.get()
+        ResponseEntity<TestResponse> response = client.get()
                 .uri("/api/nocontent")
                 .retrieve()
                 .toEntity(TestResponse.class);
@@ -1018,7 +1018,7 @@ class OkHttpRequestBuilderResponseSpecTest {
                 .setBody("")
                 .setHeader("Content-Type", "application/json"));
 
-        HttpResponse<TestResponse> response = client.get()
+        ResponseEntity<TestResponse> response = client.get()
                 .uri("/api/empty")
                 .retrieve()
                 .toEntity(TestResponse.class);
@@ -1037,7 +1037,7 @@ class OkHttpRequestBuilderResponseSpecTest {
                 .setBody("{\"result\":\"ok\"}")
                 .setHeader("Content-Type", "application/json"));
 
-        HttpResponse<Void> response = client.get()
+        ResponseEntity<Void> response = client.get()
                 .uri("/api/void")
                 .retrieve()
                 .toEntity(Void.class);
@@ -1055,7 +1055,7 @@ class OkHttpRequestBuilderResponseSpecTest {
                 .setBody("test data")
                 .setHeader("Content-Type", "application/octet-stream"));
 
-        HttpResponse<byte[]> response = client.get()
+        ResponseEntity<byte[]> response = client.get()
                 .uri("/api/bytes")
                 .retrieve()
                 .toEntity(byte[].class);
@@ -1074,7 +1074,7 @@ class OkHttpRequestBuilderResponseSpecTest {
                 .setBody("test string")
                 .setHeader("Content-Type", "text/plain"));
 
-        HttpResponse<String> response = client.get()
+        ResponseEntity<String> response = client.get()
                 .uri("/api/string")
                 .retrieve()
                 .toEntity(String.class);
@@ -1093,7 +1093,7 @@ class OkHttpRequestBuilderResponseSpecTest {
                 .setBody("{\"name\":\"test\",\"id\":123}")
                 .setHeader("Content-Type", "application/json"));
 
-        HttpResponse<TestResponse> response = client.get()
+        ResponseEntity<TestResponse> response = client.get()
                 .uri("/api/test")
                 .retrieve()
                 .toEntity(TestResponse.class);
@@ -1128,7 +1128,7 @@ class OkHttpRequestBuilderResponseSpecTest {
         mockServer.enqueue(new MockResponse()
                 .setResponseCode(204));
 
-        HttpResponse<List<TestResponse>> response = client.get()
+        ResponseEntity<List<TestResponse>> response = client.get()
                 .uri("/api/nocontent")
                 .retrieve()
                 .toEntity(new TypeReference<List<TestResponse>>() {});
@@ -1146,7 +1146,7 @@ class OkHttpRequestBuilderResponseSpecTest {
                 .setBody("")
                 .setHeader("Content-Type", "application/json"));
 
-        HttpResponse<List<TestResponse>> response = client.get()
+        ResponseEntity<List<TestResponse>> response = client.get()
                 .uri("/api/empty")
                 .retrieve()
                 .toEntity(new TypeReference<List<TestResponse>>() {});

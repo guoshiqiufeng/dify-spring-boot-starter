@@ -18,7 +18,7 @@ package io.github.guoshiqiufeng.dify.client.integration.spring.http;
 import io.github.guoshiqiufeng.dify.client.codec.jackson.JacksonJsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
-import io.github.guoshiqiufeng.dify.client.core.response.HttpResponse;
+import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import lombok.Getter;
 import lombok.Setter;
 import okhttp3.mockwebserver.MockResponse;
@@ -340,7 +340,7 @@ class RestClientExecutorIntegrationTest {
         Map<String, String> cookies = new HashMap<>();
 
         // Act
-        HttpResponse<TestResponse> response = executor.executeForEntity(
+        ResponseEntity<TestResponse> response = executor.executeForEntity(
                 "GET",
                 URI.create(mockServer.url("/api/test").toString()),
                 headers,
@@ -371,7 +371,7 @@ class RestClientExecutorIntegrationTest {
         Map<String, String> cookies = new HashMap<>();
 
         // Act
-        HttpResponse<TestResponse> response = executor.executeForEntity(
+        ResponseEntity<TestResponse> response = executor.executeForEntity(
                 "GET",
                 URI.create(mockServer.url("/api/test").toString()),
                 headers,
@@ -398,7 +398,7 @@ class RestClientExecutorIntegrationTest {
         Map<String, String> cookies = new HashMap<>();
 
         // Act
-        HttpResponse<TestResponse> response = executor.executeForEntity(
+        ResponseEntity<TestResponse> response = executor.executeForEntity(
                 "POST",
                 URI.create(mockServer.url("/api/create").toString()),
                 headers,
@@ -423,7 +423,7 @@ class RestClientExecutorIntegrationTest {
         Map<String, String> cookies = new HashMap<>();
 
         // Act
-        HttpResponse<TestResponse> response = executor.executeForEntity(
+        ResponseEntity<TestResponse> response = executor.executeForEntity(
                 "GET",
                 URI.create(mockServer.url("/api/empty").toString()),
                 headers,
@@ -448,7 +448,7 @@ class RestClientExecutorIntegrationTest {
         Map<String, String> cookies = new HashMap<>();
 
         // Act
-        HttpResponse<TestResponse> response = executor.executeForEntity(
+        ResponseEntity<TestResponse> response = executor.executeForEntity(
                 "GET",
                 URI.create(mockServer.url("/api/bad").toString()),
                 headers,
@@ -476,7 +476,7 @@ class RestClientExecutorIntegrationTest {
         Map<String, String> cookies = new HashMap<>();
 
         // Act
-        HttpResponse<TestResponse> response = executor.executeForEntity(
+        ResponseEntity<TestResponse> response = executor.executeForEntity(
                 "GET",
                 URI.create(mockServer.url("/api/test").toString()),
                 headers,
@@ -505,7 +505,7 @@ class RestClientExecutorIntegrationTest {
         Map<String, String> cookies = new HashMap<>();
 
         // Act
-        HttpResponse<List<TestResponse>> response = executor.executeForEntity(
+        ResponseEntity<List<TestResponse>> response = executor.executeForEntity(
                 "GET",
                 URI.create(mockServer.url("/api/list").toString()),
                 headers,
@@ -533,7 +533,7 @@ class RestClientExecutorIntegrationTest {
         Map<String, String> cookies = new HashMap<>();
 
         // Act
-        HttpResponse<Map<String, String>> response = executor.executeForEntity(
+        ResponseEntity<Map<String, String>> response = executor.executeForEntity(
                 "GET",
                 URI.create(mockServer.url("/api/map").toString()),
                 headers,
@@ -557,7 +557,7 @@ class RestClientExecutorIntegrationTest {
         Map<String, String> cookies = new HashMap<>();
 
         // Act
-        HttpResponse<List<TestResponse>> response = executor.executeForEntity(
+        ResponseEntity<List<TestResponse>> response = executor.executeForEntity(
                 "GET",
                 URI.create(mockServer.url("/api/forbidden").toString()),
                 headers,
@@ -1055,7 +1055,7 @@ class RestClientExecutorIntegrationTest {
         Map<String, String> cookies = new HashMap<>();
 
         // Act
-        HttpResponse<TestResponse> response = executor.executeForEntity(
+        ResponseEntity<TestResponse> response = executor.executeForEntity(
                 "GET",
                 URI.create(mockServer.url("/api/redirect").toString()),
                 headers,
@@ -1082,7 +1082,7 @@ class RestClientExecutorIntegrationTest {
         Map<String, String> cookies = new HashMap<>();
 
         // Act
-        HttpResponse<TestResponse> response = executor.executeForEntity(
+        ResponseEntity<TestResponse> response = executor.executeForEntity(
                 "GET",
                 URI.create(mockServer.url("/api/unavailable").toString()),
                 headers,
