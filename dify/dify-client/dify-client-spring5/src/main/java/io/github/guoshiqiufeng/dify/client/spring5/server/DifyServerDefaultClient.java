@@ -259,6 +259,26 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
     }
 
     @Override
+    public List<DailyWorkflowConversationsResponse> dailyWorkflowConversations(String appId, java.time.LocalDateTime start, java.time.LocalDateTime end) {
+        return executeWithRetry(
+                () -> webClient.get()
+                        .uri(uriBuilder -> uriBuilder
+                                .path(ServerUriConstant.WORKFLOW_DAILY_CONVERSATIONS)
+                                .queryParam("start", start.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
+                                .queryParam("end", end.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
+                                .build(appId))
+                        .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
+                        .retrieve()
+                        .onStatus(HttpStatus::isError, WebClientUtil::exceptionFunction)
+                        .bodyToMono(new org.springframework.core.ParameterizedTypeReference<DailyWorkflowConversationsResultResponse>() {
+                        })
+                        .map(DailyWorkflowConversationsResultResponse::getData)
+                        .block()
+        );
+    }
+
+    @Override
     public List<DailyEndUsersResponse> dailyEndUsers(String appId, java.time.LocalDateTime start, java.time.LocalDateTime end) {
         return executeWithRetry(
                 () -> webClient.get()

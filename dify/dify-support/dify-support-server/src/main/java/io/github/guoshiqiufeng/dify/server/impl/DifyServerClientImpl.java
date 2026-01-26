@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,6 +98,11 @@ public class DifyServerClientImpl implements DifyServer {
     }
 
     @Override
+    public List<DailyWorkflowConversationsResponse> dailyWorkflowConversations(String appId, LocalDateTime start, LocalDateTime end) {
+        return difyServerClient.dailyWorkflowConversations(appId, start, end);
+    }
+
+    @Override
     public List<DailyEndUsersResponse> dailyEndUsers(String appId, LocalDateTime start, LocalDateTime end) {
         return difyServerClient.dailyEndUsers(appId, start, end);
     }
@@ -134,7 +139,7 @@ public class DifyServerClientImpl implements DifyServer {
 
     @Override
     public DocumentIndexingStatusResponse.ProcessingStatus getDocumentIndexingStatus(String datasetId, String documentId) {
-        return difyServerClient.getDocumentIndexingStatus(datasetId,documentId);
+        return difyServerClient.getDocumentIndexingStatus(datasetId, documentId);
     }
 
     @Override

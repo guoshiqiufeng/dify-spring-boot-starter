@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ public interface DifyServerClient {
     /**
      * Deletes an API key for a specific application
      *
-     * @param appId The ID of the application to delete API key for
+     * @param appId    The ID of the application to delete API key for
      * @param apiKeyId The ID of the API key to delete
      */
     void deleteAppApiKey(String appId, String apiKeyId);
@@ -143,6 +143,16 @@ public interface DifyServerClient {
      * @return List of daily conversation statistics, each encapsulated in {@link DailyConversationsResponse} object
      */
     List<DailyConversationsResponse> dailyConversations(String appId, LocalDateTime start, LocalDateTime end);
+
+    /**
+     * Retrieves daily workflow conversation statistics for a specific application
+     *
+     * @param appId The ID of the application to get statistics for
+     * @param start Start time in format "yyyy-MM-dd HH:mm"
+     * @param end   End time in format "yyyy-MM-dd HH:mm"
+     * @return List of daily workflow conversation statistics, each encapsulated in {@link DailyWorkflowConversationsResponse} object
+     */
+    List<DailyWorkflowConversationsResponse> dailyWorkflowConversations(String appId, LocalDateTime start, LocalDateTime end);
 
     /**
      * Retrieves daily end users statistics for a specific application
@@ -210,7 +220,7 @@ public interface DifyServerClient {
      *
      * @param datasetId The unique identifier of the dataset, must not be null
      * @return {@link DocumentIndexingStatusResponse} object containing indexing status of all documents,
-     *         including lists of documents that are indexing, completed, or failed, along with detailed information
+     * including lists of documents that are indexing, completed, or failed, along with detailed information
      * @throws NullPointerException if datasetId is null
      */
     DocumentIndexingStatusResponse getDatasetIndexingStatus(String datasetId);
@@ -222,7 +232,7 @@ public interface DifyServerClient {
      * @param datasetId  The unique identifier of the dataset, must not be null
      * @param documentId The unique identifier of the document, must not be null
      * @return {@link DocumentIndexingStatusResponse.ProcessingStatus} object containing document indexing status,
-     *         including indexing progress, status, error information (if any), and other detailed information
+     * including indexing progress, status, error information (if any), and other detailed information
      * @throws NullPointerException if datasetId or documentId is null
      */
     DocumentIndexingStatusResponse.ProcessingStatus getDocumentIndexingStatus(String datasetId, String documentId);
@@ -234,7 +244,7 @@ public interface DifyServerClient {
      *
      * @param datasetId The unique identifier of the dataset, must not be null
      * @return {@link DatasetErrorDocumentsResponse} object containing list of error documents,
-     *         including details of failed documents, error reasons, total count, etc.
+     * including details of failed documents, error reasons, total count, etc.
      * @throws NullPointerException if datasetId is null
      */
     DatasetErrorDocumentsResponse getDatasetErrorDocuments(String datasetId);
@@ -244,7 +254,7 @@ public interface DifyServerClient {
      * For documents that failed indexing, this method can re-trigger the indexing processing workflow
      *
      * @param request Document retry request encapsulating dataset ID and list of document IDs to retry, must not be null
-     * @throws NullPointerException if request is null
+     * @throws NullPointerException     if request is null
      * @throws IllegalArgumentException if datasetId or documentIds in the request is empty
      */
     void retryDocumentIndexing(DocumentRetryRequest request);

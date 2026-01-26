@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,11 @@
 package io.github.guoshiqiufeng.dify.server.impl;
 
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
+import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -249,23 +252,23 @@ class DifyServerClientImplTest {
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
 
         DailyConversationsResponse dailyStat1 =
-            new DailyConversationsResponse();
+                new DailyConversationsResponse();
         dailyStat1.setDate("2025-10-23");
         dailyStat1.setConversationCount(10);
 
         DailyConversationsResponse dailyStat2 =
-            new DailyConversationsResponse();
+                new DailyConversationsResponse();
         dailyStat2.setDate("2025-10-24");
         dailyStat2.setConversationCount(15);
 
         List<DailyConversationsResponse> expectedStats =
-            Arrays.asList(dailyStat1, dailyStat2);
+                Arrays.asList(dailyStat1, dailyStat2);
 
         when(difyServerClient.dailyConversations(appId, start, end)).thenReturn(expectedStats);
 
         // Act
         List<DailyConversationsResponse> actualStats =
-            difyServerClientImpl.dailyConversations(appId, start, end);
+                difyServerClientImpl.dailyConversations(appId, start, end);
 
         // Assert
         assertNotNull(actualStats);
@@ -276,6 +279,40 @@ class DifyServerClientImplTest {
     }
 
     @Test
+    void testDailyWorkflowConversations() {
+        // Arrange
+        String appId = "app-123";
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
+        java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        DailyWorkflowConversationsResponse dailyStat1 =
+                new DailyWorkflowConversationsResponse();
+        dailyStat1.setDate("2025-10-23");
+        dailyStat1.setRuns(10);
+
+        DailyWorkflowConversationsResponse dailyStat2 =
+                new DailyWorkflowConversationsResponse();
+        dailyStat2.setDate("2025-10-24");
+        dailyStat2.setRuns(15);
+
+        List<DailyWorkflowConversationsResponse> expectedStats =
+                Arrays.asList(dailyStat1, dailyStat2);
+
+        when(difyServerClient.dailyWorkflowConversations(appId, start, end)).thenReturn(expectedStats);
+
+        // Act
+        List<DailyWorkflowConversationsResponse> actualStats =
+                difyServerClientImpl.dailyWorkflowConversations(appId, start, end);
+
+        // Assert
+        assertNotNull(actualStats);
+        assertEquals(expectedStats.size(), actualStats.size());
+        assertEquals(expectedStats.get(0).getDate(), actualStats.get(0).getDate());
+        assertEquals(expectedStats.get(0).getRuns(), actualStats.get(0).getRuns());
+        verify(difyServerClient, times(1)).dailyWorkflowConversations(appId, start, end);
+    }
+
+    @Test
     void testDailyEndUsers() {
         // Arrange
         String appId = "app-123";
@@ -283,23 +320,23 @@ class DifyServerClientImplTest {
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
 
         DailyEndUsersResponse dailyStat1 =
-            new DailyEndUsersResponse();
+                new DailyEndUsersResponse();
         dailyStat1.setDate("2025-10-23");
         dailyStat1.setTerminalCount(5);
 
         DailyEndUsersResponse dailyStat2 =
-            new DailyEndUsersResponse();
+                new DailyEndUsersResponse();
         dailyStat2.setDate("2025-10-24");
         dailyStat2.setTerminalCount(8);
 
         List<DailyEndUsersResponse> expectedStats =
-            Arrays.asList(dailyStat1, dailyStat2);
+                Arrays.asList(dailyStat1, dailyStat2);
 
         when(difyServerClient.dailyEndUsers(appId, start, end)).thenReturn(expectedStats);
 
         // Act
         List<DailyEndUsersResponse> actualStats =
-            difyServerClientImpl.dailyEndUsers(appId, start, end);
+                difyServerClientImpl.dailyEndUsers(appId, start, end);
 
         // Assert
         assertNotNull(actualStats);
@@ -317,23 +354,23 @@ class DifyServerClientImplTest {
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
 
         AverageSessionInteractionsResponse dailyStat1 =
-            new AverageSessionInteractionsResponse();
+                new AverageSessionInteractionsResponse();
         dailyStat1.setDate("2025-10-23");
         dailyStat1.setInteractions(2.5);
 
         AverageSessionInteractionsResponse dailyStat2 =
-            new AverageSessionInteractionsResponse();
+                new AverageSessionInteractionsResponse();
         dailyStat2.setDate("2025-10-24");
         dailyStat2.setInteractions(3.0);
 
         List<AverageSessionInteractionsResponse> expectedStats =
-            Arrays.asList(dailyStat1, dailyStat2);
+                Arrays.asList(dailyStat1, dailyStat2);
 
         when(difyServerClient.averageSessionInteractions(appId, start, end)).thenReturn(expectedStats);
 
         // Act
         List<AverageSessionInteractionsResponse> actualStats =
-            difyServerClientImpl.averageSessionInteractions(appId, start, end);
+                difyServerClientImpl.averageSessionInteractions(appId, start, end);
 
         // Assert
         assertNotNull(actualStats);
@@ -351,23 +388,23 @@ class DifyServerClientImplTest {
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
 
         TokensPerSecondResponse dailyStat1 =
-            new TokensPerSecondResponse();
+                new TokensPerSecondResponse();
         dailyStat1.setDate("2025-10-23");
         dailyStat1.setTps(30.8603);
 
         TokensPerSecondResponse dailyStat2 =
-            new TokensPerSecondResponse();
+                new TokensPerSecondResponse();
         dailyStat2.setDate("2025-10-24");
         dailyStat2.setTps(45.12);
 
         List<TokensPerSecondResponse> expectedStats =
-            Arrays.asList(dailyStat1, dailyStat2);
+                Arrays.asList(dailyStat1, dailyStat2);
 
         when(difyServerClient.tokensPerSecond(appId, start, end)).thenReturn(expectedStats);
 
         // Act
         List<TokensPerSecondResponse> actualStats =
-            difyServerClientImpl.tokensPerSecond(appId, start, end);
+                difyServerClientImpl.tokensPerSecond(appId, start, end);
 
         // Assert
         assertNotNull(actualStats);
@@ -385,23 +422,23 @@ class DifyServerClientImplTest {
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
 
         UserSatisfactionRateResponse dailyStat1 =
-            new UserSatisfactionRateResponse();
+                new UserSatisfactionRateResponse();
         dailyStat1.setDate("2025-10-23");
         dailyStat1.setRate(95.5);
 
         UserSatisfactionRateResponse dailyStat2 =
-            new UserSatisfactionRateResponse();
+                new UserSatisfactionRateResponse();
         dailyStat2.setDate("2025-10-24");
         dailyStat2.setRate(98.0);
 
         List<UserSatisfactionRateResponse> expectedStats =
-            Arrays.asList(dailyStat1, dailyStat2);
+                Arrays.asList(dailyStat1, dailyStat2);
 
         when(difyServerClient.userSatisfactionRate(appId, start, end)).thenReturn(expectedStats);
 
         // Act
         List<UserSatisfactionRateResponse> actualStats =
-            difyServerClientImpl.userSatisfactionRate(appId, start, end);
+                difyServerClientImpl.userSatisfactionRate(appId, start, end);
 
         // Assert
         assertNotNull(actualStats);
@@ -419,27 +456,27 @@ class DifyServerClientImplTest {
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
 
         TokenCostsResponse dailyStat1 =
-            new TokenCostsResponse();
+                new TokenCostsResponse();
         dailyStat1.setDate("2025-10-23");
         dailyStat1.setTokenCount(1000);
         dailyStat1.setTotalPrice("0.00123");
         dailyStat1.setCurrency("USD");
 
         TokenCostsResponse dailyStat2 =
-            new TokenCostsResponse();
+                new TokenCostsResponse();
         dailyStat2.setDate("2025-10-24");
         dailyStat2.setTokenCount(2500);
         dailyStat2.setTotalPrice("0.003075");
         dailyStat2.setCurrency("USD");
 
         List<TokenCostsResponse> expectedStats =
-            Arrays.asList(dailyStat1, dailyStat2);
+                Arrays.asList(dailyStat1, dailyStat2);
 
         when(difyServerClient.tokenCosts(appId, start, end)).thenReturn(expectedStats);
 
         // Act
         List<TokenCostsResponse> actualStats =
-            difyServerClientImpl.tokenCosts(appId, start, end);
+                difyServerClientImpl.tokenCosts(appId, start, end);
 
         // Assert
         assertNotNull(actualStats);
@@ -459,23 +496,23 @@ class DifyServerClientImplTest {
         java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
 
         DailyMessagesResponse dailyStat1 =
-            new DailyMessagesResponse();
+                new DailyMessagesResponse();
         dailyStat1.setDate("2025-10-23");
         dailyStat1.setMessageCount(15);
 
         DailyMessagesResponse dailyStat2 =
-            new DailyMessagesResponse();
+                new DailyMessagesResponse();
         dailyStat2.setDate("2025-10-24");
         dailyStat2.setMessageCount(22);
 
         List<DailyMessagesResponse> expectedStats =
-            Arrays.asList(dailyStat1, dailyStat2);
+                Arrays.asList(dailyStat1, dailyStat2);
 
         when(difyServerClient.dailyMessages(appId, start, end)).thenReturn(expectedStats);
 
         // Act
         List<DailyMessagesResponse> actualStats =
-            difyServerClientImpl.dailyMessages(appId, start, end);
+                difyServerClientImpl.dailyMessages(appId, start, end);
 
         // Assert
         assertNotNull(actualStats);
@@ -508,5 +545,151 @@ class DifyServerClientImplTest {
 
         // Assert
         verify(difyServerClient, times(1)).deleteDatasetApiKey(apiKeyId);
+    }
+
+    @Test
+    void testAppsWithRequest() {
+        // Arrange
+        AppsRequest request = new AppsRequest();
+        request.setPage(1);
+        request.setLimit(20);
+
+        AppsResponse app1 = new AppsResponse();
+        app1.setId("app-123");
+        app1.setName("Test App 1");
+
+        AppsResponse app2 = new AppsResponse();
+        app2.setId("app-456");
+        app2.setName("Test App 2");
+
+        AppsResponseResult expectedResult = new AppsResponseResult();
+        expectedResult.setData(Arrays.asList(app1, app2));
+        expectedResult.setPage(1);
+        expectedResult.setLimit(20);
+        expectedResult.setTotal(2);
+        expectedResult.setHasMore(false);
+
+        when(difyServerClient.apps(request)).thenReturn(expectedResult);
+
+        // Act
+        AppsResponseResult actualResult = difyServerClientImpl.apps(request);
+
+        // Assert
+        assertNotNull(actualResult);
+        assertEquals(expectedResult.getTotal(), actualResult.getTotal());
+        assertEquals(expectedResult.getPage(), actualResult.getPage());
+        assertEquals(expectedResult.getLimit(), actualResult.getLimit());
+        assertEquals(expectedResult.getData().size(), actualResult.getData().size());
+        assertEquals(expectedResult.getData().get(0).getId(), actualResult.getData().get(0).getId());
+        verify(difyServerClient, times(1)).apps(request);
+    }
+
+    @Test
+    void testGetDatasetIndexingStatus() {
+        // Arrange
+        String datasetId = "dataset-123";
+
+        DocumentIndexingStatusResponse expectedResponse = new DocumentIndexingStatusResponse();
+
+        DocumentIndexingStatusResponse.ProcessingStatus status1 = new DocumentIndexingStatusResponse.ProcessingStatus();
+        status1.setId("doc-1");
+        status1.setIndexingStatus("completed");
+        status1.setProcessingStartedAt(1234567890L);
+        status1.setCompletedAt(1234567900L);
+
+        DocumentIndexingStatusResponse.ProcessingStatus status2 = new DocumentIndexingStatusResponse.ProcessingStatus();
+        status2.setId("doc-2");
+        status2.setIndexingStatus("indexing");
+        status2.setProcessingStartedAt(1234567895L);
+
+        expectedResponse.setData(Arrays.asList(status1, status2));
+
+        when(difyServerClient.getDatasetIndexingStatus(datasetId)).thenReturn(expectedResponse);
+
+        // Act
+        DocumentIndexingStatusResponse actualResponse = difyServerClientImpl.getDatasetIndexingStatus(datasetId);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getData().size(), actualResponse.getData().size());
+        assertEquals(expectedResponse.getData().get(0).getId(), actualResponse.getData().get(0).getId());
+        assertEquals(expectedResponse.getData().get(0).getIndexingStatus(), actualResponse.getData().get(0).getIndexingStatus());
+        verify(difyServerClient, times(1)).getDatasetIndexingStatus(datasetId);
+    }
+
+    @Test
+    void testGetDocumentIndexingStatus() {
+        // Arrange
+        String datasetId = "dataset-123";
+        String documentId = "doc-456";
+
+        DocumentIndexingStatusResponse.ProcessingStatus expectedStatus = new DocumentIndexingStatusResponse.ProcessingStatus();
+        expectedStatus.setId(documentId);
+        expectedStatus.setIndexingStatus("completed");
+        expectedStatus.setProcessingStartedAt(1234567890L);
+        expectedStatus.setCompletedAt(1234567900L);
+        expectedStatus.setError(null);
+
+        when(difyServerClient.getDocumentIndexingStatus(datasetId, documentId)).thenReturn(expectedStatus);
+
+        // Act
+        DocumentIndexingStatusResponse.ProcessingStatus actualStatus =
+                difyServerClientImpl.getDocumentIndexingStatus(datasetId, documentId);
+
+        // Assert
+        assertNotNull(actualStatus);
+        assertEquals(expectedStatus.getId(), actualStatus.getId());
+        assertEquals(expectedStatus.getIndexingStatus(), actualStatus.getIndexingStatus());
+        assertEquals(expectedStatus.getProcessingStartedAt(), actualStatus.getProcessingStartedAt());
+        assertEquals(expectedStatus.getCompletedAt(), actualStatus.getCompletedAt());
+        verify(difyServerClient, times(1)).getDocumentIndexingStatus(datasetId, documentId);
+    }
+
+    @Test
+    void testGetDatasetErrorDocuments() {
+        // Arrange
+        String datasetId = "dataset-123";
+
+        DatasetErrorDocumentsResponse expectedResponse = new DatasetErrorDocumentsResponse();
+
+        DocumentIndexingStatusResponse.ProcessingStatus errorDoc1 = new DocumentIndexingStatusResponse.ProcessingStatus();
+        errorDoc1.setId("doc-error-1");
+        errorDoc1.setError("Parsing failed");
+        errorDoc1.setIndexingStatus("error");
+
+        DocumentIndexingStatusResponse.ProcessingStatus errorDoc2 = new DocumentIndexingStatusResponse.ProcessingStatus();
+        errorDoc2.setId("doc-error-2");
+        errorDoc2.setError("Timeout");
+        errorDoc2.setIndexingStatus("error");
+
+        expectedResponse.setData(Arrays.asList(errorDoc1, errorDoc2));
+        expectedResponse.setTotal(2);
+
+        when(difyServerClient.getDatasetErrorDocuments(datasetId)).thenReturn(expectedResponse);
+
+        // Act
+        DatasetErrorDocumentsResponse actualResponse = difyServerClientImpl.getDatasetErrorDocuments(datasetId);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getTotal(), actualResponse.getTotal());
+        assertEquals(expectedResponse.getData().size(), actualResponse.getData().size());
+        assertEquals(expectedResponse.getData().get(0).getId(), actualResponse.getData().get(0).getId());
+        assertEquals(expectedResponse.getData().get(0).getError(), actualResponse.getData().get(0).getError());
+        verify(difyServerClient, times(1)).getDatasetErrorDocuments(datasetId);
+    }
+
+    @Test
+    void testRetryDocumentIndexing() {
+        // Arrange
+        DocumentRetryRequest request = new DocumentRetryRequest();
+        request.setDatasetId("dataset-123");
+        request.setDocumentIds(Arrays.asList("doc-456", "doc-789"));
+
+        // Act
+        difyServerClientImpl.retryDocumentIndexing(request);
+
+        // Assert
+        verify(difyServerClient, times(1)).retryDocumentIndexing(request);
     }
 }
