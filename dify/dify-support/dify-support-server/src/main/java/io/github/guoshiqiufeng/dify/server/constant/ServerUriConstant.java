@@ -46,6 +46,8 @@ public interface ServerUriConstant {
 
     String DAILY_CONVERSATIONS = APPS + "/{appId}/statistics/daily-conversations";
 
+    String WORKFLOW_DAILY_CONVERSATIONS = APPS + "/{appId}/workflow/statistics/daily-conversations";
+
     String DAILY_END_USERS = APPS + "/{appId}/statistics/daily-end-users";
 
     String AVERAGE_SESSION_INTERACTIONS = APPS + "/{appId}/statistics/average-session-interactions";

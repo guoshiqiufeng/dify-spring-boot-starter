@@ -279,6 +279,40 @@ class DifyServerClientImplTest {
     }
 
     @Test
+    void testDailyWorkflowConversations() {
+        // Arrange
+        String appId = "app-123";
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
+        java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        DailyWorkflowConversationsResponse dailyStat1 =
+                new DailyWorkflowConversationsResponse();
+        dailyStat1.setDate("2025-10-23");
+        dailyStat1.setRuns(10);
+
+        DailyWorkflowConversationsResponse dailyStat2 =
+                new DailyWorkflowConversationsResponse();
+        dailyStat2.setDate("2025-10-24");
+        dailyStat2.setRuns(15);
+
+        List<DailyWorkflowConversationsResponse> expectedStats =
+                Arrays.asList(dailyStat1, dailyStat2);
+
+        when(difyServerClient.dailyWorkflowConversations(appId, start, end)).thenReturn(expectedStats);
+
+        // Act
+        List<DailyWorkflowConversationsResponse> actualStats =
+                difyServerClientImpl.dailyWorkflowConversations(appId, start, end);
+
+        // Assert
+        assertNotNull(actualStats);
+        assertEquals(expectedStats.size(), actualStats.size());
+        assertEquals(expectedStats.get(0).getDate(), actualStats.get(0).getDate());
+        assertEquals(expectedStats.get(0).getRuns(), actualStats.get(0).getRuns());
+        verify(difyServerClient, times(1)).dailyWorkflowConversations(appId, start, end);
+    }
+
+    @Test
     void testDailyEndUsers() {
         // Arrange
         String appId = "app-123";

@@ -800,6 +800,61 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
     }
 
     @Test
+    @DisplayName("Test dailyWorkflowConversations method")
+    public void testDailyWorkflowConversations() {
+        // Prepare test data
+        String appId = "08534c1a-4316-4cd3-806d-bbbca03f58aa";
+        java.time.LocalDateTime start = java.time.LocalDateTime.of(2025, 10, 23, 0, 0);
+        java.time.LocalDateTime end = java.time.LocalDateTime.of(2025, 10, 30, 23, 59);
+
+        // Mock the UriBuilder for queryParam functionality
+        UriBuilder uriBuilderMock = mock(UriBuilder.class);
+        URI uriMock = mock(URI.class);
+
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+
+            when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("start"), eq("2025-10-23 00:00"))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.queryParam(eq("end"), eq("2025-10-30 23:59"))).thenReturn(uriBuilderMock);
+            when(uriBuilderMock.build(eq(appId))).thenReturn(uriMock);
+
+            uriFunction.apply(uriBuilderMock);
+            return requestHeadersSpecMock;
+        });
+
+        // Create mock daily conversation data
+        DailyWorkflowConversationsResponse dailyStat = new DailyWorkflowConversationsResponse();
+        dailyStat.setDate("2025-09-02");
+        dailyStat.setRuns(1);
+
+        // Create mock response
+        List<DailyWorkflowConversationsResponse> mockResponse = List.of(dailyStat);
+        DailyWorkflowConversationsResultResponse response = new DailyWorkflowConversationsResultResponse();
+        response.setData(mockResponse);
+        // Set up the response mock to return our expected response
+        when(responseSpecMock.body(any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class))).thenReturn(response);
+
+        // Execute the method
+        List<DailyWorkflowConversationsResponse> actualResponse = client.dailyWorkflowConversations(appId, start, end);
+
+        // Verify the result
+        assertNotNull(actualResponse);
+        assertEquals(1, actualResponse.size());
+        assertEquals("2025-09-02", actualResponse.get(0).getDate());
+        assertEquals(1, actualResponse.get(0).getRuns());
+
+        // Verify WebClient interactions
+        verify(httpClientMock).get();
+        verify(requestHeadersUriSpecMock).uri(any(Function.class));
+        verify(responseSpecMock).body(any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class));
+
+        when(responseSpecMock.body(any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class))).thenReturn(null);
+        client.dailyWorkflowConversations(appId, start, end);
+
+    }
+
+    @Test
     @DisplayName("Test dailyEndUsers method")
     public void testDailyEndUsers() {
         // Prepare test data

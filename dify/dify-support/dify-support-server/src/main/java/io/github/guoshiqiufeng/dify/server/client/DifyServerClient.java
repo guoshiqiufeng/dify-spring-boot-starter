@@ -145,6 +145,16 @@ public interface DifyServerClient {
     List<DailyConversationsResponse> dailyConversations(String appId, LocalDateTime start, LocalDateTime end);
 
     /**
+     * Retrieves daily workflow conversation statistics for a specific application
+     *
+     * @param appId The ID of the application to get statistics for
+     * @param start Start time in format "yyyy-MM-dd HH:mm"
+     * @param end   End time in format "yyyy-MM-dd HH:mm"
+     * @return List of daily workflow conversation statistics, each encapsulated in {@link DailyWorkflowConversationsResponse} object
+     */
+    List<DailyWorkflowConversationsResponse> dailyWorkflowConversations(String appId, LocalDateTime start, LocalDateTime end);
+
+    /**
      * Retrieves daily end users statistics for a specific application
      *
      * @param appId The ID of the application to get statistics for
