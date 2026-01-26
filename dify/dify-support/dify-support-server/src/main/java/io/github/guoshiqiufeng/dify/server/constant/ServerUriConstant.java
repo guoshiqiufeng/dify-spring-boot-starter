@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,8 @@ public interface ServerUriConstant {
     String DATASET_API_KEYS = DATASETS + "/api-keys/{apiKeyId}";
 
     String DAILY_CONVERSATIONS = APPS + "/{appId}/statistics/daily-conversations";
+
+    String WORKFLOW_DAILY_CONVERSATIONS = APPS + "/{appId}/workflow/statistics/daily-conversations";
 
     String DAILY_END_USERS = APPS + "/{appId}/statistics/daily-end-users";
 

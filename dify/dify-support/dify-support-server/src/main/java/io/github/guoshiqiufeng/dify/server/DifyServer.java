@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025, fubluesky (fubluesky@foxmail.com)
+ * Copyright (c) 2025-2026, fubluesky (fubluesky@foxmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ public interface DifyServer {
     /**
      * 删除指定应用的API Key
      *
-     * @param appId 应用的唯一标识符，不能为空
+     * @param appId    应用的唯一标识符，不能为空
      * @param apiKeyId API Key的唯一标识符，不能为空
      * @throws NullPointerException 如果 appId 或 apiKeyId 为 null
      */
@@ -127,7 +127,7 @@ public interface DifyServer {
     DifyPageResult<ChatConversationResponse> chatConversations(ChatConversationsRequest request);
 
     /**
-     * 获取应用的每日对话统计
+     * 获取应用的每日对话统计(工作流除外)
      *
      * @param appId 应用的唯一标识符，不能为空
      * @param start 开始时间，格式为 "yyyy-MM-dd HH:mm"
@@ -136,6 +136,17 @@ public interface DifyServer {
      * @throws IllegalArgumentException 如果传入的参数不符合预期格式或范围
      */
     List<DailyConversationsResponse> dailyConversations(String appId, LocalDateTime start, LocalDateTime end);
+
+    /**
+     * 获取应用的每日工作流对话统计
+     *
+     * @param appId 应用的唯一标识符，不能为空
+     * @param start 开始时间，格式为 "yyyy-MM-dd HH:mm"
+     * @param end   结束时间，格式为 "yyyy-MM-dd HH:mm"
+     * @return 返回每日工作流对话统计列表，每个统计封装为 {@link DailyWorkflowConversationsResponse} 对象
+     * @throws IllegalArgumentException 如果传入的参数不符合预期格式或范围
+     */
+    List<DailyWorkflowConversationsResponse> dailyWorkflowConversations(String appId, LocalDateTime start, LocalDateTime end);
 
     /**
      * 获取应用的每日终端用户统计
@@ -209,7 +220,7 @@ public interface DifyServer {
      *
      * @param datasetId 知识库的唯一标识符，不能为空
      * @return 返回封装了所有文档索引状态的 {@link DocumentIndexingStatusResponse} 对象，
-     *         包含正在索引、已完成、失败等状态的文档列表及其详细信息
+     * 包含正在索引、已完成、失败等状态的文档列表及其详细信息
      * @throws NullPointerException 如果 datasetId 为 null
      */
     DocumentIndexingStatusResponse getDatasetIndexingStatus(String datasetId);
@@ -221,7 +232,7 @@ public interface DifyServer {
      * @param datasetId  知识库的唯一标识符，不能为空
      * @param documentId 文档的唯一标识符，不能为空
      * @return 返回封装了文档索引处理状态的 {@link DocumentIndexingStatusResponse.ProcessingStatus} 对象，
-     *         包含索引进度、状态、错误信息（如果有）等详细信息
+     * 包含索引进度、状态、错误信息（如果有）等详细信息
      * @throws NullPointerException 如果 datasetId 或 documentId 为 null
      */
     DocumentIndexingStatusResponse.ProcessingStatus getDocumentIndexingStatus(String datasetId, String documentId);
@@ -232,7 +243,7 @@ public interface DifyServer {
      *
      * @param datasetId 知识库的唯一标识符，不能为空
      * @return 返回封装了错误文档列表的 {@link DatasetErrorDocumentsResponse} 对象，
-     *         包含失败文档的详细信息、错误原因、总数等
+     * 包含失败文档的详细信息、错误原因、总数等
      * @throws NullPointerException 如果 datasetId 为 null
      */
     DatasetErrorDocumentsResponse getDatasetErrorDocuments(String datasetId);
@@ -242,7 +253,7 @@ public interface DifyServer {
      * 对于索引失败的文档，通过调用此方法可以重新触发索引处理流程
      *
      * @param request 文档重试请求，封装了知识库ID和需要重试的文档ID列表，不能为null
-     * @throws NullPointerException 如果 request 为 null
+     * @throws NullPointerException     如果 request 为 null
      * @throws IllegalArgumentException 如果 request 中的 datasetId 或 documentIds 为空
      */
     void retryDocumentIndexing(DocumentRetryRequest request);
