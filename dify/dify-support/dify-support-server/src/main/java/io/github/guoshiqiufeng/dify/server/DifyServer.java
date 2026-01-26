@@ -127,7 +127,7 @@ public interface DifyServer {
     DifyPageResult<ChatConversationResponse> chatConversations(ChatConversationsRequest request);
 
     /**
-     * 获取应用的每日对话统计
+     * 获取应用的每日对话统计(工作流除外)
      *
      * @param appId 应用的唯一标识符，不能为空
      * @param start 开始时间，格式为 "yyyy-MM-dd HH:mm"
@@ -136,6 +136,17 @@ public interface DifyServer {
      * @throws IllegalArgumentException 如果传入的参数不符合预期格式或范围
      */
     List<DailyConversationsResponse> dailyConversations(String appId, LocalDateTime start, LocalDateTime end);
+
+    /**
+     * 获取应用的每日工作流对话统计
+     *
+     * @param appId 应用的唯一标识符，不能为空
+     * @param start 开始时间，格式为 "yyyy-MM-dd HH:mm"
+     * @param end   结束时间，格式为 "yyyy-MM-dd HH:mm"
+     * @return 返回每日工作流对话统计列表，每个统计封装为 {@link DailyWorkflowConversationsResponse} 对象
+     * @throws IllegalArgumentException 如果传入的参数不符合预期格式或范围
+     */
+    List<DailyWorkflowConversationsResponse> dailyWorkflowConversations(String appId, LocalDateTime start, LocalDateTime end);
 
     /**
      * 获取应用的每日终端用户统计
