@@ -26,11 +26,11 @@ import io.github.guoshiqiufeng.dify.dataset.dto.response.*;
 import io.github.guoshiqiufeng.dify.dataset.enums.*;
 import io.github.guoshiqiufeng.dify.dataset.enums.document.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
-import org.testcontainers.shaded.org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
