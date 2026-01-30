@@ -393,8 +393,8 @@ class Spring6HttpClientIntegrationTest {
 
         // Assert
         RecordedRequest request = mockServer.takeRequest();
-        assertNotNull(request.getHeader("X-API-Key"));
-        assertNotNull(request.getHeader("X-Client-Version"));
+        assertNotNull(request.getHeaders().get("X-API-Key"));
+        assertNotNull(request.getHeaders().get("X-Client-Version"));
     }
 
     @Test
@@ -416,7 +416,7 @@ class Spring6HttpClientIntegrationTest {
 
         // Assert
         RecordedRequest request = mockServer.takeRequest();
-        assertEquals("application/json", request.getHeader("Accept"));
+        assertEquals("application/json", request.getHeaders().get("Accept"));
     }
 
     // ========== WebClient Tests ==========
@@ -660,8 +660,8 @@ class Spring6HttpClientIntegrationTest {
 
         // Assert
         RecordedRequest request = mockServer.takeRequest();
-        assertEquals("Bearer token123", request.getHeader("Authorization"));
-        assertEquals("req-456", request.getHeader("X-Request-ID"));
+        assertEquals("Bearer token123", request.getHeaders().get("Authorization"));
+        assertEquals("req-456", request.getHeaders().get("X-Request-ID"));
     }
 
     @Test
