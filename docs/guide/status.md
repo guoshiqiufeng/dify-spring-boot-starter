@@ -29,8 +29,8 @@ const version = inject('version');
 
 ```gradle:no-line-numbers:no-v-pre
 dependencies {
-    implementation 'io.github.guoshiqiufeng:dify-spring-boot-starter:{{version}}'
-    implementation 'io.github.guoshiqiufeng:dify-status:{{version}}'
+    implementation 'io.github.guoshiqiufeng.dify:dify-spring-boot-starter:{{version}}'
+    implementation 'io.github.guoshiqiufeng.dify:dify-status:{{version}}'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 ```
@@ -40,12 +40,12 @@ dependencies {
 ```xml:no-line-numbers:no-v-pre
 <dependencies>
     <dependency>
-        <groupId>io.github.guoshiqiufeng</groupId>
+        <groupId>io.github.guoshiqiufeng.dify</groupId>
         <artifactId>dify-spring-boot-starter</artifactId>
         <version>{{version}}</version>
     </dependency>
     <dependency>
-        <groupId>io.github.guoshiqiufeng</groupId>
+        <groupId>io.github.guoshiqiufeng.dify</groupId>
         <artifactId>dify-status</artifactId>
         <version>{{version}}</version>
     </dependency>
