@@ -35,6 +35,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -215,7 +216,8 @@ public class DifyStatusServiceImpl implements DifyStatusService {
         Map<String, ApiStatus> clientSummary = clientReports.stream()
                 .collect(Collectors.toMap(
                         ClientStatusReport::getClientName,
-                        ClientStatusReport::getOverallStatus
+                        ClientStatusReport::getOverallStatus,
+                        this::mergeClientStatus  // Handle duplicate keys by merging statuses
                 ));
 
         return AggregatedStatusReport.builder()
@@ -250,6 +252,44 @@ public class DifyStatusServiceImpl implements DifyStatusService {
             // Some clients are working, some are not
             return ApiStatus.CLIENT_ERROR;
         }
+    }
+
+    /**
+     * Merge two ApiStatus values when duplicate client names are encountered.
+     * Returns the more severe status based on predefined severity order.
+     *
+     * @param left  First status
+     * @param right Second status
+     * @return The more severe status
+     */
+    private ApiStatus mergeClientStatus(ApiStatus left, ApiStatus right) {
+        // Severity order (from most severe to least severe)
+        List<ApiStatus> severityOrder = Arrays.asList(
+                ApiStatus.SERVER_ERROR,
+                ApiStatus.CLIENT_ERROR,
+                ApiStatus.TIMEOUT,
+                ApiStatus.UNAUTHORIZED_401,
+                ApiStatus.NOT_FOUND_404,
+                ApiStatus.NETWORK_ERROR,
+                ApiStatus.UNKNOWN_ERROR,
+                ApiStatus.NOT_CONFIGURED,
+                ApiStatus.NORMAL
+        );
+
+        int leftIndex = severityOrder.indexOf(left);
+        int rightIndex = severityOrder.indexOf(right);
+
+        // Return the more severe status (lower index = more severe)
+        // If status not found in list, treat as UNKNOWN_ERROR
+        if (leftIndex == -1 && rightIndex == -1) {
+            return ApiStatus.UNKNOWN_ERROR;
+        } else if (leftIndex == -1) {
+            return right;
+        } else if (rightIndex == -1) {
+            return left;
+        }
+
+        return leftIndex <= rightIndex ? left : right;
     }
 
     /**

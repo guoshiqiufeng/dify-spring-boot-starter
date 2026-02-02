@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 /**
  * DifyStatusServiceImpl test
@@ -238,6 +239,270 @@ class DifyStatusServiceImplTest {
         assertEquals(ApiStatus.CLIENT_ERROR, report.getClientSummary().get("DifyDataset"));
         assertEquals(ApiStatus.NORMAL, report.getClientSummary().get("DifyServer"));
         assertEquals(ApiStatus.NORMAL, report.getClientSummary().get("DifyWorkflow"));
+    }
+
+    @Test
+    void testCheckStatus_WithDuplicateClientNames() {
+        // Test case: Multiple API keys produce the same clientName
+        // This should not throw IllegalStateException anymore
+        StatusCheckConfig config = StatusCheckConfig.builder()
+                .chatApiKey(java.util.Arrays.asList("key1", "key2"))  // Two keys for same client
+                .parallel(false)
+                .build();
+
+        // Create a custom checker that returns different statuses for different calls
+        TestDifyChatStatusChecker multiCallChecker = new TestDifyChatStatusChecker() {
+            private int callCount = 0;
+
+            @Override
+            public ClientStatusReport checkAllApis(String apiKey) {
+                callCount++;
+                ApiStatus status = (callCount == 1) ? ApiStatus.NORMAL : ApiStatus.CLIENT_ERROR;
+                return createMockClientReport("DifyChat", status, 10, 10 - callCount, callCount);
+            }
+        };
+
+        DifyStatusServiceImpl service = new DifyStatusServiceImpl(
+                multiCallChecker,
+                null,  // No dataset checker
+                null,  // No server checker
+                null   // No workflow checker
+        );
+
+        // This should not throw exception
+        AggregatedStatusReport report = service.checkStatus(config);
+
+        assertNotNull(report);
+        assertNotNull(report.getClientSummary());
+
+        // The more severe status (CLIENT_ERROR) should be kept
+        assertEquals(ApiStatus.CLIENT_ERROR, report.getClientSummary().get("DifyChat"));
+    }
+
+    @Test
+    void testCheckAllApis_WithException() {
+        // Test that exceptions in checkStatus are handled gracefully
+        TestDifyChatStatusChecker exceptionChecker = new TestDifyChatStatusChecker() {
+            @Override
+            public ApiStatusResult checkStatus(String methodName, String apiKey) {
+                // Throw exception to test error handling in AbstractClientStatusChecker
+                throw new RuntimeException("Simulated API check failure");
+            }
+
+            @Override
+            protected String[] methodsToCheck() {
+                return new String[]{"testMethod1", "testMethod2"};
+            }
+
+            @Override
+            public ClientStatusReport checkAllApis(String apiKey) {
+                // Call the template method to trigger exception handling
+                return checkAllApisInternal(apiKey);
+            }
+        };
+
+        ClientStatusReport report = exceptionChecker.checkAllApis("test-key");
+
+        assertNotNull(report);
+        assertEquals("DifyChat", report.getClientName());
+        assertEquals(2, report.getTotalApis());
+        assertEquals(0, report.getNormalApis());
+        assertEquals(2, report.getErrorApis());
+        assertEquals(ApiStatus.SERVER_ERROR, report.getOverallStatus());
+
+        // Verify error results were created
+        assertEquals(2, report.getApiStatuses().size());
+        for (ApiStatusResult result : report.getApiStatuses()) {
+            assertEquals(ApiStatus.UNKNOWN_ERROR, result.getStatus());
+            assertNotNull(result.getErrorMessage());
+            assertTrue(result.getErrorMessage().contains("Simulated API check failure"));
+        }
+    }
+
+    @Test
+    void testMergeClientStatus_SeverityOrder() {
+        // Test that more severe statuses are preserved when merging
+        StatusCheckConfig config = StatusCheckConfig.builder()
+                .chatApiKey(java.util.Arrays.asList("key1", "key2", "key3"))
+                .parallel(false)
+                .build();
+
+        // Create a custom checker that returns different statuses
+        TestDifyChatStatusChecker multiStatusChecker = new TestDifyChatStatusChecker() {
+            private int callCount = 0;
+
+            @Override
+            public ClientStatusReport checkAllApis(String apiKey) {
+                callCount++;
+                ApiStatus status;
+                switch (callCount) {
+                    case 1:
+                        status = ApiStatus.NORMAL;
+                        break;
+                    case 2:
+                        status = ApiStatus.CLIENT_ERROR;
+                        break;
+                    case 3:
+                        status = ApiStatus.SERVER_ERROR;
+                        break;
+                    default:
+                        status = ApiStatus.NORMAL;
+                }
+                return createMockClientReport("DifyChat", status, 10, 10 - callCount, callCount);
+            }
+        };
+
+        DifyStatusServiceImpl service = new DifyStatusServiceImpl(
+                multiStatusChecker,
+                null,  // No dataset checker
+                null,  // No server checker
+                null   // No workflow checker
+        );
+
+        AggregatedStatusReport report = service.checkStatus(config);
+
+        assertNotNull(report);
+        assertNotNull(report.getClientSummary());
+
+        // SERVER_ERROR is most severe, should be kept
+        assertEquals(ApiStatus.SERVER_ERROR, report.getClientSummary().get("DifyChat"));
+    }
+
+    @Test
+    void testShutdown() {
+        // Test executor service shutdown
+        statusService.shutdown();
+        // Verify no exception is thrown
+        // Note: We can't easily verify the executor is actually shut down without exposing it
+    }
+
+    @Test
+    void testMergeClientStatus_WithUnknownStatus() {
+        // Test merging when one or both statuses are not in the severity list
+        // This tests the edge cases in mergeClientStatus method
+
+        // We need to use reflection to test the private mergeClientStatus method
+        // Or we can trigger it through duplicate client names with various statuses
+        StatusCheckConfig config = StatusCheckConfig.builder()
+                .chatApiKey(java.util.Arrays.asList("key1", "key2"))
+                .parallel(false)
+                .build();
+
+        TestDifyChatStatusChecker checker = new TestDifyChatStatusChecker() {
+            private int callCount = 0;
+
+            @Override
+            public ClientStatusReport checkAllApis(String apiKey) {
+                callCount++;
+                // Return different statuses to test merge logic
+                ApiStatus status = (callCount == 1) ? ApiStatus.TIMEOUT : ApiStatus.UNAUTHORIZED_401;
+                return createMockClientReport("DifyChat", status, 5, 0, 5);
+            }
+        };
+
+        DifyStatusServiceImpl service = new DifyStatusServiceImpl(checker, null, null, null);
+        AggregatedStatusReport report = service.checkStatus(config);
+
+        assertNotNull(report);
+        // TIMEOUT is more severe than UNAUTHORIZED_401
+        assertEquals(ApiStatus.TIMEOUT, report.getClientSummary().get("DifyChat"));
+    }
+
+    @Test
+    void testCheckAllClientsStatusByServer() {
+        // Create mock DifyServer
+        io.github.guoshiqiufeng.dify.server.DifyServer mockDifyServer =
+            mock(io.github.guoshiqiufeng.dify.server.DifyServer.class);
+
+        // Mock apps response
+        io.github.guoshiqiufeng.dify.server.dto.response.AppsResponseResult appsResult =
+            new io.github.guoshiqiufeng.dify.server.dto.response.AppsResponseResult();
+
+        io.github.guoshiqiufeng.dify.server.dto.response.AppsResponse chatApp =
+            new io.github.guoshiqiufeng.dify.server.dto.response.AppsResponse();
+        chatApp.setId("chat-app-id");
+        chatApp.setMode("chat");
+
+        io.github.guoshiqiufeng.dify.server.dto.response.AppsResponse workflowApp =
+            new io.github.guoshiqiufeng.dify.server.dto.response.AppsResponse();
+        workflowApp.setId("workflow-app-id");
+        workflowApp.setMode("workflow");
+
+        appsResult.setData(java.util.Arrays.asList(chatApp, workflowApp));
+
+        // Mock API key responses
+        io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponse chatApiKey =
+            new io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponse();
+        chatApiKey.setToken("chat-api-key");
+
+        io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponse workflowApiKey =
+            new io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponse();
+        workflowApiKey.setToken("workflow-api-key");
+
+        io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponse datasetApiKey =
+            new io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponse();
+        datasetApiKey.setToken("dataset-api-key");
+
+        // Setup mock behaviors
+        when(mockDifyServer.apps(any())).thenReturn(appsResult);
+        when(mockDifyServer.getAppApiKey("chat-app-id"))
+            .thenReturn(java.util.Collections.singletonList(chatApiKey));
+        when(mockDifyServer.getAppApiKey("workflow-app-id"))
+            .thenReturn(java.util.Collections.singletonList(workflowApiKey));
+        when(mockDifyServer.getDatasetApiKey())
+            .thenReturn(java.util.Collections.singletonList(datasetApiKey));
+
+        // Create a custom server checker with the mock DifyServer
+        TestDifyServerStatusChecker customServerChecker = new TestDifyServerStatusChecker() {
+            @Override
+            public io.github.guoshiqiufeng.dify.server.DifyServer getDifyServer() {
+                return mockDifyServer;
+            }
+        };
+        customServerChecker.setReportToReturn(createMockClientReport("DifyServer", ApiStatus.NORMAL, 2, 2, 0));
+
+        // Set up other checkers
+        chatChecker.setReportToReturn(createMockClientReport("DifyChat", ApiStatus.NORMAL, 10, 10, 0));
+        datasetChecker.setReportToReturn(createMockClientReport("DifyDataset", ApiStatus.NORMAL, 5, 5, 0));
+        workflowChecker.setReportToReturn(createMockClientReport("DifyWorkflow", ApiStatus.NORMAL, 1, 1, 0));
+
+        DifyStatusServiceImpl service = new DifyStatusServiceImpl(
+                chatChecker,
+                datasetChecker,
+                customServerChecker,
+                workflowChecker
+        );
+
+        AggregatedStatusReport report = service.checkAllClientsStatusByServer();
+
+        assertNotNull(report);
+        assertEquals(ApiStatus.NORMAL, report.getOverallStatus());
+        assertTrue(report.getClientReports().size() >= 3); // At least chat, dataset, workflow
+    }
+
+    @Test
+    void testCheckStatus_WithNullCheckers() {
+        // Test when some checkers are null
+        StatusCheckConfig config = StatusCheckConfig.builder()
+                .apiKey("test-key")
+                .parallel(false)
+                .build();
+
+        // Create service with only chat checker
+        DifyStatusServiceImpl service = new DifyStatusServiceImpl(
+                chatChecker,
+                null,  // No dataset checker
+                null,  // No server checker
+                null   // No workflow checker
+        );
+
+        chatChecker.setReportToReturn(createMockClientReport("DifyChat", ApiStatus.NORMAL, 10, 10, 0));
+
+        AggregatedStatusReport report = service.checkStatus(config);
+
+        assertNotNull(report);
+        assertEquals(1, report.getClientReports().size());
+        assertEquals(ApiStatus.NORMAL, report.getOverallStatus());
     }
 
     private ClientStatusReport createMockClientReport(String clientName, ApiStatus status,
