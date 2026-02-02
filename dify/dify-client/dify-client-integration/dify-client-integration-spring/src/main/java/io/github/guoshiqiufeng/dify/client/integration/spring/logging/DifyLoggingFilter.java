@@ -27,7 +27,6 @@ import reactor.core.publisher.Mono;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Collectors;
 
 /**
  * A logging filter for Dify client requests and responses.
@@ -95,11 +94,11 @@ public class DifyLoggingFilter implements ExchangeFilterFunction {
     private void logRequest(String requestId, ClientRequest request) {
         if (log.isDebugEnabled()) {
             if (maskingEnabled) {
+                // Convert HttpHeaders to Map for masking
+                Map<String, List<String>> headersMap = new HashMap<>(request.headers());
+
                 // Mask sensitive headers
-                Map<String, List<String>> maskedHeaders = LogMaskingUtils.maskHeaders(
-                    request.headers().entrySet().stream()
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
-                );
+                Map<String, List<String>> maskedHeaders = LogMaskingUtils.maskHeaders(headersMap);
 
                 log.debug("logRequest，requestId：{}，url：{}，method：{}，headers：{}, cookies: {}",
                         requestId, request.url(), request.method(), maskedHeaders, request.cookies());
@@ -115,11 +114,11 @@ public class DifyLoggingFilter implements ExchangeFilterFunction {
         REQUEST_TIME_CACHE.remove(requestId);
 
         if (maskingEnabled) {
+            // Convert HttpHeaders to Map for masking
+            Map<String, List<String>> headersMap = new HashMap<>(response.headers().asHttpHeaders());
+
             // Mask sensitive headers
-            Map<String, List<String>> maskedHeaders = LogMaskingUtils.maskHeaders(
-                response.headers().asHttpHeaders().entrySet().stream()
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
-            );
+            Map<String, List<String>> maskedHeaders = LogMaskingUtils.maskHeaders(headersMap);
 
             log.debug("logResponse (streaming)，requestId：{}，status：{}，headers：{}，executionTime：{}ms",
                     requestId, ClientResponseUtils.getStatusCodeValue(response), maskedHeaders, executionTime);
@@ -138,11 +137,11 @@ public class DifyLoggingFilter implements ExchangeFilterFunction {
                 .defaultIfEmpty("")
                 .flatMap(body -> {
                     if (maskingEnabled) {
+                        // Convert HttpHeaders to Map for masking
+                        Map<String, List<String>> headersMap = new HashMap<>(response.headers().asHttpHeaders());
+
                         // Mask sensitive headers
-                        Map<String, List<String>> maskedHeaders = LogMaskingUtils.maskHeaders(
-                            response.headers().asHttpHeaders().entrySet().stream()
-                                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
-                        );
+                        Map<String, List<String>> maskedHeaders = LogMaskingUtils.maskHeaders(headersMap);
 
                         // Mask sensitive body content
                         String maskedBody = LogMaskingUtils.maskBody(body);

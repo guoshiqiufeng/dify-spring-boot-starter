@@ -89,11 +89,12 @@ public class DifyRestLoggingInterceptor implements ClientHttpRequestInterceptor 
             String bodyContent = body != null && body.length > 0 ? new String(body, StandardCharsets.UTF_8) : "";
 
             if (maskingEnabled) {
+                // Convert HttpHeaders to Map for masking
+                Map<String, List<String>> headersMap = new HashMap<>();
+                request.getHeaders().forEach(headersMap::put);
+
                 // Mask sensitive headers
-                Map<String, List<String>> maskedHeaders = LogMaskingUtils.maskHeaders(
-                    request.getHeaders().entrySet().stream()
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
-                );
+                Map<String, List<String>> maskedHeaders = LogMaskingUtils.maskHeaders(headersMap);
 
                 // Mask sensitive body content
                 String maskedBody = LogMaskingUtils.maskBody(bodyContent);
@@ -121,11 +122,12 @@ public class DifyRestLoggingInterceptor implements ClientHttpRequestInterceptor 
             Object statusCode = getStatusCodeSafely(response);
 
             if (maskingEnabled) {
+                // Convert HttpHeaders to Map for masking
+                Map<String, List<String>> headersMap = new HashMap<>();
+                response.getHeaders().forEach(headersMap::put);
+
                 // Mask sensitive headers
-                Map<String, List<String>> maskedHeaders = LogMaskingUtils.maskHeaders(
-                    response.getHeaders().entrySet().stream()
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
-                );
+                Map<String, List<String>> maskedHeaders = LogMaskingUtils.maskHeaders(headersMap);
 
                 // Mask sensitive body content
                 String maskedBody = LogMaskingUtils.maskBody(bodyContent);
