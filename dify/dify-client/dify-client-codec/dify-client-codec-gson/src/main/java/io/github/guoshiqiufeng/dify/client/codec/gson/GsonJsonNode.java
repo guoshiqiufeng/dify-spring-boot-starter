@@ -22,6 +22,7 @@ import com.google.gson.JsonPrimitive;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonNode;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -171,7 +172,7 @@ public class GsonJsonNode implements JsonNode {
             }
             return nodes.iterator();
         }
-        return new ArrayList<JsonNode>().iterator();
+        return Collections.emptyIterator();
     }
 
     @Override
@@ -181,7 +182,7 @@ public class GsonJsonNode implements JsonNode {
             Set<String> keys = object.keySet();
             return keys.iterator();
         }
-        return new ArrayList<String>().iterator();
+        return Collections.emptyIterator();
     }
 
     @Override

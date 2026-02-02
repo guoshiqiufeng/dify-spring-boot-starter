@@ -75,7 +75,10 @@ public class LoggingInterceptor implements Interceptor {
                 Charset charset = UTF8;
                 MediaType contentType = requestBody.contentType();
                 if (contentType != null) {
-                    charset = contentType.charset(UTF8);
+                    Charset mediaCharset = contentType.charset(UTF8);
+                    if (mediaCharset != null) {
+                        charset = mediaCharset;
+                    }
                 }
                 log.debug("【Dify】Request Body: {}", buffer.readString(charset));
             }

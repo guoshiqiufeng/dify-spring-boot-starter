@@ -302,7 +302,7 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
                     // For error responses, return raw error message as body
                     // The error handler will receive this and can process it
                     String errorBody = response.body() != null ? response.body().string() : "";
-                    log.debug("OkHttp error response: status={}, body={}", statusCode, errorBody);
+                    log.debug("OkHttp toEntity error response: status={}, body={}", statusCode, errorBody);
 
                     @SuppressWarnings("unchecked")
                     T typedErrorBody = (T) errorBody;
@@ -374,7 +374,11 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
         } else {
             fullUrl = baseUrl + path;
         }
-        HttpUrl.Builder urlBuilder = HttpUrl.parse(fullUrl).newBuilder();
+        HttpUrl parsedUrl = HttpUrl.parse(fullUrl);
+        if (parsedUrl == null) {
+            throw new HttpClientException("Invalid URL: " + fullUrl);
+        }
+        HttpUrl.Builder urlBuilder = parsedUrl.newBuilder();
         for (Map.Entry<String, String> entry : queryParams.entrySet()) {
             urlBuilder.addQueryParameter(entry.getKey(), entry.getValue());
         }

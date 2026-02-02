@@ -57,7 +57,7 @@ public class DifyFileConverter {
 
         String filename = multipartFile.getOriginalFilename();
         String contentType = multipartFile.getContentType();
-        byte[] content = null;
+        byte[] content;
         try {
             content = multipartFile.getBytes();
         } catch (IOException e) {

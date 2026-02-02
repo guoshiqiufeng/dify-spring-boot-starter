@@ -241,7 +241,7 @@ class WebClientExecutor {
             int statusCode = e.getStatusCode().value();
             String errorBody = e.getResponseBodyAsString();
 
-            log.debug("WebClient error response: status={}, body={}", statusCode, errorBody);
+            log.debug("WebClient executeForEntity error response: status={}, body={}", statusCode, errorBody);
 
             // Return error response without throwing exception
             // Let the upper layer handleErrors() process it

@@ -173,7 +173,11 @@ public class LinkedMultiValueMap<K, V> implements MultiValueMap<K, V> {
         if (this == other) {
             return true;
         }
-        return this.targetMap.equals(other);
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+        LinkedMultiValueMap<?, ?> otherMap = (LinkedMultiValueMap<?, ?>) other;
+        return this.targetMap.equals(otherMap.targetMap);
     }
 
     @Override
