@@ -300,6 +300,9 @@ class LinkedMultiValueMapTest {
         assertEquals(map1, map2);
         assertNotEquals(map1, map3);
         assertEquals(map1, map1);
+        assertNotEquals(map1, null);
+        assertNotEquals(map1, "not a map");
+        assertNotEquals(map1, new HashMap<>());
     }
 
     @Test
