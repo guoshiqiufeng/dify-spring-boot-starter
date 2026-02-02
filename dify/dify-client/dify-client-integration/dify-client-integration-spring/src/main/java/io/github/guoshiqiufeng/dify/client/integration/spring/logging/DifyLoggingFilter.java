@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.client.integration.spring.logging;
 
 import io.github.guoshiqiufeng.dify.client.integration.spring.util.ClientResponseUtils;
+import io.github.guoshiqiufeng.dify.core.utils.LogMaskingUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -23,9 +24,10 @@ import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.ExchangeFunction;
 import reactor.core.publisher.Mono;
 
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 /**
  * A logging filter for Dify client requests and responses.
@@ -39,6 +41,24 @@ import java.util.concurrent.ConcurrentMap;
 public class DifyLoggingFilter implements ExchangeFilterFunction {
 
     private static final ConcurrentMap<String, Long> REQUEST_TIME_CACHE = new ConcurrentHashMap<>();
+
+    private final boolean maskingEnabled;
+
+    /**
+     * Constructor with default masking enabled
+     */
+    public DifyLoggingFilter() {
+        this(true);
+    }
+
+    /**
+     * Constructor with configurable masking
+     *
+     * @param maskingEnabled whether to enable log masking
+     */
+    public DifyLoggingFilter(boolean maskingEnabled) {
+        this.maskingEnabled = maskingEnabled;
+    }
 
     @Override
     public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
@@ -74,8 +94,19 @@ public class DifyLoggingFilter implements ExchangeFilterFunction {
 
     private void logRequest(String requestId, ClientRequest request) {
         if (log.isDebugEnabled()) {
-            log.debug("logRequest，requestId：{}，url：{}，method：{}，headers：{}, cookies: {}",
-                    requestId, request.url(), request.method(), request.headers(), request.cookies());
+            if (maskingEnabled) {
+                // Mask sensitive headers
+                Map<String, List<String>> maskedHeaders = LogMaskingUtils.maskHeaders(
+                    request.headers().entrySet().stream()
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+                );
+
+                log.debug("logRequest，requestId：{}，url：{}，method：{}，headers：{}, cookies: {}",
+                        requestId, request.url(), request.method(), maskedHeaders, request.cookies());
+            } else {
+                log.debug("logRequest，requestId：{}，url：{}，method：{}，headers：{}, cookies: {}",
+                        requestId, request.url(), request.method(), request.headers(), request.cookies());
+            }
         }
     }
 
@@ -83,8 +114,19 @@ public class DifyLoggingFilter implements ExchangeFilterFunction {
         long executionTime = System.currentTimeMillis() - REQUEST_TIME_CACHE.getOrDefault(requestId, 0L);
         REQUEST_TIME_CACHE.remove(requestId);
 
-        log.debug("logResponse (streaming)，requestId：{}，status：{}，headers：{}，executionTime：{}ms",
-                requestId, ClientResponseUtils.getStatusCodeValue(response), response.headers().asHttpHeaders(), executionTime);
+        if (maskingEnabled) {
+            // Mask sensitive headers
+            Map<String, List<String>> maskedHeaders = LogMaskingUtils.maskHeaders(
+                response.headers().asHttpHeaders().entrySet().stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+            );
+
+            log.debug("logResponse (streaming)，requestId：{}，status：{}，headers：{}，executionTime：{}ms",
+                    requestId, ClientResponseUtils.getStatusCodeValue(response), maskedHeaders, executionTime);
+        } else {
+            log.debug("logResponse (streaming)，requestId：{}，status：{}，headers：{}，executionTime：{}ms",
+                    requestId, ClientResponseUtils.getStatusCodeValue(response), response.headers().asHttpHeaders(), executionTime);
+        }
     }
 
     private Mono<ClientResponse> logResponseWithBody(String requestId, ClientResponse response) {
@@ -95,8 +137,22 @@ public class DifyLoggingFilter implements ExchangeFilterFunction {
         return response.bodyToMono(String.class)
                 .defaultIfEmpty("")
                 .flatMap(body -> {
-                    log.debug("logResponse，requestId：{}，status：{}，headers：{}，executionTime：{}ms，body：{}",
-                            requestId, ClientResponseUtils.getStatusCodeValue(response), response.headers().asHttpHeaders(), executionTime, body);
+                    if (maskingEnabled) {
+                        // Mask sensitive headers
+                        Map<String, List<String>> maskedHeaders = LogMaskingUtils.maskHeaders(
+                            response.headers().asHttpHeaders().entrySet().stream()
+                                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+                        );
+
+                        // Mask sensitive body content
+                        String maskedBody = LogMaskingUtils.maskBody(body);
+
+                        log.debug("logResponse，requestId：{}，status：{}，headers：{}，executionTime：{}ms，body：{}",
+                                requestId, ClientResponseUtils.getStatusCodeValue(response), maskedHeaders, executionTime, maskedBody);
+                    } else {
+                        log.debug("logResponse，requestId：{}，status：{}，headers：{}，executionTime：{}ms，body：{}",
+                                requestId, ClientResponseUtils.getStatusCodeValue(response), response.headers().asHttpHeaders(), executionTime, body);
+                    }
 
                     return Mono.just(ClientResponseUtils.createClientResponse(response, body));
                 });

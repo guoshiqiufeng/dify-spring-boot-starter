@@ -59,6 +59,7 @@ public class DifyProperties implements Serializable {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
+    @lombok.ToString(exclude = {"apiKey"})
     public static class Dataset implements Serializable {
         private static final long serialVersionUID = -8070163136236819894L;
         private String apiKey;
@@ -67,6 +68,7 @@ public class DifyProperties implements Serializable {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
+    @lombok.ToString(exclude = {"password"})
     public static class Server implements Serializable {
         private static final long serialVersionUID = -8070163136236819894L;
 
@@ -106,6 +108,11 @@ public class DifyProperties implements Serializable {
         private Boolean logging = true;
 
         /**
+         * 是否启用日志脱敏，默认 true
+         */
+        private Boolean loggingMaskEnabled = true;
+
+        /**
          * 连接超时时间（秒），默认 30 秒
          */
         private Integer connectTimeout = 30;
@@ -130,6 +137,7 @@ public class DifyProperties implements Serializable {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @lombok.ToString(exclude = {"apiKey", "datasetApiKey", "chatApiKey", "workflowApiKey"})
     public static class StatusConfig implements Serializable {
         private static final long serialVersionUID = -9124280674952624154L;
 
