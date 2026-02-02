@@ -210,4 +210,26 @@ class OkHttpRequestBuilderTest {
         assertNotNull(result);
         assertSame(builder, result);
     }
+
+    @Test
+    void testHeadersConsumerWithMultipleValues() {
+        var result = builder.headers(headers -> {
+            headers.add("Accept", "application/json");
+            headers.add("Accept", "text/plain");
+            headers.add("X-Custom", "value1");
+        });
+        assertNotNull(result);
+        assertSame(builder, result);
+    }
+
+    @Test
+    void testCookiesConsumerWithMultipleValues() {
+        var result = builder.cookies(cookies -> {
+            cookies.add("session", "abc123");
+            cookies.add("session", "def456");
+            cookies.add("user", "john");
+        });
+        assertNotNull(result);
+        assertSame(builder, result);
+    }
 }
