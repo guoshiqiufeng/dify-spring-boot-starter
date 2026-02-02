@@ -322,4 +322,88 @@ class LoggingInterceptorTest {
         assertNotNull(result);
         assertNotNull(result.body());
     }
+
+    @Test
+    void testInterceptWithCharsetInContentType() throws IOException {
+        // Arrange
+        RequestBody requestBody = RequestBody.create("{\"key\":\"value\"}", MediaType.parse("application/json; charset=ISO-8859-1"));
+        Request request = new Request.Builder()
+                .url("https://api.dify.ai/v1/test")
+                .post(requestBody)
+                .build();
+
+        Response response = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("success", MediaType.get("text/plain")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any(Request.class))).thenReturn(response);
+
+        // Act
+        Response result = interceptor.intercept(mockChain);
+
+        // Assert
+        assertNotNull(result);
+        verify(mockChain).proceed(request);
+    }
+
+    @Test
+    void testInterceptWithNullCharsetInContentType() throws IOException {
+        // Arrange
+        RequestBody requestBody = RequestBody.create("{\"key\":\"value\"}", MediaType.parse("application/json"));
+        Request request = new Request.Builder()
+                .url("https://api.dify.ai/v1/test")
+                .post(requestBody)
+                .build();
+
+        Response response = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("success", MediaType.get("text/plain")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any(Request.class))).thenReturn(response);
+
+        // Act
+        Response result = interceptor.intercept(mockChain);
+
+        // Assert
+        assertNotNull(result);
+        verify(mockChain).proceed(request);
+    }
+
+    @Test
+    void testInterceptWithFormUrlEncodedResponse() throws IOException {
+        // Arrange
+        Request request = new Request.Builder()
+                .url("https://api.dify.ai/v1/test")
+                .get()
+                .build();
+
+        String formResponse = "key1=value1&key2=value2";
+        Response response = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create(formResponse, MediaType.get("application/x-www-form-urlencoded")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any(Request.class))).thenReturn(response);
+
+        // Act
+        Response result = interceptor.intercept(mockChain);
+
+        // Assert
+        assertNotNull(result);
+        assertNotNull(result.body());
+    }
 }
