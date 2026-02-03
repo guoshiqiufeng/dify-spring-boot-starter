@@ -113,19 +113,11 @@ public class DifyLoggingFilter implements ExchangeFilterFunction {
         long executionTime = System.currentTimeMillis() - REQUEST_TIME_CACHE.getOrDefault(requestId, 0L);
         REQUEST_TIME_CACHE.remove(requestId);
 
-        if (maskingEnabled) {
-            // Convert HttpHeaders to Map for masking
-            Map<String, List<String>> headersMap = new HashMap<>(response.headers().asHttpHeaders());
-
-            // Mask sensitive headers
-            Map<String, List<String>> maskedHeaders = LogMaskingUtils.maskHeaders(headersMap);
-
-            log.debug("logResponse (streaming)，requestId：{}，status：{}，headers：{}，executionTime：{}ms",
-                    requestId, ClientResponseUtils.getStatusCodeValue(response), maskedHeaders, executionTime);
-        } else {
+        if(log.isDebugEnabled()) {
             log.debug("logResponse (streaming)，requestId：{}，status：{}，headers：{}，executionTime：{}ms",
                     requestId, ClientResponseUtils.getStatusCodeValue(response), response.headers().asHttpHeaders(), executionTime);
         }
+
     }
 
     private Mono<ClientResponse> logResponseWithBody(String requestId, ClientResponse response) {
