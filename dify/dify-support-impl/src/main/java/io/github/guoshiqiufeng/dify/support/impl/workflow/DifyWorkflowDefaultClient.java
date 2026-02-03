@@ -19,7 +19,6 @@ import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
-import io.github.guoshiqiufeng.dify.core.bean.BeanUtils;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.enums.ResponseModeEnum;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
@@ -148,15 +147,26 @@ public class DifyWorkflowDefaultClient extends BaseDifyDefaultClient implements 
 
         List<WorkflowRunRequest.WorkflowFile> files = request.getFiles();
         if (!CollUtil.isEmpty(files)) {
-            files = files.stream().peek(f -> {
-                if (StrUtil.isEmpty(f.getType())) {
-                    f.setType("image");
-                }
-                if (StrUtil.isEmpty(f.getTransferMethod())) {
-                    f.setTransferMethod("remote_url");
-                }
-            }).collect(Collectors.toList());
-            chatMessage.setFiles(BeanUtils.copyToList(files, ChatMessageVO.ChatMessageFile.class));
+            List<ChatMessageVO.ChatMessageFile> targetFiles = files.stream()
+                .map(f -> {
+                    // Set default values if empty
+                    if (StrUtil.isEmpty(f.getType())) {
+                        f.setType("image");
+                    }
+                    if (StrUtil.isEmpty(f.getTransferMethod())) {
+                        f.setTransferMethod("remote_url");
+                    }
+
+                    // Manual mapping to avoid BeanUtils issues with additional getter/setter methods
+                    ChatMessageVO.ChatMessageFile target = new ChatMessageVO.ChatMessageFile();
+                    target.setType(f.getType());
+                    target.setTransferMethod(f.getTransferMethod());
+                    target.setUrl(f.getUrl());
+                    target.setUploadFileId(f.getUploadFileId());
+                    return target;
+                })
+                .collect(Collectors.toList());
+            chatMessage.setFiles(targetFiles);
         }
         HashMap<String, Object> inputs = new HashMap<>(1);
         chatMessage.setInputs(request.getInputs() == null ? inputs : request.getInputs());
