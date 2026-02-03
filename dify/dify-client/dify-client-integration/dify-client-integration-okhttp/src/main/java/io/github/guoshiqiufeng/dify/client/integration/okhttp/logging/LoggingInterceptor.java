@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.client.integration.okhttp.logging;
 
+import io.github.guoshiqiufeng.dify.core.utils.LogMaskingUtils;
 import okhttp3.*;
 import okio.Buffer;
 import org.slf4j.Logger;
@@ -23,6 +24,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * OkHttp interceptor for logging HTTP requests and responses.
@@ -35,6 +39,24 @@ public class LoggingInterceptor implements Interceptor {
 
     private static final Logger log = LoggerFactory.getLogger(LoggingInterceptor.class);
     private static final Charset UTF8 = StandardCharsets.UTF_8;
+
+    private final boolean maskingEnabled;
+
+    /**
+     * Constructor with default masking enabled
+     */
+    public LoggingInterceptor() {
+        this(true);
+    }
+
+    /**
+     * Constructor with configurable masking
+     *
+     * @param maskingEnabled whether to enable log masking
+     */
+    public LoggingInterceptor(boolean maskingEnabled) {
+        this.maskingEnabled = maskingEnabled;
+    }
 
     @Override
     public Response intercept(Chain chain) throws IOException {
@@ -66,7 +88,16 @@ public class LoggingInterceptor implements Interceptor {
 
         try {
             log.debug("【Dify】HTTP Request: {} {}", request.method(), request.url());
-            log.debug("【Dify】Request Headers: {}", request.headers());
+
+            // Mask headers if enabled
+            if (maskingEnabled) {
+                Map<String, List<String>> headersMap = new HashMap<>();
+                request.headers().toMultimap().forEach(headersMap::put);
+                Map<String, List<String>> maskedHeaders = LogMaskingUtils.maskHeaders(headersMap);
+                log.debug("【Dify】Request Headers: {}", maskedHeaders);
+            } else {
+                log.debug("【Dify】Request Headers: {}", request.headers());
+            }
 
             RequestBody requestBody = request.body();
             if (requestBody != null) {
@@ -80,7 +111,15 @@ public class LoggingInterceptor implements Interceptor {
                         charset = mediaCharset;
                     }
                 }
-                log.debug("【Dify】Request Body: {}", buffer.readString(charset));
+                String bodyContent = buffer.readString(charset);
+
+                // Mask body if enabled
+                if (maskingEnabled) {
+                    String maskedBody = LogMaskingUtils.maskBody(bodyContent);
+                    log.debug("【Dify】Request Body: {}", maskedBody);
+                } else {
+                    log.debug("【Dify】Request Body: {}", bodyContent);
+                }
             }
         } catch (Exception e) {
             log.warn("【Dify】Failed to log request", e);
@@ -101,16 +140,32 @@ public class LoggingInterceptor implements Interceptor {
 
         try {
             log.debug("【Dify】HTTP Response: {} {} ({}ms)", response.code(), response.message(), duration);
-            log.debug("【Dify】Response Headers: {}", response.headers());
+
+            // Mask headers if enabled
+            if (maskingEnabled) {
+                Map<String, List<String>> headersMap = new HashMap<>();
+                response.headers().toMultimap().forEach(headersMap::put);
+                Map<String, List<String>> maskedHeaders = LogMaskingUtils.maskHeaders(headersMap);
+                log.debug("【Dify】Response Headers: {}", maskedHeaders);
+            } else {
+                log.debug("【Dify】Response Headers: {}", response.headers());
+            }
 
             ResponseBody responseBody = response.body();
             if (responseBody != null) {
                 MediaType contentType = responseBody.contentType();
                 if (contentType != null && isTextContentType(contentType)) {
                     String bodyString = responseBody.string();
-                    log.debug("【Dify】Response Body: {}", bodyString);
 
-                    // Recreate response body for downstream consumption
+                    // Mask body if enabled
+                    if (maskingEnabled) {
+                        String maskedBody = LogMaskingUtils.maskBody(bodyString);
+                        log.debug("【Dify】Response Body: {}", maskedBody);
+                    } else {
+                        log.debug("【Dify】Response Body: {}", bodyString);
+                    }
+
+                    // Recreate response body for downstream consumption (use original body, not masked)
                     ResponseBody newBody = ResponseBody.create(bodyString, contentType);
                     return response.newBuilder().body(newBody).build();
                 }

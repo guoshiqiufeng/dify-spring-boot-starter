@@ -51,3 +51,4 @@ node_modules/**
 /dify/starter/spring-boot/spring-boot4-starter/dify-spring-boot4-starter/src/test/resources/application-test.yml
 
 .ace-tool/*
+.claude/*
