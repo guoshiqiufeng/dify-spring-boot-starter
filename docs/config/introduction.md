@@ -20,6 +20,7 @@ dify:
   client-config:
     skip-null: true # 是否跳过 null 字段，默认 true
     logging: true # 是否打印请求日志，默认 true
+    logging-mask-enabled: true # 是否启用日志脱敏，默认 true
     connect-timeout: 30 # 连接超时时间（秒），默认 30
     read-timeout: 30 # 读取超时时间（秒），默认 30
     write-timeout: 30 # 写入超时时间（秒），默认 30
@@ -86,6 +87,13 @@ dify:
 - 默认值：`true`
 - 非必填
 - 描述：是否打印请求日志，开启此参数并配置 `io.github.guoshiqiufeng.dify.client` 日志级别为 debug 则打印请求、响应日志
+
+##### loggingMaskEnabled
+
+- 类型：`Boolean`
+- 默认值：`true`
+- 非必填
+- 描述：是否启用日志脱敏，用于保护敏感信息（如 API Key、密码等）。开启后，日志中的敏感数据将被脱敏处理以保障安全
 
 ##### connectTimeout
 

@@ -20,6 +20,7 @@ dify:
   client-config:
     skip-null: true # Whether to skip null fields, default true
     logging: true # Whether to print request logs, default true
+    logging-mask-enabled: true # Whether to enable log masking, default true
     connect-timeout: 30 # Connection timeout in seconds, default 30
     read-timeout: 30 # Read timeout in seconds, default 30
     write-timeout: 30 # Write timeout in seconds, default 30
@@ -86,6 +87,13 @@ dify:
 - Default value: `true`
 - Not required
 - Description: Whether to print request logs, enable this parameter and configure `io.github.guoshiqiufeng.dify.client` log level to debug to print request and response logs
+
+##### loggingMaskEnabled
+
+- Type: `Boolean`
+- Default value: `true`
+- Not required
+- Description: Whether to enable log masking for sensitive information (such as API keys, passwords). When enabled, sensitive data in logs will be masked for security purposes
 
 ##### connectTimeout
 
