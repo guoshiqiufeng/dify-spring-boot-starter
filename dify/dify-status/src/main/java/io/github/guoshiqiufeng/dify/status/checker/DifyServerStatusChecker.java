@@ -39,7 +39,7 @@ import java.util.Map;
  */
 @Getter
 @Slf4j
-public class DifyServerStatusChecker extends AbstractStatusCheckStrategy {
+public class DifyServerStatusChecker extends AbstractClientStatusChecker {
 
     private final DifyServer difyServer;
 
@@ -70,81 +70,20 @@ public class DifyServerStatusChecker extends AbstractStatusCheckStrategy {
         }
     }
 
+    @Override
+    protected String[] methodsToCheck() {
+        return new String[]{
+                "apps",
+                "getDatasetApiKey"
+        };
+    }
+
     /**
      * Check all DifyServer APIs
      *
      * @return ClientStatusReport
      */
     public ClientStatusReport checkAllApis() {
-        List<ApiStatusResult> results = new ArrayList<>();
-
-        // Read-only methods that are safe to check
-        String[] methodsToCheck = {
-                "apps",
-                "getDatasetApiKey"
-        };
-
-        for (String method : methodsToCheck) {
-            try {
-                results.add(checkStatus(method, null));
-            } catch (Exception e) {
-                log.error("Error checking method {}: {}", method, e.getMessage());
-                // Add error result
-                results.add(ApiStatusResult.builder()
-                        .methodName(method)
-                        .status(ApiStatus.UNKNOWN_ERROR)
-                        .errorMessage(e.getMessage())
-                        .checkTime(LocalDateTime.now())
-                        .build());
-            }
-        }
-
-        return buildClientReport(results);
-    }
-
-    /**
-     * Build client status report from results
-     *
-     * @param results List of API status results
-     * @return ClientStatusReport
-     */
-    private ClientStatusReport buildClientReport(List<ApiStatusResult> results) {
-        int totalApis = results.size();
-        int normalApis = 0;
-        int errorApis = 0;
-        Map<ApiStatus, Integer> statusSummary = new HashMap<>();
-
-        for (ApiStatusResult result : results) {
-            ApiStatus status = result.getStatus();
-            statusSummary.put(status, statusSummary.getOrDefault(status, 0) + 1);
-
-            if (status == ApiStatus.NORMAL) {
-                normalApis++;
-            } else {
-                errorApis++;
-            }
-        }
-
-        // Determine overall status
-        ApiStatus overallStatus;
-        if (normalApis == totalApis) {
-            overallStatus = ApiStatus.NORMAL;
-        } else if (normalApis == 0) {
-            overallStatus = ApiStatus.SERVER_ERROR;
-        } else {
-            // Partially working
-            overallStatus = ApiStatus.CLIENT_ERROR;
-        }
-
-        return ClientStatusReport.builder()
-                .clientName(getClientName())
-                .overallStatus(overallStatus)
-                .apiStatuses(results)
-                .totalApis(totalApis)
-                .normalApis(normalApis)
-                .errorApis(errorApis)
-                .reportTime(LocalDateTime.now())
-                .statusSummary(statusSummary)
-                .build();
+        return checkAllApisInternal(null);
     }
 }

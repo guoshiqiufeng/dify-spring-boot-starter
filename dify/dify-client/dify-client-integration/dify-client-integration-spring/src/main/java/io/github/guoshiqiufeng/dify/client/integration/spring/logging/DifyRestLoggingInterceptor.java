@@ -15,6 +15,7 @@
  */
 package io.github.guoshiqiufeng.dify.client.integration.spring.logging;
 
+import io.github.guoshiqiufeng.dify.core.utils.LogMaskingUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
@@ -28,9 +29,10 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 /**
  * A logging interceptor for RestClient requests and responses.
@@ -45,6 +47,24 @@ import java.util.concurrent.ConcurrentMap;
 public class DifyRestLoggingInterceptor implements ClientHttpRequestInterceptor {
 
     private static final ConcurrentMap<String, Long> REQUEST_TIME_CACHE = new ConcurrentHashMap<>();
+
+    private final boolean maskingEnabled;
+
+    /**
+     * Constructor with default masking enabled
+     */
+    public DifyRestLoggingInterceptor() {
+        this(true);
+    }
+
+    /**
+     * Constructor with configurable masking
+     *
+     * @param maskingEnabled whether to enable log masking
+     */
+    public DifyRestLoggingInterceptor(boolean maskingEnabled) {
+        this.maskingEnabled = maskingEnabled;
+    }
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
@@ -67,8 +87,24 @@ public class DifyRestLoggingInterceptor implements ClientHttpRequestInterceptor 
     private void logRequest(String requestId, HttpRequest request, byte[] body) {
         if (log.isDebugEnabled()) {
             String bodyContent = body != null && body.length > 0 ? new String(body, StandardCharsets.UTF_8) : "";
-            log.debug("logRequest，requestId：{}，url：{}，method：{}，headers：{}，body：{}",
-                    requestId, request.getURI(), request.getMethod(), request.getHeaders(), bodyContent);
+
+            if (maskingEnabled) {
+                // Convert HttpHeaders to Map for masking
+                Map<String, List<String>> headersMap = new HashMap<>();
+                request.getHeaders().forEach(headersMap::put);
+
+                // Mask sensitive headers
+                Map<String, List<String>> maskedHeaders = LogMaskingUtils.maskHeaders(headersMap);
+
+                // Mask sensitive body content
+                String maskedBody = LogMaskingUtils.maskBody(bodyContent);
+
+                log.debug("logRequest，requestId：{}，url：{}，method：{}，headers：{}，body：{}",
+                        requestId, request.getURI(), request.getMethod(), maskedHeaders, maskedBody);
+            } else {
+                log.debug("logRequest，requestId：{}，url：{}，method：{}，headers：{}，body：{}",
+                        requestId, request.getURI(), request.getMethod(), request.getHeaders(), bodyContent);
+            }
         }
     }
 
@@ -84,8 +120,24 @@ public class DifyRestLoggingInterceptor implements ClientHttpRequestInterceptor 
             String bodyContent = body.length > 0 ? new String(body, StandardCharsets.UTF_8) : "";
             // Use reflection to get status code to support both Spring 5 (HttpStatus) and Spring 6+ (HttpStatusCode)
             Object statusCode = getStatusCodeSafely(response);
-            log.debug("logResponse，requestId：{}，status：{}，headers：{}，executionTime：{}ms，body：{}",
-                    requestId, statusCode, response.getHeaders(), executionTime, bodyContent);
+
+            if (maskingEnabled) {
+                // Convert HttpHeaders to Map for masking
+                Map<String, List<String>> headersMap = new HashMap<>();
+                response.getHeaders().forEach(headersMap::put);
+
+                // Mask sensitive headers
+                Map<String, List<String>> maskedHeaders = LogMaskingUtils.maskHeaders(headersMap);
+
+                // Mask sensitive body content
+                String maskedBody = LogMaskingUtils.maskBody(bodyContent);
+
+                log.debug("logResponse，requestId：{}，status：{}，headers：{}，executionTime：{}ms，body：{}",
+                        requestId, statusCode, maskedHeaders, executionTime, maskedBody);
+            } else {
+                log.debug("logResponse，requestId：{}，status：{}，headers：{}，executionTime：{}ms，body：{}",
+                        requestId, statusCode, response.getHeaders(), executionTime, bodyContent);
+            }
         }
 
         return body;
