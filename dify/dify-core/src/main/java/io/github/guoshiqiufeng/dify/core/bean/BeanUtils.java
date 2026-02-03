@@ -120,6 +120,9 @@ public class BeanUtils {
         PropertyDescriptor[] sourceDescriptors = getPropertyDescriptors(sourceClass);
         PropertyDescriptor[] targetDescriptors = getPropertyDescriptors(targetClass);
 
+        // Build a map of non-standard setters (e.g., Lombok chain setters)
+        Map<String, Method> nonStandardSetters = findNonStandardSetters(targetClass);
+
         for (PropertyDescriptor sourcePd : sourceDescriptors) {
             String propertyName = sourcePd.getName();
 
@@ -135,11 +138,17 @@ public class BeanUtils {
 
             // Find matching property in target
             PropertyDescriptor targetPd = findPropertyDescriptor(targetDescriptors, propertyName);
-            if (targetPd == null) {
-                continue;
+            Method writeMethod = null;
+
+            if (targetPd != null) {
+                writeMethod = targetPd.getWriteMethod();
             }
 
-            Method writeMethod = targetPd.getWriteMethod();
+            // If no standard setter found, try non-standard setter
+            if (writeMethod == null) {
+                writeMethod = nonStandardSetters.get(propertyName);
+            }
+
             if (writeMethod == null) {
                 continue;
             }
@@ -198,5 +207,39 @@ public class BeanUtils {
             }
         }
         return null;
+    }
+
+    /**
+     * Find non-standard setter methods (e.g., Lombok chain setters that return 'this').
+     * These methods are not recognized by JavaBeans Introspector because they don't return void.
+     *
+     * @param clazz the class to search
+     * @return map of property name to setter method
+     */
+    private static Map<String, Method> findNonStandardSetters(Class<?> clazz) {
+        Map<String, Method> setters = new HashMap<>();
+        Method[] methods = clazz.getMethods();
+
+        for (Method method : methods) {
+            String methodName = method.getName();
+
+            // Check if it's a setter method (starts with "set" and has exactly one parameter)
+            if (methodName.startsWith("set") && methodName.length() > 3
+                    && method.getParameterCount() == 1) {
+
+                // Skip if it's a standard void setter (already handled by PropertyDescriptor)
+                if (method.getReturnType() == void.class) {
+                    continue;
+                }
+
+                // Extract property name (e.g., "setName" -> "name")
+                String propertyName = methodName.substring(3);
+                propertyName = Character.toLowerCase(propertyName.charAt(0)) + propertyName.substring(1);
+
+                setters.put(propertyName, method);
+            }
+        }
+
+        return setters;
     }
 }

@@ -74,7 +74,6 @@ public class ChatMessageVO implements Serializable {
     private Boolean autoGenerateName = true;
 
     @Data
-    @Accessors(chain = false)
     public static class ChatMessageFile implements Serializable {
         private static final long serialVersionUID = 3796193415966750860L;
         /**
