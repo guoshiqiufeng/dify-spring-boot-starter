@@ -15,12 +15,18 @@
  */
 package io.github.guoshiqiufeng.dify.core.bean;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.github.guoshiqiufeng.dify.core.enums.message.MessageFileTransferMethodEnum;
+import io.github.guoshiqiufeng.dify.core.enums.message.MessageFileTypeEnum;
+import io.github.guoshiqiufeng.dify.core.pojo.request.ChatMessageVO;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.io.Serializable;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -504,6 +510,18 @@ class BeanUtilsTest {
         assertEquals("OldName", target.getName());
     }
 
+    @Test
+    void testForLombokChain() {
+        List<ChatMessageSendRequest.ChatMessageFile> files = new ArrayList<>();
+        ChatMessageSendRequest.ChatMessageFile e = new ChatMessageSendRequest.ChatMessageFile();
+        e.setType("d");
+        e.setUrl("http://demo");
+        files.add(e);
+        List<ChatMessageVO.ChatMessageFile> chatMessageFiles = BeanUtils.copyToList(files, ChatMessageVO.ChatMessageFile.class);
+        assertEquals("d", chatMessageFiles.get(0).getType());
+        assertEquals("http://demo", chatMessageFiles.get(0).getUrl());
+    }
+
     // Test beans
 
     public static class SourceBean {
@@ -893,4 +911,419 @@ class BeanUtilsTest {
             return name;
         }
     }
+
+    @Data
+    @Accessors(chain = true)
+    static class ChatMessageSendRequest implements Serializable {
+
+        /**
+         * 聊天对话编号
+         */
+        private String conversationId;
+
+        /**
+         * 聊天内容
+         */
+        private String content;
+
+        /**
+         * 文件
+         */
+        private List<ChatMessageFile> files;
+
+        /**
+         * 自定义参数
+         */
+        private Map<String, Object> inputs;
+
+        /**
+         * 是否自动生成会话标题
+         */
+        @JsonProperty("auto_generate_name")
+        @JsonAlias("autoGenerateName")
+        private Boolean autoGenerateName = true;
+
+        @Data
+        public static class ChatMessageFile {
+            private String type = "image";
+            private String transferMethod = "remote_url";
+            private String url;
+            private String uploadFileId;
+
+            public void setMessageFileType(MessageFileTypeEnum messageFileType) {
+                if (messageFileType == null) {
+                    this.type = null;
+                } else {
+                    this.type = messageFileType.name();
+                }
+            }
+
+            public void setMessageFileTransferMethod(MessageFileTransferMethodEnum transferMethod) {
+                if (transferMethod == null) {
+                    this.transferMethod = null;
+                } else {
+                    this.transferMethod = transferMethod.name();
+                }
+            }
+
+            public MessageFileTypeEnum getMessageFileType() {
+                return this.type == null ? null : MessageFileTypeEnum.valueOf(this.type);
+            }
+
+            public MessageFileTransferMethodEnum getMessageFileTransferMethod() {
+                return this.transferMethod == null ? null : MessageFileTransferMethodEnum.valueOf(this.transferMethod);
+            }
+        }
+    }
+
+    // ========== Tests for Non-Standard Setters (Chain Setters) ==========
+
+    @Test
+    void testCopyPropertiesWithChainSetter() {
+        // Test that chain setters (returning 'this') are properly handled
+        ChainSetterSource source = new ChainSetterSource();
+        source.setName("John");
+        source.setAge(30);
+
+        ChainSetterTarget target = new ChainSetterTarget();
+        BeanUtils.copyProperties(source, target);
+
+        assertEquals("John", target.getName());
+        assertEquals(30, target.getAge());
+    }
+
+    @Test
+    void testCopyPropertiesWithMixedSetters() {
+        // Test bean with both standard void setters and chain setters
+        MixedSetterSource source = new MixedSetterSource();
+        source.setName("Jane");
+        source.setAge(25);
+        source.setEmail("jane@example.com");
+
+        MixedSetterTarget target = new MixedSetterTarget();
+        BeanUtils.copyProperties(source, target);
+
+        assertEquals("Jane", target.getName());
+        assertEquals(25, target.getAge());
+        assertEquals("jane@example.com", target.getEmail());
+    }
+
+    @Test
+    void testNonStandardSetterWithShortMethodName() {
+        // Test that method named "set" (length <= 3) is not treated as setter
+        ShortSetterMethodBean source = new ShortSetterMethodBean();
+        source.setValue("test");
+
+        ShortSetterMethodBean target = new ShortSetterMethodBean();
+        BeanUtils.copyProperties(source, target);
+
+        // value should be copied via standard setter
+        assertEquals("test", target.getValue());
+    }
+
+    @Test
+    void testNonStandardSetterWithNoParameters() {
+        // Test that setter with no parameters is not treated as setter
+        NoParameterSetterBean source = new NoParameterSetterBean();
+        source.setName("test");
+
+        NoParameterSetterBean target = new NoParameterSetterBean();
+        BeanUtils.copyProperties(source, target);
+
+        assertEquals("test", target.getName());
+    }
+
+    @Test
+    void testNonStandardSetterWithMultipleParameters() {
+        // Test that setter with multiple parameters is not treated as setter
+        MultiParameterSetterBean source = new MultiParameterSetterBean();
+        source.setName("test");
+
+        MultiParameterSetterBean target = new MultiParameterSetterBean();
+        BeanUtils.copyProperties(source, target);
+
+        assertEquals("test", target.getName());
+    }
+
+    @Test
+    void testNonStandardSetterNotStartingWithSet() {
+        // Test that methods not starting with "set" are not treated as setters
+        NonSetMethodBean source = new NonSetMethodBean();
+        source.setName("test");
+
+        NonSetMethodBean target = new NonSetMethodBean();
+        BeanUtils.copyProperties(source, target);
+
+        assertEquals("test", target.getName());
+    }
+
+    @Test
+    void testChainSetterPriorityOverStandardSetter() {
+        // Test that when both standard and chain setter exist, standard is used first
+        DualSetterBean source = new DualSetterBean();
+        source.setName("test");
+
+        DualSetterTarget target = new DualSetterTarget();
+        BeanUtils.copyProperties(source, target);
+
+        assertEquals("test", target.getName());
+        assertTrue(target.isStandardSetterCalled());
+    }
+
+    @Test
+    void testChainSetterWhenNoStandardSetter() {
+        // Test that chain setter is used when no standard setter exists
+        ChainOnlySource source = new ChainOnlySource();
+        source.setName("test");
+
+        ChainOnlyTarget target = new ChainOnlyTarget();
+        BeanUtils.copyProperties(source, target);
+
+        assertEquals("test", target.getName());
+    }
+
+    // ========== Test Beans for Non-Standard Setters ==========
+
+    public static class ChainSetterSource {
+        private String name;
+        private int age;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public int getAge() {
+            return age;
+        }
+
+        public void setAge(int age) {
+            this.age = age;
+        }
+    }
+
+    public static class ChainSetterTarget {
+        private String name;
+        private int age;
+
+        public String getName() {
+            return name;
+        }
+
+        // Chain setter returning 'this'
+        public ChainSetterTarget setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public int getAge() {
+            return age;
+        }
+
+        // Chain setter returning 'this'
+        public ChainSetterTarget setAge(int age) {
+            this.age = age;
+            return this;
+        }
+    }
+
+    public static class MixedSetterSource {
+        private String name;
+        private int age;
+        private String email;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public int getAge() {
+            return age;
+        }
+
+        public void setAge(int age) {
+            this.age = age;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+    }
+
+    public static class MixedSetterTarget {
+        private String name;
+        private int age;
+        private String email;
+
+        public String getName() {
+            return name;
+        }
+
+        // Standard void setter
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public int getAge() {
+            return age;
+        }
+
+        // Chain setter
+        public MixedSetterTarget setAge(int age) {
+            this.age = age;
+            return this;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        // Chain setter
+        public MixedSetterTarget setEmail(String email) {
+            this.email = email;
+            return this;
+        }
+    }
+
+    public static class ShortSetterMethodBean {
+        private String value;
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        // This method should NOT be treated as a setter (name too short)
+        public void set(String ignored) {
+            // Should not be called
+        }
+    }
+
+    public static class NoParameterSetterBean {
+        private String name;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        // This method should NOT be treated as a setter (no parameters)
+        public void setOther() {
+            // Should not be called
+        }
+    }
+
+    public static class MultiParameterSetterBean {
+        private String name;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        // This method should NOT be treated as a setter (multiple parameters)
+        public void setOther(String value1, String value2) {
+            // Should not be called
+        }
+    }
+
+    public static class NonSetMethodBean {
+        private String name;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        // This method should NOT be treated as a setter (doesn't start with "set")
+        public void updateName(String name) {
+            // Should not be called
+        }
+    }
+
+    public static class DualSetterBean {
+        private String name;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
+    public static class DualSetterTarget {
+        private String name;
+        private boolean standardSetterCalled = false;
+
+        public String getName() {
+            return name;
+        }
+
+        // Standard void setter (should be used first)
+        public void setName(String name) {
+            this.name = name;
+            this.standardSetterCalled = true;
+        }
+
+        // Chain setter (should be ignored when standard exists)
+        public DualSetterTarget setNameChain(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public boolean isStandardSetterCalled() {
+            return standardSetterCalled;
+        }
+    }
+
+    public static class ChainOnlySource {
+        private String name;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
+    public static class ChainOnlyTarget {
+        private String name;
+
+        public String getName() {
+            return name;
+        }
+
+        // Only chain setter, no standard setter
+        public ChainOnlyTarget setName(String name) {
+            this.name = name;
+            return this;
+        }
+    }
+
 }
