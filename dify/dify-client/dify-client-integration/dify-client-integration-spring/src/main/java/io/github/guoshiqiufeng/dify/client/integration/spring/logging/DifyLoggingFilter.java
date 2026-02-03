@@ -93,7 +93,7 @@ public class DifyLoggingFilter implements ExchangeFilterFunction {
 
     private void logRequest(String requestId, ClientRequest request) {
         if (log.isDebugEnabled()) {
-            if (maskingEnabled) {
+            if (maskingEnabled && !request.headers().getClass().getName().contains("ReadOnlyHttpHeaders")) {
                 // Convert HttpHeaders to Map for masking
                 Map<String, List<String>> headersMap = new HashMap<>(request.headers());
 
