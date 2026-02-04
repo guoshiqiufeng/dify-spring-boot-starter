@@ -15,16 +15,21 @@
  */
 package io.github.guoshiqiufeng.dify.client.integration.spring.logging;
 
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.HttpHeaderConverter;
 import io.github.guoshiqiufeng.dify.client.integration.spring.util.ClientResponseUtils;
 import io.github.guoshiqiufeng.dify.core.utils.LogMaskingUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.MimeType;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.ExchangeFunction;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -73,7 +78,7 @@ public class DifyLoggingFilter implements ExchangeFilterFunction {
                     if (log.isDebugEnabled()) {
                         // Check if this is a streaming response (SSE)
                         String contentType = response.headers().contentType()
-                                .map(mediaType -> mediaType.toString())
+                                .map(MimeType::toString)
                                 .orElse("");
 
                         if (contentType.contains("text/event-stream") || contentType.contains("stream")) {
@@ -93,9 +98,9 @@ public class DifyLoggingFilter implements ExchangeFilterFunction {
 
     private void logRequest(String requestId, ClientRequest request) {
         if (log.isDebugEnabled()) {
-            if (maskingEnabled && !request.headers().getClass().getName().contains("ReadOnlyHttpHeaders")) {
+            if (maskingEnabled) {
                 // Convert HttpHeaders to Map for masking
-                Map<String, List<String>> headersMap = new HashMap<>(request.headers());
+                Map<String, List<String>> headersMap = new HashMap<>(HttpHeaderConverter.fromSpringHeaders(request.headers()));
 
                 // Mask sensitive headers
                 Map<String, List<String>> maskedHeaders = LogMaskingUtils.maskHeaders(headersMap);
@@ -113,9 +118,20 @@ public class DifyLoggingFilter implements ExchangeFilterFunction {
         long executionTime = System.currentTimeMillis() - REQUEST_TIME_CACHE.getOrDefault(requestId, 0L);
         REQUEST_TIME_CACHE.remove(requestId);
 
-        if(log.isDebugEnabled()) {
-            log.debug("logResponse (streaming)，requestId：{}，status：{}，headers：{}，executionTime：{}ms",
-                    requestId, ClientResponseUtils.getStatusCodeValue(response), response.headers().asHttpHeaders(), executionTime);
+        if (log.isDebugEnabled()) {
+            if (maskingEnabled) {
+                // Convert HttpHeaders to Map for masking
+                Map<String, List<String>> headersMap = new HashMap<>(HttpHeaderConverter.fromSpringHeaders(response.headers().asHttpHeaders()));
+
+                // Mask sensitive headers
+                Map<String, List<String>> maskedHeaders = LogMaskingUtils.maskHeaders(headersMap);
+
+                log.debug("logResponse (streaming)，requestId：{}，status：{}，headers：{}，executionTime：{}ms",
+                        requestId, ClientResponseUtils.getStatusCodeValue(response), maskedHeaders, executionTime);
+            } else {
+                log.debug("logResponse (streaming)，requestId：{}，status：{}，headers：{}，executionTime：{}ms",
+                        requestId, ClientResponseUtils.getStatusCodeValue(response), response.headers().asHttpHeaders(), executionTime);
+            }
         }
 
     }
@@ -130,7 +146,7 @@ public class DifyLoggingFilter implements ExchangeFilterFunction {
                 .flatMap(body -> {
                     if (maskingEnabled) {
                         // Convert HttpHeaders to Map for masking
-                        Map<String, List<String>> headersMap = new HashMap<>(response.headers().asHttpHeaders());
+                        Map<String, List<String>> headersMap = new HashMap<>(HttpHeaderConverter.fromSpringHeaders(response.headers().asHttpHeaders()));
 
                         // Mask sensitive headers
                         Map<String, List<String>> maskedHeaders = LogMaskingUtils.maskHeaders(headersMap);
