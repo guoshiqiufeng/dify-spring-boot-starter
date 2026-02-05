@@ -105,13 +105,31 @@ public class DifyLoggingFilter implements ExchangeFilterFunction {
                 // Mask sensitive headers
                 Map<String, List<String>> maskedHeaders = LogMaskingUtils.maskHeaders(headersMap);
 
-                log.debug("logRequest，requestId：{}，url：{}，method：{}，headers：{}, cookies: {}",
-                        requestId, request.url(), request.method(), maskedHeaders, request.cookies());
+                // Mask URL parameters
+                String maskedUrl = maskSensitiveUrlParams(request.url().toString());
+
+                log.debug("logRequest，requestId：{}，url：{}，method：{}，headers：{}, cookies: ***MASKED***",
+                        requestId, maskedUrl, request.method(), maskedHeaders);
             } else {
                 log.debug("logRequest，requestId：{}，url：{}，method：{}，headers：{}, cookies: {}",
                         requestId, request.url(), request.method(), request.headers(), request.cookies());
             }
         }
+    }
+
+    /**
+     * Mask sensitive URL parameters
+     *
+     * @param url original URL
+     * @return URL with masked sensitive parameters
+     */
+    private String maskSensitiveUrlParams(String url) {
+        if (url == null || url.isEmpty()) {
+            return url;
+        }
+        // Mask common sensitive parameters
+        return url.replaceAll("(api_key|apikey|token|authorization|password|secret|access_token|refresh_token)=([^&]*)",
+                "$1=***MASKED***");
     }
 
     private void logResponseHeadersOnly(String requestId, ClientResponse response) {

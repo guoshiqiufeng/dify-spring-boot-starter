@@ -143,7 +143,9 @@ public class JavaHttpClient implements HttpClient {
 
         // Add logging interceptor if enabled
         if (clientConfig != null && clientConfig.getLogging() != null && clientConfig.getLogging()) {
-            builder.addInterceptor(new LoggingInterceptor());
+            boolean maskingEnabled = clientConfig.getLoggingMaskEnabled() != null
+                    ? clientConfig.getLoggingMaskEnabled() : true;
+            builder.addInterceptor(new LoggingInterceptor(maskingEnabled));
         }
 
         // Add custom interceptors

@@ -374,4 +374,49 @@ class SpringHttpClientTest {
         assertNotNull(client);
         assertNotNull(client.getWebClient());
     }
+
+    @Test
+    void testConstructorWithLoggingEnabledAndMaskingExplicitlyTrue() {
+        // Arrange - Test explicit masking enabled
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setLogging(true);
+        config.setLoggingMaskEnabled(true);
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+    }
+
+    @Test
+    void testConstructorWithLoggingEnabledAndMaskingExplicitlyFalse() {
+        // Arrange - Test explicit masking disabled
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setLogging(true);
+        config.setLoggingMaskEnabled(false);
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+    }
+
+    @Test
+    void testConstructorWithLoggingEnabledAndMaskingNull() {
+        // Arrange - Test masking null (should default to true)
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setLogging(true);
+        config.setLoggingMaskEnabled(null);
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+    }
 }

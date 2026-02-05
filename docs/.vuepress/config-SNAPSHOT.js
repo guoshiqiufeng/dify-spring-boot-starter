@@ -62,6 +62,7 @@ export default defineUserConfig({
                                 '/guide/config',
                                 '/guide/builder',
                                 '/guide/status',
+                                '/guide/logging-security',
                                 // '/guide/annotation',
                             ]
                         },
@@ -105,6 +106,7 @@ export default defineUserConfig({
                             '/guide/config',
                             '/guide/builder',
                             '/guide/status',
+                            '/guide/logging-security',
                             // '/guide/annotation',
                             {
                                 text: '功能',
@@ -178,6 +180,7 @@ export default defineUserConfig({
                                 '/en/guide/config',
                                 '/en/guide/builder',
                                 '/en/guide/status',
+                                '/en/guide/logging-security',
                                 // '/en/guide/annotation',
                             ]
                         },
@@ -221,6 +224,7 @@ export default defineUserConfig({
                             '/en/guide/config',
                             '/en/guide/builder',
                             '/en/guide/status',
+                            '/en/guide/logging-security',
                             // '/en/guide/annotation',
                             {
                                 text: 'Features',

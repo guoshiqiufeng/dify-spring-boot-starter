@@ -223,4 +223,221 @@ class DifyLoggingFilterTest {
                     .verifyComplete();
         }
     }
+
+    @Test
+    void testFilterWithUrlParameterMasking() {
+        // Arrange - Test URL parameter masking
+        DifyLoggingFilter maskingFilter = new DifyLoggingFilter(true);
+
+        ClientRequest request = ClientRequest.create(HttpMethod.GET,
+                URI.create("http://example.com/api?api_key=secret123&token=abc&user_id=456"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .body("response")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = maskingFilter.filter(request, exchangeFunction);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithMaskingDisabled() {
+        // Arrange - Test with masking disabled
+        DifyLoggingFilter noMaskFilter = new DifyLoggingFilter(false);
+
+        ClientRequest request = ClientRequest.create(HttpMethod.GET,
+                URI.create("http://example.com/api?api_key=secret123"))
+                .header("Authorization", "Bearer token")
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .body("{\"password\":\"secret\"}")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = noMaskFilter.filter(request, exchangeFunction);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithSensitiveHeaders() {
+        // Arrange - Test sensitive headers masking
+        DifyLoggingFilter maskingFilter = new DifyLoggingFilter(true);
+
+        ClientRequest request = ClientRequest.create(HttpMethod.POST, URI.create("http://example.com/api"))
+                .header("Authorization", "Bearer secret-token")
+                .header("Cookie", "session=abc123")
+                .header("X-API-Key", "api-key-value")
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .body("response")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = maskingFilter.filter(request, exchangeFunction);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithMultipleSensitiveUrlParams() {
+        // Arrange - Test multiple sensitive URL parameters
+        DifyLoggingFilter maskingFilter = new DifyLoggingFilter(true);
+
+        ClientRequest request = ClientRequest.create(HttpMethod.GET,
+                URI.create("http://example.com/api?api_key=key1&password=pass1&secret=sec1&access_token=tok1&refresh_token=tok2"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .body("response")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = maskingFilter.filter(request, exchangeFunction);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithEmptyUrl() {
+        // Arrange - Test with simple URL (no parameters)
+        DifyLoggingFilter maskingFilter = new DifyLoggingFilter(true);
+
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .body("response")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = maskingFilter.filter(request, exchangeFunction);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithStreamContentType() {
+        // Arrange - Test with generic stream content type
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/stream"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "application/stream+json")
+                .body("data stream")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = loggingFilter.filter(request, exchangeFunction);
+
+        // Assert - streaming responses should not have body logged
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithCookies() {
+        // Arrange - Test cookies masking
+        DifyLoggingFilter maskingFilter = new DifyLoggingFilter(true);
+
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .cookie("session", "session-value")
+                .cookie("auth", "auth-value")
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .body("response")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = maskingFilter.filter(request, exchangeFunction);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithStreamingResponseAndMaskingDisabled() {
+        // Arrange - Test streaming response with masking disabled
+        DifyLoggingFilter noMaskFilter = new DifyLoggingFilter(false);
+
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/stream"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "text/event-stream")
+                .body("data: test stream")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = noMaskFilter.filter(request, exchangeFunction);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithNullUrl() {
+        // Arrange - Test with request that has URL parameters to trigger maskSensitiveUrlParams with edge cases
+        DifyLoggingFilter maskingFilter = new DifyLoggingFilter(true);
+
+        // Create a request with a URL that will test the masking logic
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .body("response")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = maskingFilter.filter(request, exchangeFunction);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
 }

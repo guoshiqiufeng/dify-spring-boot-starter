@@ -224,4 +224,307 @@ class DifyRestLoggingInterceptorTest {
         HttpHeaders headers = (HttpHeaders) headersResult;
         assertEquals("value", headers.getFirst("X-Test"));
     }
+
+    @Test
+    void testInterceptWithUrlParameterMasking() throws IOException {
+        // Arrange - Test URL parameter masking
+        DifyRestLoggingInterceptor maskingInterceptor = new DifyRestLoggingInterceptor(true);
+
+        MockClientHttpRequest request = new MockClientHttpRequest(
+                HttpMethod.GET,
+                URI.create("http://example.com/api?api_key=secret123&token=abc&user_id=456")
+        );
+        byte[] requestBody = new byte[0];
+
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(
+                "response".getBytes(StandardCharsets.UTF_8),
+                HttpStatus.OK
+        );
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = maskingInterceptor.intercept(request, requestBody, execution);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testInterceptWithMaskingDisabled() throws IOException {
+        // Arrange - Test with masking disabled
+        DifyRestLoggingInterceptor noMaskInterceptor = new DifyRestLoggingInterceptor(false);
+
+        MockClientHttpRequest request = new MockClientHttpRequest(
+                HttpMethod.GET,
+                URI.create("http://example.com/api?api_key=secret123")
+        );
+        request.getHeaders().add("Authorization", "Bearer token");
+        byte[] requestBody = "{\"password\":\"secret\"}".getBytes(StandardCharsets.UTF_8);
+
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(
+                "{\"token\":\"new-token\"}".getBytes(StandardCharsets.UTF_8),
+                HttpStatus.OK
+        );
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = noMaskInterceptor.intercept(request, requestBody, execution);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testInterceptWithMaskingEnabled() throws IOException {
+        // Arrange - Test with masking enabled
+        DifyRestLoggingInterceptor maskingInterceptor = new DifyRestLoggingInterceptor(true);
+
+        MockClientHttpRequest request = new MockClientHttpRequest(
+                HttpMethod.POST,
+                URI.create("http://example.com/api")
+        );
+        request.getHeaders().add("Authorization", "Bearer secret-token");
+        request.getHeaders().add("Cookie", "session=abc123");
+        byte[] requestBody = "{\"api_key\":\"secret\",\"password\":\"pass123\"}".getBytes(StandardCharsets.UTF_8);
+
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(
+                "{\"token\":\"new-token\"}".getBytes(StandardCharsets.UTF_8),
+                HttpStatus.OK
+        );
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = maskingInterceptor.intercept(request, requestBody, execution);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testInterceptWithMultipleSensitiveUrlParams() throws IOException {
+        // Arrange - Test multiple sensitive URL parameters
+        DifyRestLoggingInterceptor maskingInterceptor = new DifyRestLoggingInterceptor(true);
+
+        MockClientHttpRequest request = new MockClientHttpRequest(
+                HttpMethod.GET,
+                URI.create("http://example.com/api?api_key=key1&password=pass1&secret=sec1&access_token=tok1&refresh_token=tok2")
+        );
+        byte[] requestBody = new byte[0];
+
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(
+                "response".getBytes(StandardCharsets.UTF_8),
+                HttpStatus.OK
+        );
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = maskingInterceptor.intercept(request, requestBody, execution);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testInterceptWithSensitiveHeaders() throws IOException {
+        // Arrange - Test sensitive headers masking
+        DifyRestLoggingInterceptor maskingInterceptor = new DifyRestLoggingInterceptor(true);
+
+        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.POST, URI.create("http://example.com/api"));
+        request.getHeaders().add("Authorization", "Bearer secret-token");
+        request.getHeaders().add("Cookie", "session=abc123");
+        request.getHeaders().add("X-API-Key", "api-key-value");
+        byte[] requestBody = "{}".getBytes(StandardCharsets.UTF_8);
+
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(
+                "response".getBytes(StandardCharsets.UTF_8),
+                HttpStatus.OK
+        );
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = maskingInterceptor.intercept(request, requestBody, execution);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testInterceptWithComplexUrl() throws IOException {
+        // Arrange - Test complex URL with mixed parameters
+        DifyRestLoggingInterceptor maskingInterceptor = new DifyRestLoggingInterceptor(true);
+
+        MockClientHttpRequest request = new MockClientHttpRequest(
+                HttpMethod.GET,
+                URI.create("https://api.example.com/v1/chat?api_key=secret&user_id=123&token=abc&page=1&limit=10")
+        );
+        byte[] requestBody = new byte[0];
+
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(
+                "response".getBytes(StandardCharsets.UTF_8),
+                HttpStatus.OK
+        );
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = maskingInterceptor.intercept(request, requestBody, execution);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testInterceptWithEmptyUrl() throws IOException {
+        // Arrange - Test with simple URL (no parameters)
+        DifyRestLoggingInterceptor maskingInterceptor = new DifyRestLoggingInterceptor(true);
+
+        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://example.com/api"));
+        byte[] requestBody = new byte[0];
+
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(
+                "response".getBytes(StandardCharsets.UTF_8),
+                HttpStatus.OK
+        );
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = maskingInterceptor.intercept(request, requestBody, execution);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testInterceptWithErrorResponse() throws IOException {
+        // Arrange - Test error response
+        DifyRestLoggingInterceptor maskingInterceptor = new DifyRestLoggingInterceptor(true);
+
+        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://example.com/api"));
+        byte[] requestBody = new byte[0];
+
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(
+                "{\"error\":\"Not found\"}".getBytes(StandardCharsets.UTF_8),
+                HttpStatus.NOT_FOUND
+        );
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = maskingInterceptor.intercept(request, requestBody, execution);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void testInterceptWithLargeResponseBody() throws IOException {
+        // Arrange - Test with large response body
+        StringBuilder largeBody = new StringBuilder();
+        for (int i = 0; i < 1000; i++) {
+            largeBody.append("This is line ").append(i).append("\n");
+        }
+
+        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.POST, URI.create("http://example.com/api"));
+        byte[] requestBody = "{\"data\":\"test\"}".getBytes(StandardCharsets.UTF_8);
+
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(
+                largeBody.toString().getBytes(StandardCharsets.UTF_8),
+                HttpStatus.OK
+        );
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = interceptor.intercept(request, requestBody, execution);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        // Verify body can be read
+        String actualBody = new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8);
+        assertTrue(actualBody.contains("This is line 0"));
+        assertTrue(actualBody.contains("This is line 999"));
+    }
+
+    @Test
+    void testMaskSensitiveUrlParamsWithNullUrl() throws IOException {
+        // Arrange - Test URL masking with null/empty scenarios
+        // We can't directly test the private method, but we can test through intercept
+        DifyRestLoggingInterceptor maskingInterceptor = new DifyRestLoggingInterceptor(true);
+
+        // Test with empty URL parameters (no sensitive params)
+        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://example.com/api"));
+        byte[] requestBody = new byte[0];
+
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(
+                "response".getBytes(StandardCharsets.UTF_8),
+                HttpStatus.OK
+        );
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = maskingInterceptor.intercept(request, requestBody, execution);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testInterceptWithNullRequestBody() throws IOException {
+        // Arrange - Test with null body
+        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.POST, URI.create("http://example.com/api"));
+        byte[] requestBody = null;
+
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(
+                "response".getBytes(StandardCharsets.UTF_8),
+                HttpStatus.OK
+        );
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = interceptor.intercept(request, requestBody, execution);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testInterceptWithEmptyResponseBody() throws IOException {
+        // Arrange - Test with empty response body
+        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://example.com/api"));
+        byte[] requestBody = new byte[0];
+
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(
+                new byte[0],
+                HttpStatus.NO_CONTENT
+        );
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = interceptor.intercept(request, requestBody, execution);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+    }
 }

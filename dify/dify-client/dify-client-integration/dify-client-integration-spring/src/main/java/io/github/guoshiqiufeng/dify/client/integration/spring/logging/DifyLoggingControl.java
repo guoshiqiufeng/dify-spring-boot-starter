@@ -34,8 +34,8 @@ public class DifyLoggingControl {
     private final AtomicBoolean interceptorAdded = new AtomicBoolean(false);
     private final AtomicBoolean filterAdded = new AtomicBoolean(false);
 
-    private final DifyRestLoggingInterceptor loggingInterceptor = new DifyRestLoggingInterceptor();
-    private final DifyLoggingFilter loggingFilter = new DifyLoggingFilter();
+    private volatile DifyRestLoggingInterceptor loggingInterceptor;
+    private volatile DifyLoggingFilter loggingFilter;
 
     private DifyLoggingControl() {
     }
@@ -50,24 +50,52 @@ public class DifyLoggingControl {
     }
 
     /**
-     * getAndMarkInterceptor
+     * getAndMarkInterceptor with default masking enabled
      *
      * @return DifyRestLoggingInterceptor instance, or null if it has already been added.
      */
     public DifyRestLoggingInterceptor getAndMarkInterceptor() {
+        return getAndMarkInterceptor(true);
+    }
+
+    /**
+     * getAndMarkInterceptor with configurable masking
+     *
+     * @param maskingEnabled whether to enable log masking
+     * @return DifyRestLoggingInterceptor instance, or null if it has already been added.
+     */
+    public DifyRestLoggingInterceptor getAndMarkInterceptor(boolean maskingEnabled) {
         if (interceptorAdded.compareAndSet(false, true)) {
+            // Create instance only once and reuse it
+            if (loggingInterceptor == null) {
+                loggingInterceptor = new DifyRestLoggingInterceptor(maskingEnabled);
+            }
             return loggingInterceptor;
         }
         return null;
     }
 
     /**
-     * Gets the log filter instance and marks it as added
+     * Gets the log filter instance and marks it as added (default masking enabled)
      *
      * @return DifyLoggingFilter instance, or null if it has already been added.
      */
     public DifyLoggingFilter getAndMarkFilter() {
+        return getAndMarkFilter(true);
+    }
+
+    /**
+     * Gets the log filter instance and marks it as added with configurable masking
+     *
+     * @param maskingEnabled whether to enable log masking
+     * @return DifyLoggingFilter instance, or null if it has already been added.
+     */
+    public DifyLoggingFilter getAndMarkFilter(boolean maskingEnabled) {
         if (filterAdded.compareAndSet(false, true)) {
+            // Create instance only once and reuse it
+            if (loggingFilter == null) {
+                loggingFilter = new DifyLoggingFilter(maskingEnabled);
+            }
             return loggingFilter;
         }
         return null;
@@ -79,5 +107,6 @@ public class DifyLoggingControl {
     public void reset() {
         interceptorAdded.set(false);
         filterAdded.set(false);
+        // Don't set to null to maintain same instance for testing
     }
 }
