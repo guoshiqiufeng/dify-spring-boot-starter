@@ -493,4 +493,52 @@ class JavaHttpClientTest {
         assertFalse(client.getSkipNull());
         assertNotNull(client.getOkHttpClient());
     }
+
+    @Test
+    void testConstructorWithLoggingEnabledAndMaskingExplicitlyTrue() {
+        // Arrange - Test explicit masking enabled
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setLogging(true);
+        config.setLoggingMaskEnabled(true);
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getOkHttpClient());
+        assertTrue(client.getOkHttpClient().interceptors().size() > 0);
+    }
+
+    @Test
+    void testConstructorWithLoggingEnabledAndMaskingExplicitlyFalse() {
+        // Arrange - Test explicit masking disabled
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setLogging(true);
+        config.setLoggingMaskEnabled(false);
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getOkHttpClient());
+        assertTrue(client.getOkHttpClient().interceptors().size() > 0);
+    }
+
+    @Test
+    void testConstructorWithLoggingEnabledAndMaskingNull() {
+        // Arrange - Test masking null (should default to true)
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setLogging(true);
+        config.setLoggingMaskEnabled(null);
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getOkHttpClient());
+        assertTrue(client.getOkHttpClient().interceptors().size() > 0);
+    }
 }
