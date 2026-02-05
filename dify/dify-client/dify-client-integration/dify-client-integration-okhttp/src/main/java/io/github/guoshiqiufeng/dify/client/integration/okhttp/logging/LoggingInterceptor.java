@@ -154,6 +154,13 @@ public class LoggingInterceptor implements Interceptor {
             ResponseBody responseBody = response.body();
             if (responseBody != null) {
                 MediaType contentType = responseBody.contentType();
+
+                // Check if SSE response - skip body logging to avoid blocking stream
+                if (isSseResponse(contentType)) {
+                    log.debug("【Dify】SSE response detected, skipping body logging to avoid blocking stream");
+                    return null;
+                }
+
                 if (contentType != null && isTextContentType(contentType)) {
                     String bodyString = responseBody.string();
 
@@ -174,6 +181,20 @@ public class LoggingInterceptor implements Interceptor {
             log.warn("【Dify】Failed to log response", e);
         }
         return null;
+    }
+
+    /**
+     * Check if response is Server-Sent Events (SSE).
+     *
+     * @param contentType the media type
+     * @return true if SSE response
+     */
+    private boolean isSseResponse(MediaType contentType) {
+        if (contentType == null) {
+            return false;
+        }
+        // Check for text/event-stream
+        return "text".equals(contentType.type()) && "event-stream".equals(contentType.subtype());
     }
 
     /**

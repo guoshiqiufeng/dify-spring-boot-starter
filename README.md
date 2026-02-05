@@ -30,6 +30,7 @@ Provides Spring Boot Starter and pure Java support for Dify to simplify developm
 - 🔧 Modular architecture with flexible HTTP clients
 - 📦 Multiple JSON codec options (Gson, Jackson 2.x/3.x)
 - 🚀 Unified client implementation, eliminating code duplication
+- 🔒 Log masking and SSE safety hardening (v2.1.0+)
 
 ### Supported Frameworks
 
@@ -53,6 +54,7 @@ Provides Spring Boot Starter and pure Java support for Dify to simplify developm
 - workflow
 - dataset (Knowledge)
 - status (Monitoring)
+- logging security (Masking & SSE Protection)
 
 ### Use
 

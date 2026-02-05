@@ -99,13 +99,31 @@ public class DifyRestLoggingInterceptor implements ClientHttpRequestInterceptor 
                 // Mask sensitive body content
                 String maskedBody = LogMaskingUtils.maskBody(bodyContent);
 
+                // Mask sensitive URL parameters
+                String maskedUrl = maskSensitiveUrlParams(request.getURI().toString());
+
                 log.debug("logRequest，requestId：{}，url：{}，method：{}，headers：{}，body：{}",
-                        requestId, request.getURI(), request.getMethod(), maskedHeaders, maskedBody);
+                        requestId, maskedUrl, request.getMethod(), maskedHeaders, maskedBody);
             } else {
                 log.debug("logRequest，requestId：{}，url：{}，method：{}，headers：{}，body：{}",
                         requestId, request.getURI(), request.getMethod(), request.getHeaders(), bodyContent);
             }
         }
+    }
+
+    /**
+     * Mask sensitive URL parameters
+     *
+     * @param url original URL
+     * @return URL with masked sensitive parameters
+     */
+    private String maskSensitiveUrlParams(String url) {
+        if (url == null || url.isEmpty()) {
+            return url;
+        }
+        // Mask common sensitive parameters
+        return url.replaceAll("(api_key|apikey|token|authorization|password|secret|access_token|refresh_token)=([^&]*)",
+                "$1=***MASKED***");
     }
 
     private byte[] logResponse(String requestId, ClientHttpResponse response) throws IOException {

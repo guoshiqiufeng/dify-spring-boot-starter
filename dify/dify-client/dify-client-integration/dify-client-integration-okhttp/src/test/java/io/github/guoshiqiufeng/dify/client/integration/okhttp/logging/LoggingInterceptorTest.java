@@ -406,4 +406,301 @@ class LoggingInterceptorTest {
         assertNotNull(result);
         assertNotNull(result.body());
     }
+
+    @Test
+    void testInterceptWithSseResponse() throws IOException {
+        // Arrange - Test SSE response detection
+        Request request = new Request.Builder()
+                .url("https://api.dify.ai/v1/chat-messages")
+                .get()
+                .build();
+
+        Response response = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("data: test\n\n", MediaType.get("text/event-stream")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any(Request.class))).thenReturn(response);
+
+        // Act
+        Response result = interceptor.intercept(mockChain);
+
+        // Assert - SSE response should not have body consumed
+        assertNotNull(result);
+        assertEquals(200, result.code());
+        assertNotNull(result.body());
+    }
+
+    @Test
+    void testInterceptWithMaskingDisabled() throws IOException {
+        // Arrange - Test with masking disabled
+        LoggingInterceptor noMaskInterceptor = new LoggingInterceptor(false);
+
+        Request request = new Request.Builder()
+                .url("https://api.dify.ai/v1/test")
+                .header("Authorization", "Bearer secret-token")
+                .get()
+                .build();
+
+        Response response = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("{\"api_key\":\"secret\"}", MediaType.get("application/json")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any(Request.class))).thenReturn(response);
+
+        // Act
+        Response result = noMaskInterceptor.intercept(mockChain);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(200, result.code());
+    }
+
+    @Test
+    void testInterceptWithMaskingEnabled() throws IOException {
+        // Arrange - Test with masking enabled (default)
+        LoggingInterceptor maskInterceptor = new LoggingInterceptor(true);
+
+        Request request = new Request.Builder()
+                .url("https://api.dify.ai/v1/test")
+                .header("Authorization", "Bearer secret-token")
+                .header("Cookie", "session=abc123")
+                .get()
+                .build();
+
+        Response response = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("{\"password\":\"secret123\"}", MediaType.get("application/json")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any(Request.class))).thenReturn(response);
+
+        // Act
+        Response result = maskInterceptor.intercept(mockChain);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(200, result.code());
+    }
+
+    @Test
+    void testInterceptWithNullContentType() throws IOException {
+        // Arrange - Test response with null content type
+        Request request = new Request.Builder()
+                .url("https://api.dify.ai/v1/test")
+                .get()
+                .build();
+
+        Response response = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("test", null))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any(Request.class))).thenReturn(response);
+
+        // Act
+        Response result = interceptor.intercept(mockChain);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(200, result.code());
+    }
+
+    @Test
+    void testInterceptWithSseCharsetResponse() throws IOException {
+        // Arrange - Test SSE with charset
+        Request request = new Request.Builder()
+                .url("https://api.dify.ai/v1/stream")
+                .get()
+                .build();
+
+        Response response = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("data: test\n\n", MediaType.parse("text/event-stream; charset=utf-8")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any(Request.class))).thenReturn(response);
+
+        // Act
+        Response result = interceptor.intercept(mockChain);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(200, result.code());
+    }
+
+    @Test
+    void testInterceptWithPostRequestAndMasking() throws IOException {
+        // Arrange - Test POST with sensitive data
+        RequestBody requestBody = RequestBody.create(
+                "{\"api_key\":\"secret123\",\"password\":\"pass456\"}",
+                MediaType.get("application/json")
+        );
+
+        Request request = new Request.Builder()
+                .url("https://api.dify.ai/v1/auth")
+                .post(requestBody)
+                .header("Authorization", "Bearer token")
+                .build();
+
+        Response response = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("{\"token\":\"new-token\"}", MediaType.get("application/json")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any(Request.class))).thenReturn(response);
+
+        // Act
+        Response result = interceptor.intercept(mockChain);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(200, result.code());
+    }
+
+    @Test
+    void testInterceptWithPostRequestNoMasking() throws IOException {
+        // Arrange - Test POST with masking disabled
+        LoggingInterceptor noMaskInterceptor = new LoggingInterceptor(false);
+
+        RequestBody requestBody = RequestBody.create(
+                "{\"data\":\"test\"}",
+                MediaType.get("application/json")
+        );
+
+        Request request = new Request.Builder()
+                .url("https://api.dify.ai/v1/test")
+                .post(requestBody)
+                .build();
+
+        Response response = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("success", MediaType.get("text/plain")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any(Request.class))).thenReturn(response);
+
+        // Act
+        Response result = noMaskInterceptor.intercept(mockChain);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(200, result.code());
+    }
+
+    @Test
+    void testInterceptWithRequestBodyNullContentType() throws IOException {
+        // Arrange - Test request body with null content type
+        RequestBody requestBody = RequestBody.create("test data", null);
+
+        Request request = new Request.Builder()
+                .url("https://api.dify.ai/v1/test")
+                .post(requestBody)
+                .build();
+
+        Response response = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("success", MediaType.get("text/plain")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any(Request.class))).thenReturn(response);
+
+        // Act
+        Response result = interceptor.intercept(mockChain);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(200, result.code());
+    }
+
+    @Test
+    void testInterceptWithTextHtmlResponse() throws IOException {
+        // Arrange - Test text/html response to cover html subtype check
+        Request request = new Request.Builder()
+                .url("https://api.dify.ai/v1/test")
+                .get()
+                .build();
+
+        String htmlResponse = "<!DOCTYPE html><html><body><h1>Test</h1></body></html>";
+        Response response = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create(htmlResponse, MediaType.get("text/html; charset=utf-8")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any(Request.class))).thenReturn(response);
+
+        // Act
+        Response result = interceptor.intercept(mockChain);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(200, result.code());
+        assertNotNull(result.body());
+    }
+
+    @Test
+    void testInterceptWithApplicationHtmlResponse() throws IOException {
+        // Arrange - Test application/html response
+        Request request = new Request.Builder()
+                .url("https://api.dify.ai/v1/test")
+                .get()
+                .build();
+
+        String htmlResponse = "<html><body>Test</body></html>";
+        Response response = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create(htmlResponse, MediaType.get("application/html")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any(Request.class))).thenReturn(response);
+
+        // Act
+        Response result = interceptor.intercept(mockChain);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(200, result.code());
+        assertNotNull(result.body());
+    }
 }

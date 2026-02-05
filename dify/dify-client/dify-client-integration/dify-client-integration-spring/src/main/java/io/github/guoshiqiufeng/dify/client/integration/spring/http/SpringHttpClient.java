@@ -201,8 +201,10 @@ public class SpringHttpClient implements HttpClient {
             });
         }
         if (clientConfig != null && clientConfig.getLogging()) {
+            boolean maskingEnabled = clientConfig.getLoggingMaskEnabled() != null
+                    ? clientConfig.getLoggingMaskEnabled() : true;
             DifyLoggingControl loggingControl = DifyLoggingControl.getInstance();
-            DifyLoggingFilter filter = loggingControl.getAndMarkFilter();
+            DifyLoggingFilter filter = loggingControl.getAndMarkFilter(maskingEnabled);
             if (filter != null) {
                 builder.filter(filter);
             }
@@ -326,9 +328,11 @@ public class SpringHttpClient implements HttpClient {
             }
 
             if (clientConfig != null && clientConfig.getLogging()) {
+                boolean maskingEnabled = clientConfig.getLoggingMaskEnabled() != null
+                        ? clientConfig.getLoggingMaskEnabled() : true;
                 DifyLoggingControl loggingControl = DifyLoggingControl.getInstance();
 
-                DifyRestLoggingInterceptor interceptor = loggingControl.getAndMarkInterceptor();
+                DifyRestLoggingInterceptor interceptor = loggingControl.getAndMarkInterceptor(maskingEnabled);
                 if (interceptor != null) {
                     try {
                         // Check if it's a ClientHttpRequestInterceptor
