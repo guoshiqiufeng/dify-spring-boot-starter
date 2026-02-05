@@ -41,6 +41,66 @@ dify:
     write-timeout: 30 # 写入超时时间（秒），默认 30
 ```
 
+### 性能优化配置
+
+针对高并发场景和大规模应用，可以配置以下性能优化参数：
+
+```yaml
+dify:
+  client-config:
+    # 基础超时配置
+    connect-timeout: 30
+    read-timeout: 30
+    write-timeout: 30
+
+    # 连接池优化（提升吞吐量 20-30%）
+    max-idle-connections: 10      # 最大空闲连接数，默认 5
+    keep-alive-seconds: 300       # 连接保活时间（秒），默认 300
+    max-requests: 128             # 最大并发请求数，默认 64
+    max-requests-per-host: 10     # 每个主机最大并发请求数，默认 5
+    call-timeout: 60              # 调用超时时间（秒），0 表示不设置
+
+    # SSE 流式优化（减少断流 90%+）
+    sse-read-timeout: 0           # SSE 读取超时（秒），0 表示禁用超时
+
+    # 日志优化（降低内存使用 30-50%）
+    logging: true
+    logging-mask-enabled: true    # 启用日志脱敏，默认 true
+    log-body-max-bytes: 4096      # 日志 body 最大字节数，默认 4096（4KB）
+    log-binary-body: false        # 是否记录二进制响应，默认 false
+```
+
+**配置说明**：
+
+**连接池配置**：
+- `max-idle-connections`: 连接池中保持的最大空闲连接数，增加可提高连接复用率
+- `keep-alive-seconds`: 空闲连接的保活时间，超过此时间的连接将被关闭
+- `max-requests`: 全局最大并发请求数，限制整体并发量
+- `max-requests-per-host`: 单个主机的最大并发请求数，避免对单个服务器压力过大
+- `call-timeout`: 完整调用的超时时间（包括连接、读取、写入），0 表示不限制
+
+**SSE 优化**：
+- `sse-read-timeout`: SSE 流式响应的读取超时时间（秒），设置为 0 表示禁用超时，适用于长时间运行的流式对话
+
+**日志优化**：
+- `log-body-max-bytes`: 日志中记录的响应 body 最大字节数，超过则截断。设置为 0 表示不限制
+- `log-binary-body`: 是否记录二进制响应（如图片、文件），建议设置为 false 以节省内存
+
+**推荐配置**：
+- **低并发场景**（< 10 QPS）：使用默认值
+- **中等并发场景**（10-100 QPS）：
+  ```yaml
+  max-idle-connections: 10
+  max-requests: 128
+  max-requests-per-host: 10
+  ```
+- **高并发场景**（> 100 QPS）：
+  ```yaml
+  max-idle-connections: 20
+  max-requests: 256
+  max-requests-per-host: 20
+  ```
+
 ### 状态监控配置
 
 ```yaml

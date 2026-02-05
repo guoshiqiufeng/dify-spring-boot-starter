@@ -161,6 +161,135 @@ DifyChatClient client = DifyChatBuilder.builder()
         .build();
 ```
 
+### 性能优化配置
+
+#### 连接池配置
+
+针对高并发场景，可以配置 OkHttp 连接池参数以提升性能：
+
+```java
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
+
+DifyProperties.ClientConfig clientConfig = new DifyProperties.ClientConfig();
+
+// 连接池配置
+clientConfig.setMaxIdleConnections(10);      // 最大空闲连接数，默认 5
+clientConfig.setKeepAliveSeconds(300);       // 连接保活时间（秒），默认 300
+clientConfig.setMaxRequests(128);            // 最大并发请求数，默认 64
+clientConfig.setMaxRequestsPerHost(10);      // 每个主机最大并发请求数，默认 5
+clientConfig.setCallTimeout(60);             // 调用超时时间（秒），0 表示不设置
+
+// 创建客户端
+DifyChatClient client = DifyChatBuilder.builder()
+        .baseUrl("https://api.dify.ai")
+        .clientConfig(clientConfig)
+        .httpClientFactory(new JavaHttpClientFactory(JacksonJsonMapper.getInstance()))
+        .build();
+```
+
+**配置说明**：
+- `maxIdleConnections`: 连接池中保持的最大空闲连接数，增加可提高连接复用率
+- `keepAliveSeconds`: 空闲连接的保活时间，超过此时间的连接将被关闭
+- `maxRequests`: 全局最大并发请求数，限制整体并发量
+- `maxRequestsPerHost`: 单个主机的最大并发请求数，避免对单个服务器压力过大
+- `callTimeout`: 完整调用的超时时间（包括连接、读取、写入），0 表示不限制
+
+**推荐配置**：
+- 低并发场景（< 10 QPS）：使用默认值
+- 中等并发场景（10-100 QPS）：`maxIdleConnections=10`, `maxRequests=128`, `maxRequestsPerHost=10`
+- 高并发场景（> 100 QPS）：`maxIdleConnections=20`, `maxRequests=256`, `maxRequestsPerHost=20`
+
+#### SSE 流式优化
+
+针对 SSE（Server-Sent Events）长连接场景，可以配置专门的超时策略：
+
+```java
+DifyProperties.ClientConfig clientConfig = new DifyProperties.ClientConfig();
+
+// SSE 优化配置
+clientConfig.setSseReadTimeout(0);  // 禁用 SSE 读取超时，默认 0（禁用）
+
+// 创建客户端
+DifyChatClient client = DifyChatBuilder.builder()
+        .baseUrl("https://api.dify.ai")
+        .clientConfig(clientConfig)
+        .httpClientFactory(new JavaHttpClientFactory(JacksonJsonMapper.getInstance()))
+        .build();
+```
+
+**配置说明**：
+- `sseReadTimeout`: SSE 流式响应的读取超时时间（秒），设置为 0 表示禁用超时
+- 对于长时间运行的 SSE 连接，建议设置为 0 以避免超时中断
+
+#### 日志优化配置
+
+针对大响应场景，可以配置日志限制以降低内存使用：
+
+```java
+DifyProperties.ClientConfig clientConfig = new DifyProperties.ClientConfig();
+
+// 日志优化配置
+clientConfig.setLogging(true);              // 启用日志
+clientConfig.setLoggingMaskEnabled(true);   // 启用日志脱敏，默认 true
+clientConfig.setLogBodyMaxBytes(8192);      // 日志 body 最大字节数，默认 4096（4KB）
+clientConfig.setLogBinaryBody(false);       // 是否记录二进制响应，默认 false
+
+// 创建客户端
+DifyChatClient client = DifyChatBuilder.builder()
+        .baseUrl("https://api.dify.ai")
+        .clientConfig(clientConfig)
+        .httpClientFactory(new JavaHttpClientFactory(JacksonJsonMapper.getInstance()))
+        .build();
+```
+
+**配置说明**：
+- `logBodyMaxBytes`: 日志中记录的响应 body 最大字节数，超过则截断。设置为 0 表示不限制
+- `logBinaryBody`: 是否记录二进制响应（如图片、文件），建议设置为 false 以节省内存
+
+**推荐配置**：
+- 开发环境：`logBodyMaxBytes=0`（不限制），便于调试
+- 测试环境：`logBodyMaxBytes=8192`（8KB），平衡可读性和性能
+- 生产环境：`logBodyMaxBytes=4096`（4KB）或更小，降低内存使用
+
+#### 完整性能优化示例
+
+```java
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
+import io.github.guoshiqiufeng.dify.client.integration.okhttp.http.JavaHttpClientFactory;
+import io.github.guoshiqiufeng.dify.client.codec.jackson.JacksonJsonMapper;
+
+// 创建高性能配置
+DifyProperties.ClientConfig clientConfig = new DifyProperties.ClientConfig();
+
+// 基础超时配置
+clientConfig.setConnectTimeout(30);
+clientConfig.setReadTimeout(30);
+clientConfig.setWriteTimeout(30);
+
+// 连接池优化（高并发场景）
+clientConfig.setMaxIdleConnections(20);
+clientConfig.setKeepAliveSeconds(300);
+clientConfig.setMaxRequests(256);
+clientConfig.setMaxRequestsPerHost(20);
+clientConfig.setCallTimeout(60);
+
+// SSE 优化
+clientConfig.setSseReadTimeout(0);
+
+// 日志优化
+clientConfig.setLogging(true);
+clientConfig.setLoggingMaskEnabled(true);
+clientConfig.setLogBodyMaxBytes(4096);
+clientConfig.setLogBinaryBody(false);
+
+// 创建客户端
+DifyChatClient client = DifyChatBuilder.builder()
+        .baseUrl("https://api.dify.ai")
+        .clientConfig(clientConfig)
+        .httpClientFactory(new JavaHttpClientFactory(JacksonJsonMapper.getInstance()))
+        .build();
+```
+
 ### 自定义 JSON 编解码器
 
 #### 使用 Jackson 编解码器（默认）

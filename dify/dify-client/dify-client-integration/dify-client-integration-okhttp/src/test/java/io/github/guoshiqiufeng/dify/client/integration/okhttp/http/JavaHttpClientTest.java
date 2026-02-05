@@ -541,4 +541,116 @@ class JavaHttpClientTest {
         assertNotNull(client.getOkHttpClient());
         assertTrue(client.getOkHttpClient().interceptors().size() > 0);
     }
+
+    @Test
+    void testConnectionPoolConfiguration() {
+        // Arrange - Test connection pool configuration
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setMaxIdleConnections(10);
+        config.setKeepAliveSeconds(600);
+        config.setMaxRequests(128);
+        config.setMaxRequestsPerHost(10);
+        config.setCallTimeout(60);
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getOkHttpClient());
+        assertNotNull(client.getOkHttpClient().connectionPool());
+        assertNotNull(client.getOkHttpClient().dispatcher());
+        assertEquals(60000, client.getOkHttpClient().callTimeoutMillis()); // 60 seconds in milliseconds
+    }
+
+    @Test
+    void testConnectionPoolWithNullConfig() {
+        // Arrange - Test with null config (should use defaults)
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setMaxIdleConnections(null);
+        config.setKeepAliveSeconds(null);
+        config.setMaxRequests(null);
+        config.setMaxRequestsPerHost(null);
+        config.setCallTimeout(null);
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getOkHttpClient());
+        assertNotNull(client.getOkHttpClient().connectionPool());
+        assertNotNull(client.getOkHttpClient().dispatcher());
+    }
+
+    @Test
+    void testConnectionPoolWithZeroCallTimeout() {
+        // Arrange - Test with call timeout = 0 (should not set timeout)
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setCallTimeout(0);
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getOkHttpClient());
+        assertEquals(0, client.getOkHttpClient().callTimeoutMillis());
+    }
+
+    @Test
+    void testLoggingInterceptorWithNewParameters() {
+        // Arrange - Test logging interceptor with new parameters
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setLogging(true);
+        config.setLoggingMaskEnabled(true);
+        config.setLogBodyMaxBytes(8192);
+        config.setLogBinaryBody(false);
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getOkHttpClient());
+        assertTrue(client.getOkHttpClient().interceptors().size() > 0);
+    }
+
+    @Test
+    void testLoggingInterceptorWithNullParameters() {
+        // Arrange - Test logging interceptor with null parameters (should use defaults)
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setLogging(true);
+        config.setLoggingMaskEnabled(null);
+        config.setLogBodyMaxBytes(null);
+        config.setLogBinaryBody(null);
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getOkHttpClient());
+        assertTrue(client.getOkHttpClient().interceptors().size() > 0);
+    }
+
+    @Test
+    void testHighConcurrencyConfiguration() {
+        // Arrange - Test high concurrency configuration
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setMaxIdleConnections(20);
+        config.setKeepAliveSeconds(300);
+        config.setMaxRequests(256);
+        config.setMaxRequestsPerHost(20);
+        config.setCallTimeout(60);
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getOkHttpClient());
+        assertNotNull(client.getOkHttpClient().connectionPool());
+        assertNotNull(client.getOkHttpClient().dispatcher());
+    }
 }

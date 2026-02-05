@@ -703,4 +703,250 @@ class LoggingInterceptorTest {
         assertEquals(200, result.code());
         assertNotNull(result.body());
     }
+
+    @Test
+    void testInterceptWithLargeResponseBodySkipped() throws IOException {
+        // Arrange - Test large response body is skipped
+        LoggingInterceptor limitedInterceptor = new LoggingInterceptor(true, 100, false);
+
+        Request request = new Request.Builder()
+                .url("https://api.dify.ai/v1/test")
+                .get()
+                .build();
+
+        // Create large response (200 bytes, exceeds 100 byte limit)
+        String largeResponse = "x".repeat(200);
+        Response response = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create(largeResponse, MediaType.get("text/plain")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any(Request.class))).thenReturn(response);
+
+        // Act
+        Response result = limitedInterceptor.intercept(mockChain);
+
+        // Assert - Should return original response without consuming body
+        assertNotNull(result);
+        assertEquals(200, result.code());
+        assertNotNull(result.body());
+    }
+
+    @Test
+    void testInterceptWithBodyTruncation() throws IOException {
+        // Arrange - Test body truncation when exceeds limit
+        LoggingInterceptor limitedInterceptor = new LoggingInterceptor(true, 50, false);
+
+        Request request = new Request.Builder()
+                .url("https://api.dify.ai/v1/test")
+                .get()
+                .build();
+
+        // Create response with unknown content length (will be read and truncated)
+        String response100Chars = "a".repeat(100);
+        Response response = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create(response100Chars, MediaType.get("text/plain")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any(Request.class))).thenReturn(response);
+
+        // Act
+        Response result = limitedInterceptor.intercept(mockChain);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(200, result.code());
+        assertNotNull(result.body());
+        // Verify the full body is still available (not truncated in actual response)
+        String actualBody = result.body().string();
+        assertEquals(100, actualBody.length());
+        assertEquals(response100Chars, actualBody);
+    }
+
+    @Test
+    void testInterceptWithBodyTruncationInLogging() throws IOException {
+        // Arrange - Test that truncation happens in logging but not in actual response
+        // This test verifies the code path: if (logBodyMaxBytes > 0 && bodyString.length() > logBodyMaxBytes)
+        LoggingInterceptor limitedInterceptor = new LoggingInterceptor(false, 20, false);
+
+        Request request = new Request.Builder()
+                .url("https://api.dify.ai/v1/test")
+                .get()
+                .build();
+
+        // Create a response with body longer than limit
+        String longBody = "This is a very long response body that should be truncated in logs";
+        Response response = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create(longBody, MediaType.get("text/plain")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any(Request.class))).thenReturn(response);
+
+        // Act
+        Response result = limitedInterceptor.intercept(mockChain);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(200, result.code());
+        assertNotNull(result.body());
+
+        // Verify the actual response body is NOT truncated
+        String actualBody = result.body().string();
+        assertEquals(longBody.length(), actualBody.length());
+        assertEquals(longBody, actualBody);
+
+        // The truncation only happens in logging (line 198-200 in LoggingInterceptor.java)
+        // We can't directly verify the log output, but we verified the response is intact
+    }
+
+    @Test
+    void testInterceptWithBinaryBodySkipped() throws IOException {
+        // Arrange - Test binary body is skipped when logBinaryBody=false
+        LoggingInterceptor noBinaryInterceptor = new LoggingInterceptor(true, 4096, false);
+
+        Request request = new Request.Builder()
+                .url("https://api.dify.ai/v1/test")
+                .get()
+                .build();
+
+        byte[] binaryData = new byte[]{0x00, 0x01, 0x02, 0x03};
+        Response response = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create(binaryData, MediaType.get("application/octet-stream")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any(Request.class))).thenReturn(response);
+
+        // Act
+        Response result = noBinaryInterceptor.intercept(mockChain);
+
+        // Assert - Should return original response without consuming body
+        assertNotNull(result);
+        assertEquals(200, result.code());
+        assertNotNull(result.body());
+    }
+
+    @Test
+    void testInterceptWithBinaryBodyLogged() throws IOException {
+        // Arrange - Test binary body is logged when logBinaryBody=true
+        LoggingInterceptor binaryInterceptor = new LoggingInterceptor(true, 4096, true);
+
+        Request request = new Request.Builder()
+                .url("https://api.dify.ai/v1/test")
+                .get()
+                .build();
+
+        byte[] binaryData = new byte[]{0x00, 0x01, 0x02, 0x03};
+        Response response = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create(binaryData, MediaType.get("application/octet-stream")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any(Request.class))).thenReturn(response);
+
+        // Act
+        Response result = binaryInterceptor.intercept(mockChain);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(200, result.code());
+        assertNotNull(result.body());
+    }
+
+    @Test
+    void testInterceptWithUnlimitedBodySize() throws IOException {
+        // Arrange - Test unlimited body size (logBodyMaxBytes=0)
+        LoggingInterceptor unlimitedInterceptor = new LoggingInterceptor(true, 0, false);
+
+        Request request = new Request.Builder()
+                .url("https://api.dify.ai/v1/test")
+                .get()
+                .build();
+
+        String largeResponse = "x".repeat(10000);
+        Response response = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create(largeResponse, MediaType.get("text/plain")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any(Request.class))).thenReturn(response);
+
+        // Act
+        Response result = unlimitedInterceptor.intercept(mockChain);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(200, result.code());
+        assertNotNull(result.body());
+    }
+
+    @Test
+    void testInterceptWithImageResponse() throws IOException {
+        // Arrange - Test image response (binary)
+        LoggingInterceptor interceptor = new LoggingInterceptor(true, 4096, false);
+
+        Request request = new Request.Builder()
+                .url("https://api.dify.ai/v1/image")
+                .get()
+                .build();
+
+        byte[] imageData = new byte[1024]; // 1KB image
+        Response response = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create(imageData, MediaType.get("image/png")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any(Request.class))).thenReturn(response);
+
+        // Act
+        Response result = interceptor.intercept(mockChain);
+
+        // Assert - Binary should be skipped
+        assertNotNull(result);
+        assertEquals(200, result.code());
+        assertNotNull(result.body());
+    }
+
+    @Test
+    void testConstructorWithAllParameters() {
+        // Arrange & Act
+        LoggingInterceptor interceptor1 = new LoggingInterceptor();
+        LoggingInterceptor interceptor2 = new LoggingInterceptor(true);
+        LoggingInterceptor interceptor3 = new LoggingInterceptor(false, 8192, true);
+
+        // Assert
+        assertNotNull(interceptor1);
+        assertNotNull(interceptor2);
+        assertNotNull(interceptor3);
+    }
 }

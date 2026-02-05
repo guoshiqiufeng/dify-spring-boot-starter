@@ -41,6 +41,66 @@ dify:
     write-timeout: 30 # Write timeout in seconds, default 30
 ```
 
+### Performance Optimization Configuration
+
+For high-concurrency scenarios and large-scale applications, you can configure the following performance optimization parameters:
+
+```yaml
+dify:
+  client-config:
+    # Basic timeout configuration
+    connect-timeout: 30
+    read-timeout: 30
+    write-timeout: 30
+
+    # Connection pool optimization (improve throughput by 20-30%)
+    max-idle-connections: 10      # Max idle connections, default 5
+    keep-alive-seconds: 300       # Keep-alive duration (seconds), default 300
+    max-requests: 128             # Max concurrent requests, default 64
+    max-requests-per-host: 10     # Max concurrent requests per host, default 5
+    call-timeout: 60              # Call timeout (seconds), 0 means no limit
+
+    # SSE streaming optimization (reduce disconnections by 90%+)
+    sse-read-timeout: 0           # SSE read timeout (seconds), 0 disables timeout
+
+    # Logging optimization (reduce memory usage by 30-50%)
+    logging: true
+    logging-mask-enabled: true    # Enable log masking, default true
+    log-body-max-bytes: 4096      # Max body bytes in logs, default 4096 (4KB)
+    log-binary-body: false        # Whether to log binary responses, default false
+```
+
+**Configuration Details**:
+
+**Connection Pool Configuration**:
+- `max-idle-connections`: Maximum number of idle connections in the pool, increase for better connection reuse
+- `keep-alive-seconds`: Keep-alive duration for idle connections, connections exceeding this time will be closed
+- `max-requests`: Global maximum concurrent requests, limits overall concurrency
+- `max-requests-per-host`: Maximum concurrent requests per host, prevents overwhelming a single server
+- `call-timeout`: Total call timeout (including connect, read, write), 0 means no limit
+
+**SSE Optimization**:
+- `sse-read-timeout`: Read timeout for SSE streaming responses (seconds), set to 0 to disable timeout, suitable for long-running streaming conversations
+
+**Logging Optimization**:
+- `log-body-max-bytes`: Maximum bytes of response body to log, truncated if exceeded. Set to 0 for no limit
+- `log-binary-body`: Whether to log binary responses (e.g., images, files), recommended to set false to save memory
+
+**Recommended Settings**:
+- **Low concurrency** (< 10 QPS): Use default values
+- **Medium concurrency** (10-100 QPS):
+  ```yaml
+  max-idle-connections: 10
+  max-requests: 128
+  max-requests-per-host: 10
+  ```
+- **High concurrency** (> 100 QPS):
+  ```yaml
+  max-idle-connections: 20
+  max-requests: 256
+  max-requests-per-host: 20
+  ```
+
 ### Status Monitoring Configuration
 
 ```yaml

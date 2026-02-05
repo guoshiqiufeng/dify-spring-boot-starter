@@ -21,6 +21,7 @@ import io.github.guoshiqiufeng.dify.server.dto.response.ApiKeyResponse;
 import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponse;
 import io.github.guoshiqiufeng.dify.server.dto.response.AppsResponseResult;
 import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponse;
+import io.github.guoshiqiufeng.dify.status.cache.StatusCacheService;
 import io.github.guoshiqiufeng.dify.status.checker.DifyChatStatusChecker;
 import io.github.guoshiqiufeng.dify.status.checker.DifyDatasetStatusChecker;
 import io.github.guoshiqiufeng.dify.status.checker.DifyServerStatusChecker;
@@ -38,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -58,13 +60,14 @@ public class DifyStatusServiceImpl implements DifyStatusService {
     private final DifyServerStatusChecker serverChecker;
     private final DifyWorkflowStatusChecker workflowChecker;
     private final ExecutorService executorService;
+    private final StatusCacheService cacheService;
 
     public DifyStatusServiceImpl(
             DifyChatStatusChecker chatChecker,
             DifyDatasetStatusChecker datasetChecker,
             DifyServerStatusChecker serverChecker,
             DifyWorkflowStatusChecker workflowChecker) {
-        this(chatChecker, datasetChecker, serverChecker, workflowChecker, null);
+        this(chatChecker, datasetChecker, serverChecker, workflowChecker, null, null);
     }
 
     public DifyStatusServiceImpl(
@@ -73,11 +76,22 @@ public class DifyStatusServiceImpl implements DifyStatusService {
             DifyServerStatusChecker serverChecker,
             DifyWorkflowStatusChecker workflowChecker,
             ExecutorService executorService) {
+        this(chatChecker, datasetChecker, serverChecker, workflowChecker, executorService, null);
+    }
+
+    public DifyStatusServiceImpl(
+            DifyChatStatusChecker chatChecker,
+            DifyDatasetStatusChecker datasetChecker,
+            DifyServerStatusChecker serverChecker,
+            DifyWorkflowStatusChecker workflowChecker,
+            ExecutorService executorService,
+            StatusCacheService cacheService) {
         this.chatChecker = chatChecker;
         this.datasetChecker = datasetChecker;
         this.serverChecker = serverChecker;
         this.workflowChecker = workflowChecker;
         this.executorService = executorService != null ? executorService : Executors.newFixedThreadPool(4);
+        this.cacheService = cacheService;
     }
 
     @Override
@@ -144,6 +158,16 @@ public class DifyStatusServiceImpl implements DifyStatusService {
 
     @Override
     public AggregatedStatusReport checkStatus(StatusCheckConfig config) {
+        // Check cache if enabled
+        if (cacheService != null && config.getUseCache() != null && config.getUseCache()) {
+            Optional<AggregatedStatusReport> cached = cacheService.getCachedAggregatedReport();
+            if (cached.isPresent()) {
+                log.debug("【Dify】Returning cached aggregated status report");
+                return cached.get();
+            }
+        }
+
+        // Execute actual checks
         List<ClientStatusReport> clientReports = new ArrayList<>();
 
         if (config.getParallel() != null && config.getParallel()) {
@@ -193,7 +217,16 @@ public class DifyStatusServiceImpl implements DifyStatusService {
             }
         }
 
-        return aggregateReports(clientReports);
+        AggregatedStatusReport report = aggregateReports(clientReports);
+
+        // Cache the result if enabled
+        if (cacheService != null && config.getUseCache() != null && config.getUseCache()) {
+            long ttl = config.getCacheTtlSeconds() != null ? config.getCacheTtlSeconds() : 60L;
+            cacheService.cacheAggregatedReport(report, ttl);
+            log.debug("【Dify】Cached aggregated status report with TTL {} seconds", ttl);
+        }
+
+        return report;
     }
 
     /**

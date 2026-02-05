@@ -141,11 +141,42 @@ public class JavaHttpClient implements HttpClient {
         builder.readTimeout(readTimeout, TimeUnit.SECONDS);
         builder.writeTimeout(writeTimeout, TimeUnit.SECONDS);
 
+        // Configure connection pool
+        if (clientConfig != null) {
+            int maxIdleConnections = clientConfig.getMaxIdleConnections() != null
+                    ? clientConfig.getMaxIdleConnections() : 5;
+            int keepAliveSeconds = clientConfig.getKeepAliveSeconds() != null
+                    ? clientConfig.getKeepAliveSeconds() : 300;
+            okhttp3.ConnectionPool pool = new okhttp3.ConnectionPool(
+                    maxIdleConnections, keepAliveSeconds, TimeUnit.SECONDS);
+            builder.connectionPool(pool);
+
+            // Configure dispatcher
+            int maxRequests = clientConfig.getMaxRequests() != null
+                    ? clientConfig.getMaxRequests() : 64;
+            int maxRequestsPerHost = clientConfig.getMaxRequestsPerHost() != null
+                    ? clientConfig.getMaxRequestsPerHost() : 5;
+            okhttp3.Dispatcher dispatcher = new okhttp3.Dispatcher();
+            dispatcher.setMaxRequests(maxRequests);
+            dispatcher.setMaxRequestsPerHost(maxRequestsPerHost);
+            builder.dispatcher(dispatcher);
+
+            // Configure call timeout if specified
+            Integer callTimeout = clientConfig.getCallTimeout();
+            if (callTimeout != null && callTimeout > 0) {
+                builder.callTimeout(callTimeout, TimeUnit.SECONDS);
+            }
+        }
+
         // Add logging interceptor if enabled
         if (clientConfig != null && clientConfig.getLogging() != null && clientConfig.getLogging()) {
             boolean maskingEnabled = clientConfig.getLoggingMaskEnabled() != null
                     ? clientConfig.getLoggingMaskEnabled() : true;
-            builder.addInterceptor(new LoggingInterceptor(maskingEnabled));
+            Integer logBodyMaxBytes = clientConfig.getLogBodyMaxBytes() != null
+                    ? clientConfig.getLogBodyMaxBytes() : 4096;
+            Boolean logBinaryBody = clientConfig.getLogBinaryBody() != null
+                    ? clientConfig.getLogBinaryBody() : false;
+            builder.addInterceptor(new LoggingInterceptor(maskingEnabled, logBodyMaxBytes, logBinaryBody));
         }
 
         // Add custom interceptors
