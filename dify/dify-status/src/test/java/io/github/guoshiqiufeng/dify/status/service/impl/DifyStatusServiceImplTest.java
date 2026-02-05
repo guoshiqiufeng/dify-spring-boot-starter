@@ -752,6 +752,108 @@ class DifyStatusServiceImplTest {
         verify(mockCacheService, times(1)).cacheAggregatedReport(any(AggregatedStatusReport.class), eq(90L));
     }
 
+    @Test
+    void testConstructorWithExecutorService() {
+        // Test constructor: DifyStatusServiceImpl(checkers, executorService)
+        // This covers line 79: this(chatChecker, datasetChecker, serverChecker, workflowChecker, executorService, null);
+        java.util.concurrent.ExecutorService customExecutor = java.util.concurrent.Executors.newFixedThreadPool(2);
+
+        chatChecker.setReportToReturn(createMockClientReport("DifyChat", ApiStatus.NORMAL, 10, 10, 0));
+
+        DifyStatusServiceImpl service = new DifyStatusServiceImpl(
+                chatChecker,
+                null,
+                null,
+                null,
+                customExecutor
+        );
+
+        StatusCheckConfig config = StatusCheckConfig.builder()
+                .apiKey("test-key")
+                .parallel(false)
+                .build();
+
+        AggregatedStatusReport report = service.checkStatus(config);
+
+        assertNotNull(report);
+        assertEquals(ApiStatus.NORMAL, report.getOverallStatus());
+
+        // Clean up
+        service.shutdown();
+        customExecutor.shutdown();
+    }
+
+    @Test
+    void testCheckStatus_WithUseCacheNull() {
+        // Test when config.getUseCache() returns null
+        // This covers the condition: if (cacheService != null && config.getUseCache() != null && config.getUseCache())
+        io.github.guoshiqiufeng.dify.status.cache.StatusCacheService mockCacheService =
+                mock(io.github.guoshiqiufeng.dify.status.cache.StatusCacheService.class);
+
+        chatChecker.setReportToReturn(createMockClientReport("DifyChat", ApiStatus.NORMAL, 10, 10, 0));
+
+        DifyStatusServiceImpl service = new DifyStatusServiceImpl(
+                chatChecker,
+                null,
+                null,
+                null,
+                null,
+                mockCacheService
+        );
+
+        StatusCheckConfig config = StatusCheckConfig.builder()
+                .apiKey("test-key")
+                .useCache(null)  // useCache is null
+                .parallel(false)
+                .build();
+
+        // Act
+        AggregatedStatusReport report = service.checkStatus(config);
+
+        // Assert
+        assertNotNull(report);
+        assertEquals(ApiStatus.NORMAL, report.getOverallStatus());
+
+        // Verify cache was NOT checked because useCache is null
+        verify(mockCacheService, never()).getCachedAggregatedReport();
+        verify(mockCacheService, never()).cacheAggregatedReport(any(), anyLong());
+    }
+
+    @Test
+    void testCheckStatus_WithUseCacheFalseExplicit() {
+        // Test when config.getUseCache() explicitly returns false
+        io.github.guoshiqiufeng.dify.status.cache.StatusCacheService mockCacheService =
+                mock(io.github.guoshiqiufeng.dify.status.cache.StatusCacheService.class);
+
+        chatChecker.setReportToReturn(createMockClientReport("DifyChat", ApiStatus.NORMAL, 10, 10, 0));
+
+        DifyStatusServiceImpl service = new DifyStatusServiceImpl(
+                chatChecker,
+                null,
+                null,
+                null,
+                null,
+                mockCacheService
+        );
+
+        StatusCheckConfig config = StatusCheckConfig.builder()
+                .apiKey("test-key")
+                .useCache(false)  // useCache is explicitly false
+                .parallel(false)
+                .build();
+
+        // Act
+        AggregatedStatusReport report = service.checkStatus(config);
+
+        // Assert
+        assertNotNull(report);
+        assertEquals(ApiStatus.NORMAL, report.getOverallStatus());
+
+        // Verify cache was NOT checked because useCache is false
+        verify(mockCacheService, never()).getCachedAggregatedReport();
+        verify(mockCacheService, never()).cacheAggregatedReport(any(), anyLong());
+    }
+
     private AggregatedStatusReport createMockAggregatedReport(ApiStatus status, int totalApis, int healthyApis, int unhealthyApis) {
         return AggregatedStatusReport.builder()
                 .overallStatus(status)

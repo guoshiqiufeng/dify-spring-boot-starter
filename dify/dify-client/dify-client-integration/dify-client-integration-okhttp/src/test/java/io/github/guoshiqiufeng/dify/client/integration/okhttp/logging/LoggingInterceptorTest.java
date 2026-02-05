@@ -766,6 +766,51 @@ class LoggingInterceptorTest {
         assertNotNull(result);
         assertEquals(200, result.code());
         assertNotNull(result.body());
+        // Verify the full body is still available (not truncated in actual response)
+        String actualBody = result.body().string();
+        assertEquals(100, actualBody.length());
+        assertEquals(response100Chars, actualBody);
+    }
+
+    @Test
+    void testInterceptWithBodyTruncationInLogging() throws IOException {
+        // Arrange - Test that truncation happens in logging but not in actual response
+        // This test verifies the code path: if (logBodyMaxBytes > 0 && bodyString.length() > logBodyMaxBytes)
+        LoggingInterceptor limitedInterceptor = new LoggingInterceptor(false, 20, false);
+
+        Request request = new Request.Builder()
+                .url("https://api.dify.ai/v1/test")
+                .get()
+                .build();
+
+        // Create a response with body longer than limit
+        String longBody = "This is a very long response body that should be truncated in logs";
+        Response response = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create(longBody, MediaType.get("text/plain")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any(Request.class))).thenReturn(response);
+
+        // Act
+        Response result = limitedInterceptor.intercept(mockChain);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(200, result.code());
+        assertNotNull(result.body());
+
+        // Verify the actual response body is NOT truncated
+        String actualBody = result.body().string();
+        assertEquals(longBody.length(), actualBody.length());
+        assertEquals(longBody, actualBody);
+
+        // The truncation only happens in logging (line 198-200 in LoggingInterceptor.java)
+        // We can't directly verify the log output, but we verified the response is intact
     }
 
     @Test
