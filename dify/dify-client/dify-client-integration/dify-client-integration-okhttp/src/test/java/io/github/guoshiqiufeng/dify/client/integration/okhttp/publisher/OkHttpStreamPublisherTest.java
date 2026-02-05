@@ -458,6 +458,138 @@ class OkHttpStreamPublisherTest {
                 .verifyComplete();
     }
 
+    // ========== Resource Cleanup Tests (SSE Cancellation) ==========
+
+    @Test
+    void testStreamCancellation() {
+        // Arrange - long-running stream
+        String sseData = "data: {\"id\":1,\"message\":\"first\"}\n\n" +
+                "data: {\"id\":2,\"message\":\"second\"}\n\n" +
+                "data: {\"id\":3,\"message\":\"third\"}\n\n";
+
+        mockServer.enqueue(new MockResponse()
+                .setBody(sseData)
+                .setHeader("Content-Type", "text/event-stream"));
+
+        Request request = new Request.Builder()
+                .url(mockServer.url("/stream"))
+                .build();
+
+        OkHttpStreamPublisher<TestEvent> publisher = new OkHttpStreamPublisher<>(
+                client, request, jsonMapper, TestEvent.class);
+
+        // Act & Assert
+        Flux<TestEvent> flux = Flux.create(publisher::stream);
+
+        // Cancel after receiving first event
+        StepVerifier.create(flux)
+                .expectNextMatches(event -> event.id == 1)
+                .thenCancel()
+                .verify();
+
+        // Verify that cancellation was handled (no exception thrown)
+        // The onCancel callback should have called call.cancel()
+    }
+
+    @Test
+    void testStreamDisposal() {
+        // Arrange
+        String sseData = "data: {\"id\":1,\"message\":\"first\"}\n\n" +
+                "data: {\"id\":2,\"message\":\"second\"}\n\n";
+
+        mockServer.enqueue(new MockResponse()
+                .setBody(sseData)
+                .setHeader("Content-Type", "text/event-stream"));
+
+        Request request = new Request.Builder()
+                .url(mockServer.url("/stream"))
+                .build();
+
+        OkHttpStreamPublisher<TestEvent> publisher = new OkHttpStreamPublisher<>(
+                client, request, jsonMapper, TestEvent.class);
+
+        // Act & Assert
+        Flux<TestEvent> flux = Flux.create(publisher::stream);
+
+        // Take only 1 event, which will dispose the flux
+        StepVerifier.create(flux.take(1))
+                .expectNextMatches(event -> event.id == 1)
+                .verifyComplete();
+
+        // Verify that disposal was handled (no exception thrown)
+        // The onDispose callback should have called call.cancel()
+    }
+
+    @Test
+    void testStreamCancellationReleasesConnection() {
+        // Arrange - simulate a slow stream
+        mockServer.enqueue(new MockResponse()
+                .setBody("data: {\"id\":1,\"message\":\"slow\"}\n\n")
+                .setHeader("Content-Type", "text/event-stream")
+                .setBodyDelay(5, java.util.concurrent.TimeUnit.SECONDS));
+
+        Request request = new Request.Builder()
+                .url(mockServer.url("/stream"))
+                .build();
+
+        OkHttpStreamPublisher<TestEvent> publisher = new OkHttpStreamPublisher<>(
+                client, request, jsonMapper, TestEvent.class);
+
+        // Act & Assert
+        Flux<TestEvent> flux = Flux.create(publisher::stream);
+
+        // Cancel immediately without waiting for events
+        StepVerifier.create(flux)
+                .thenCancel()
+                .verify();
+
+        // If connection is properly released, this should complete quickly
+        // without waiting for the 5-second delay
+    }
+
+    @Test
+    void testMultipleSubscriptionsWithCancellation() {
+        // Arrange
+        String sseData = "data: {\"id\":1,\"message\":\"test\"}\n\n" +
+                "data: {\"id\":2,\"message\":\"test2\"}\n\n";
+
+        mockServer.enqueue(new MockResponse()
+                .setBody(sseData)
+                .setHeader("Content-Type", "text/event-stream"));
+
+        mockServer.enqueue(new MockResponse()
+                .setBody(sseData)
+                .setHeader("Content-Type", "text/event-stream"));
+
+        Request request1 = new Request.Builder()
+                .url(mockServer.url("/stream"))
+                .build();
+
+        Request request2 = new Request.Builder()
+                .url(mockServer.url("/stream"))
+                .build();
+
+        OkHttpStreamPublisher<TestEvent> publisher1 = new OkHttpStreamPublisher<>(
+                client, request1, jsonMapper, TestEvent.class);
+
+        OkHttpStreamPublisher<TestEvent> publisher2 = new OkHttpStreamPublisher<>(
+                client, request2, jsonMapper, TestEvent.class);
+
+        // Act & Assert - cancel first subscription
+        Flux<TestEvent> flux1 = Flux.create(publisher1::stream);
+        StepVerifier.create(flux1)
+                .expectNextMatches(event -> event.id == 1)
+                .thenCancel()
+                .verify();
+
+        // Second subscription should still work
+        Flux<TestEvent> flux2 = Flux.create(publisher2::stream);
+        StepVerifier.create(flux2)
+                .expectNextMatches(event -> event.id == 1)
+                .expectNextMatches(event -> event.id == 2)
+                .verifyComplete();
+    }
+
     // ========== Error Handling Tests ==========
 
     @Test

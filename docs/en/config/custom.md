@@ -162,6 +162,135 @@ DifyChatClient client = DifyChatBuilder.builder()
         .build();
 ```
 
+### Performance Optimization Configuration
+
+#### Connection Pool Configuration
+
+For high-concurrency scenarios, you can configure OkHttp connection pool parameters to improve performance:
+
+```java
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
+
+DifyProperties.ClientConfig clientConfig = new DifyProperties.ClientConfig();
+
+// Connection pool configuration
+clientConfig.setMaxIdleConnections(10);      // Max idle connections, default 5
+clientConfig.setKeepAliveSeconds(300);       // Keep-alive duration (seconds), default 300
+clientConfig.setMaxRequests(128);            // Max concurrent requests, default 64
+clientConfig.setMaxRequestsPerHost(10);      // Max concurrent requests per host, default 5
+clientConfig.setCallTimeout(60);             // Call timeout (seconds), 0 means no limit
+
+// Create client
+DifyChatClient client = DifyChatBuilder.builder()
+        .baseUrl("https://api.dify.ai")
+        .clientConfig(clientConfig)
+        .httpClientFactory(new JavaHttpClientFactory(JacksonJsonMapper.getInstance()))
+        .build();
+```
+
+**Configuration Details**:
+- `maxIdleConnections`: Maximum number of idle connections in the pool, increase for better connection reuse
+- `keepAliveSeconds`: Keep-alive duration for idle connections, connections exceeding this time will be closed
+- `maxRequests`: Global maximum concurrent requests, limits overall concurrency
+- `maxRequestsPerHost`: Maximum concurrent requests per host, prevents overwhelming a single server
+- `callTimeout`: Total call timeout (including connect, read, write), 0 means no limit
+
+**Recommended Settings**:
+- Low concurrency (< 10 QPS): Use default values
+- Medium concurrency (10-100 QPS): `maxIdleConnections=10`, `maxRequests=128`, `maxRequestsPerHost=10`
+- High concurrency (> 100 QPS): `maxIdleConnections=20`, `maxRequests=256`, `maxRequestsPerHost=20`
+
+#### SSE Streaming Optimization
+
+For SSE (Server-Sent Events) long-connection scenarios, you can configure specific timeout strategies:
+
+```java
+DifyProperties.ClientConfig clientConfig = new DifyProperties.ClientConfig();
+
+// SSE optimization configuration
+clientConfig.setSseReadTimeout(0);  // Disable SSE read timeout, default 0 (disabled)
+
+// Create client
+DifyChatClient client = DifyChatBuilder.builder()
+        .baseUrl("https://api.dify.ai")
+        .clientConfig(clientConfig)
+        .httpClientFactory(new JavaHttpClientFactory(JacksonJsonMapper.getInstance()))
+        .build();
+```
+
+**Configuration Details**:
+- `sseReadTimeout`: Read timeout for SSE streaming responses (seconds), set to 0 to disable timeout
+- For long-running SSE connections, it's recommended to set to 0 to avoid timeout interruptions
+
+#### Logging Optimization Configuration
+
+For large response scenarios, you can configure logging limits to reduce memory usage:
+
+```java
+DifyProperties.ClientConfig clientConfig = new DifyProperties.ClientConfig();
+
+// Logging optimization configuration
+clientConfig.setLogging(true);              // Enable logging
+clientConfig.setLoggingMaskEnabled(true);   // Enable log masking, default true
+clientConfig.setLogBodyMaxBytes(8192);      // Max body bytes in logs, default 4096 (4KB)
+clientConfig.setLogBinaryBody(false);       // Whether to log binary responses, default false
+
+// Create client
+DifyChatClient client = DifyChatBuilder.builder()
+        .baseUrl("https://api.dify.ai")
+        .clientConfig(clientConfig)
+        .httpClientFactory(new JavaHttpClientFactory(JacksonJsonMapper.getInstance()))
+        .build();
+```
+
+**Configuration Details**:
+- `logBodyMaxBytes`: Maximum bytes of response body to log, truncated if exceeded. Set to 0 for no limit
+- `logBinaryBody`: Whether to log binary responses (e.g., images, files), recommended to set false to save memory
+
+**Recommended Settings**:
+- Development: `logBodyMaxBytes=0` (no limit), convenient for debugging
+- Testing: `logBodyMaxBytes=8192` (8KB), balances readability and performance
+- Production: `logBodyMaxBytes=4096` (4KB) or smaller, reduces memory usage
+
+#### Complete Performance Optimization Example
+
+```java
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
+import io.github.guoshiqiufeng.dify.client.integration.okhttp.http.JavaHttpClientFactory;
+import io.github.guoshiqiufeng.dify.client.codec.jackson.JacksonJsonMapper;
+
+// Create high-performance configuration
+DifyProperties.ClientConfig clientConfig = new DifyProperties.ClientConfig();
+
+// Basic timeout configuration
+clientConfig.setConnectTimeout(30);
+clientConfig.setReadTimeout(30);
+clientConfig.setWriteTimeout(30);
+
+// Connection pool optimization (high concurrency scenario)
+clientConfig.setMaxIdleConnections(20);
+clientConfig.setKeepAliveSeconds(300);
+clientConfig.setMaxRequests(256);
+clientConfig.setMaxRequestsPerHost(20);
+clientConfig.setCallTimeout(60);
+
+// SSE optimization
+clientConfig.setSseReadTimeout(0);
+
+// Logging optimization
+clientConfig.setLogging(true);
+clientConfig.setLoggingMaskEnabled(true);
+clientConfig.setLogBodyMaxBytes(4096);
+clientConfig.setLogBinaryBody(false);
+
+// Create client
+DifyChatClient client = DifyChatBuilder.builder()
+        .baseUrl("https://api.dify.ai")
+        .clientConfig(clientConfig)
+        .httpClientFactory(new JavaHttpClientFactory(JacksonJsonMapper.getInstance()))
+        .build();
+```
+
 ### Custom JSON Codec
 
 #### Using Jackson Codec (Default)

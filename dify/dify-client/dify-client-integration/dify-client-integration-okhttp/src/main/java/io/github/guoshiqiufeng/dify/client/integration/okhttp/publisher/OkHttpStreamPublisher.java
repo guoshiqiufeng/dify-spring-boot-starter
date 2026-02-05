@@ -66,7 +66,20 @@ public class OkHttpStreamPublisher<T> {
      * @param sink the FluxSink to emit items to
      */
     public void stream(FluxSink<T> sink) {
-        client.newCall(request).enqueue(new Callback() {
+        Call call = client.newCall(request);
+
+        // Register cancellation handlers to properly release resources
+        sink.onCancel(() -> {
+            log.debug("【Dify】SSE stream cancelled, releasing connection");
+            call.cancel();
+        });
+
+        sink.onDispose(() -> {
+            log.debug("【Dify】SSE stream disposed, releasing connection");
+            call.cancel();
+        });
+
+        call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) {
                 if (!response.isSuccessful()) {

@@ -125,6 +125,52 @@ public class DifyProperties implements Serializable {
          */
         private Integer writeTimeout = 30;
 
+        // ========== OkHttp 连接池配置 ==========
+
+        /**
+         * 最大空闲连接数，默认 5
+         */
+        private Integer maxIdleConnections = 5;
+
+        /**
+         * 连接保活时间（秒），默认 300 秒（5 分钟）
+         */
+        private Integer keepAliveSeconds = 300;
+
+        /**
+         * 最大并发请求数，默认 64
+         */
+        private Integer maxRequests = 64;
+
+        /**
+         * 每个主机的最大并发请求数，默认 5
+         */
+        private Integer maxRequestsPerHost = 5;
+
+        /**
+         * 调用超时时间（秒），0 表示不设置，默认 0
+         */
+        private Integer callTimeout = 0;
+
+        // ========== SSE 超时配置 ==========
+
+        /**
+         * SSE 读取超时时间（秒），0 表示禁用超时，默认 0（禁用）
+         */
+        private Integer sseReadTimeout = 0;
+
+        // ========== 日志配置 ==========
+
+        /**
+         * 日志 body 最大字节数，超过则截断，默认 4096 字节（4KB）
+         */
+        private Integer logBodyMaxBytes = 4096;
+
+        /**
+         * 是否记录二进制响应 body，默认 false
+         */
+        private Boolean logBinaryBody = false;
+
         public ClientConfig(Boolean skipNull, Boolean logging) {
             this.skipNull = skipNull;
             this.logging = logging;

@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -503,6 +504,264 @@ class DifyStatusServiceImplTest {
         assertNotNull(report);
         assertEquals(1, report.getClientReports().size());
         assertEquals(ApiStatus.NORMAL, report.getOverallStatus());
+    }
+
+    // ========== Cache Integration Tests ==========
+
+    @Test
+    void testCheckStatus_WithCacheHit() {
+        // Arrange - create mock cache service
+        io.github.guoshiqiufeng.dify.status.cache.StatusCacheService mockCacheService =
+                mock(io.github.guoshiqiufeng.dify.status.cache.StatusCacheService.class);
+
+        AggregatedStatusReport cachedReport = createMockAggregatedReport(ApiStatus.NORMAL, 18, 18, 0);
+        when(mockCacheService.getCachedAggregatedReport()).thenReturn(Optional.of(cachedReport));
+
+        // Create service with cache
+        DifyStatusServiceImpl service = new DifyStatusServiceImpl(
+                chatChecker,
+                datasetChecker,
+                serverChecker,
+                workflowChecker,
+                null,
+                mockCacheService
+        );
+
+        StatusCheckConfig config = StatusCheckConfig.builder()
+                .apiKey("test-key")
+                .useCache(true)
+                .parallel(false)
+                .build();
+
+        // Act
+        AggregatedStatusReport report = service.checkStatus(config);
+
+        // Assert
+        assertNotNull(report);
+        assertEquals(cachedReport, report);
+        assertEquals(ApiStatus.NORMAL, report.getOverallStatus());
+        assertEquals(18, report.getTotalApis());
+
+        // Verify cache was checked
+        verify(mockCacheService, times(1)).getCachedAggregatedReport();
+
+        // Verify no actual checks were performed (checkers should not be called)
+        assertFalse(chatChecker.wasCheckAllApisCalled());
+        assertFalse(datasetChecker.wasCheckAllApisCalled());
+        assertFalse(serverChecker.wasCheckAllApisCalled());
+        assertFalse(workflowChecker.wasCheckAllApisCalled());
+    }
+
+    @Test
+    void testCheckStatus_WithCacheMiss() {
+        // Arrange - create mock cache service
+        io.github.guoshiqiufeng.dify.status.cache.StatusCacheService mockCacheService =
+                mock(io.github.guoshiqiufeng.dify.status.cache.StatusCacheService.class);
+
+        when(mockCacheService.getCachedAggregatedReport()).thenReturn(Optional.empty());
+
+        // Set up checkers to return reports
+        chatChecker.setReportToReturn(createMockClientReport("DifyChat", ApiStatus.NORMAL, 10, 10, 0));
+        datasetChecker.setReportToReturn(createMockClientReport("DifyDataset", ApiStatus.NORMAL, 5, 5, 0));
+        serverChecker.setReportToReturn(createMockClientReport("DifyServer", ApiStatus.NORMAL, 2, 2, 0));
+        workflowChecker.setReportToReturn(createMockClientReport("DifyWorkflow", ApiStatus.NORMAL, 1, 1, 0));
+
+        // Create service with cache
+        DifyStatusServiceImpl service = new DifyStatusServiceImpl(
+                chatChecker,
+                datasetChecker,
+                serverChecker,
+                workflowChecker,
+                null,
+                mockCacheService
+        );
+
+        StatusCheckConfig config = StatusCheckConfig.builder()
+                .apiKey("test-key")
+                .useCache(true)
+                .cacheTtlSeconds(120L)
+                .parallel(false)
+                .build();
+
+        // Act
+        AggregatedStatusReport report = service.checkStatus(config);
+
+        // Assert
+        assertNotNull(report);
+        assertEquals(ApiStatus.NORMAL, report.getOverallStatus());
+        assertEquals(18, report.getTotalApis());
+
+        // Verify cache was checked
+        verify(mockCacheService, times(1)).getCachedAggregatedReport();
+
+        // Verify actual checks were performed
+        assertTrue(chatChecker.wasCheckAllApisCalled());
+        assertTrue(datasetChecker.wasCheckAllApisCalled());
+        assertTrue(serverChecker.wasCheckAllApisCalled());
+        assertTrue(workflowChecker.wasCheckAllApisCalled());
+
+        // Verify result was cached with correct TTL
+        verify(mockCacheService, times(1)).cacheAggregatedReport(any(AggregatedStatusReport.class), eq(120L));
+    }
+
+    @Test
+    void testCheckStatus_WithCacheDisabled() {
+        // Arrange - create mock cache service
+        io.github.guoshiqiufeng.dify.status.cache.StatusCacheService mockCacheService =
+                mock(io.github.guoshiqiufeng.dify.status.cache.StatusCacheService.class);
+
+        // Set up checkers to return reports
+        chatChecker.setReportToReturn(createMockClientReport("DifyChat", ApiStatus.NORMAL, 10, 10, 0));
+
+        // Create service with cache
+        DifyStatusServiceImpl service = new DifyStatusServiceImpl(
+                chatChecker,
+                null,
+                null,
+                null,
+                null,
+                mockCacheService
+        );
+
+        StatusCheckConfig config = StatusCheckConfig.builder()
+                .apiKey("test-key")
+                .useCache(false)  // Cache disabled
+                .parallel(false)
+                .build();
+
+        // Act
+        AggregatedStatusReport report = service.checkStatus(config);
+
+        // Assert
+        assertNotNull(report);
+        assertEquals(ApiStatus.NORMAL, report.getOverallStatus());
+
+        // Verify cache was NOT checked
+        verify(mockCacheService, never()).getCachedAggregatedReport();
+
+        // Verify actual checks were performed
+        assertTrue(chatChecker.wasCheckAllApisCalled());
+
+        // Verify result was NOT cached
+        verify(mockCacheService, never()).cacheAggregatedReport(any(), anyLong());
+    }
+
+    @Test
+    void testCheckStatus_WithNullCacheService() {
+        // Arrange - no cache service
+        chatChecker.setReportToReturn(createMockClientReport("DifyChat", ApiStatus.NORMAL, 10, 10, 0));
+
+        // Create service without cache
+        DifyStatusServiceImpl service = new DifyStatusServiceImpl(
+                chatChecker,
+                null,
+                null,
+                null,
+                null,
+                null  // No cache service
+        );
+
+        StatusCheckConfig config = StatusCheckConfig.builder()
+                .apiKey("test-key")
+                .useCache(true)  // Cache enabled but service is null
+                .parallel(false)
+                .build();
+
+        // Act
+        AggregatedStatusReport report = service.checkStatus(config);
+
+        // Assert
+        assertNotNull(report);
+        assertEquals(ApiStatus.NORMAL, report.getOverallStatus());
+
+        // Verify actual checks were performed (no cache available)
+        assertTrue(chatChecker.wasCheckAllApisCalled());
+    }
+
+    @Test
+    void testCheckStatus_WithDefaultCacheTtl() {
+        // Arrange - create mock cache service
+        io.github.guoshiqiufeng.dify.status.cache.StatusCacheService mockCacheService =
+                mock(io.github.guoshiqiufeng.dify.status.cache.StatusCacheService.class);
+
+        when(mockCacheService.getCachedAggregatedReport()).thenReturn(Optional.empty());
+
+        chatChecker.setReportToReturn(createMockClientReport("DifyChat", ApiStatus.NORMAL, 10, 10, 0));
+
+        // Create service with cache
+        DifyStatusServiceImpl service = new DifyStatusServiceImpl(
+                chatChecker,
+                null,
+                null,
+                null,
+                null,
+                mockCacheService
+        );
+
+        StatusCheckConfig config = StatusCheckConfig.builder()
+                .apiKey("test-key")
+                .useCache(true)
+                // No cacheTtlSeconds specified, should use default 60
+                .parallel(false)
+                .build();
+
+        // Act
+        service.checkStatus(config);
+
+        // Assert - verify default TTL of 60 seconds was used
+        verify(mockCacheService, times(1)).cacheAggregatedReport(any(AggregatedStatusReport.class), eq(60L));
+    }
+
+    @Test
+    void testCheckStatus_CacheWithParallelExecution() {
+        // Arrange - create mock cache service
+        io.github.guoshiqiufeng.dify.status.cache.StatusCacheService mockCacheService =
+                mock(io.github.guoshiqiufeng.dify.status.cache.StatusCacheService.class);
+
+        when(mockCacheService.getCachedAggregatedReport()).thenReturn(Optional.empty());
+
+        chatChecker.setReportToReturn(createMockClientReport("DifyChat", ApiStatus.NORMAL, 10, 10, 0));
+        datasetChecker.setReportToReturn(createMockClientReport("DifyDataset", ApiStatus.NORMAL, 5, 5, 0));
+
+        // Create service with cache
+        DifyStatusServiceImpl service = new DifyStatusServiceImpl(
+                chatChecker,
+                datasetChecker,
+                null,
+                null,
+                null,
+                mockCacheService
+        );
+
+        StatusCheckConfig config = StatusCheckConfig.builder()
+                .apiKey("test-key")
+                .useCache(true)
+                .cacheTtlSeconds(90L)
+                .parallel(true)  // Parallel execution
+                .build();
+
+        // Act
+        AggregatedStatusReport report = service.checkStatus(config);
+
+        // Assert
+        assertNotNull(report);
+        assertEquals(ApiStatus.NORMAL, report.getOverallStatus());
+
+        // Verify cache was checked and result was cached
+        verify(mockCacheService, times(1)).getCachedAggregatedReport();
+        verify(mockCacheService, times(1)).cacheAggregatedReport(any(AggregatedStatusReport.class), eq(90L));
+    }
+
+    private AggregatedStatusReport createMockAggregatedReport(ApiStatus status, int totalApis, int healthyApis, int unhealthyApis) {
+        return AggregatedStatusReport.builder()
+                .overallStatus(status)
+                .totalApis(totalApis)
+                .healthyApis(healthyApis)
+                .unhealthyApis(unhealthyApis)
+                .reportTime(LocalDateTime.now())
+                .clientReports(new ArrayList<>())
+                .clientSummary(new HashMap<>())
+                .build();
     }
 
     private ClientStatusReport createMockClientReport(String clientName, ApiStatus status,

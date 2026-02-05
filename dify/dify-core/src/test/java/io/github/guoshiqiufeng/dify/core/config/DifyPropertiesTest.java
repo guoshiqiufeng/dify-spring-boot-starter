@@ -117,6 +117,117 @@ class DifyPropertiesTest {
     }
 
     @Test
+    void testClientConfigPerformanceSettings() {
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+
+        // 测试连接池配置默认值
+        assertEquals(5, config.getMaxIdleConnections());
+        assertEquals(300, config.getKeepAliveSeconds());
+        assertEquals(64, config.getMaxRequests());
+        assertEquals(5, config.getMaxRequestsPerHost());
+        assertEquals(0, config.getCallTimeout());
+
+        // 测试 SSE 配置默认值
+        assertEquals(0, config.getSseReadTimeout());
+
+        // 测试日志配置默认值
+        assertTrue(config.getLoggingMaskEnabled());
+        assertEquals(4096, config.getLogBodyMaxBytes());
+        assertFalse(config.getLogBinaryBody());
+
+        // 测试 setter/getter - 连接池配置
+        config.setMaxIdleConnections(10);
+        config.setKeepAliveSeconds(600);
+        config.setMaxRequests(128);
+        config.setMaxRequestsPerHost(10);
+        config.setCallTimeout(60);
+
+        assertEquals(10, config.getMaxIdleConnections());
+        assertEquals(600, config.getKeepAliveSeconds());
+        assertEquals(128, config.getMaxRequests());
+        assertEquals(10, config.getMaxRequestsPerHost());
+        assertEquals(60, config.getCallTimeout());
+
+        // 测试 setter/getter - SSE 配置
+        config.setSseReadTimeout(120);
+        assertEquals(120, config.getSseReadTimeout());
+
+        // 测试 setter/getter - 日志配置
+        config.setLoggingMaskEnabled(false);
+        config.setLogBodyMaxBytes(8192);
+        config.setLogBinaryBody(true);
+
+        assertFalse(config.getLoggingMaskEnabled());
+        assertEquals(8192, config.getLogBodyMaxBytes());
+        assertTrue(config.getLogBinaryBody());
+    }
+
+    @Test
+    void testClientConfigNullValues() {
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+
+        // 测试设置 null 值
+        config.setMaxIdleConnections(null);
+        config.setKeepAliveSeconds(null);
+        config.setMaxRequests(null);
+        config.setMaxRequestsPerHost(null);
+        config.setCallTimeout(null);
+        config.setSseReadTimeout(null);
+        config.setLoggingMaskEnabled(null);
+        config.setLogBodyMaxBytes(null);
+        config.setLogBinaryBody(null);
+
+        assertNull(config.getMaxIdleConnections());
+        assertNull(config.getKeepAliveSeconds());
+        assertNull(config.getMaxRequests());
+        assertNull(config.getMaxRequestsPerHost());
+        assertNull(config.getCallTimeout());
+        assertNull(config.getSseReadTimeout());
+        assertNull(config.getLoggingMaskEnabled());
+        assertNull(config.getLogBodyMaxBytes());
+        assertNull(config.getLogBinaryBody());
+    }
+
+    @Test
+    void testClientConfigEdgeCases() {
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+
+        // 测试边界值 - 最小值
+        config.setMaxIdleConnections(0);
+        config.setKeepAliveSeconds(0);
+        config.setMaxRequests(0);
+        config.setMaxRequestsPerHost(0);
+        config.setCallTimeout(0);
+        config.setSseReadTimeout(0);
+        config.setLogBodyMaxBytes(0);
+
+        assertEquals(0, config.getMaxIdleConnections());
+        assertEquals(0, config.getKeepAliveSeconds());
+        assertEquals(0, config.getMaxRequests());
+        assertEquals(0, config.getMaxRequestsPerHost());
+        assertEquals(0, config.getCallTimeout());
+        assertEquals(0, config.getSseReadTimeout());
+        assertEquals(0, config.getLogBodyMaxBytes());
+
+        // 测试边界值 - 大值
+        config.setMaxIdleConnections(1000);
+        config.setKeepAliveSeconds(3600);
+        config.setMaxRequests(10000);
+        config.setMaxRequestsPerHost(1000);
+        config.setCallTimeout(300);
+        config.setSseReadTimeout(600);
+        config.setLogBodyMaxBytes(1048576); // 1MB
+
+        assertEquals(1000, config.getMaxIdleConnections());
+        assertEquals(3600, config.getKeepAliveSeconds());
+        assertEquals(10000, config.getMaxRequests());
+        assertEquals(1000, config.getMaxRequestsPerHost());
+        assertEquals(300, config.getCallTimeout());
+        assertEquals(600, config.getSseReadTimeout());
+        assertEquals(1048576, config.getLogBodyMaxBytes());
+    }
+
+    @Test
     void testSetAndGetClientConfig() {
         DifyProperties properties = new DifyProperties();
         DifyProperties.ClientConfig config = new DifyProperties.ClientConfig(false, true);

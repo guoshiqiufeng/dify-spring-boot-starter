@@ -41,12 +41,14 @@ public class LoggingInterceptor implements Interceptor {
     private static final Charset UTF8 = StandardCharsets.UTF_8;
 
     private final boolean maskingEnabled;
+    private final int logBodyMaxBytes;
+    private final boolean logBinaryBody;
 
     /**
      * Constructor with default masking enabled
      */
     public LoggingInterceptor() {
-        this(true);
+        this(true, 4096, false);
     }
 
     /**
@@ -55,7 +57,20 @@ public class LoggingInterceptor implements Interceptor {
      * @param maskingEnabled whether to enable log masking
      */
     public LoggingInterceptor(boolean maskingEnabled) {
+        this(maskingEnabled, 4096, false);
+    }
+
+    /**
+     * Constructor with full configuration
+     *
+     * @param maskingEnabled  whether to enable log masking
+     * @param logBodyMaxBytes maximum bytes to log for body (0 = unlimited)
+     * @param logBinaryBody   whether to log binary response bodies
+     */
+    public LoggingInterceptor(boolean maskingEnabled, int logBodyMaxBytes, boolean logBinaryBody) {
         this.maskingEnabled = maskingEnabled;
+        this.logBodyMaxBytes = logBodyMaxBytes;
+        this.logBinaryBody = logBinaryBody;
     }
 
     @Override
@@ -161,15 +176,35 @@ public class LoggingInterceptor implements Interceptor {
                     return null;
                 }
 
+                // Check content length and skip if too large
+                long contentLength = responseBody.contentLength();
+                if (logBodyMaxBytes > 0 && contentLength > logBodyMaxBytes) {
+                    log.debug("【Dify】Response body too large ({}bytes > {}bytes), skipping body logging",
+                            contentLength, logBodyMaxBytes);
+                    return null;
+                }
+
+                // Check if binary content and skip if not enabled
+                if (contentType != null && !isTextContentType(contentType) && !logBinaryBody) {
+                    log.debug("【Dify】Binary response detected ({}), skipping body logging", contentType);
+                    return null;
+                }
+
                 if (contentType != null && isTextContentType(contentType)) {
                     String bodyString = responseBody.string();
 
+                    // Apply max bytes truncation if needed
+                    String logBody = bodyString;
+                    if (logBodyMaxBytes > 0 && bodyString.length() > logBodyMaxBytes) {
+                        logBody = bodyString.substring(0, logBodyMaxBytes) + "... (truncated)";
+                    }
+
                     // Mask body if enabled
                     if (maskingEnabled) {
-                        String maskedBody = LogMaskingUtils.maskBody(bodyString);
+                        String maskedBody = LogMaskingUtils.maskBody(logBody);
                         log.debug("【Dify】Response Body: {}", maskedBody);
                     } else {
-                        log.debug("【Dify】Response Body: {}", bodyString);
+                        log.debug("【Dify】Response Body: {}", logBody);
                     }
 
                     // Recreate response body for downstream consumption (use original body, not masked)
