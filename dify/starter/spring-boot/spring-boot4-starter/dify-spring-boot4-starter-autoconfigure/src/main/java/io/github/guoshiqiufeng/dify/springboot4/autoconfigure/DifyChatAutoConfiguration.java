@@ -18,6 +18,8 @@ package io.github.guoshiqiufeng.dify.springboot4.autoconfigure;
 import io.github.guoshiqiufeng.dify.chat.client.DifyChatClient;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.integration.spring.http.SpringHttpClientFactory;
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.pool.RestClientHttpClientFactory;
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.pool.WebClientConnectionProviderFactory;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.springboot.common.autoconfigure.AbstractDifyChatAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
@@ -39,12 +41,18 @@ public class DifyChatAutoConfiguration extends AbstractDifyChatAutoConfiguration
 
     private final ObjectProvider<WebClient.Builder> webClientBuilderProvider;
     private final ObjectProvider<RestClient.Builder> restClientBuilderProvider;
+    private final ObjectProvider<WebClientConnectionProviderFactory> webClientConnectionProviderFactoryProvider;
+    private final ObjectProvider<RestClientHttpClientFactory> restClientHttpClientFactoryProvider;
 
     public DifyChatAutoConfiguration(
             ObjectProvider<WebClient.Builder> webClientBuilderProvider,
-            ObjectProvider<RestClient.Builder> restClientBuilderProvider) {
+            ObjectProvider<RestClient.Builder> restClientBuilderProvider,
+            ObjectProvider<WebClientConnectionProviderFactory> webClientConnectionProviderFactoryProvider,
+            ObjectProvider<RestClientHttpClientFactory> restClientHttpClientFactoryProvider) {
         this.webClientBuilderProvider = webClientBuilderProvider;
         this.restClientBuilderProvider = restClientBuilderProvider;
+        this.webClientConnectionProviderFactoryProvider = webClientConnectionProviderFactoryProvider;
+        this.restClientHttpClientFactoryProvider = restClientHttpClientFactoryProvider;
     }
 
     @Override
@@ -52,6 +60,8 @@ public class DifyChatAutoConfiguration extends AbstractDifyChatAutoConfiguration
         return new SpringHttpClientFactory(
                 webClientBuilderProvider.getIfAvailable(WebClient::builder),
                 restClientBuilderProvider.getIfAvailable(RestClient::builder),
-                jsonMapper);
+                jsonMapper,
+                webClientConnectionProviderFactoryProvider.getIfAvailable(),
+                restClientHttpClientFactoryProvider.getIfAvailable());
     }
 }

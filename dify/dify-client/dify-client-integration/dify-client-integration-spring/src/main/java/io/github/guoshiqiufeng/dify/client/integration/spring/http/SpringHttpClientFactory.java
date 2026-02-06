@@ -19,6 +19,8 @@ import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientFactory;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders;
 import io.github.guoshiqiufeng.dify.client.core.web.client.HttpClient;
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.pool.RestClientHttpClientFactory;
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.pool.WebClientConnectionProviderFactory;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -44,45 +46,72 @@ public class SpringHttpClientFactory implements HttpClientFactory {
 
     private final List<Object> interceptors;
 
+    private final WebClientConnectionProviderFactory webClientConnectionProviderFactory;
+
+    private final RestClientHttpClientFactory restClientHttpClientFactory;
+
     public SpringHttpClientFactory(JsonMapper jsonMapper) {
-        this(WebClient.builder(), null, jsonMapper, new HttpHeaders(), new ArrayList<>());
+        this(WebClient.builder(), null, jsonMapper, new HttpHeaders(), new ArrayList<>(), null, null);
     }
 
     public SpringHttpClientFactory(WebClient.Builder webClientBuilder, JsonMapper jsonMapper) {
-        this(webClientBuilder, null, jsonMapper, new HttpHeaders(), new ArrayList<>());
+        this(webClientBuilder, null, jsonMapper, new HttpHeaders(), new ArrayList<>(), null, null);
     }
 
     public SpringHttpClientFactory(WebClient.Builder webClientBuilder, Object restClientBuilder, JsonMapper jsonMapper) {
-        this(webClientBuilder, restClientBuilder, jsonMapper, new HttpHeaders(), new ArrayList<>());
+        this(webClientBuilder, restClientBuilder, jsonMapper, new HttpHeaders(), new ArrayList<>(), null, null);
+    }
+
+    /**
+     * Constructor with custom connection pool factories.
+     *
+     * @param webClientBuilder                     custom WebClient.Builder
+     * @param restClientBuilder                    custom RestClient.Builder (Spring 6+ only)
+     * @param jsonMapper                           JSON mapper
+     * @param webClientConnectionProviderFactory   factory for creating WebClient ConnectionProvider (optional)
+     * @param restClientHttpClientFactory          factory for creating RestClient HttpClient (optional)
+     */
+    public SpringHttpClientFactory(WebClient.Builder webClientBuilder, Object restClientBuilder, JsonMapper jsonMapper,
+                                    WebClientConnectionProviderFactory webClientConnectionProviderFactory,
+                                    RestClientHttpClientFactory restClientHttpClientFactory) {
+        this(webClientBuilder, restClientBuilder, jsonMapper, new HttpHeaders(), new ArrayList<>(),
+                webClientConnectionProviderFactory, restClientHttpClientFactory);
     }
 
     private SpringHttpClientFactory(WebClient.Builder webClientBuilder, Object restClientBuilder, JsonMapper jsonMapper,
-                                    HttpHeaders defaultHeaders, List<Object> interceptors) {
+                                    HttpHeaders defaultHeaders, List<Object> interceptors,
+                                    WebClientConnectionProviderFactory webClientConnectionProviderFactory,
+                                    RestClientHttpClientFactory restClientHttpClientFactory) {
         this.webClientBuilder = webClientBuilder;
         this.restClientBuilder = restClientBuilder;
         this.jsonMapper = jsonMapper;
         this.defaultHeaders = defaultHeaders;
         this.interceptors = interceptors;
+        this.webClientConnectionProviderFactory = webClientConnectionProviderFactory;
+        this.restClientHttpClientFactory = restClientHttpClientFactory;
     }
 
     @Override
     public HttpClient createClient(String baseUrl, DifyProperties.ClientConfig clientConfig) {
         WebClient.Builder builder = webClientBuilder.clone();
 
-        return new SpringHttpClient(baseUrl, clientConfig, builder, restClientBuilder, jsonMapper, defaultHeaders, interceptors);
+        return new SpringHttpClient(baseUrl, clientConfig, builder, restClientBuilder, jsonMapper, defaultHeaders, interceptors,
+                webClientConnectionProviderFactory, restClientHttpClientFactory);
     }
 
     @Override
     public HttpClientFactory defaultHeader(String key, String value) {
         HttpHeaders newHeaders = new HttpHeaders(this.defaultHeaders);
         newHeaders.add(key, value);
-        return new SpringHttpClientFactory(webClientBuilder, restClientBuilder, jsonMapper, newHeaders, interceptors);
+        return new SpringHttpClientFactory(webClientBuilder, restClientBuilder, jsonMapper, newHeaders, interceptors,
+                webClientConnectionProviderFactory, restClientHttpClientFactory);
     }
 
     @Override
     public HttpClientFactory interceptor(Object interceptor) {
         List<Object> newInterceptors = new ArrayList<>(this.interceptors);
         newInterceptors.add(interceptor);
-        return new SpringHttpClientFactory(webClientBuilder, restClientBuilder, jsonMapper, defaultHeaders, newInterceptors);
+        return new SpringHttpClientFactory(webClientBuilder, restClientBuilder, jsonMapper, defaultHeaders, newInterceptors,
+                webClientConnectionProviderFactory, restClientHttpClientFactory);
     }
 }

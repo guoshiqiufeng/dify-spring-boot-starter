@@ -15,6 +15,9 @@
  */
 package io.github.guoshiqiufeng.dify.core.logging.masking;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,6 +30,7 @@ import java.util.stream.Collectors;
  */
 public final class MaskingEngine implements MaskingStrategy {
 
+    private static final Logger log = LoggerFactory.getLogger(MaskingEngine.class);
     private static final String MASK_VALUE = "***MASKED***";
     private static final MaskingEngine DEFAULT_INSTANCE = new MaskingEngine(MaskingConfig.createDefault());
 
@@ -109,8 +113,20 @@ public final class MaskingEngine implements MaskingStrategy {
                     }
 
                     return masked;
+                } catch (UnsupportedFormatException e) {
+                    // Normal condition: tokenizer doesn't support this format, try next one
+                    continue;
+                } catch (MaskingParseException e) {
+                    // Real error: parsing failed (e.g., malformed JSON)
+                    // Log warning but DON'T include exception message (may contain sensitive data)
+                    log.warn("Failed to parse body for masking with {} - parse error occurred (message suppressed for security)",
+                            tokenizer.getClass().getSimpleName());
+                    continue;
                 } catch (Exception e) {
-                    // Tokenizer failed, try next one
+                    // Unexpected error: log and try next tokenizer
+                    log.warn("Unexpected error during masking with {}",
+                            tokenizer.getClass().getSimpleName(), e);
+                    continue;
                 }
             }
         }

@@ -31,8 +31,8 @@ description: 日志脱敏与 SSE 安全加固
    - `authorization`
    - `password`
    - `secret`
-   - `access_token`
-   - `refresh_token`
+   - `access_token` / `accessToken`
+   - `refresh_token` / `refreshToken`
 
 3. **Cookies**
    - 所有 cookies 在日志中显示为 `***MASKED***`

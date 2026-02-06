@@ -24,6 +24,7 @@ import io.github.guoshiqiufeng.dify.client.integration.okhttp.logging.LoggingInt
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.utils.StrUtil;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 
@@ -39,10 +40,13 @@ import java.util.concurrent.TimeUnit;
  * @version 2.0.0
  * @since 2025-12-26
  */
+@Slf4j
 public class JavaHttpClient implements HttpClient {
 
     @Getter
     private final OkHttpClient okHttpClient;
+    @Getter
+    private final OkHttpClient sseOkHttpClient;  // Separate client for SSE requests
     @Getter
     private final String baseUrl;
     private final HttpHeaders defaultHeaders;
@@ -64,7 +68,9 @@ public class JavaHttpClient implements HttpClient {
         this.builder = builder;
         this.defaultHeaders = new HttpHeaders();
         this.skipNull = clientConfig != null ? clientConfig.getSkipNull() : true;
-        this.okHttpClient = createOkHttpClient(clientConfig, builder, new HttpHeaders(), new ArrayList<>());
+        OkHttpClient[] clients = createOkHttpClients(clientConfig, builder, new HttpHeaders(), new ArrayList<>());
+        this.okHttpClient = clients[0];
+        this.sseOkHttpClient = clients[1];
     }
 
     public JavaHttpClient(String baseUrl, DifyProperties.ClientConfig clientConfig, OkHttpClient.Builder builder, JsonMapper jsonMapper, HttpHeaders defaultHeaders) {
@@ -73,7 +79,9 @@ public class JavaHttpClient implements HttpClient {
         this.builder = builder;
         this.defaultHeaders = defaultHeaders;
         this.skipNull = clientConfig != null ? clientConfig.getSkipNull() : true;
-        this.okHttpClient = createOkHttpClient(clientConfig, builder, defaultHeaders, new ArrayList<>());
+        OkHttpClient[] clients = createOkHttpClients(clientConfig, builder, defaultHeaders, new ArrayList<>());
+        this.okHttpClient = clients[0];
+        this.sseOkHttpClient = clients[1];
     }
 
     /**
@@ -92,7 +100,9 @@ public class JavaHttpClient implements HttpClient {
         this.builder = builder;
         this.defaultHeaders = defaultHeaders;
         this.skipNull = clientConfig != null ? clientConfig.getSkipNull() : true;
-        this.okHttpClient = createOkHttpClient(clientConfig, builder, defaultHeaders, interceptors);
+        OkHttpClient[] clients = createOkHttpClients(clientConfig, builder, defaultHeaders, interceptors);
+        this.okHttpClient = clients[0];
+        this.sseOkHttpClient = clients[1];
     }
 
     /**
@@ -115,17 +125,23 @@ public class JavaHttpClient implements HttpClient {
     }
 
     /**
-     * Create OkHttpClient with configuration.
+     * Create OkHttpClient instances with configuration.
+     * Creates separate clients for regular and SSE requests if sseReadTimeout differs.
+     * Creates a new Builder instance to avoid shared state and race conditions.
      *
      * @param clientConfig   the client configuration
      * @param defaultHeaders the default headers to add to all requests
      * @param interceptors   the list of custom interceptors
-     * @return configured OkHttpClient
+     * @return array of [regularClient, sseClient] - both may be the same instance if no SSE timeout configured
      */
-    private OkHttpClient createOkHttpClient(DifyProperties.ClientConfig clientConfig, OkHttpClient.Builder builder,
-                                            HttpHeaders defaultHeaders,
-                                            List<Interceptor> interceptors) {
-        if (builder == null) {
+    private OkHttpClient[] createOkHttpClients(DifyProperties.ClientConfig clientConfig, OkHttpClient.Builder builder,
+                                               HttpHeaders defaultHeaders,
+                                               List<Interceptor> interceptors) {
+        // Preserve user's custom builder configuration while avoiding shared mutable state
+        // If a builder is provided, create a new builder from the existing client to preserve all configurations
+        if (builder != null) {
+            builder = builder.build().newBuilder();
+        } else {
             builder = new OkHttpClient.Builder();
         }
 
@@ -137,31 +153,100 @@ public class JavaHttpClient implements HttpClient {
         int writeTimeout = (clientConfig != null && clientConfig.getWriteTimeout() != null)
                 ? clientConfig.getWriteTimeout() : 30;
 
+        // Check if SSE read timeout is configured and differs from regular read timeout
+        Integer sseReadTimeout = (clientConfig != null && clientConfig.getSseReadTimeout() != null)
+                ? clientConfig.getSseReadTimeout() : null;
+
+        boolean needsSeparateSseClient = false;
+        if (sseReadTimeout != null) {
+            // Validate: must be >= 0 (0 = no timeout, >0 = timeout in seconds)
+            if (sseReadTimeout < 0) {
+                // Invalid value, log warning and ignore
+                log.warn("【Dify】Invalid sseReadTimeout value: {}. Must be >= 0. Using default readTimeout instead.", sseReadTimeout);
+                sseReadTimeout = null;
+            } else if (sseReadTimeout != readTimeout) {
+                // Valid and different from regular timeout - need separate client
+                needsSeparateSseClient = true;
+            }
+        }
+
+        // Build regular client with readTimeout
+        OkHttpClient regularClient = buildOkHttpClient(builder, connectTimeout, readTimeout, writeTimeout,
+                clientConfig, defaultHeaders, interceptors);
+
+        // Build SSE client if needed
+        OkHttpClient sseClient;
+        if (needsSeparateSseClient) {
+            // Create a new builder from the regular client to preserve all custom configurations
+            // (TLS, proxy, auth, custom interceptors) while applying different timeout
+            OkHttpClient.Builder sseBuilder = regularClient.newBuilder();
+            // Only override the read timeout for SSE
+            sseBuilder.readTimeout(sseReadTimeout, TimeUnit.SECONDS);
+            sseClient = sseBuilder.build();
+        } else {
+            // Use same client for both
+            sseClient = regularClient;
+        }
+
+        return new OkHttpClient[]{regularClient, sseClient};
+    }
+
+    /**
+     * Build a single OkHttpClient with the specified timeouts and configuration.
+     */
+    private OkHttpClient buildOkHttpClient(OkHttpClient.Builder builder, int connectTimeout, int readTimeout,
+                                           int writeTimeout, DifyProperties.ClientConfig clientConfig,
+                                           HttpHeaders defaultHeaders, List<Interceptor> interceptors) {
+
         builder.connectTimeout(connectTimeout, TimeUnit.SECONDS);
         builder.readTimeout(readTimeout, TimeUnit.SECONDS);
         builder.writeTimeout(writeTimeout, TimeUnit.SECONDS);
 
         // Configure connection pool
         if (clientConfig != null) {
+            // Validate and apply connection pool settings with boundary checks
+            // Strategy: Use default value for invalid parameters (< 1)
+            // This matches the Spring implementation for consistency
             int maxIdleConnections = clientConfig.getMaxIdleConnections() != null
                     ? clientConfig.getMaxIdleConnections() : 5;
+            if (maxIdleConnections < 1) {
+                log.warn("Invalid maxIdleConnections value: {}, using default value 5", maxIdleConnections);
+                maxIdleConnections = 5;
+            }
+
             int keepAliveSeconds = clientConfig.getKeepAliveSeconds() != null
                     ? clientConfig.getKeepAliveSeconds() : 300;
+            if (keepAliveSeconds < 1) {
+                log.warn("Invalid keepAliveSeconds value: {}, using default value 300", keepAliveSeconds);
+                keepAliveSeconds = 300;
+            }
+
             okhttp3.ConnectionPool pool = new okhttp3.ConnectionPool(
                     maxIdleConnections, keepAliveSeconds, TimeUnit.SECONDS);
             builder.connectionPool(pool);
 
-            // Configure dispatcher
+            // Configure dispatcher with boundary checks
             int maxRequests = clientConfig.getMaxRequests() != null
                     ? clientConfig.getMaxRequests() : 64;
+            if (maxRequests < 1) {
+                log.warn("Invalid maxRequests value: {}, using default value 64", maxRequests);
+                maxRequests = 64;
+            }
+
             int maxRequestsPerHost = clientConfig.getMaxRequestsPerHost() != null
                     ? clientConfig.getMaxRequestsPerHost() : 5;
+            if (maxRequestsPerHost < 1) {
+                log.warn("Invalid maxRequestsPerHost value: {}, using default value 5", maxRequestsPerHost);
+                maxRequestsPerHost = 5;
+            }
+
             okhttp3.Dispatcher dispatcher = new okhttp3.Dispatcher();
             dispatcher.setMaxRequests(maxRequests);
             dispatcher.setMaxRequestsPerHost(maxRequestsPerHost);
             builder.dispatcher(dispatcher);
 
             // Configure call timeout if specified
+            // Note: callTimeout can be 0 (no limit) or positive value
             Integer callTimeout = clientConfig.getCallTimeout();
             if (callTimeout != null && callTimeout > 0) {
                 builder.callTimeout(callTimeout, TimeUnit.SECONDS);

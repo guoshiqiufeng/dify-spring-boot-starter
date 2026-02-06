@@ -52,6 +52,7 @@ import java.util.Map;
 class WebClientExecutor {
 
     private final WebClient webClient;
+    private final WebClient sseWebClient;
     private final JsonMapper jsonMapper;
     private final ResponseConverter responseConverter;
     private final Boolean skipNull;
@@ -63,7 +64,7 @@ class WebClientExecutor {
      * @param jsonMapper JSON mapper
      */
     WebClientExecutor(WebClient webClient, JsonMapper jsonMapper) {
-        this(webClient, jsonMapper, true);
+        this(webClient, webClient, jsonMapper, true);
     }
 
     /**
@@ -73,7 +74,20 @@ class WebClientExecutor {
      * @param jsonMapper JSON mapper
      */
     WebClientExecutor(WebClient webClient, JsonMapper jsonMapper, Boolean skipNull) {
+        this(webClient, webClient, jsonMapper, skipNull);
+    }
+
+    /**
+     * Constructor with separate SSE WebClient.
+     *
+     * @param webClient    WebClient instance for regular requests
+     * @param sseWebClient WebClient instance for SSE streaming requests
+     * @param jsonMapper   JSON mapper
+     * @param skipNull     whether to skip null values
+     */
+    WebClientExecutor(WebClient webClient, WebClient sseWebClient, JsonMapper jsonMapper, Boolean skipNull) {
         this.webClient = webClient;
+        this.sseWebClient = sseWebClient;
         this.jsonMapper = jsonMapper;
         this.skipNull = skipNull;
         this.responseConverter = new ResponseConverter(jsonMapper);
@@ -271,7 +285,8 @@ class WebClientExecutor {
     <T> Flux<T> executeStream(String method, URI uri, Map<String, String> headers,
                               Map<String, String> cookies, Map<String, String> queryParams,
                               Object body, Class<T> responseType) {
-        WebClient.RequestBodySpec requestSpec = buildRequest(method, uri, headers, cookies, queryParams, body);
+        // Use SSE-specific WebClient for streaming requests
+        WebClient.RequestBodySpec requestSpec = buildRequest(sseWebClient, method, uri, headers, cookies, queryParams, body);
 
         // For SSE streaming, use Spring's ServerSentEvent support
         ParameterizedTypeReference<org.springframework.http.codec.ServerSentEvent<String>> sseType =
@@ -315,7 +330,8 @@ class WebClientExecutor {
     <T> Flux<T> executeStream(String method, URI uri, Map<String, String> headers,
                               Map<String, String> cookies, Map<String, String> queryParams,
                               Object body, TypeReference<T> typeReference) {
-        WebClient.RequestBodySpec requestSpec = buildRequest(method, uri, headers, cookies, queryParams, body);
+        // Use SSE-specific WebClient for streaming requests
+        WebClient.RequestBodySpec requestSpec = buildRequest(sseWebClient, method, uri, headers, cookies, queryParams, body);
 
         // For SSE streaming, use Spring's ServerSentEvent support
         ParameterizedTypeReference<org.springframework.http.codec.ServerSentEvent<String>> sseType =
@@ -393,8 +409,26 @@ class WebClientExecutor {
     WebClient.RequestBodySpec buildRequest(String method, URI uri, Map<String, String> headers,
                                            Map<String, String> cookies, Map<String, String> queryParams,
                                            Object body) {
+        return buildRequest(webClient, method, uri, headers, cookies, queryParams, body);
+    }
+
+    /**
+     * Build request with specified WebClient.
+     *
+     * @param client      WebClient instance to use
+     * @param method      HTTP method
+     * @param uri         request URI
+     * @param headers     request headers
+     * @param cookies     request cookies
+     * @param queryParams query parameters
+     * @param body        request body
+     * @return WebClient.RequestBodySpec
+     */
+    WebClient.RequestBodySpec buildRequest(WebClient client, String method, URI uri, Map<String, String> headers,
+                                           Map<String, String> cookies, Map<String, String> queryParams,
+                                           Object body) {
         // Start request
-        WebClient.RequestBodyUriSpec requestSpec = webClient.method(HttpMethod.valueOf(method));
+        WebClient.RequestBodyUriSpec requestSpec = client.method(HttpMethod.valueOf(method));
 
         // Set URI - use uriBuilder to respect baseUrl and avoid double encoding
         WebClient.RequestBodySpec bodySpec;

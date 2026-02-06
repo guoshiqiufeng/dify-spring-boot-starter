@@ -46,6 +46,10 @@ public class ClientResponseUtils {
         }
     }
 
+    public ClientResponse.Headers getHeaders(ClientResponse clientResponse) {
+        return clientResponse.headers();
+    }
+
     public ClientResponse createClientResponse(ClientResponse response, String body) {
         try {
             // Try Spring 6+ approach: ClientResponse.create(HttpStatusCode, ExchangeStrategies)

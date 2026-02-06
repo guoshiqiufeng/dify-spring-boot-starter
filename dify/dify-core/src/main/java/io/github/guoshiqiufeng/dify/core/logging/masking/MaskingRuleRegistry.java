@@ -122,7 +122,9 @@ public final class MaskingRuleRegistry {
         rules.add(MaskingRule.builder()
                 .name("token")
                 .fieldNames("password", "token", "secret", "apikey", "api_key", "authorization", "credential",
-                        "x-api-key", "api-key", "x-auth-token", "cookie", "set-cookie")
+                        "x-api-key", "api-key", "x-auth-token", "cookie", "set-cookie",
+                        "access_token", "accessToken", "refresh_token", "refreshToken",
+                        "bearer_token", "bearerToken", "session_token", "sessionToken")
                 .type(MaskingRule.Type.FULL)
                 .kind(MaskingRule.ValueKind.TOKEN)
                 .build());

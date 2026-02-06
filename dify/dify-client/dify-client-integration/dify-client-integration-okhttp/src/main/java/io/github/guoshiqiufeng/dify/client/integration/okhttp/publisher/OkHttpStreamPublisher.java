@@ -17,6 +17,7 @@ package io.github.guoshiqiufeng.dify.client.integration.okhttp.publisher;
 
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
+import io.github.guoshiqiufeng.dify.core.utils.LogMaskingUtils;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -217,8 +218,16 @@ public class OkHttpStreamPublisher<T> {
             int statusCode = response.code();
             String responseBody = response.body() != null ? response.body().string() : "";
 
-            log.error("【Dify】Stream request failed: Status: {}, Body: {}", statusCode, responseBody);
+            // Mask and truncate response body for logging to prevent sensitive data leakage
+            String maskedBody = LogMaskingUtils.maskBody(responseBody);
+            // Truncate to 500 chars to prevent log bloat
+            if (maskedBody.length() > 500) {
+                maskedBody = maskedBody.substring(0, 500) + "... (truncated)";
+            }
 
+            log.error("【Dify】Stream request failed: Status: {}, Body: {}", statusCode, maskedBody);
+
+            // Use original body in exception to preserve error parsing capability for downstream consumers
             sink.error(new HttpClientException(statusCode, responseBody));
         } catch (IOException e) {
             sink.error(new HttpClientException("Failed to read error response", e));

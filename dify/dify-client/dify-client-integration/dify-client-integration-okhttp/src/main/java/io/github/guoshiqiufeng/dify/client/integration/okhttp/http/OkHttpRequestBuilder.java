@@ -207,7 +207,8 @@ public class OkHttpRequestBuilder implements HttpRequestBuilder {
     @Override
     public <T> Flux<T> stream(Class<T> responseType) {
         Request request = buildRequest();
-        OkHttpStreamPublisher<T> publisher = new OkHttpStreamPublisher<>(client.getOkHttpClient(), request, jsonMapper, responseType);
+        // Use SSE client for streaming requests
+        OkHttpStreamPublisher<T> publisher = new OkHttpStreamPublisher<>(client.getSseOkHttpClient(), request, jsonMapper, responseType);
 
         return Flux.create(publisher::stream);
     }

@@ -141,6 +141,8 @@ class DifyRestLoggingInterceptorTest {
                 responseBody.getBytes(StandardCharsets.UTF_8),
                 HttpStatus.OK
         );
+        // Set Content-Length header so the interceptor will buffer the body
+        mockResponse.getHeaders().setContentLength(responseBody.getBytes(StandardCharsets.UTF_8).length);
 
         when(execution.execute(any(), any())).thenReturn(mockResponse);
 
@@ -527,4 +529,511 @@ class DifyRestLoggingInterceptorTest {
         assertNotNull(response);
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
+
+    // ========== Branch coverage tests for SSE, binary content, and content-length ==========
+
+    @Test
+    void testInterceptWithSSEResponse() throws IOException {
+        // Arrange - Test SSE response (text/event-stream)
+        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://example.com/stream"));
+        byte[] requestBody = new byte[0];
+
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(
+                "data: test stream\n\n".getBytes(StandardCharsets.UTF_8),
+                HttpStatus.OK
+        );
+        mockResponse.getHeaders().add("Content-Type", "text/event-stream");
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = interceptor.intercept(request, requestBody, execution);
+
+        // Assert - SSE responses should not be buffered
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testInterceptWithBinaryContentAndLogBinaryBodyEnabled() throws IOException {
+        // Arrange - Test binary content with logBinaryBody=true
+        DifyRestLoggingInterceptor binaryInterceptor = new DifyRestLoggingInterceptor(true, 10240, true);
+
+        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://example.com/file"));
+        byte[] requestBody = new byte[0];
+
+        byte[] binaryData = new byte[1024];
+        for (int i = 0; i < binaryData.length; i++) {
+            binaryData[i] = (byte) i;
+        }
+
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(binaryData, HttpStatus.OK);
+        mockResponse.getHeaders().add("Content-Type", "application/octet-stream");
+        mockResponse.getHeaders().setContentLength(binaryData.length);
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = binaryInterceptor.intercept(request, requestBody, execution);
+
+        // Assert - should buffer binary body when enabled
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testInterceptWithBinaryContentAndLogBinaryBodyDisabled() throws IOException {
+        // Arrange - Test binary content with logBinaryBody=false (default)
+        DifyRestLoggingInterceptor binaryInterceptor = new DifyRestLoggingInterceptor(true, 10240, false);
+
+        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://example.com/file"));
+        byte[] requestBody = new byte[0];
+
+        byte[] binaryData = new byte[2048];
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(binaryData, HttpStatus.OK);
+        mockResponse.getHeaders().add("Content-Type", "application/octet-stream");
+        mockResponse.getHeaders().setContentLength(binaryData.length);
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = binaryInterceptor.intercept(request, requestBody, execution);
+
+        // Assert - should skip binary body logging
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testInterceptWithUnknownContentLength() throws IOException {
+        // Arrange - Test with unknown content-length (-1)
+        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://example.com/api"));
+        byte[] requestBody = new byte[0];
+
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(
+                "{\"data\":\"test\"}".getBytes(StandardCharsets.UTF_8),
+                HttpStatus.OK
+        );
+        // No Content-Length header = -1
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = interceptor.intercept(request, requestBody, execution);
+
+        // Assert - should handle unknown content-length
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testInterceptWithContentLengthExceedsLimit() throws IOException {
+        // Arrange - Test with content-length > logBodyMaxBytes
+        DifyRestLoggingInterceptor limitedInterceptor = new DifyRestLoggingInterceptor(true, 100); // 100 bytes limit
+
+        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://example.com/api"));
+        byte[] requestBody = new byte[0];
+
+        String largeBody = "x".repeat(10240); // 10KB
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(
+                largeBody.getBytes(StandardCharsets.UTF_8),
+                HttpStatus.OK
+        );
+        mockResponse.getHeaders().setContentLength(10240);
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = limitedInterceptor.intercept(request, requestBody, execution);
+
+        // Assert - should skip body logging when exceeds limit
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testInterceptWithContentLengthWithinLimit() throws IOException {
+        // Arrange - Test with content-length <= logBodyMaxBytes
+        DifyRestLoggingInterceptor limitedInterceptor = new DifyRestLoggingInterceptor(true, 10240); // 10KB limit
+
+        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://example.com/api"));
+        byte[] requestBody = new byte[0];
+
+        String smallBody = "{\"data\":\"small\"}";
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(
+                smallBody.getBytes(StandardCharsets.UTF_8),
+                HttpStatus.OK
+        );
+        mockResponse.getHeaders().setContentLength(smallBody.length());
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = limitedInterceptor.intercept(request, requestBody, execution);
+
+        // Assert - should buffer body when within limit
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        // Verify body can be read multiple times
+        String firstRead = new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8);
+        String secondRead = new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8);
+        assertEquals(smallBody, firstRead);
+        assertEquals(smallBody, secondRead);
+    }
+
+    @Test
+    void testInterceptWithUnlimitedBodyLogging() throws IOException {
+        // Arrange - Test with logBodyMaxBytes=0 (unlimited)
+        DifyRestLoggingInterceptor unlimitedInterceptor = new DifyRestLoggingInterceptor(true, 0);
+
+        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://example.com/api"));
+        byte[] requestBody = new byte[0];
+
+        String largeBody = "x".repeat(100000); // 100KB
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(
+                largeBody.getBytes(StandardCharsets.UTF_8),
+                HttpStatus.OK
+        );
+        mockResponse.getHeaders().setContentLength(100000);
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = unlimitedInterceptor.intercept(request, requestBody, execution);
+
+        // Assert - should buffer body regardless of size
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testInterceptWithGetStatusCodeException() throws IOException {
+        // Arrange - Test getStatusCodeSafely exception path
+        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://example.com/api"));
+        byte[] requestBody = new byte[0];
+
+        // Create a response that throws on getStatusCode
+        ClientHttpResponse faultyResponse = new MockClientHttpResponse(
+                "response".getBytes(StandardCharsets.UTF_8),
+                HttpStatus.OK
+        ) {
+            @Override
+            public HttpStatus getStatusCode() {
+                throw new RuntimeException("Status code unavailable");
+            }
+        };
+
+        when(execution.execute(any(), any())).thenReturn(faultyResponse);
+
+        // Act
+        ClientHttpResponse response = interceptor.intercept(request, requestBody, execution);
+
+        // Assert - should handle exception and return response
+        assertNotNull(response);
+    }
+
+    @Test
+    void testInterceptWithExecutionException() throws IOException {
+        // Arrange - Test exception path in intercept (cleanup)
+        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://example.com/api"));
+        byte[] requestBody = new byte[0];
+
+        when(execution.execute(any(), any())).thenThrow(new IOException("Network error"));
+
+        // Act & Assert - should propagate exception and cleanup cache
+        assertThrows(IOException.class, () -> {
+            interceptor.intercept(request, requestBody, execution);
+        });
+    }
+
+    @Test
+    void testInterceptWithImageContentType() throws IOException {
+        // Arrange - Test with image content type (binary)
+        DifyRestLoggingInterceptor binaryInterceptor = new DifyRestLoggingInterceptor(true, 10240, false);
+
+        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://example.com/image.png"));
+        byte[] requestBody = new byte[0];
+
+        byte[] imageData = new byte[5000];
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(imageData, HttpStatus.OK);
+        mockResponse.getHeaders().add("Content-Type", "image/png");
+        mockResponse.getHeaders().setContentLength(imageData.length);
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = binaryInterceptor.intercept(request, requestBody, execution);
+
+        // Assert - should skip binary body logging
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testInterceptWithVideoContentType() throws IOException {
+        // Arrange - Test with video content type (binary)
+        DifyRestLoggingInterceptor binaryInterceptor = new DifyRestLoggingInterceptor(true, 10240, true);
+
+        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://example.com/video.mp4"));
+        byte[] requestBody = new byte[0];
+
+        byte[] videoData = new byte[8000];
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(videoData, HttpStatus.OK);
+        mockResponse.getHeaders().add("Content-Type", "video/mp4");
+        mockResponse.getHeaders().setContentLength(videoData.length);
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = binaryInterceptor.intercept(request, requestBody, execution);
+
+        // Assert - should buffer binary body when enabled
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    // ========== Tests for log.isDebugEnabled()=false branch ==========
+
+    @Test
+    void testInterceptWithDebugDisabled() throws IOException {
+        // Arrange - Temporarily disable DEBUG logging to test the else branch
+        ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)
+            org.slf4j.LoggerFactory.getLogger(DifyRestLoggingInterceptor.class);
+        ch.qos.logback.classic.Level originalLevel = logger.getLevel();
+
+        try {
+            // Set to INFO to disable debug
+            logger.setLevel(ch.qos.logback.classic.Level.INFO);
+
+            MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://example.com/api"));
+            byte[] requestBody = new byte[0];
+
+            MockClientHttpResponse mockResponse = new MockClientHttpResponse(
+                    "{\"data\":\"test\"}".getBytes(StandardCharsets.UTF_8),
+                    HttpStatus.OK
+            );
+
+            when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+            // Act
+            ClientHttpResponse response = interceptor.intercept(request, requestBody, execution);
+
+            // Assert - should skip logging when debug is disabled
+            assertNotNull(response);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+        } finally {
+            // Restore original level
+            logger.setLevel(originalLevel);
+        }
+    }
+
+    @Test
+    void testInterceptWithDebugDisabledAndMaskingEnabled() throws IOException {
+        // Arrange - Test debug disabled with masking enabled
+        ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)
+            org.slf4j.LoggerFactory.getLogger(DifyRestLoggingInterceptor.class);
+        ch.qos.logback.classic.Level originalLevel = logger.getLevel();
+
+        try {
+            logger.setLevel(ch.qos.logback.classic.Level.INFO);
+
+            DifyRestLoggingInterceptor maskingInterceptor = new DifyRestLoggingInterceptor(true);
+
+            MockClientHttpRequest request = new MockClientHttpRequest(
+                    HttpMethod.POST,
+                    URI.create("http://example.com/api?api_key=secret")
+            );
+            request.getHeaders().add("Authorization", "Bearer token");
+            byte[] requestBody = "{\"password\":\"secret\"}".getBytes(StandardCharsets.UTF_8);
+
+            MockClientHttpResponse mockResponse = new MockClientHttpResponse(
+                    "{\"token\":\"new-token\"}".getBytes(StandardCharsets.UTF_8),
+                    HttpStatus.OK
+            );
+
+            when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+            // Act
+            ClientHttpResponse response = maskingInterceptor.intercept(request, requestBody, execution);
+
+            // Assert - should skip all logging when debug is disabled
+            assertNotNull(response);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+        } finally {
+            logger.setLevel(originalLevel);
+        }
+    }
+
+    @Test
+    void testInterceptWithDebugDisabledAndError() throws IOException {
+        // Arrange - Test debug disabled with error
+        ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)
+            org.slf4j.LoggerFactory.getLogger(DifyRestLoggingInterceptor.class);
+        ch.qos.logback.classic.Level originalLevel = logger.getLevel();
+
+        try {
+            logger.setLevel(ch.qos.logback.classic.Level.INFO);
+
+            MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://example.com/api"));
+            byte[] requestBody = new byte[0];
+
+            when(execution.execute(any(), any())).thenThrow(new IOException("Network error"));
+
+            // Act & Assert - should propagate exception and cleanup cache
+            assertThrows(IOException.class, () -> {
+                interceptor.intercept(request, requestBody, execution);
+            });
+        } finally {
+            logger.setLevel(originalLevel);
+        }
+    }
+
+    // ========== Tests for additional content-type and size branches ==========
+
+    @Test
+    void testInterceptWithApplicationStreamContentType() throws IOException {
+        // Arrange - Test with application/stream+json (contains "stream")
+        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://example.com/stream"));
+        byte[] requestBody = new byte[0];
+
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(
+                "stream data".getBytes(StandardCharsets.UTF_8),
+                HttpStatus.OK
+        );
+        mockResponse.getHeaders().add("Content-Type", "application/stream+json");
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = interceptor.intercept(request, requestBody, execution);
+
+        // Assert - should treat as streaming and return original response
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testInterceptWithOctetStreamContentType() throws IOException {
+        // Arrange - Test with application/octet-stream (binary)
+        DifyRestLoggingInterceptor binaryInterceptor = new DifyRestLoggingInterceptor(true, 10240, false);
+
+        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://example.com/file"));
+        byte[] requestBody = new byte[0];
+
+        byte[] binaryData = new byte[3000];
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(binaryData, HttpStatus.OK);
+        mockResponse.getHeaders().add("Content-Type", "application/octet-stream");
+        mockResponse.getHeaders().setContentLength(binaryData.length);
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = binaryInterceptor.intercept(request, requestBody, execution);
+
+        // Assert - should skip binary body when logBinaryBody=false
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testInterceptWithPdfContentType() throws IOException {
+        // Arrange - Test with application/pdf (binary)
+        DifyRestLoggingInterceptor binaryInterceptor = new DifyRestLoggingInterceptor(true, 10240, true);
+
+        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://example.com/doc.pdf"));
+        byte[] requestBody = new byte[0];
+
+        byte[] pdfData = new byte[5000];
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(pdfData, HttpStatus.OK);
+        mockResponse.getHeaders().add("Content-Type", "application/pdf");
+        mockResponse.getHeaders().setContentLength(pdfData.length);
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = binaryInterceptor.intercept(request, requestBody, execution);
+
+        // Assert - should buffer binary body when logBinaryBody=true
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testInterceptWithZeroContentLength() throws IOException {
+        // Arrange - Test with content-length=0
+        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://example.com/api"));
+        byte[] requestBody = new byte[0];
+
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(
+                new byte[0],
+                HttpStatus.OK
+        );
+        mockResponse.getHeaders().add("Content-Type", "application/json");
+        mockResponse.getHeaders().setContentLength(0);
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = interceptor.intercept(request, requestBody, execution);
+
+        // Assert - should handle zero content-length
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testInterceptWithVeryLargeContentLength() throws IOException {
+        // Arrange - Test with very large content-length
+        DifyRestLoggingInterceptor limitedInterceptor = new DifyRestLoggingInterceptor(true, 1024); // 1KB limit
+
+        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://example.com/api"));
+        byte[] requestBody = new byte[0];
+
+        String largeBody = "x".repeat(1048576); // 1MB
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(
+                largeBody.getBytes(StandardCharsets.UTF_8),
+                HttpStatus.OK
+        );
+        mockResponse.getHeaders().add("Content-Type", "application/json");
+        mockResponse.getHeaders().setContentLength(1048576);
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = limitedInterceptor.intercept(request, requestBody, execution);
+
+        // Assert - should skip body logging when exceeds limit
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testInterceptWithMaskingDisabledAndSensitiveData() throws IOException {
+        // Arrange - Test masking disabled with sensitive data
+        DifyRestLoggingInterceptor noMaskInterceptor = new DifyRestLoggingInterceptor(false);
+
+        MockClientHttpRequest request = new MockClientHttpRequest(
+                HttpMethod.POST,
+                URI.create("http://example.com/api?password=secret123")
+        );
+        request.getHeaders().add("Authorization", "Bearer token123");
+        request.getHeaders().add("Cookie", "session=abc");
+        byte[] requestBody = "{\"api_key\":\"key123\"}".getBytes(StandardCharsets.UTF_8);
+
+        MockClientHttpResponse mockResponse = new MockClientHttpResponse(
+                "{\"token\":\"new-token\"}".getBytes(StandardCharsets.UTF_8),
+                HttpStatus.OK
+        );
+
+        when(execution.execute(any(), any())).thenReturn(mockResponse);
+
+        // Act
+        ClientHttpResponse response = noMaskInterceptor.intercept(request, requestBody, execution);
+
+        // Assert - should log without masking
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
 }
