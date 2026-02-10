@@ -18,6 +18,7 @@ package io.github.guoshiqiufeng.dify.core.utils;
 import io.github.guoshiqiufeng.dify.core.logging.masking.MaskingConfig;
 import io.github.guoshiqiufeng.dify.core.logging.masking.MaskingEngine;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
  * @version 2.1.0
  * @since 2026/2/2
  */
+@Slf4j
 @UtilityClass
 public final class LogMaskingUtils {
 
@@ -133,5 +135,50 @@ public final class LogMaskingUtils {
      */
     public static MaskingEngine getDefaultEngine() {
         return DEFAULT_ENGINE;
+    }
+
+    /**
+     * Mask sensitive query parameters in URL.
+     * Supports case-insensitive matching and URL-encoded parameters.
+     * <p>
+     * This method masks common sensitive parameters including:
+     * <ul>
+     *   <li>API keys: api_key, apiKey, api-key</li>
+     *   <li>Tokens: token, access_token, accessToken, refresh_token, refreshToken, bearer_token, bearerToken, session_token, sessionToken</li>
+     *   <li>Credentials: password, secret, authorization, auth</li>
+     * </ul>
+     * </p>
+     *
+     * @param url the URL to mask
+     * @return masked URL with sensitive parameters replaced with ***
+     * @since 2.1.0
+     */
+    public static String maskUrl(String url) {
+        if (url == null || !url.contains("?")) {
+            return url;
+        }
+
+        try {
+            int queryStart = url.indexOf('?');
+            String baseUrl = url.substring(0, queryStart);
+            String queryString = url.substring(queryStart + 1);
+
+            // Comprehensive pattern covering all variants (case-insensitive)
+            // Matches: api_key, apiKey, api-key, token, password, secret, authorization, auth,
+            // access_token, accessToken, access-token, refresh_token, refreshToken, refresh-token,
+            // bearer_token, bearerToken, bearer-token, session_token, sessionToken, session-token
+            String maskedQuery = queryString.replaceAll(
+                    "(?i)(api[_-]?key|token|password|secret|authorization|auth|access[_-]?token|refresh[_-]?token|bearer[_-]?token|session[_-]?token)=([^&]*)",
+                    "$1=***"
+            );
+
+            return baseUrl + "?" + maskedQuery;
+        } catch (Exception e) {
+            // SECURITY: Don't return original URL - strip query params
+            int queryStart = url.indexOf('?');
+            String baseUrl = url.substring(0, queryStart);
+            log.warn("Failed to mask URL query parameters, returning base URL only");
+            return baseUrl + "?***MASKED***";
+        }
     }
 }

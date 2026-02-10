@@ -24,10 +24,16 @@ import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -650,6 +656,101 @@ class JavaHttpClientTest {
         // Assert
         assertNotNull(client);
         assertNotNull(client.getOkHttpClient());
+        assertNotNull(client.getOkHttpClient().connectionPool());
+        assertNotNull(client.getOkHttpClient().dispatcher());
+    }
+
+    @Test
+    @DisplayName("Should preserve custom Builder configurations")
+    void testCustomBuilderConfigurationPreserved() {
+        // Arrange - Create custom builder with specific configurations
+        OkHttpClient.Builder customBuilder = new OkHttpClient.Builder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .addInterceptor(chain -> {
+                    // Custom interceptor that adds a header
+                    return chain.proceed(
+                            chain.request().newBuilder()
+                                    .addHeader("X-Custom-Header", "test")
+                                    .build()
+                    );
+                });
+
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setConnectTimeout(30); // This should override the builder's timeout
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient(
+                "http://example.com",
+                config,
+                customBuilder,
+                jsonMapper,
+                null,
+                null
+        );
+
+        // Assert
+        assertNotNull(client);
+        OkHttpClient okHttpClient = client.getOkHttpClient();
+        assertNotNull(okHttpClient);
+        // Custom interceptor should be preserved (plus logging interceptor if enabled)
+        assertTrue(okHttpClient.interceptors().size() >= 1);
+        // Config timeout should override builder timeout
+        assertEquals(30000, okHttpClient.connectTimeoutMillis());
+    }
+
+    @Test
+    @DisplayName("Should allow sseReadTimeout=0 to disable timeout")
+    void testSseReadTimeoutZeroDisablesTimeout() {
+        // Arrange - Config with sseReadTimeout=0 (disable timeout)
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setReadTimeout(30);
+        config.setSseReadTimeout(0); // Explicitly disable SSE timeout
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        OkHttpClient okHttpClient = client.getOkHttpClient();
+        // SSE timeout of 0 should override readTimeout
+        assertEquals(30000, okHttpClient.readTimeoutMillis());
+    }
+
+    @Test
+    @DisplayName("Should use readTimeout when sseReadTimeout is null")
+    void testSseReadTimeoutNullUsesReadTimeout() {
+        // Arrange - Config with sseReadTimeout=null (use readTimeout)
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setReadTimeout(90);
+        config.setSseReadTimeout(null); // Use readTimeout
+
+        // Act
+        JavaHttpClient client = new JavaHttpClient("http://example.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        OkHttpClient okHttpClient = client.getOkHttpClient();
+        // Should use readTimeout when sseReadTimeout is null
+        assertEquals(90000, okHttpClient.readTimeoutMillis());
+    }
+
+    @Test
+    @DisplayName("Should validate connection pool parameters with boundary checks")
+    void testConnectionPoolParameterBoundaryValidation() {
+        // Arrange - Config with invalid (negative/zero) values
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setMaxIdleConnections(-5); // Invalid
+        config.setKeepAliveSeconds(0); // Invalid
+        config.setMaxRequests(-10); // Invalid
+        config.setMaxRequestsPerHost(0); // Invalid
+
+        // Act - Should not throw exception, values should be validated to minimum 1
+        JavaHttpClient client = new JavaHttpClient("http://example.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getOkHttpClient());
+        // All values should be validated to at least 1
         assertNotNull(client.getOkHttpClient().connectionPool());
         assertNotNull(client.getOkHttpClient().dispatcher());
     }

@@ -9,6 +9,10 @@ dependencies {
     api libs.spring.webflux
     api libs.spring.web
 
+    // Apache HttpClient 5 for RestClient connection pool (optional)
+    compileOnly 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
+    compileOnly 'org.apache.httpcomponents.core5:httpcore5:5.2.1'
+
     // Base test dependencies (without Spring versions)
     testImplementation libs.junit.jupiter
     testImplementation libs.mockito.core
@@ -18,6 +22,8 @@ dependencies {
     testImplementation project(":dify:dify-client:dify-client-codec:dify-client-codec-gson")
     testImplementation libs.spring.boot.starter.reactor.netty
     testImplementation 'org.springframework:spring-test'
+    testImplementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 // Configure test suites for different Spring versions

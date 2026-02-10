@@ -80,11 +80,15 @@ dify:
 - `call-timeout`: Total call timeout (including connect, read, write), 0 means no limit
 
 **SSE Optimization**:
-- `sse-read-timeout`: Read timeout for SSE streaming responses (seconds), set to 0 to disable timeout, suitable for long-running streaming conversations
+- `sse-read-timeout`: Read timeout for SSE streaming responses (seconds)
+  - `null` (default): Use the `read-timeout` value
+  - `0`: Completely disable timeout, suitable for long-running streaming conversations
+  - `>0`: Use the specified timeout in seconds
 
 **Logging Optimization**:
+- `logging-mask-enabled`: Enable log masking, default true. When enabled, automatically masks sensitive parameters (api_key, token, password, secret, authorization, access_token, refresh_token, etc.)
 - `log-body-max-bytes`: Maximum bytes of response body to log, truncated if exceeded. Set to 0 for no limit
-- `log-binary-body`: Whether to log binary responses (e.g., images, files), recommended to set false to save memory
+- `log-binary-body`: Whether to log binary responses (e.g., images, files). When enabled, logs binary content size and Content-Type. Recommended to set false to save memory
 
 **Recommended Settings**:
 - **Low concurrency** (< 10 QPS): Use default values

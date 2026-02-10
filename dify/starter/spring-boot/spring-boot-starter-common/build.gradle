@@ -25,6 +25,7 @@ dependencies {
     testImplementation libs.bytebuddy
     testImplementation libs.bytebuddy.agent
     testImplementation "org.junit.platform:junit-platform-launcher"
+    testImplementation "org.apache.httpcomponents.client5:httpclient5"
     testImplementation "org.springframework.boot:spring-boot-starter-data-redis"
     testImplementation libs.spring.boot.starter.test
     testImplementation "org.springframework.boot:spring-boot-starter-actuator"

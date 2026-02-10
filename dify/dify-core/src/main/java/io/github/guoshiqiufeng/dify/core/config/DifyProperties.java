@@ -155,7 +155,7 @@ public class DifyProperties implements Serializable {
         // ========== SSE 超时配置 ==========
 
         /**
-         * SSE 读取超时时间（秒），0 表示禁用超时，默认 0（禁用）
+         * SSE 读取超时时间（秒），null 表示使用 readTimeout，0 表示禁用超时，默认 0（禁用超时，保持向后兼容）
          */
         private Integer sseReadTimeout = 0;
 
