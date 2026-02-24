@@ -80,11 +80,15 @@ dify:
 - `call-timeout`: 完整调用的超时时间（包括连接、读取、写入），0 表示不限制
 
 **SSE 优化**：
-- `sse-read-timeout`: SSE 流式响应的读取超时时间（秒），设置为 0 表示禁用超时，适用于长时间运行的流式对话
+- `sse-read-timeout`: SSE 流式响应的读取超时时间（秒）
+  - `null`（默认）：使用 `read-timeout` 的值
+  - `0`：完全禁用超时，适用于长时间运行的流式对话
+  - `>0`：使用指定的超时时间（秒）
 
 **日志优化**：
+- `logging-mask-enabled`: 是否启用日志脱敏，默认 true。启用后会自动脱敏敏感参数（api_key、token、password、secret、authorization、access_token、refresh_token 等）
 - `log-body-max-bytes`: 日志中记录的响应 body 最大字节数，超过则截断。设置为 0 表示不限制
-- `log-binary-body`: 是否记录二进制响应（如图片、文件），建议设置为 false 以节省内存
+- `log-binary-body`: 是否记录二进制响应（如图片、文件）。启用后会记录二进制内容的大小和 Content-Type，建议设置为 false 以节省内存
 
 **推荐配置**：
 - **低并发场景**（< 10 QPS）：使用默认值

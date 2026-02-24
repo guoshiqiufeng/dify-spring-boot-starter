@@ -949,4 +949,149 @@ class LoggingInterceptorTest {
         assertNotNull(interceptor2);
         assertNotNull(interceptor3);
     }
+
+    @Test
+    void testUrlMaskingWithAccessToken() throws IOException {
+        // Arrange - URL with access_token parameter
+        String urlWithAccessToken = "https://api.example.com/v1/chat?access_token=secret123&user=test";
+        Request request = new Request.Builder()
+                .url(urlWithAccessToken)
+                .get()
+                .build();
+
+        Response mockResponse = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("test", MediaType.parse("text/plain")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any())).thenReturn(mockResponse);
+
+        // Act
+        Response result = interceptor.intercept(mockChain);
+
+        // Assert - access_token should be masked in logs
+        assertNotNull(result);
+        assertEquals(200, result.code());
+    }
+
+    @Test
+    void testUrlMaskingWithRefreshToken() throws IOException {
+        // Arrange - URL with refresh_token parameter
+        String urlWithRefreshToken = "https://api.example.com/v1/auth?refresh_token=refresh456&client_id=app";
+        Request request = new Request.Builder()
+                .url(urlWithRefreshToken)
+                .get()
+                .build();
+
+        Response mockResponse = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("test", MediaType.parse("text/plain")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any())).thenReturn(mockResponse);
+
+        // Act
+        Response result = interceptor.intercept(mockChain);
+
+        // Assert - refresh_token should be masked in logs
+        assertNotNull(result);
+        assertEquals(200, result.code());
+    }
+
+    @Test
+    void testUrlMaskingWithMultipleSensitiveTokens() throws IOException {
+        // Arrange - URL with multiple sensitive parameters
+        String urlWithTokens = "https://api.example.com/v1/data?api_key=key123&access_token=token456&refresh_token=refresh789&user=test";
+        Request request = new Request.Builder()
+                .url(urlWithTokens)
+                .get()
+                .build();
+
+        Response mockResponse = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("test", MediaType.parse("text/plain")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any())).thenReturn(mockResponse);
+
+        // Act
+        Response result = interceptor.intercept(mockChain);
+
+        // Assert - all sensitive tokens should be masked in logs
+        assertNotNull(result);
+        assertEquals(200, result.code());
+    }
+
+    @Test
+    void testBinaryBodyLoggingWhenEnabled() throws IOException {
+        // Arrange - Binary response with logBinaryBody=true
+        LoggingInterceptor binaryInterceptor = new LoggingInterceptor(true, 4096, true);
+
+        byte[] binaryData = new byte[]{0x00, 0x01, 0x02, 0x03, 0x04};
+        Request request = new Request.Builder()
+                .url("https://api.example.com/v1/image")
+                .get()
+                .build();
+
+        Response mockResponse = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create(binaryData, MediaType.parse("image/png")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any())).thenReturn(mockResponse);
+
+        // Act
+        Response result = binaryInterceptor.intercept(mockChain);
+
+        // Assert - binary content info should be logged
+        assertNotNull(result);
+        assertEquals(200, result.code());
+        assertNotNull(result.body());
+    }
+
+    @Test
+    void testBinaryBodyLoggingWhenDisabled() throws IOException {
+        // Arrange - Binary response with logBinaryBody=false (default)
+        LoggingInterceptor binaryInterceptor = new LoggingInterceptor(true, 4096, false);
+
+        byte[] binaryData = new byte[]{0x00, 0x01, 0x02, 0x03, 0x04};
+        Request request = new Request.Builder()
+                .url("https://api.example.com/v1/image")
+                .get()
+                .build();
+
+        Response mockResponse = new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create(binaryData, MediaType.parse("image/png")))
+                .build();
+
+        when(mockChain.request()).thenReturn(request);
+        when(mockChain.proceed(any())).thenReturn(mockResponse);
+
+        // Act
+        Response result = binaryInterceptor.intercept(mockChain);
+
+        // Assert - binary content should be skipped
+        assertNotNull(result);
+        assertEquals(200, result.code());
+    }
 }

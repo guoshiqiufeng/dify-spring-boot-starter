@@ -17,10 +17,10 @@ package io.github.guoshiqiufeng.dify.client.integration.spring.logging;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 /**
- * Control the global state of Dify loggers to prevent duplicate interceptors from being added
+ * Factory for creating Dify logging components.
+ * Changed from singleton pattern to factory pattern to support multiple clients
+ * with different configurations (e.g., multi-tenant scenarios).
  *
  * @author yanghq
  * @version 0.11.0
@@ -31,82 +31,180 @@ public class DifyLoggingControl {
 
     private static final DifyLoggingControl INSTANCE = new DifyLoggingControl();
 
-    private final AtomicBoolean interceptorAdded = new AtomicBoolean(false);
-    private final AtomicBoolean filterAdded = new AtomicBoolean(false);
-
-    private volatile DifyRestLoggingInterceptor loggingInterceptor;
-    private volatile DifyLoggingFilter loggingFilter;
-
     private DifyLoggingControl() {
     }
 
     /**
-     * getInstance
+     * Get singleton instance (for backward compatibility).
      *
-     * @return DifyLoggingControl实例
+     * @return DifyLoggingControl instance
+     * @deprecated Use static factory methods {@link #createInterceptor()} or {@link #createFilter()} instead.
+     *             The singleton pattern has been replaced with factory pattern to support multiple clients.
      */
+    @Deprecated
     public static DifyLoggingControl getInstance() {
         return INSTANCE;
     }
 
+    // Track whether deprecated methods have been called (for backward compatibility)
+    private volatile boolean interceptorMarked = false;
+    private volatile boolean filterMarked = false;
+
     /**
-     * getAndMarkInterceptor with default masking enabled
+     * Get and mark interceptor (for backward compatibility).
+     * Preserves original idempotent behavior: returns instance on first call, null on subsequent calls.
      *
-     * @return DifyRestLoggingInterceptor instance, or null if it has already been added.
+     * @return DifyRestLoggingInterceptor instance on first call, null on subsequent calls
+     * @deprecated Use {@link #createInterceptor()} instead for multi-tenant scenarios.
+     *             This method maintains backward compatibility by returning null after first call.
      */
-    public DifyRestLoggingInterceptor getAndMarkInterceptor() {
+    @Deprecated
+    public synchronized DifyRestLoggingInterceptor getAndMarkInterceptor() {
         return getAndMarkInterceptor(true);
     }
 
     /**
-     * getAndMarkInterceptor with configurable masking
+     * Get and mark interceptor with configurable masking (for backward compatibility).
+     * Preserves original idempotent behavior: returns instance on first call, null on subsequent calls.
      *
      * @param maskingEnabled whether to enable log masking
-     * @return DifyRestLoggingInterceptor instance, or null if it has already been added.
+     * @return DifyRestLoggingInterceptor instance on first call, null on subsequent calls
+     * @deprecated Use {@link #createInterceptor(boolean)} instead for multi-tenant scenarios.
+     *             This method maintains backward compatibility by returning null after first call.
      */
-    public DifyRestLoggingInterceptor getAndMarkInterceptor(boolean maskingEnabled) {
-        if (interceptorAdded.compareAndSet(false, true)) {
-            // Create instance only once and reuse it
-            if (loggingInterceptor == null) {
-                loggingInterceptor = new DifyRestLoggingInterceptor(maskingEnabled);
-            }
-            return loggingInterceptor;
+    @Deprecated
+    public synchronized DifyRestLoggingInterceptor getAndMarkInterceptor(boolean maskingEnabled) {
+        if (!interceptorMarked) {
+            interceptorMarked = true;
+            return createInterceptor(maskingEnabled);
         }
         return null;
     }
 
     /**
-     * Gets the log filter instance and marks it as added (default masking enabled)
+     * Get and mark filter (for backward compatibility).
+     * Preserves original idempotent behavior: returns instance on first call, null on subsequent calls.
      *
-     * @return DifyLoggingFilter instance, or null if it has already been added.
+     * @return DifyLoggingFilter instance on first call, null on subsequent calls
+     * @deprecated Use {@link #createFilter()} instead for multi-tenant scenarios.
+     *             This method maintains backward compatibility by returning null after first call.
      */
-    public DifyLoggingFilter getAndMarkFilter() {
+    @Deprecated
+    public synchronized DifyLoggingFilter getAndMarkFilter() {
         return getAndMarkFilter(true);
     }
 
     /**
-     * Gets the log filter instance and marks it as added with configurable masking
+     * Get and mark filter with configurable masking (for backward compatibility).
+     * Preserves original idempotent behavior: returns instance on first call, null on subsequent calls.
      *
      * @param maskingEnabled whether to enable log masking
-     * @return DifyLoggingFilter instance, or null if it has already been added.
+     * @return DifyLoggingFilter instance on first call, null on subsequent calls
+     * @deprecated Use {@link #createFilter(boolean)} instead for multi-tenant scenarios.
+     *             This method maintains backward compatibility by returning null after first call.
      */
-    public DifyLoggingFilter getAndMarkFilter(boolean maskingEnabled) {
-        if (filterAdded.compareAndSet(false, true)) {
-            // Create instance only once and reuse it
-            if (loggingFilter == null) {
-                loggingFilter = new DifyLoggingFilter(maskingEnabled);
-            }
-            return loggingFilter;
+    @Deprecated
+    public synchronized DifyLoggingFilter getAndMarkFilter(boolean maskingEnabled) {
+        if (!filterMarked) {
+            filterMarked = true;
+            return createFilter(maskingEnabled);
         }
         return null;
     }
 
     /**
-     * Reset state, mainly used for testing
+     * Reset state (for backward compatibility).
+     * Resets the marked flags so getAndMark* methods can be called again.
+     *
+     * @deprecated Use factory methods {@link #createInterceptor()} or {@link #createFilter()} instead.
      */
-    public void reset() {
-        interceptorAdded.set(false);
-        filterAdded.set(false);
-        // Don't set to null to maintain same instance for testing
+    @Deprecated
+    public synchronized void reset() {
+        interceptorMarked = false;
+        filterMarked = false;
+    }
+
+    /**
+     * Create a new RestClient logging interceptor with default masking enabled
+     *
+     * @return new DifyRestLoggingInterceptor instance
+     */
+    public static DifyRestLoggingInterceptor createInterceptor() {
+        return createInterceptor(true);
+    }
+
+    /**
+     * Create a new RestClient logging interceptor with configurable masking
+     *
+     * @param maskingEnabled whether to enable log masking
+     * @return new DifyRestLoggingInterceptor instance
+     */
+    public static DifyRestLoggingInterceptor createInterceptor(boolean maskingEnabled) {
+        return new DifyRestLoggingInterceptor(maskingEnabled);
+    }
+
+    /**
+     * Create a new RestClient logging interceptor with full configuration
+     *
+     * @param maskingEnabled  whether to enable log masking
+     * @param logBodyMaxBytes maximum bytes to log for body (0 = unlimited)
+     * @return new DifyRestLoggingInterceptor instance
+     */
+    public static DifyRestLoggingInterceptor createInterceptor(boolean maskingEnabled, int logBodyMaxBytes) {
+        return new DifyRestLoggingInterceptor(maskingEnabled, logBodyMaxBytes);
+    }
+
+    /**
+     * Create a new WebClient logging filter with default masking enabled
+     *
+     * @return new DifyLoggingFilter instance
+     */
+    public static DifyLoggingFilter createFilter() {
+        return createFilter(true);
+    }
+
+    /**
+     * Create a new WebClient logging filter with configurable masking
+     *
+     * @param maskingEnabled whether to enable log masking
+     * @return new DifyLoggingFilter instance
+     */
+    public static DifyLoggingFilter createFilter(boolean maskingEnabled) {
+        return new DifyLoggingFilter(maskingEnabled);
+    }
+
+    /**
+     * Create a new WebClient logging filter with full configuration
+     *
+     * @param maskingEnabled  whether to enable log masking
+     * @param logBodyMaxBytes maximum bytes to log for body (0 = unlimited)
+     * @return new DifyLoggingFilter instance
+     */
+    public static DifyLoggingFilter createFilter(boolean maskingEnabled, int logBodyMaxBytes) {
+        return new DifyLoggingFilter(maskingEnabled, logBodyMaxBytes);
+    }
+
+    /**
+     * Create a new WebClient logging filter with full configuration including binary body logging
+     *
+     * @param maskingEnabled  whether to enable log masking
+     * @param logBodyMaxBytes maximum bytes to log for body (0 = unlimited)
+     * @param logBinaryBody   whether to log binary body content (default: false, only log metadata)
+     * @return new DifyLoggingFilter instance
+     */
+    public static DifyLoggingFilter createFilter(boolean maskingEnabled, int logBodyMaxBytes, boolean logBinaryBody) {
+        return new DifyLoggingFilter(maskingEnabled, logBodyMaxBytes, logBinaryBody);
+    }
+
+    /**
+     * Create a new RestClient logging interceptor with full configuration including binary body logging
+     *
+     * @param maskingEnabled  whether to enable log masking
+     * @param logBodyMaxBytes maximum bytes to log for body (0 = unlimited)
+     * @param logBinaryBody   whether to log binary body content (default: false, only log metadata)
+     * @return new DifyRestLoggingInterceptor instance
+     */
+    public static DifyRestLoggingInterceptor createInterceptor(boolean maskingEnabled, int logBodyMaxBytes, boolean logBinaryBody) {
+        return new DifyRestLoggingInterceptor(maskingEnabled, logBodyMaxBytes, logBinaryBody);
     }
 }

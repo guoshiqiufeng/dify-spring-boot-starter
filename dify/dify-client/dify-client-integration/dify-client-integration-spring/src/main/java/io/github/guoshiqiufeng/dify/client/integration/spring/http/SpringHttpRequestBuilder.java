@@ -83,7 +83,7 @@ public class SpringHttpRequestBuilder implements HttpRequestBuilder {
         this.restClientExecutor = client.hasRestClient()
                 ? new RestClientExecutor(client.getRestClient(), jsonMapper, skipNull)
                 : null;
-        this.webClientExecutor = new WebClientExecutor(client.getWebClient(), jsonMapper, skipNull);
+        this.webClientExecutor = new WebClientExecutor(client.getWebClient(), client.getSseWebClient(), jsonMapper, skipNull);
     }
 
     @Override

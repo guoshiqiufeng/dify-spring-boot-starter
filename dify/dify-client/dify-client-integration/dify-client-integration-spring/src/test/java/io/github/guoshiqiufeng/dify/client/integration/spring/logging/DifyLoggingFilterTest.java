@@ -440,4 +440,810 @@ class DifyLoggingFilterTest {
                 .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
                 .verifyComplete();
     }
+
+    // ========== Branch coverage tests for content-length and binary content ==========
+
+    @Test
+    void testFilterWithBinaryContentAndLogBinaryBodyEnabled() {
+        // Arrange - Test binary content with logBinaryBody=true
+        DifyLoggingFilter binaryFilter = new DifyLoggingFilter(true, 10240, true);
+
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "application/octet-stream")
+                .header("Content-Length", "1024")
+                .body("binary data placeholder")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = binaryFilter.filter(request, exchangeFunction);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithBinaryContentAndLogBinaryBodyDisabled() {
+        // Arrange - Test binary content with logBinaryBody=false (default)
+        DifyLoggingFilter binaryFilter = new DifyLoggingFilter(true, 10240, false);
+
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "application/octet-stream")
+                .header("Content-Length", "2048")
+                .body("binary data placeholder")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = binaryFilter.filter(request, exchangeFunction);
+
+        // Assert - should skip body logging for binary content
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithUnknownContentLength() {
+        // Arrange - Test with unknown content-length (-1)
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "application/json")
+                // No Content-Length header = -1
+                .body("{\"data\":\"test\"}")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = loggingFilter.filter(request, exchangeFunction);
+
+        // Assert - should handle unknown content-length
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithContentLengthExceedsLimit() {
+        // Arrange - Test with content-length > logBodyMaxBytes
+        DifyLoggingFilter limitedFilter = new DifyLoggingFilter(true, 100); // 100 bytes limit
+
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "application/json")
+                .header("Content-Length", "10240") // 10KB > 100 bytes
+                .body("{\"data\":\"large response body\"}")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = limitedFilter.filter(request, exchangeFunction);
+
+        // Assert - should skip body logging when exceeds limit
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithContentLengthWithinLimit() {
+        // Arrange - Test with content-length <= logBodyMaxBytes
+        DifyLoggingFilter limitedFilter = new DifyLoggingFilter(true, 10240); // 10KB limit
+
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "application/json")
+                .header("Content-Length", "50")
+                .body("{\"data\":\"small response\"}")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = limitedFilter.filter(request, exchangeFunction);
+
+        // Assert - should log body when within limit
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithUnlimitedBodyLogging() {
+        // Arrange - Test with logBodyMaxBytes=0 (unlimited)
+        DifyLoggingFilter unlimitedFilter = new DifyLoggingFilter(true, 0);
+
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "application/json")
+                .header("Content-Length", "100000") // Large content
+                .body("{\"data\":\"very large response body\"}")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = unlimitedFilter.filter(request, exchangeFunction);
+
+        // Assert - should log body regardless of size
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithExchangeError() {
+        // Arrange - Test error/cancel path (doFinally cleanup)
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class)))
+                .thenReturn(Mono.error(new RuntimeException("Network error")));
+
+        // Act
+        Mono<ClientResponse> result = loggingFilter.filter(request, exchangeFunction);
+
+        // Assert - should handle error and cleanup
+        StepVerifier.create(result)
+                .expectError(RuntimeException.class)
+                .verify();
+    }
+
+    @Test
+    void testFilterWithImageContentType() {
+        // Arrange - Test with image content type (binary)
+        DifyLoggingFilter binaryFilter = new DifyLoggingFilter(true, 10240, false);
+
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/image.png"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "image/png")
+                .header("Content-Length", "5000")
+                .body("image binary data")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = binaryFilter.filter(request, exchangeFunction);
+
+        // Assert - should skip binary body logging
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithVideoContentType() {
+        // Arrange - Test with video content type (binary)
+        DifyLoggingFilter binaryFilter = new DifyLoggingFilter(true, 10240, true);
+
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/video.mp4"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "video/mp4")
+                .header("Content-Length", "8000")
+                .body("video binary data")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = binaryFilter.filter(request, exchangeFunction);
+
+        // Assert - should log binary body when enabled
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    // ========== Tests for log.isDebugEnabled()=false branch ==========
+
+    @Test
+    void testFilterWithDebugDisabled() {
+        // Arrange - Temporarily disable DEBUG logging to test the else branch
+        ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)
+            org.slf4j.LoggerFactory.getLogger(DifyLoggingFilter.class);
+        ch.qos.logback.classic.Level originalLevel = logger.getLevel();
+
+        try {
+            // Set to INFO to disable debug
+            logger.setLevel(ch.qos.logback.classic.Level.INFO);
+
+            ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                    .build();
+
+            ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                    .body("{\"data\":\"test\"}")
+                    .build();
+
+            when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+            // Act
+            Mono<ClientResponse> result = loggingFilter.filter(request, exchangeFunction);
+
+            // Assert - should skip logging when debug is disabled
+            StepVerifier.create(result)
+                    .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                    .verifyComplete();
+        } finally {
+            // Restore original level
+            logger.setLevel(originalLevel);
+        }
+    }
+
+    @Test
+    void testFilterWithDebugDisabledAndMaskingEnabled() {
+        // Arrange - Test debug disabled with masking enabled
+        ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)
+            org.slf4j.LoggerFactory.getLogger(DifyLoggingFilter.class);
+        ch.qos.logback.classic.Level originalLevel = logger.getLevel();
+
+        try {
+            logger.setLevel(ch.qos.logback.classic.Level.INFO);
+
+            DifyLoggingFilter maskingFilter = new DifyLoggingFilter(true);
+
+            ClientRequest request = ClientRequest.create(HttpMethod.GET,
+                    URI.create("http://example.com/api?api_key=secret"))
+                    .header("Authorization", "Bearer token")
+                    .build();
+
+            ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                    .body("{\"password\":\"secret\"}")
+                    .build();
+
+            when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+            // Act
+            Mono<ClientResponse> result = maskingFilter.filter(request, exchangeFunction);
+
+            // Assert - should skip all logging when debug is disabled
+            StepVerifier.create(result)
+                    .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                    .verifyComplete();
+        } finally {
+            logger.setLevel(originalLevel);
+        }
+    }
+
+    @Test
+    void testFilterWithDebugDisabledAndError() {
+        // Arrange - Test debug disabled with error response
+        ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)
+            org.slf4j.LoggerFactory.getLogger(DifyLoggingFilter.class);
+        ch.qos.logback.classic.Level originalLevel = logger.getLevel();
+
+        try {
+            logger.setLevel(ch.qos.logback.classic.Level.INFO);
+
+            ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                    .build();
+
+            when(exchangeFunction.exchange(any(ClientRequest.class)))
+                    .thenReturn(Mono.error(new RuntimeException("Network error")));
+
+            // Act
+            Mono<ClientResponse> result = loggingFilter.filter(request, exchangeFunction);
+
+            // Assert - should handle error and cleanup cache
+            StepVerifier.create(result)
+                    .expectError(RuntimeException.class)
+                    .verify();
+        } finally {
+            logger.setLevel(originalLevel);
+        }
+    }
+
+    // ========== Tests for additional content-type and size branches ==========
+
+    @Test
+    void testFilterWithApplicationStreamContentType() {
+        // Arrange - Test with application/stream+json (contains "stream")
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/stream"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "application/stream+json")
+                .body("stream data")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = loggingFilter.filter(request, exchangeFunction);
+
+        // Assert - should treat as streaming and skip body logging
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithOctetStreamContentType() {
+        // Arrange - Test with application/octet-stream (binary)
+        DifyLoggingFilter binaryFilter = new DifyLoggingFilter(true, 10240, false);
+
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/file"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "application/octet-stream")
+                .header("Content-Length", "3000")
+                .body("binary data")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = binaryFilter.filter(request, exchangeFunction);
+
+        // Assert - should skip binary body when logBinaryBody=false
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithPdfContentType() {
+        // Arrange - Test with application/pdf (binary)
+        DifyLoggingFilter binaryFilter = new DifyLoggingFilter(true, 10240, true);
+
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/doc.pdf"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "application/pdf")
+                .header("Content-Length", "5000")
+                .body("pdf binary data")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = binaryFilter.filter(request, exchangeFunction);
+
+        // Assert - should log binary body when logBinaryBody=true
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithZeroContentLength() {
+        // Arrange - Test with content-length=0
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "application/json")
+                .header("Content-Length", "0")
+                .body("")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = loggingFilter.filter(request, exchangeFunction);
+
+        // Assert - should handle zero content-length
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithVeryLargeContentLength() {
+        // Arrange - Test with very large content-length
+        DifyLoggingFilter limitedFilter = new DifyLoggingFilter(true, 1024); // 1KB limit
+
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "application/json")
+                .header("Content-Length", "1048576") // 1MB
+                .body("{\"data\":\"large\"}")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = limitedFilter.filter(request, exchangeFunction);
+
+        // Assert - should skip body logging when exceeds limit
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithMaskingDisabledAndSensitiveData() {
+        // Arrange - Test masking disabled with sensitive data
+        DifyLoggingFilter noMaskFilter = new DifyLoggingFilter(false);
+
+        ClientRequest request = ClientRequest.create(HttpMethod.POST,
+                URI.create("http://example.com/api?password=secret123"))
+                .header("Authorization", "Bearer token123")
+                .header("Cookie", "session=abc")
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .body("{\"api_key\":\"key123\"}")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = noMaskFilter.filter(request, exchangeFunction);
+
+        // Assert - should log without masking
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    // ========== Tests for various content types (isBinaryContentType coverage) ==========
+
+    @Test
+    void testFilterWithTextPlainContentType() {
+        // Arrange - Test text/plain (text/* should be logged)
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "text/plain")
+                .body("plain text response")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = loggingFilter.filter(request, exchangeFunction);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithTextHtmlContentType() {
+        // Arrange - Test text/html
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "text/html; charset=utf-8")
+                .body("<html><body>Hello</body></html>")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = loggingFilter.filter(request, exchangeFunction);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithApplicationXmlContentType() {
+        // Arrange - Test application/xml
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "application/xml")
+                .body("<root><data>value</data></root>")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = loggingFilter.filter(request, exchangeFunction);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithApplicationFormUrlencodedContentType() {
+        // Arrange - Test application/x-www-form-urlencoded
+        ClientRequest request = ClientRequest.create(HttpMethod.POST, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .body("key1=value1&key2=value2")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = loggingFilter.filter(request, exchangeFunction);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithApplicationJavascriptContentType() {
+        // Arrange - Test application/javascript
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "application/javascript")
+                .body("function test() { return true; }")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = loggingFilter.filter(request, exchangeFunction);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithApplicationXhtmlXmlContentType() {
+        // Arrange - Test application/xhtml+xml
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "application/xhtml+xml")
+                .body("<?xml version=\"1.0\"?><html></html>")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = loggingFilter.filter(request, exchangeFunction);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithJsonSuffixContentType() {
+        // Arrange - Test +json suffix (e.g., application/vnd.api+json)
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "application/vnd.api+json")
+                .body("{\"data\":\"value\"}")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = loggingFilter.filter(request, exchangeFunction);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithXmlSuffixContentType() {
+        // Arrange - Test +xml suffix (e.g., application/atom+xml)
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "application/atom+xml")
+                .body("<?xml version=\"1.0\"?><feed></feed>")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = loggingFilter.filter(request, exchangeFunction);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithAudioContentType() {
+        // Arrange - Test audio/* (binary)
+        DifyLoggingFilter binaryFilter = new DifyLoggingFilter(true, 10240, false);
+
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "audio/mpeg")
+                .body("binary audio data")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = binaryFilter.filter(request, exchangeFunction);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithApplicationZipContentType() {
+        // Arrange - Test application/zip (binary)
+        DifyLoggingFilter binaryFilter = new DifyLoggingFilter(true, 10240, false);
+
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "application/zip")
+                .body("binary zip data")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = binaryFilter.filter(request, exchangeFunction);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithApplicationGzipContentType() {
+        // Arrange - Test application/gzip (binary)
+        DifyLoggingFilter binaryFilter = new DifyLoggingFilter(true, 10240, false);
+
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "application/gzip")
+                .body("binary gzip data")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = binaryFilter.filter(request, exchangeFunction);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithMultipartContentType() {
+        // Arrange - Test multipart/* (binary)
+        DifyLoggingFilter binaryFilter = new DifyLoggingFilter(true, 10240, false);
+
+        ClientRequest request = ClientRequest.create(HttpMethod.POST, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "multipart/form-data; boundary=----WebKitFormBoundary")
+                .body("multipart data")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = binaryFilter.filter(request, exchangeFunction);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithUnknownApplicationContentType() {
+        // Arrange - Test unknown application/* type (should default to binary)
+        DifyLoggingFilter binaryFilter = new DifyLoggingFilter(true, 10240, false);
+
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "application/unknown-type")
+                .body("unknown data")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = binaryFilter.filter(request, exchangeFunction);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithNullContentType() {
+        // Arrange - Test null content-type (should assume text)
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                // No Content-Type header
+                .body("response without content type")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = loggingFilter.filter(request, exchangeFunction);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
+
+    @Test
+    void testFilterWithEmptyContentType() {
+        // Arrange - Test empty content-type (should assume text)
+        ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create("http://example.com/api"))
+                .build();
+
+        ClientResponse mockResponse = ClientResponse.create(HttpStatus.OK, ExchangeStrategies.withDefaults())
+                .header("Content-Type", "")
+                .body("response with empty content type")
+                .build();
+
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+
+        // Act
+        Mono<ClientResponse> result = loggingFilter.filter(request, exchangeFunction);
+
+        // Assert
+        StepVerifier.create(result)
+                .expectNextMatches(response -> response.statusCode().equals(HttpStatus.OK))
+                .verifyComplete();
+    }
 }

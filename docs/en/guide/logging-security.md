@@ -31,8 +31,8 @@ Automatically masks the following types of sensitive information:
    - `authorization`
    - `password`
    - `secret`
-   - `access_token`
-   - `refresh_token`
+   - `access_token` / `accessToken`
+   - `refresh_token` / `refreshToken`
 
 3. **Cookies**
    - All cookies are displayed as `***MASKED***` in logs

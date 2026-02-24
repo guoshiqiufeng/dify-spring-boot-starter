@@ -174,11 +174,17 @@ import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 DifyProperties.ClientConfig clientConfig = new DifyProperties.ClientConfig();
 
 // Connection pool configuration
-clientConfig.setMaxIdleConnections(10);      // Max idle connections, default 5
-clientConfig.setKeepAliveSeconds(300);       // Keep-alive duration (seconds), default 300
-clientConfig.setMaxRequests(128);            // Max concurrent requests, default 64
-clientConfig.setMaxRequestsPerHost(10);      // Max concurrent requests per host, default 5
+clientConfig.setMaxIdleConnections(10);      // Max idle connections, default 5 (minimum 1)
+clientConfig.setKeepAliveSeconds(300);       // Keep-alive duration (seconds), default 300 (minimum 1)
+clientConfig.setMaxRequests(128);            // Max concurrent requests, default 64 (minimum 1)
+clientConfig.setMaxRequestsPerHost(10);      // Max concurrent requests per host, default 5 (minimum 1)
 clientConfig.setCallTimeout(60);             // Call timeout (seconds), 0 means no limit
+
+// SSE timeout configuration
+clientConfig.setSseReadTimeout(0);           // SSE read timeout (seconds)
+                                             // null (default) = use readTimeout
+                                             // 0 = disable timeout (for long streaming conversations)
+                                             // >0 = use specified timeout
 
 // Create client
 DifyChatClient client = DifyChatBuilder.builder()
@@ -219,8 +225,10 @@ DifyChatClient client = DifyChatBuilder.builder()
 ```
 
 **Configuration Details**:
-- `sseReadTimeout`: Read timeout for SSE streaming responses (seconds), set to 0 to disable timeout
-- For long-running SSE connections, it's recommended to set to 0 to avoid timeout interruptions
+- `sseReadTimeout`: Read timeout for SSE streaming responses (seconds)
+  - `null` (default): Use the `readTimeout` value
+  - `0`: Completely disable timeout for long-running streaming conversations
+  - `>0`: Use the specified timeout in seconds
 
 #### Logging Optimization Configuration
 
@@ -244,8 +252,9 @@ DifyChatClient client = DifyChatBuilder.builder()
 ```
 
 **Configuration Details**:
+- `loggingMaskEnabled`: Enable log masking, default true. When enabled, automatically masks sensitive parameters (api_key, token, password, secret, authorization, access_token, refresh_token, etc.)
 - `logBodyMaxBytes`: Maximum bytes of response body to log, truncated if exceeded. Set to 0 for no limit
-- `logBinaryBody`: Whether to log binary responses (e.g., images, files), recommended to set false to save memory
+- `logBinaryBody`: Whether to log binary responses (e.g., images, files). When enabled, logs binary content size and Content-Type. Recommended to set false to save memory
 
 **Recommended Settings**:
 - Development: `logBodyMaxBytes=0` (no limit), convenient for debugging

@@ -165,19 +165,28 @@ DifyChatClient client = DifyChatBuilder.builder()
 
 #### 连接池配置
 
-针对高并发场景，可以配置 OkHttp 连接池参数以提升性能：
+针对高并发场景，可以配置连接池参数以提升性能。Dify SDK 支持两种 HTTP 客户端实现：
+
+##### OkHttp 连接池配置（Java 原生项目）
 
 ```java
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
+import io.github.guoshiqiufeng.dify.client.integration.okhttp.http.JavaHttpClientFactory;
 
 DifyProperties.ClientConfig clientConfig = new DifyProperties.ClientConfig();
 
 // 连接池配置
-clientConfig.setMaxIdleConnections(10);      // 最大空闲连接数，默认 5
-clientConfig.setKeepAliveSeconds(300);       // 连接保活时间（秒），默认 300
-clientConfig.setMaxRequests(128);            // 最大并发请求数，默认 64
-clientConfig.setMaxRequestsPerHost(10);      // 每个主机最大并发请求数，默认 5
+clientConfig.setMaxIdleConnections(10);      // 最大空闲连接数，默认 5（最小值 1）
+clientConfig.setKeepAliveSeconds(300);       // 连接保活时间（秒），默认 300（最小值 1）
+clientConfig.setMaxRequests(128);            // 最大并发请求数，默认 64（最小值 1）
+clientConfig.setMaxRequestsPerHost(10);      // 每个主机最大并发请求数，默认 5（最小值 1）
 clientConfig.setCallTimeout(60);             // 调用超时时间（秒），0 表示不设置
+
+// SSE 超时配置
+clientConfig.setSseReadTimeout(0);           // SSE 读取超时（秒）
+                                             // null（默认）= 使用 readTimeout
+                                             // 0 = 禁用超时（适用于长时间流式对话）
+                                             // >0 = 使用指定超时时间
 
 // 创建客户端
 DifyChatClient client = DifyChatBuilder.builder()
@@ -185,6 +194,107 @@ DifyChatClient client = DifyChatBuilder.builder()
         .clientConfig(clientConfig)
         .httpClientFactory(new JavaHttpClientFactory(JacksonJsonMapper.getInstance()))
         .build();
+```
+
+##### Spring 连接池配置（Spring 项目）
+
+Spring 集成模块支持 WebClient（reactor-netty）和 RestClient（Apache HttpClient 5）的连接池配置：
+
+```java
+import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.SpringHttpClientFactory;
+import org.springframework.web.reactive.function.client.WebClient;
+
+DifyProperties.ClientConfig clientConfig = new DifyProperties.ClientConfig();
+
+// 连接池配置（与 OkHttp 参数一致）
+clientConfig.setMaxIdleConnections(10);      // 最大空闲连接数，默认 5（最小值 1）
+clientConfig.setKeepAliveSeconds(300);       // 连接保活时间（秒），默认 300（最小值 1）
+clientConfig.setMaxRequests(128);            // 最大并发请求数，默认 64（最小值 1）
+clientConfig.setMaxRequestsPerHost(10);      // 每个主机最大并发请求数，默认 5（最小值 1）
+clientConfig.setCallTimeout(60);             // 调用超时时间（秒），0 表示不设置
+
+// SSE 超时配置
+clientConfig.setSseReadTimeout(0);           // SSE 读取超时（秒）
+                                             // null（默认）= 使用 readTimeout
+                                             // 0 = 禁用超时（适用于长时间流式对话）
+                                             // >0 = 使用指定超时时间
+
+// 创建客户端（自动使用 WebClient 和 RestClient 连接池）
+DifyChatClient client = DifyChatBuilder.builder()
+        .baseUrl("https://api.dify.ai")
+        .clientConfig(clientConfig)
+        .httpClientFactory(new SpringHttpClientFactory(
+                WebClient.builder(),
+                JacksonJsonMapper.getInstance()))
+        .build();
+```
+
+**Spring 参数映射说明**：
+
+| OkHttp 参数 | WebClient (reactor-netty) | RestClient (HttpClient 5) |
+|------------|---------------------------|---------------------------|
+| maxRequests | maxConnections | maxTotal |
+| maxRequestsPerHost | *(不支持)* | defaultMaxPerRoute |
+| keepAliveSeconds | maxIdleTime | connection TTL |
+| callTimeout | responseTimeout | responseTimeout |
+
+**Spring Boot 自动配置**：
+
+在 Spring Boot 项目中，连接池配置会自动生效：
+
+```yaml
+# application.yml
+dify:
+  client-config:
+    max-idle-connections: 10
+    keep-alive-seconds: 300
+    max-requests: 128
+    max-requests-per-host: 10
+    call-timeout: 60
+```
+
+**自定义连接池实现**：
+
+Spring 集成模块提供了扩展点，允许用户自定义连接池实现：
+
+```java
+import io.github.guoshiqiufeng.dify.client.integration.spring.http.pool.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import reactor.netty.resources.ConnectionProvider;
+
+@Configuration
+public class CustomPoolConfig {
+
+    // 自定义 WebClient 连接池
+    @Bean
+    public WebClientConnectionProviderFactory customWebClientPool() {
+        return (settings, poolName) -> {
+            return ConnectionProvider.builder(poolName)
+                .maxConnections(settings.getMaxRequestsPerHost())
+                .maxIdleTime(Duration.ofSeconds(settings.getKeepAliveSeconds()))
+                .metrics(true) // 启用指标监控
+                .build();
+        };
+    }
+
+    // 自定义 RestClient 连接池
+    @Bean
+    public RestClientHttpClientFactory customRestClientHttpClient() {
+        return settings -> {
+            PoolingHttpClientConnectionManager cm =
+                PoolingHttpClientConnectionManagerBuilder.create()
+                    .setMaxConnTotal(settings.getMaxRequests())
+                    .setMaxConnPerRoute(settings.getMaxRequestsPerHost())
+                    .build();
+
+            return HttpClients.custom()
+                .setConnectionManager(cm)
+                .build();
+        };
+    }
+}
 ```
 
 **配置说明**：

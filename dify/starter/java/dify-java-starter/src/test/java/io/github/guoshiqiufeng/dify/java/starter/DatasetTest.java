@@ -16,6 +16,7 @@
 package io.github.guoshiqiufeng.dify.java.starter;
 
 import io.github.guoshiqiufeng.dify.client.codec.jackson.JacksonJsonMapper;
+import io.github.guoshiqiufeng.dify.client.integration.okhttp.http.JavaHttpClient;
 import io.github.guoshiqiufeng.dify.client.integration.okhttp.http.JavaHttpClientFactory;
 import io.github.guoshiqiufeng.dify.core.config.DifyProperties;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyFile;
@@ -31,6 +32,7 @@ import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.dto.response.DatasetApiKeyResponse;
 import io.github.guoshiqiufeng.dify.support.impl.builder.DifyDatasetBuilder;
 import io.github.guoshiqiufeng.dify.support.impl.builder.DifyServerBuilder;
+import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.*;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -50,7 +52,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @Testcontainers(disabledWithoutDocker = true)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class DatasetTest {
+public class DatasetTest extends BaseConnectionPoolTest {
 
     private static DifyDataset difyDataset;
     private static DifyServer difyServer;
@@ -611,5 +613,86 @@ public class DatasetTest {
     public static DifyFile createTestFile(String fileName, String contentType) throws IOException {
         String content = "This is a test file content for API testing.";
         return new DifyFile(fileName, contentType, content.getBytes());
+    }
+
+    @Test
+    @Order(100)
+    @DisplayName("OkHttp default connection pool config")
+    public void testOkHttpDefaultPoolConfig() {
+        JavaHttpClientFactory httpClientFactory = new JavaHttpClientFactory(new JacksonJsonMapper());
+
+        Object client = DifyDatasetBuilder.builder()
+                .baseUrl(baseUrl)
+                .httpClientFactory(httpClientFactory)
+                .build();
+
+        OkHttpClient okHttpClient = extractOkHttpClient(client);
+        assertOkHttpConfig(okHttpClient, 5, 300, 64, 5, 0);
+    }
+
+    @Test
+    @Order(101)
+    @DisplayName("OkHttp low concurrency connection pool config")
+    public void testOkHttpLowConcurrencyPoolConfig() {
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setMaxIdleConnections(5);
+        config.setKeepAliveSeconds(300);
+        config.setMaxRequests(64);
+        config.setMaxRequestsPerHost(5);
+        config.setCallTimeout(0);
+
+        JavaHttpClientFactory httpClientFactory = new JavaHttpClientFactory(new JacksonJsonMapper());
+        Object client = DifyDatasetBuilder.builder()
+                .baseUrl(baseUrl)
+                .clientConfig(config)
+                .httpClientFactory(httpClientFactory)
+                .build();
+
+        OkHttpClient okHttpClient = extractOkHttpClient(client);
+        assertOkHttpConfig(okHttpClient, 5, 300, 64, 5, 0);
+    }
+
+    @Test
+    @Order(102)
+    @DisplayName("OkHttp medium concurrency connection pool config")
+    public void testOkHttpMediumConcurrencyPoolConfig() {
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setMaxIdleConnections(10);
+        config.setKeepAliveSeconds(300);
+        config.setMaxRequests(128);
+        config.setMaxRequestsPerHost(10);
+        config.setCallTimeout(60);
+
+        JavaHttpClientFactory httpClientFactory = new JavaHttpClientFactory(new JacksonJsonMapper());
+        Object client = DifyDatasetBuilder.builder()
+                .baseUrl(baseUrl)
+                .clientConfig(config)
+                .httpClientFactory(httpClientFactory)
+                .build();
+
+        OkHttpClient okHttpClient = extractOkHttpClient(client);
+        assertOkHttpConfig(okHttpClient, 10, 300, 128, 10, 60);
+    }
+
+    @Test
+    @Order(103)
+    @DisplayName("OkHttp high concurrency connection pool config")
+    public void testOkHttpHighConcurrencyPoolConfig() {
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setMaxIdleConnections(20);
+        config.setKeepAliveSeconds(300);
+        config.setMaxRequests(256);
+        config.setMaxRequestsPerHost(20);
+        config.setCallTimeout(60);
+
+        JavaHttpClientFactory httpClientFactory = new JavaHttpClientFactory(new JacksonJsonMapper());
+        Object client = DifyDatasetBuilder.builder()
+                .baseUrl(baseUrl)
+                .clientConfig(config)
+                .httpClientFactory(httpClientFactory)
+                .build();
+
+        OkHttpClient okHttpClient = extractOkHttpClient(client);
+        assertOkHttpConfig(okHttpClient, 20, 300, 256, 20, 60);
     }
 }

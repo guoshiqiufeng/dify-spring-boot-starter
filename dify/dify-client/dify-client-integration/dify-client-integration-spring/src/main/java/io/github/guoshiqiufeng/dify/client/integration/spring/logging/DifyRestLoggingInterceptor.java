@@ -49,12 +49,14 @@ public class DifyRestLoggingInterceptor implements ClientHttpRequestInterceptor 
     private static final ConcurrentMap<String, Long> REQUEST_TIME_CACHE = new ConcurrentHashMap<>();
 
     private final boolean maskingEnabled;
+    private final int logBodyMaxBytes;
+    private final boolean logBinaryBody;
 
     /**
      * Constructor with default masking enabled
      */
     public DifyRestLoggingInterceptor() {
-        this(true);
+        this(true, 10240, false);
     }
 
     /**
@@ -63,7 +65,30 @@ public class DifyRestLoggingInterceptor implements ClientHttpRequestInterceptor 
      * @param maskingEnabled whether to enable log masking
      */
     public DifyRestLoggingInterceptor(boolean maskingEnabled) {
+        this(maskingEnabled, 10240, false);
+    }
+
+    /**
+     * Constructor with full configuration
+     *
+     * @param maskingEnabled  whether to enable log masking
+     * @param logBodyMaxBytes maximum bytes to log for body (0 = unlimited)
+     */
+    public DifyRestLoggingInterceptor(boolean maskingEnabled, int logBodyMaxBytes) {
+        this(maskingEnabled, logBodyMaxBytes, false);
+    }
+
+    /**
+     * Constructor with full configuration including binary body logging
+     *
+     * @param maskingEnabled  whether to enable log masking
+     * @param logBodyMaxBytes maximum bytes to log for body (0 = unlimited)
+     * @param logBinaryBody   whether to log binary body content (default: false, only log metadata)
+     */
+    public DifyRestLoggingInterceptor(boolean maskingEnabled, int logBodyMaxBytes, boolean logBinaryBody) {
         this.maskingEnabled = maskingEnabled;
+        this.logBodyMaxBytes = logBodyMaxBytes;
+        this.logBinaryBody = logBinaryBody;
     }
 
     @Override
@@ -72,21 +97,42 @@ public class DifyRestLoggingInterceptor implements ClientHttpRequestInterceptor 
         long startTime = System.currentTimeMillis();
         REQUEST_TIME_CACHE.put(requestId, startTime);
 
-        // Log request
-        logRequest(requestId, request, body);
+        try {
+            // Log request
+            logRequest(requestId, request, body);
 
-        // Execute request
-        ClientHttpResponse response = execution.execute(request, body);
+            // Execute request
+            ClientHttpResponse response = execution.execute(request, body);
 
-        // Log response
-        byte[] cachedBody = logResponse(requestId, response);
+            // Log response and get cached body (or null for SSE)
+            byte[] cachedBody = logResponse(requestId, response);
 
-        return createBufferedResponse(response, cachedBody);
+            // If cachedBody is null (SSE case), return original response without wrapping
+            if (cachedBody == null) {
+                return response;
+            }
+
+            // Otherwise wrap with buffered proxy
+            return createBufferedResponse(response, cachedBody);
+        } catch (Exception e) {
+            // Ensure cache cleanup on error path
+            REQUEST_TIME_CACHE.remove(requestId);
+            throw e;
+        }
     }
 
     private void logRequest(String requestId, HttpRequest request, byte[] body) {
         if (log.isDebugEnabled()) {
-            String bodyContent = body != null && body.length > 0 ? new String(body, StandardCharsets.UTF_8) : "";
+            String bodyContent = "";
+            if (body != null && body.length > 0) {
+                // Apply logBodyMaxBytes limit at byte level (already in bytes)
+                if (logBodyMaxBytes > 0 && body.length > logBodyMaxBytes) {
+                    // Truncate at byte boundary
+                    bodyContent = new String(body, 0, logBodyMaxBytes, StandardCharsets.UTF_8) + "... (truncated)";
+                } else {
+                    bodyContent = new String(body, StandardCharsets.UTF_8);
+                }
+            }
 
             if (maskingEnabled) {
                 // Convert HttpHeaders to Map for masking
@@ -99,43 +145,84 @@ public class DifyRestLoggingInterceptor implements ClientHttpRequestInterceptor 
                 // Mask sensitive body content
                 String maskedBody = LogMaskingUtils.maskBody(bodyContent);
 
-                // Mask sensitive URL parameters
-                String maskedUrl = maskSensitiveUrlParams(request.getURI().toString());
+                // Mask sensitive URL parameters using shared utility
+                String maskedUrl = LogMaskingUtils.maskUrl(request.getURI().toString());
 
-                log.debug("logRequest，requestId：{}，url：{}，method：{}，headers：{}，body：{}",
+                log.debug("logRequest | requestId: {} | url: {} | method: {} | headers: {} | body: {}",
                         requestId, maskedUrl, request.getMethod(), maskedHeaders, maskedBody);
             } else {
-                log.debug("logRequest，requestId：{}，url：{}，method：{}，headers：{}，body：{}",
+                log.debug("logRequest | requestId: {} | url: {} | method: {} | headers: {} | body: {}",
                         requestId, request.getURI(), request.getMethod(), request.getHeaders(), bodyContent);
             }
         }
     }
 
-    /**
-     * Mask sensitive URL parameters
-     *
-     * @param url original URL
-     * @return URL with masked sensitive parameters
-     */
-    private String maskSensitiveUrlParams(String url) {
-        if (url == null || url.isEmpty()) {
-            return url;
-        }
-        // Mask common sensitive parameters
-        return url.replaceAll("(api_key|apikey|token|authorization|password|secret|access_token|refresh_token)=([^&]*)",
-                "$1=***MASKED***");
-    }
-
     private byte[] logResponse(String requestId, ClientHttpResponse response) throws IOException {
-        byte[] body = StreamUtils.copyToByteArray(response.getBody());
-
         // Always remove from cache to prevent memory leak
         Long startTime = REQUEST_TIME_CACHE.remove(requestId);
 
-        if (log.isDebugEnabled() && startTime != null) {
+        // Check if SSE response first - before any body reading
+        String contentType = response.getHeaders().getContentType() != null
+                ? response.getHeaders().getContentType().toString()
+                : "";
+        if (contentType.contains("text/event-stream")) {
+            if (log.isDebugEnabled()) {
+                log.debug("logResponse | requestId: {} | SSE response detected, skipping body logging to preserve stream", requestId);
+            }
+            // Return null to signal "don't wrap, use original response"
+            return null;
+        }
+
+        // Check if binary content type
+        boolean isBinary = isBinaryContentType(contentType);
+        if (isBinary && !logBinaryBody) {
+            if (log.isDebugEnabled()) {
+                log.debug("logResponse | requestId: {} | Binary content detected ({}), skipping body logging (logBinaryBody=false)",
+                        requestId, contentType);
+            }
+            // Return null to signal "don't wrap, use original response"
+            return null;
+        }
+
+        // If debug logging is disabled, don't buffer body - return null to use original response
+        if (!log.isDebugEnabled()) {
+            return null;
+        }
+
+        // Check content length and skip buffering if too large or unknown
+        long contentLength = response.getHeaders().getContentLength();
+
+        // Skip buffering if content-length is unknown
+        if (contentLength == -1) {
+            log.debug("logResponse | requestId: {} | Response content-length unknown, skipping body buffering for safety",
+                    requestId);
+            return null; // Use original response
+        }
+
+        if (logBodyMaxBytes > 0 && contentLength > logBodyMaxBytes) {
+            log.debug("logResponse | requestId: {} | Response body too large ({}bytes > {}bytes), skipping body buffering",
+                    requestId, contentLength, logBodyMaxBytes);
+            // Don't buffer large responses - return null to use original response
+            return null;
+        }
+
+        // Safe to buffer
+        byte[] body = StreamUtils.copyToByteArray(response.getBody());
+
+        if (startTime != null) {
             long executionTime = System.currentTimeMillis() - startTime;
 
-            String bodyContent = body.length > 0 ? new String(body, StandardCharsets.UTF_8) : "";
+            // Apply max bytes truncation at byte level (already in bytes)
+            String bodyContent = "";
+            if (body.length > 0) {
+                if (logBodyMaxBytes > 0 && body.length > logBodyMaxBytes) {
+                    // Truncate at byte boundary
+                    bodyContent = new String(body, 0, logBodyMaxBytes, StandardCharsets.UTF_8) + "... (truncated)";
+                } else {
+                    bodyContent = new String(body, StandardCharsets.UTF_8);
+                }
+            }
+
             // Use reflection to get status code to support both Spring 5 (HttpStatus) and Spring 6+ (HttpStatusCode)
             Object statusCode = getStatusCodeSafely(response);
 
@@ -150,15 +237,62 @@ public class DifyRestLoggingInterceptor implements ClientHttpRequestInterceptor 
                 // Mask sensitive body content
                 String maskedBody = LogMaskingUtils.maskBody(bodyContent);
 
-                log.debug("logResponse，requestId：{}，status：{}，headers：{}，executionTime：{}ms，body：{}",
+                log.debug("logResponse | requestId: {} | status: {} | headers: {} | executionTime: {}ms | body: {}",
                         requestId, statusCode, maskedHeaders, executionTime, maskedBody);
             } else {
-                log.debug("logResponse，requestId：{}，status：{}，headers：{}，executionTime：{}ms，body：{}",
+                log.debug("logResponse | requestId: {} | status: {} | headers: {} | executionTime: {}ms | body: {}",
                         requestId, statusCode, response.getHeaders(), executionTime, bodyContent);
             }
         }
 
         return body;
+    }
+
+    /**
+     * Check if the content type is binary (non-text).
+     * Returns true for images, videos, audio, application/octet-stream, etc.
+     * Returns false for text/*, application/json, application/xml, etc.
+     *
+     * @param contentType the content type string
+     * @return true if binary content
+     */
+    private boolean isBinaryContentType(String contentType) {
+        if (contentType == null || contentType.isEmpty()) {
+            return false; // Assume text if no content type
+        }
+
+        String lowerContentType = contentType.toLowerCase();
+
+        // Text types (safe to log)
+        if (lowerContentType.startsWith("text/") ||
+            lowerContentType.contains("application/json") ||
+            lowerContentType.contains("application/xml") ||
+            lowerContentType.contains("application/x-www-form-urlencoded") ||
+            lowerContentType.contains("application/javascript") ||
+            lowerContentType.contains("application/xhtml+xml") ||
+            lowerContentType.contains("+json") ||
+            lowerContentType.contains("+xml")) {
+            return false;
+        }
+
+        // Binary types (should not log body)
+        if (lowerContentType.startsWith("image/") ||
+            lowerContentType.startsWith("video/") ||
+            lowerContentType.startsWith("audio/") ||
+            lowerContentType.contains("application/octet-stream") ||
+            lowerContentType.contains("application/pdf") ||
+            lowerContentType.contains("application/zip") ||
+            lowerContentType.contains("application/gzip") ||
+            lowerContentType.contains("multipart/")) {
+            return true;
+        }
+
+        // Default: assume binary for unknown application/* types
+        if (lowerContentType.startsWith("application/")) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
