@@ -27,6 +27,7 @@ import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
 import java.io.IOException;
@@ -56,6 +57,7 @@ class RestClientExecutorIntegrationTest {
 
         RestClient restClient = RestClient.builder()
                 .baseUrl(mockServer.url("/").toString())
+                .requestFactory(new JdkClientHttpRequestFactory())
                 .build();
 
         executor = new RestClientExecutor(restClient, new JacksonJsonMapper());

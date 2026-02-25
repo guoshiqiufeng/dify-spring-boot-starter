@@ -27,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @version 2.0.0
  * @since 2026/1/13
  */
+@SuppressWarnings("deprecation")
 class DifyLoggingControlTest {
 
     @Test

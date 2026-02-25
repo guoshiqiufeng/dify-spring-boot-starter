@@ -419,4 +419,221 @@ class SpringHttpClientTest {
         assertNotNull(client);
         assertNotNull(client.getWebClient());
     }
+
+    @Test
+    void testConstructorWithSseReadTimeout() {
+        // Arrange
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setSseReadTimeout(60);
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+        assertNotNull(client.getSseWebClient());
+    }
+
+    @Test
+    void testConstructorWithSseReadTimeoutZero() {
+        // Arrange
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setSseReadTimeout(0);
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getSseWebClient());
+    }
+
+    @Test
+    void testConstructorWithSseReadTimeoutNull() {
+        // Arrange
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setSseReadTimeout(null);
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getSseWebClient());
+    }
+
+    @Test
+    void testConstructorWithConnectionPoolConfig() {
+        // Arrange
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setMaxIdleConnections(50);
+        config.setKeepAliveSeconds(60);
+        config.setMaxRequests(100);
+        config.setMaxRequestsPerHost(20);
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+    }
+
+    @Test
+    void testConstructorWithCallTimeout() {
+        // Arrange
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setCallTimeout(45);
+        config.setReadTimeout(30);
+        config.setWriteTimeout(30);
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+    }
+
+    @Test
+    void testConstructorWithCustomBuilderAndPoolConfig() {
+        // Arrange
+        org.springframework.web.reactive.function.client.WebClient.Builder webClientBuilder =
+                org.springframework.web.reactive.function.client.WebClient.builder();
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setMaxIdleConnections(50);
+        config.setKeepAliveSeconds(60);
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", config,
+                webClientBuilder, null, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+    }
+
+    @Test
+    void testConstructorWithHeadersContainingMultipleValues() {
+        // Arrange
+        io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders headers =
+                new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders();
+        headers.add("X-Custom-Header", "value1");
+        headers.add("X-Custom-Header", "value2");
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", clientConfig,
+                null, null, jsonMapper, headers);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+    }
+
+    @Test
+    void testConstructorWithHeadersContainingEmptyValues() {
+        // Arrange
+        io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders headers =
+                new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders();
+        headers.put("X-Empty-Header", new java.util.ArrayList<>());
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", clientConfig,
+                null, null, jsonMapper, headers);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+    }
+
+    @Test
+    void testConstructorWithHeadersContainingNullValues() {
+        // Arrange
+        io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders headers =
+                new io.github.guoshiqiufeng.dify.client.core.http.HttpHeaders();
+        headers.put("X-Null-Header", null);
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", clientConfig,
+                null, null, jsonMapper, headers);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+    }
+
+    @Test
+    void testConstructorWithLoggingAndCustomLogBodyMaxBytes() {
+        // Arrange
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setLogging(true);
+        config.setLogBodyMaxBytes(5120);
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+    }
+
+    @Test
+    void testConstructorWithLoggingAndLogBinaryBodyEnabled() {
+        // Arrange
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setLogging(true);
+        config.setLogBinaryBody(true);
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+    }
+
+    @Test
+    void testConstructorWithLoggingAndLogBinaryBodyDisabled() {
+        // Arrange
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setLogging(true);
+        config.setLogBinaryBody(false);
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+    }
+
+    @Test
+    void testConstructorWithLoggingAndLogBinaryBodyNull() {
+        // Arrange
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setLogging(true);
+        config.setLogBinaryBody(null);
+
+        // Act
+        SpringHttpClient client = new SpringHttpClient("http://test.com", config, jsonMapper);
+
+        // Assert
+        assertNotNull(client);
+        assertNotNull(client.getWebClient());
+    }
+
+    @Test
+    void testGetSseWebClient() {
+        // Arrange
+        DifyProperties.ClientConfig config = new DifyProperties.ClientConfig();
+        config.setSseReadTimeout(120);
+        SpringHttpClient client = new SpringHttpClient("http://test.com", config, jsonMapper);
+
+        // Act
+        var sseWebClient = client.getSseWebClient();
+
+        // Assert
+        assertNotNull(sseWebClient);
+    }
 }

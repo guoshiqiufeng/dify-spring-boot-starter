@@ -67,10 +67,11 @@ public final class RestClientConfigurer {
         try {
             Class<?> httpComponentsFactoryClass = Class.forName(
                     "org.springframework.http.client.HttpComponentsClientHttpRequestFactory");
-            Class<?> closeableHttpClientClass = Class.forName(
-                    "org.apache.hc.client5.http.impl.classic.CloseableHttpClient");
+            // Use HttpClient interface instead of CloseableHttpClient class for Spring 6 compatibility
+            Class<?> httpClientClass = Class.forName(
+                    "org.apache.hc.client5.http.classic.HttpClient");
 
-            Object factory = httpComponentsFactoryClass.getConstructor(closeableHttpClientClass)
+            Object factory = httpComponentsFactoryClass.getConstructor(httpClientClass)
                     .newInstance(httpClient);
 
             // Set the request factory
