@@ -157,7 +157,7 @@ public interface DifyChat {
      * 文件只能在属于请求应用程序的消息范围内访问。
      *
      * @param request 文件预览请求对象，包含文件ID、下载方式等信息
-     * @return `ResponseEntity<byte[]>` 文件内容响应，包含适当的浏览器显示或下载标头
+     * @return {@code ResponseEntity<byte[]>} 文件内容响应，包含适当的浏览器显示或下载标头
      * @since 1.0.0
      */
     ResponseEntity<byte[]> filePreview(FilePreviewRequest request);
