@@ -26,6 +26,7 @@ import io.github.guoshiqiufeng.dify.client.core.http.util.RequestParameterProces
 import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.HttpHeaderConverter;
 import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.SpringMultipartBodyBuilder;
+import io.github.guoshiqiufeng.dify.client.integration.spring.util.ClientResponseUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -403,7 +404,8 @@ class WebClientExecutor {
         return requestSpec
                 .accept(MediaType.TEXT_EVENT_STREAM)
                 .exchangeToFlux(response -> {
-                    int statusCode = response.rawStatusCode();
+                    // Use ClientResponseUtils for Spring version compatibility
+                    int statusCode = ClientResponseUtils.getStatusCodeValue(response);
                     if (HttpStatusValidator.isSuccessful(statusCode)) {
                         return response.bodyToFlux(sseType);
                     }
