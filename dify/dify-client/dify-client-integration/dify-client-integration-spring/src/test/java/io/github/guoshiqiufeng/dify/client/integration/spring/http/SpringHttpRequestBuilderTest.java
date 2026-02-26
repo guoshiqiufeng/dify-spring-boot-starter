@@ -521,7 +521,7 @@ class SpringHttpRequestBuilderTest {
         executorField.set(builder, mockExecutor);
 
         reactor.core.publisher.Flux<String> mockFlux = reactor.core.publisher.Flux.just("item1", "item2");
-        when(mockExecutor.executeStream(anyString(), any(URI.class), any(), any(), any(), any(), eq(String.class)))
+        when(mockExecutor.executeStream(anyString(), any(URI.class), any(), any(), any(), any(), eq(String.class), anyList()))
                 .thenReturn(mockFlux);
 
         // Act
@@ -545,7 +545,7 @@ class SpringHttpRequestBuilderTest {
 
         reactor.core.publisher.Flux<String> mockFlux = reactor.core.publisher.Flux.just("item1", "item2");
         when(mockExecutor.executeStream(anyString(), any(URI.class), any(), any(), any(), any(),
-                any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class)))
+                any(io.github.guoshiqiufeng.dify.client.core.http.TypeReference.class), anyList()))
                 .thenReturn(mockFlux);
 
         // Act

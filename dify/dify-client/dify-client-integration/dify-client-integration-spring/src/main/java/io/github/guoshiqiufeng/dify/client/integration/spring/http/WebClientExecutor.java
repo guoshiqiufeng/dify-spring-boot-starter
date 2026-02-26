@@ -18,6 +18,7 @@ package io.github.guoshiqiufeng.dify.client.integration.spring.http;
 import io.github.guoshiqiufeng.dify.client.core.codec.JsonMapper;
 import io.github.guoshiqiufeng.dify.client.core.codec.util.JsonSerializationHelper;
 import io.github.guoshiqiufeng.dify.client.core.http.HttpClientException;
+import io.github.guoshiqiufeng.dify.client.core.http.ResponseErrorHandler;
 import io.github.guoshiqiufeng.dify.client.core.http.TypeReference;
 import io.github.guoshiqiufeng.dify.client.core.http.util.HttpStatusValidator;
 import io.github.guoshiqiufeng.dify.client.core.http.util.MultipartBodyProcessor;
@@ -25,6 +26,7 @@ import io.github.guoshiqiufeng.dify.client.core.http.util.RequestParameterProces
 import io.github.guoshiqiufeng.dify.client.core.response.ResponseEntity;
 import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.HttpHeaderConverter;
 import io.github.guoshiqiufeng.dify.client.integration.spring.http.util.SpringMultipartBodyBuilder;
+import io.github.guoshiqiufeng.dify.client.integration.spring.util.ClientResponseUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -38,6 +40,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -285,22 +289,33 @@ class WebClientExecutor {
     <T> Flux<T> executeStream(String method, URI uri, Map<String, String> headers,
                               Map<String, String> cookies, Map<String, String> queryParams,
                               Object body, Class<T> responseType) {
-        // Use SSE-specific WebClient for streaming requests
-        WebClient.RequestBodySpec requestSpec = buildRequest(sseWebClient, method, uri, headers, cookies, queryParams, body);
+        return executeStream(method, uri, headers, cookies, queryParams, body, responseType, Collections.emptyList());
+    }
 
-        // For SSE streaming, use Spring's ServerSentEvent support
-        ParameterizedTypeReference<org.springframework.http.codec.ServerSentEvent<String>> sseType =
-                new ParameterizedTypeReference<org.springframework.http.codec.ServerSentEvent<String>>() {
-                };
+    /**
+     * Execute streaming request with error handlers.
+     *
+     * @param method        HTTP method
+     * @param uri           request URI
+     * @param headers       request headers
+     * @param cookies       request cookies
+     * @param queryParams   query parameters
+     * @param body          request body
+     * @param responseType  response type
+     * @param errorHandlers error handlers to apply
+     * @param <T>           response type
+     * @return Flux of response items
+     */
+    <T> Flux<T> executeStream(String method, URI uri, Map<String, String> headers,
+                              Map<String, String> cookies, Map<String, String> queryParams,
+                              Object body, Class<T> responseType, List<ResponseErrorHandler> errorHandlers) {
+        Flux<ServerSentEvent<String>> sseFlux = exchangeForSse(method, uri, headers, cookies, queryParams, body, errorHandlers);
 
-        return requestSpec
-                .accept(MediaType.TEXT_EVENT_STREAM)
-                .retrieve()
-                .bodyToFlux(sseType)
+        return sseFlux
                 .doOnNext(sse -> log.debug("Received SSE event: id={}, event={}, data={}", sse.id(), sse.event(), sse.data()))
                 .doOnComplete(() -> log.debug("SSE stream completed"))
                 .doOnError(e -> log.error("SSE stream error", e))
-                .mapNotNull(sse -> sse.data())
+                .mapNotNull(ServerSentEvent::data)
                 .doOnNext(data -> log.debug("Extracted data: {}", data))
                 .filter(data -> data != null && !data.isEmpty() && isCompleteJson(data))
                 .doOnNext(json -> log.debug("Filtered JSON: {}", json))
@@ -330,18 +345,29 @@ class WebClientExecutor {
     <T> Flux<T> executeStream(String method, URI uri, Map<String, String> headers,
                               Map<String, String> cookies, Map<String, String> queryParams,
                               Object body, TypeReference<T> typeReference) {
-        // Use SSE-specific WebClient for streaming requests
-        WebClient.RequestBodySpec requestSpec = buildRequest(sseWebClient, method, uri, headers, cookies, queryParams, body);
+        return executeStream(method, uri, headers, cookies, queryParams, body, typeReference, Collections.emptyList());
+    }
 
-        // For SSE streaming, use Spring's ServerSentEvent support
-        ParameterizedTypeReference<org.springframework.http.codec.ServerSentEvent<String>> sseType =
-                new ParameterizedTypeReference<org.springframework.http.codec.ServerSentEvent<String>>() {
-                };
+    /**
+     * Execute streaming request with TypeReference and error handlers.
+     *
+     * @param method        HTTP method
+     * @param uri           request URI
+     * @param headers       request headers
+     * @param cookies       request cookies
+     * @param queryParams   query parameters
+     * @param body          request body
+     * @param typeReference type reference
+     * @param errorHandlers error handlers to apply
+     * @param <T>           response type
+     * @return Flux of response items
+     */
+    <T> Flux<T> executeStream(String method, URI uri, Map<String, String> headers,
+                              Map<String, String> cookies, Map<String, String> queryParams,
+                              Object body, TypeReference<T> typeReference, List<ResponseErrorHandler> errorHandlers) {
+        Flux<ServerSentEvent<String>> sseFlux = exchangeForSse(method, uri, headers, cookies, queryParams, body, errorHandlers);
 
-        return requestSpec
-                .accept(MediaType.TEXT_EVENT_STREAM)
-                .retrieve()
-                .bodyToFlux(sseType)
+        return sseFlux
                 .mapNotNull(ServerSentEvent::data)
                 .filter(data -> data != null && !data.isEmpty() && isCompleteJson(data))
                 .mapNotNull(json -> {
@@ -351,6 +377,72 @@ class WebClientExecutor {
                         log.warn("Failed to parse SSE event: {}", json, e);
                         return null;
                     }
+                });
+    }
+
+    /**
+     * Exchange for SSE stream with error handling.
+     *
+     * @param method        HTTP method
+     * @param uri           request URI
+     * @param headers       request headers
+     * @param cookies       request cookies
+     * @param queryParams   query parameters
+     * @param body          request body
+     * @param errorHandlers error handlers to apply
+     * @return Flux of ServerSentEvent
+     */
+    private Flux<ServerSentEvent<String>> exchangeForSse(String method, URI uri, Map<String, String> headers,
+                                                         Map<String, String> cookies, Map<String, String> queryParams,
+                                                         Object body, List<ResponseErrorHandler> errorHandlers) {
+        WebClient.RequestBodySpec requestSpec = buildRequest(sseWebClient, method, uri, headers, cookies, queryParams, body);
+        ParameterizedTypeReference<ServerSentEvent<String>> sseType =
+                new ParameterizedTypeReference<ServerSentEvent<String>>() {
+                };
+        List<ResponseErrorHandler> handlers = errorHandlers != null ? errorHandlers : Collections.emptyList();
+
+        return requestSpec
+                .accept(MediaType.TEXT_EVENT_STREAM)
+                .exchangeToFlux(response -> {
+                    // Use ClientResponseUtils for Spring version compatibility
+                    int statusCode = ClientResponseUtils.getStatusCodeValue(response);
+                    if (HttpStatusValidator.isSuccessful(statusCode)) {
+                        return response.bodyToFlux(sseType);
+                    }
+                    // Handle error response (4xx, 5xx)
+                    // Read response body with size limit to prevent memory issues
+                    return response.bodyToMono(String.class)
+                            .defaultIfEmpty("")
+                            .flatMapMany(bodyContent -> {
+                                ResponseEntity<String> errorResponse = ResponseEntity.<String>builder()
+                                        .statusCode(statusCode)
+                                        .headers(HttpHeaderConverter.fromSpringHeaders(response.headers().asHttpHeaders()))
+                                        .body(bodyContent)
+                                        .build();
+
+                                // Apply error handlers
+                                boolean handlerExecuted = false;
+                                for (ResponseErrorHandler handler : handlers) {
+                                    if (handler.getStatusPredicate().test(statusCode)) {
+                                        try {
+                                            handler.handle(errorResponse);
+                                            handlerExecuted = true;
+                                        } catch (Exception e) {
+                                            if (e instanceof RuntimeException) {
+                                                return Flux.error(e);
+                                            }
+                                            return Flux.error(new HttpClientException("Error handler failed: " + e.getMessage(), e));
+                                        }
+                                    }
+                                }
+
+                                // If no handler was executed, throw default exception to preserve error semantics
+                                if (!handlerExecuted) {
+                                    return Flux.error(new HttpClientException(statusCode, bodyContent));
+                                }
+
+                                return Flux.empty();
+                            });
                 });
     }
 

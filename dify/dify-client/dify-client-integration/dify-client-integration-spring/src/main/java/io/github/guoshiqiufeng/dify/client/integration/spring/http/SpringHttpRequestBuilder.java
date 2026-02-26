@@ -239,14 +239,14 @@ public class SpringHttpRequestBuilder implements HttpRequestBuilder {
         @Override
         public <T> T body(Class<T> responseType) {
             ResponseEntity<T> response = toEntity(responseType);
-            handleErrors(response);
+            // Error handling already done in toEntity()
             return response.getBody();
         }
 
         @Override
         public <T> T body(TypeReference<T> typeReference) {
             ResponseEntity<T> response = toEntity(typeReference);
-            handleErrors(response);
+            // Error handling already done in toEntity()
             return response.getBody();
         }
 
@@ -258,8 +258,7 @@ public class SpringHttpRequestBuilder implements HttpRequestBuilder {
             } else {
                 response = webClientExecutor.executeForEntity(method, uri, headers, cookies, queryParams, body, responseType);
             }
-            // Handle errors before returning the response
-            handleErrors(response);
+            ResponseErrorHandlerUtils.handleErrors(errorHandlers, response);
             return response;
         }
 
@@ -271,46 +270,25 @@ public class SpringHttpRequestBuilder implements HttpRequestBuilder {
             } else {
                 response = webClientExecutor.executeForEntity(method, uri, headers, cookies, queryParams, body, typeReference);
             }
-            // Handle errors before returning the response
-            handleErrors(response);
+            ResponseErrorHandlerUtils.handleErrors(errorHandlers, response);
             return response;
         }
 
         @Override
         public ResponseEntity<Void> toBodilessEntity() {
             ResponseEntity<Void> response = toEntity(Void.class);
-            handleErrors(response);
+            ResponseErrorHandlerUtils.handleErrors(errorHandlers, response);
             return response;
         }
 
         @Override
         public <T> Flux<T> bodyToFlux(Class<T> responseType) {
-            return webClientExecutor.executeStream(method, uri, headers, cookies, queryParams, body, responseType);
+            return webClientExecutor.executeStream(method, uri, headers, cookies, queryParams, body, responseType, errorHandlers);
         }
 
         @Override
         public <T> Flux<T> bodyToFlux(TypeReference<T> typeReference) {
-            return webClientExecutor.executeStream(method, uri, headers, cookies, queryParams, body, typeReference);
-        }
-
-        /**
-         * Handle errors using registered error handlers.
-         *
-         * @param response the HTTP response
-         */
-        private void handleErrors(ResponseEntity<?> response) {
-            for (ResponseErrorHandler handler : errorHandlers) {
-                if (handler.getStatusPredicate().test(response.getStatusCode())) {
-                    try {
-                        handler.handle(response);
-                    } catch (Exception e) {
-                        if (e instanceof RuntimeException) {
-                            throw (RuntimeException) e;
-                        }
-                        throw new HttpClientException("Error handler failed: " + e.getMessage(), e);
-                    }
-                }
-            }
+            return webClientExecutor.executeStream(method, uri, headers, cookies, queryParams, body, typeReference, errorHandlers);
         }
     }
 }
