@@ -212,9 +212,16 @@ class RestClientExecutor {
 
         // Set URI
         if (uri != null) {
-            java.lang.reflect.Method uriMethod = findMethod(requestSpec.getClass(), "uri", URI.class);
-            uriMethod.setAccessible(true);
-            requestSpec = uriMethod.invoke(requestSpec, uri);
+            if (uri.isAbsolute()) {
+                requestSpec = invokeUri(requestSpec, uri);
+            } else {
+                URI resolvedUri = resolveAgainstBaseUri(uri);
+                if (resolvedUri != null) {
+                    requestSpec = invokeUri(requestSpec, resolvedUri);
+                } else {
+                    requestSpec = invokeUriString(requestSpec, uri.toString());
+                }
+            }
         }
 
         // Set headers and cookies
@@ -256,6 +263,125 @@ class RestClientExecutor {
         }
 
         return requestSpec;
+    }
+
+    /**
+     * Invoke uri(URI) method on request spec.
+     *
+     * @param requestSpec request spec object
+     * @param uri         URI to set
+     * @return updated request spec
+     * @throws Exception if reflection fails
+     */
+    private Object invokeUri(Object requestSpec, URI uri) throws Exception {
+        java.lang.reflect.Method uriMethod = findMethod(requestSpec.getClass(), "uri", URI.class);
+        uriMethod.setAccessible(true);
+        return uriMethod.invoke(requestSpec, uri);
+    }
+
+    /**
+     * Invoke uri(String) method on request spec as fallback.
+     *
+     * @param requestSpec request spec object
+     * @param uri         URI string to set
+     * @return updated request spec
+     * @throws Exception if reflection fails
+     */
+    private Object invokeUriString(Object requestSpec, String uri) throws Exception {
+        try {
+            java.lang.reflect.Method uriMethod = findMethod(requestSpec.getClass(), "uri", String.class);
+            uriMethod.setAccessible(true);
+            return uriMethod.invoke(requestSpec, uri);
+        } catch (NoSuchMethodException e) {
+            java.lang.reflect.Method uriMethod = findMethod(requestSpec.getClass(), "uri", String.class, Object[].class);
+            uriMethod.setAccessible(true);
+            return uriMethod.invoke(requestSpec, new Object[]{uri, new Object[0]});
+        }
+    }
+
+    /**
+     * Resolve relative URI against base URI from uriBuilderFactory.
+     * Implements Spring 6.2.0 logic for handling relative URIs.
+     *
+     * @param uri relative URI to resolve
+     * @return resolved absolute URI, or null if resolution fails
+     */
+    private URI resolveAgainstBaseUri(URI uri) {
+        try {
+            Object uriBuilderFactory = getUriBuilderFactory();
+            if (uriBuilderFactory == null) {
+                return null;
+            }
+            URI baseUri = expandBaseUri(uriBuilderFactory);
+            if (baseUri == null) {
+                return null;
+            }
+            return baseUri.resolve(uri);
+        } catch (Exception e) {
+            log.debug("Failed to resolve relative URI using uriBuilderFactory: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Get UriBuilderFactory from RestClient using multiple strategies.
+     * Tries method calls first, then field access.
+     *
+     * @return UriBuilderFactory instance, or null if not accessible
+     */
+    private Object getUriBuilderFactory() {
+        // Strategy 1: Try uriBuilderFactory() method
+        try {
+            java.lang.reflect.Method method = findMethod(restClient.getClass(), "uriBuilderFactory");
+            method.setAccessible(true);
+            return method.invoke(restClient);
+        } catch (NoSuchMethodException e) {
+            // Fall through to next strategy
+        } catch (Exception e) {
+            log.debug("Failed to access uriBuilderFactory method: {}", e.getMessage());
+        }
+
+        // Strategy 2: Try getUriBuilderFactory() method
+        try {
+            java.lang.reflect.Method method = findMethod(restClient.getClass(), "getUriBuilderFactory");
+            method.setAccessible(true);
+            return method.invoke(restClient);
+        } catch (NoSuchMethodException e) {
+            // Fall through to field access
+        } catch (Exception e) {
+            log.debug("Failed to access getUriBuilderFactory method: {}", e.getMessage());
+        }
+
+        // Strategy 3: Try uriBuilderFactory field
+        try {
+            java.lang.reflect.Field field = restClient.getClass().getDeclaredField("uriBuilderFactory");
+            field.setAccessible(true);
+            return field.get(restClient);
+        } catch (Exception e) {
+            log.debug("Failed to access uriBuilderFactory field: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Expand base URI from UriBuilderFactory.
+     *
+     * @param uriBuilderFactory UriBuilderFactory instance
+     * @return base URI
+     * @throws Exception if reflection fails
+     */
+    private URI expandBaseUri(Object uriBuilderFactory) throws Exception {
+        try {
+            java.lang.reflect.Method expandMethod = findMethod(
+                    uriBuilderFactory.getClass(), "expand", String.class, Object[].class);
+            expandMethod.setAccessible(true);
+            return (URI) expandMethod.invoke(uriBuilderFactory, new Object[]{"", new Object[0]});
+        } catch (NoSuchMethodException e) {
+            java.lang.reflect.Method expandMethod = findMethod(
+                    uriBuilderFactory.getClass(), "expand", String.class);
+            expandMethod.setAccessible(true);
+            return (URI) expandMethod.invoke(uriBuilderFactory, "");
+        }
     }
 
     /**
