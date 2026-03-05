@@ -71,7 +71,7 @@
         <dependency>
             <groupId>io.github.guoshiqiufeng.dify</groupId>
             <artifactId>dify-bom</artifactId>
-            <version>2.1.0</version>
+            <version>2.1.1</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
