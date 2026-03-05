@@ -1,6 +1,6 @@
 [versions]
-springBoot4 = "4.0.2"
-springBoot3 = "3.5.10"
+springBoot4 = "4.0.3"
+springBoot3 = "3.5.11"
 springBoot2 = "2.7.18"
 hutool = "5.8.41"
 testcontainers = "2.0.3"
