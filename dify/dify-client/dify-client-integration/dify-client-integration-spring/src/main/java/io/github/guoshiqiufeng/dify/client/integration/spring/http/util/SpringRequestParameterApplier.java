@@ -20,6 +20,7 @@ import lombok.experimental.UtilityClass;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Utility class for applying request parameters to Spring HTTP clients.
@@ -112,7 +113,7 @@ public class SpringRequestParameterApplier {
 
     /**
      * Apply cookies to RestClient request spec using reflection.
-     * Uses reflection to support different Spring versions.
+     * Auto-fallback to Cookie header if cookie() method not available
      *
      * @param requestSpec the RestClient request spec object
      * @param cookies     map of cookie names to values
@@ -120,12 +121,86 @@ public class SpringRequestParameterApplier {
      * @throws Exception if reflection fails
      */
     public static Object applyCookiesReflection(Object requestSpec, Map<String, String> cookies) throws Exception {
-        for (Map.Entry<String, String> entry : cookies.entrySet()) {
-            java.lang.reflect.Method cookieMethod = findMethod(requestSpec.getClass(), "cookie", String.class, String.class);
-            cookieMethod.setAccessible(true);
-            requestSpec = cookieMethod.invoke(requestSpec, entry.getKey(), entry.getValue());
+        if (cookies == null || cookies.isEmpty()) {
+            return requestSpec;
         }
-        return requestSpec;
+
+        // 🔍 尝试查找 cookie(String, String) 方法（Spring Framework 6.2+）
+        java.lang.reflect.Method cookieMethod = findMethodNoError(requestSpec.getClass(), "cookie", String.class, String.class);
+
+        if (cookieMethod != null) {
+            // ✅ 方法存在：使用原生 .cookie() API
+            for (Map.Entry<String, String> entry : cookies.entrySet()) {
+                cookieMethod.setAccessible(true);
+                requestSpec = cookieMethod.invoke(requestSpec, entry.getKey(), entry.getValue());
+            }
+            return requestSpec;
+        }
+
+        // ⚠️ 方法不存在：降级使用 .header("Cookie", "k1=v1; k2=v2") 方式
+        return applyCookieHeaderFallback(requestSpec, cookies);
+    }
+
+    /**
+     * Fallback: apply cookies via "Cookie" request header (RFC 6265 format).
+     * Compatible with Spring Framework 6.1.x and earlier.
+     *
+     * @param requestSpec the RestClient request spec object
+     * @param cookies     map of cookie names to values
+     * @return the updated request spec
+     * @throws Exception if reflection fails
+     */
+    private static Object applyCookieHeaderFallback(Object requestSpec, Map<String, String> cookies) throws Exception {
+        // 📦 拼接 Cookie 头：name1=value1; name2=value2
+        String cookieHeader = cookies.entrySet().stream()
+                .map(e -> encodeCookieName(e.getKey()) + "=" + encodeCookieValue(e.getValue()))
+                .collect(Collectors.joining("; "));
+
+        // 🔧 调用 header(String, String[]) 方法（RestClient 所有版本都支持）
+        java.lang.reflect.Method headerMethod = findMethodNoError(requestSpec.getClass(), "header", String.class, String[].class);
+        if (headerMethod == null) {
+            throw new IllegalStateException("Cannot find 'header' method in " + requestSpec.getClass());
+        }
+
+        headerMethod.setAccessible(true);
+        return headerMethod.invoke(requestSpec, "Cookie", new String[]{cookieHeader});
+    }
+
+    /**
+     * Encode cookie name (simple validation, RFC 6265 token rules).
+     */
+    private static String encodeCookieName(String name) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("Cookie name cannot be empty");
+        }
+        return name;
+    }
+
+    /**
+     * Encode cookie value (URL-encode special characters).
+     */
+    private static String encodeCookieValue(String value) {
+        if (value == null) {
+            return "";
+        }
+        // Cookie value 可以包含大部分字符，但建议对特殊字符编码
+        // 这里做简单处理：如果包含分隔符则编码
+        if (value.matches(".*[;\\s].*")) {
+            try {
+                return java.net.URLEncoder.encode(value, "UTF-8");
+            } catch (java.io.UnsupportedEncodingException e) {
+                return value;
+            }
+        }
+        return value;
+    }
+
+    private static java.lang.reflect.Method findMethodNoError(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+        try {
+            return findMethod(clazz, methodName, parameterTypes);
+        } catch (NoSuchMethodException e) {
+            return null;
+        }
     }
 
     /**
