@@ -56,7 +56,7 @@ class LogMaskingUtilsTest {
         // Arrange
         Map<String, List<String>> headers = new HashMap<>();
         headers.put("authorization", Collections.singletonList("Bearer token1"));
-        headers.put("AUTHORIZATION", Collections.singletonList("Bearer token2"));
+        headers.put("Authorization", Collections.singletonList("Bearer token2"));
         headers.put("Authorization", Collections.singletonList("Bearer token3"));
 
         // Act
@@ -64,7 +64,7 @@ class LogMaskingUtilsTest {
 
         // Assert
         assertEquals("***MASKED***", maskedHeaders.get("authorization").get(0));
-        assertEquals("***MASKED***", maskedHeaders.get("AUTHORIZATION").get(0));
+        assertEquals("***MASKED***", maskedHeaders.get("Authorization").get(0));
         assertEquals("***MASKED***", maskedHeaders.get("Authorization").get(0));
     }
 

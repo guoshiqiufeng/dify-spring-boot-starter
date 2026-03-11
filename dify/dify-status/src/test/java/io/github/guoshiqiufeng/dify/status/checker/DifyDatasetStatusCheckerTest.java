@@ -69,9 +69,9 @@ class DifyDatasetStatusCheckerTest {
         DifyPageResult<DatasetResponse> response = new DifyPageResult<DatasetResponse>();
         when(difyDataset.page(any())).thenReturn(response);
 
-        ApiStatusResult result = checker.checkStatus("page", "test-api-key");
+        ApiStatusResult result = checker.checkStatus("datasets", "test-api-key");
 
-        assertEquals("page", result.getMethodName());
+        assertEquals("datasets", result.getMethodName());
         assertEquals("/datasets", result.getEndpoint());
         assertEquals(ApiStatus.NORMAL, result.getStatus());
         assertEquals(200, result.getHttpStatusCode());
@@ -131,9 +131,9 @@ class DifyDatasetStatusCheckerTest {
                         null
                 ));
 
-        ApiStatusResult result = checker.checkStatus("page", "test-api-key");
+        ApiStatusResult result = checker.checkStatus("datasets", "test-api-key");
 
-        assertEquals("page", result.getMethodName());
+        assertEquals("datasets", result.getMethodName());
         assertEquals(ApiStatus.NOT_FOUND_404, result.getStatus());
         assertEquals(404, result.getHttpStatusCode());
         assertNotNull(result.getErrorMessage());
@@ -150,9 +150,9 @@ class DifyDatasetStatusCheckerTest {
                         null
                 ));
 
-        ApiStatusResult result = checker.checkStatus("page", "test-api-key");
+        ApiStatusResult result = checker.checkStatus("datasets", "test-api-key");
 
-        assertEquals("page", result.getMethodName());
+        assertEquals("datasets", result.getMethodName());
         assertEquals(ApiStatus.UNAUTHORIZED_401, result.getStatus());
         assertEquals(401, result.getHttpStatusCode());
         assertNotNull(result.getErrorMessage());
@@ -169,9 +169,9 @@ class DifyDatasetStatusCheckerTest {
                         null
                 ));
 
-        ApiStatusResult result = checker.checkStatus("page", "test-api-key");
+        ApiStatusResult result = checker.checkStatus("datasets", "test-api-key");
 
-        assertEquals("page", result.getMethodName());
+        assertEquals("datasets", result.getMethodName());
         assertEquals(ApiStatus.SERVER_ERROR, result.getStatus());
         assertEquals(500, result.getHttpStatusCode());
         assertNotNull(result.getErrorMessage());

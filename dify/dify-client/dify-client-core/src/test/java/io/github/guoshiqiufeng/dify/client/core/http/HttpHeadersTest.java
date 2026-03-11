@@ -389,7 +389,7 @@ class HttpHeadersTest {
 
     @Test
     void testConstants() {
-        assertEquals("AUTHORIZATION", HttpHeaders.AUTHORIZATION);
+        assertEquals("Authorization", HttpHeaders.AUTHORIZATION);
         assertEquals("Bearer ", HttpHeaders.AUTHORIZATION_BEARER_KEY);
     }
 
@@ -407,16 +407,16 @@ class HttpHeadersTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth("test-token-123");
 
-        assertEquals("Bearer test-token-123", headers.getFirst("AUTHORIZATION"));
+        assertEquals("Bearer test-token-123", headers.getFirst("Authorization"));
     }
 
     @Test
     void testSetBearerAuthReplacesExisting() {
         HttpHeaders headers = new HttpHeaders();
-        headers.add("AUTHORIZATION", "Basic abc123");
+        headers.add("Authorization", "Basic abc123");
         headers.setBearerAuth("new-token");
 
-        List<String> authValues = headers.get("AUTHORIZATION");
+        List<String> authValues = headers.get("Authorization");
         assertEquals(1, authValues.size());
         assertEquals("Bearer new-token", authValues.get(0));
     }

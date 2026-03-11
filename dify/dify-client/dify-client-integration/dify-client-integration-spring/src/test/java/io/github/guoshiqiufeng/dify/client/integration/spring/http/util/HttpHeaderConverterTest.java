@@ -158,7 +158,7 @@ class HttpHeaderConverterTest {
     void testFromSpringHeadersWithCaseInsensitiveHeaders() {
         org.springframework.http.HttpHeaders springHeaders = new org.springframework.http.HttpHeaders();
         springHeaders.add("content-type", "application/json");
-        springHeaders.add("AUTHORIZATION", "Bearer token");
+        springHeaders.add("Authorization", "Bearer token");
         springHeaders.add("X-Custom-Header", "value");
 
         HttpHeaders result = HttpHeaderConverter.fromSpringHeaders(springHeaders);

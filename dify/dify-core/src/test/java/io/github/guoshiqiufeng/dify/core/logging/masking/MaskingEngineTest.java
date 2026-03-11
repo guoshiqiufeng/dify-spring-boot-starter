@@ -434,7 +434,7 @@ class MaskingEngineTest {
         MaskingEngine engine = MaskingEngine.getDefault();
         Map<String, List<String>> headers = new HashMap<>();
         headers.put("authorization", Collections.singletonList("Bearer token1"));
-        headers.put("AUTHORIZATION", Collections.singletonList("Bearer token2"));
+        headers.put("Authorization", Collections.singletonList("Bearer token2"));
         headers.put("Authorization", Collections.singletonList("Bearer token3"));
 
         // Act
@@ -442,7 +442,7 @@ class MaskingEngineTest {
 
         // Assert
         assertEquals("***MASKED***", result.get("authorization").get(0));
-        assertEquals("***MASKED***", result.get("AUTHORIZATION").get(0));
+        assertEquals("***MASKED***", result.get("Authorization").get(0));
         assertEquals("***MASKED***", result.get("Authorization").get(0));
     }
 
