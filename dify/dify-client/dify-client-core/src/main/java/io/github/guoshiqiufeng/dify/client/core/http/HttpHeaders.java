@@ -35,7 +35,7 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 
     private final Map<String, List<String>> headers;
 
-    public static final String AUTHORIZATION = "AUTHORIZATION";
+    public static final String AUTHORIZATION = "Authorization";
     public static final String AUTHORIZATION_BEARER_KEY = "Bearer ";
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String CONTENT_LENGTH = "Content-Length";
