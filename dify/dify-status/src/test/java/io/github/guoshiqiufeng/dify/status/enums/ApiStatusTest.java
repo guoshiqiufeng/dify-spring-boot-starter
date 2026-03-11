@@ -83,6 +83,12 @@ class ApiStatusTest {
     }
 
     @Test
+    void testCodeOf_Skipped() {
+        ApiStatus status = ApiStatus.codeOf("skipped");
+        assertEquals(ApiStatus.SKIPPED, status);
+    }
+
+    @Test
     void testCodeOf_InvalidCode() {
         ApiStatus status = ApiStatus.codeOf("invalid_code");
         assertEquals(ApiStatus.UNKNOWN_ERROR, status);
@@ -93,6 +99,7 @@ class ApiStatusTest {
         assertEquals("normal", ApiStatus.NORMAL.getCode());
         assertEquals("not_found_404", ApiStatus.NOT_FOUND_404.getCode());
         assertEquals("unauthorized_401", ApiStatus.UNAUTHORIZED_401.getCode());
+        assertEquals("skipped", ApiStatus.SKIPPED.getCode());
     }
 
     @Test
@@ -100,11 +107,12 @@ class ApiStatusTest {
         assertEquals("API is functioning normally", ApiStatus.NORMAL.getDescription());
         assertEquals("Resource not found", ApiStatus.NOT_FOUND_404.getDescription());
         assertEquals("Unauthorized access", ApiStatus.UNAUTHORIZED_401.getDescription());
+        assertEquals("Check skipped", ApiStatus.SKIPPED.getDescription());
     }
 
     @Test
     void testAllValues() {
         ApiStatus[] values = ApiStatus.values();
-        assertEquals(9, values.length);
+        assertEquals(10, values.length);
     }
 }

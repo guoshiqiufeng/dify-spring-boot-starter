@@ -32,6 +32,8 @@ subprojects {
 
     compileJava {
         options.release = 8
+        options.compilerArgs += ["-g:lines,vars,source", "-Xlint:unchecked", "-parameters"]
+        options.encoding = 'UTF-8'
     }
 
     compileTestJava {
@@ -99,14 +101,15 @@ subprojects {
 
     task sourcesJar(type: Jar) {
         archiveClassifier = 'sources'
-        dependsOn delombokTask
-        from delombokOutput
+//        dependsOn delombokTask
+//        from delombokOutput
+        from sourceSets.main.allJava
         from sourceSets.main.resources
     }
 
     javadoc {
-        dependsOn delombokTask
-        source = delombokOutput
+//        dependsOn delombokTask
+//        source = delombokOutput
         // Check for syntax during linting. 'none' doesn't seem to work in suppressing
         // all linting warnings all the time (see/link references most notably).
         options.addStringOption("Xdoclint:syntax", "-quiet")

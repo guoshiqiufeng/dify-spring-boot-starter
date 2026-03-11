@@ -72,6 +72,11 @@ public enum ApiStatus {
     UNKNOWN_ERROR("unknown_error", "Unknown error"),
 
     /**
+     * API check skipped
+     */
+    SKIPPED("skipped", "Check skipped"),
+
+    /**
      * API not configured or disabled
      */
     NOT_CONFIGURED("not_configured", "API not configured");

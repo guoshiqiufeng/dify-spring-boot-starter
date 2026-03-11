@@ -85,6 +85,7 @@ public abstract class AbstractClientStatusChecker extends AbstractStatusCheckStr
         int totalApis = results.size();
         int normalApis = 0;
         int errorApis = 0;
+        int skippedApis = 0;
         Map<ApiStatus, Integer> statusSummary = new HashMap<>();
 
         for (ApiStatusResult result : results) {
@@ -93,6 +94,8 @@ public abstract class AbstractClientStatusChecker extends AbstractStatusCheckStr
 
             if (status == ApiStatus.NORMAL) {
                 normalApis++;
+            } else if (status == ApiStatus.SKIPPED) {
+                skippedApis++;
             } else {
                 errorApis++;
             }
@@ -100,7 +103,10 @@ public abstract class AbstractClientStatusChecker extends AbstractStatusCheckStr
 
         // Determine overall status
         ApiStatus overallStatus;
-        if (normalApis == totalApis) {
+        int effectiveTotal = totalApis - skippedApis;
+        if (effectiveTotal == 0) {
+            overallStatus = ApiStatus.SKIPPED;
+        } else if (normalApis == effectiveTotal) {
             overallStatus = ApiStatus.NORMAL;
         } else if (normalApis == 0) {
             overallStatus = ApiStatus.SERVER_ERROR;

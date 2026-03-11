@@ -53,7 +53,7 @@ public class DifyDatasetStatusChecker extends AbstractClientStatusChecker {
     @Override
     public ApiStatusResult checkStatus(String methodName, String apiKey) {
         switch (methodName) {
-            case "page":
+            case "datasets":
                 return executeCheck(methodName, "/datasets",
                         () -> {
                             DatasetPageRequest request = new DatasetPageRequest();
@@ -78,7 +78,7 @@ public class DifyDatasetStatusChecker extends AbstractClientStatusChecker {
     @Override
     protected String[] methodsToCheck() {
         return new String[]{
-                "page",
+                "datasets",
                 "listTextEmbedding",
                 "listRerank",
                 "listTag"

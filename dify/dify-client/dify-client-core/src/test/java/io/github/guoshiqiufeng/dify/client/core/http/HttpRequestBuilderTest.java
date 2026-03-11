@@ -56,7 +56,7 @@ class HttpRequestBuilderTest {
     void testSetBearerAuth() {
         builder.setBearerAuth("test-token-123");
 
-        verify(builder).header("AUTHORIZATION", "Bearer test-token-123");
+        verify(builder).header("Authorization", "Bearer test-token-123");
     }
 
     @Test
@@ -79,7 +79,7 @@ class HttpRequestBuilderTest {
     void testSetBearerAuthWithValidToken() {
         builder.setBearerAuth("my-secret-token");
 
-        verify(builder).header("AUTHORIZATION", "Bearer my-secret-token");
+        verify(builder).header("Authorization", "Bearer my-secret-token");
     }
 
     @Test
@@ -94,6 +94,6 @@ class HttpRequestBuilderTest {
         String longToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
         builder.setBearerAuth(longToken);
 
-        verify(builder).header("AUTHORIZATION", "Bearer " + longToken);
+        verify(builder).header("Authorization", "Bearer " + longToken);
     }
 }

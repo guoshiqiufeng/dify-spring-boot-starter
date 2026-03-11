@@ -97,7 +97,7 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).post();
         verify(requestBodyUriSpecMock).uri(WorkflowConstant.WORKFLOW_RUN_URL);
-        verify(requestBodySpecMock).header(eq("AUTHORIZATION"), eq("Bearer " + apiKey));
+        verify(requestBodySpecMock).header(eq("Authorization"), eq("Bearer " + apiKey));
         verify(requestBodySpecMock).body(any(ChatMessageVO.class));
         verify(responseSpecMock).body(WorkflowRunResponse.class);
     }
@@ -141,7 +141,7 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).post();
         verify(requestBodyUriSpecMock).uri(WorkflowConstant.WORKFLOW_RUN_URL);
-        verify(requestBodySpecMock).header(eq("AUTHORIZATION"), eq("Bearer " + apiKey));
+        verify(requestBodySpecMock).header(eq("Authorization"), eq("Bearer " + apiKey));
         verify(requestBodySpecMock).body(any(ChatMessageVO.class));
         verify(responseSpecMock).body(WorkflowRunResponse.class);
 
@@ -221,7 +221,7 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).post();
         verify(requestBodyUriSpecMock).uri(WorkflowConstant.WORKFLOW_RUN_URL);
-        verify(requestBodySpecMock).header(eq("AUTHORIZATION"), eq("Bearer " + apiKey));
+        verify(requestBodySpecMock).header(eq("Authorization"), eq("Bearer " + apiKey));
         verify(requestBodySpecMock).body(any(ChatMessageVO.class));
     }
 
@@ -273,7 +273,7 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).get();
         verify(requestHeadersUriSpecMock).uri(eq(WorkflowConstant.WORKFLOW_RUN_URL + "/{workflowRunId}"), eq(workflowRunId));
-        verify(requestHeadersSpecMock).header(eq("AUTHORIZATION"), eq("Bearer " + apiKey));
+        verify(requestHeadersSpecMock).header(eq("Authorization"), eq("Bearer " + apiKey));
         verify(responseSpecMock).body(WorkflowInfoResponse.class);
     }
 
@@ -301,7 +301,7 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).post();
         verify(requestBodyUriSpecMock).uri(eq(WorkflowConstant.WORKFLOW_TASKS_URL + "/{taskId}/stop"), eq(taskId));
-        verify(requestBodySpecMock).header(eq("AUTHORIZATION"), eq("Bearer " + apiKey));
+        verify(requestBodySpecMock).header(eq("Authorization"), eq("Bearer " + apiKey));
         verify(requestBodySpecMock).body(any(HashMap.class));
         verify(responseSpecMock).body(WorkflowStopResponse.class);
     }
@@ -418,7 +418,7 @@ public class DifyWorkflowDefaultClientTest extends BaseClientTest {
         // Verify WebClient interactions
         verify(httpClientMock).get();
         verify(requestHeadersUriSpecMock).uri(any(Function.class));
-        verify(requestHeadersSpecMock).header(eq("AUTHORIZATION"), eq("Bearer " + apiKey));
+        verify(requestHeadersSpecMock).header(eq("Authorization"), eq("Bearer " + apiKey));
         verify(responseSpecMock).body(any(TypeReference.class));
 
         WorkflowLogsRequest defaultRequest = new WorkflowLogsRequest();

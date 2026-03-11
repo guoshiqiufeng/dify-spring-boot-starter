@@ -19,6 +19,8 @@ import io.github.guoshiqiufeng.dify.chat.DifyChat;
 import io.github.guoshiqiufeng.dify.chat.dto.response.AppInfoResponse;
 import io.github.guoshiqiufeng.dify.chat.dto.response.AppMetaResponse;
 import io.github.guoshiqiufeng.dify.chat.dto.response.AppParametersResponseVO;
+import io.github.guoshiqiufeng.dify.chat.dto.response.MessageConversationsResponse;
+import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.status.dto.ApiStatusResult;
 import io.github.guoshiqiufeng.dify.status.dto.ClientStatusReport;
 import io.github.guoshiqiufeng.dify.status.enums.ApiStatus;
@@ -27,6 +29,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.client.HttpClientErrorException;
+
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -140,9 +144,16 @@ class DifyChatStatusCheckerTest {
 
     @Test
     void testCheckAllApis_AllSuccess() {
+        // Mock conversations to provide a conversationId for conversationVariables check
+        MessageConversationsResponse conversation = new MessageConversationsResponse();
+        conversation.setId("test-conversation-id");
+        DifyPageResult<MessageConversationsResponse> conversationsResult = new DifyPageResult<>();
+        conversationsResult.setData(Collections.singletonList(conversation));
+
         when(difyChat.parameters(anyString())).thenReturn(new AppParametersResponseVO());
         when(difyChat.info(anyString())).thenReturn(new AppInfoResponse());
         when(difyChat.meta(anyString())).thenReturn(new AppMetaResponse());
+        when(difyChat.conversations(any())).thenReturn(conversationsResult);
 
         ClientStatusReport report = checker.checkAllApis("test-api-key");
 
@@ -215,5 +226,77 @@ class DifyChatStatusCheckerTest {
             assertNotNull(apiStatus.getResponseTimeMs());
             assertTrue(apiStatus.getResponseTimeMs() >= 0);
         });
+    }
+
+    @Test
+    void testCheckAllApis_NoConversations_ConversationVariablesSkipped() {
+        // Mock empty conversations result
+        DifyPageResult<MessageConversationsResponse> emptyResult = new DifyPageResult<>();
+        emptyResult.setData(Collections.emptyList());
+
+        when(difyChat.parameters(anyString())).thenReturn(new AppParametersResponseVO());
+        when(difyChat.conversations(any())).thenReturn(emptyResult);
+
+        ClientStatusReport report = checker.checkAllApis("test-api-key");
+
+        assertEquals("DifyChat", report.getClientName());
+        assertNotNull(report.getApiStatuses());
+
+        // Find conversationVariables status
+        ApiStatusResult conversationVariablesStatus = report.getApiStatuses().stream()
+                .filter(status -> "conversationVariables".equals(status.getMethodName()))
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(conversationVariablesStatus);
+        assertEquals(ApiStatus.SKIPPED, conversationVariablesStatus.getStatus());
+        assertNotNull(conversationVariablesStatus.getErrorMessage());
+        assertTrue(conversationVariablesStatus.getErrorMessage().contains("No conversations available"));
+    }
+
+    @Test
+    void testCheckAllApis_ConversationsFailed_ConversationVariablesSkipped() {
+        when(difyChat.parameters(anyString())).thenReturn(new AppParametersResponseVO());
+        when(difyChat.conversations(any())).thenThrow(new RuntimeException("Connection failed"));
+
+        ClientStatusReport report = checker.checkAllApis("test-api-key");
+
+        assertNotNull(report.getApiStatuses());
+
+        // Find conversationVariables status
+        ApiStatusResult conversationVariablesStatus = report.getApiStatuses().stream()
+                .filter(status -> "conversationVariables".equals(status.getMethodName()))
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(conversationVariablesStatus);
+        assertEquals(ApiStatus.SKIPPED, conversationVariablesStatus.getStatus());
+        assertNotNull(conversationVariablesStatus.getErrorMessage());
+        assertTrue(conversationVariablesStatus.getErrorMessage().contains("Failed to prefetch"));
+    }
+
+    @Test
+    void testCheckAllApis_NoConversations_MessagesSkipped() {
+        // Mock empty conversations result
+        DifyPageResult<MessageConversationsResponse> emptyResult = new DifyPageResult<>();
+        emptyResult.setData(Collections.emptyList());
+
+        when(difyChat.parameters(anyString())).thenReturn(new AppParametersResponseVO());
+        when(difyChat.conversations(any())).thenReturn(emptyResult);
+
+        ClientStatusReport report = checker.checkAllApis("test-api-key");
+
+        assertNotNull(report.getApiStatuses());
+
+        // Find messages status
+        ApiStatusResult messagesStatus = report.getApiStatuses().stream()
+                .filter(status -> "messages".equals(status.getMethodName()))
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(messagesStatus);
+        assertEquals(ApiStatus.SKIPPED, messagesStatus.getStatus());
+        assertNotNull(messagesStatus.getErrorMessage());
+        assertTrue(messagesStatus.getErrorMessage().contains("No conversations available"));
     }
 }
