@@ -745,6 +745,26 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
     }
 
     @Test
+    @DisplayName("Test workflowsPublish method")
+    public void testWorkflowsPublish() {
+        // Prepare test data
+        String appId = "app-123456";
+
+        // Set up the response mock to return void
+        when(responseSpecMock.body(eq(Void.class))).thenReturn(null);
+
+        // Execute the method
+        client.workflowsPublish(appId);
+
+        // Verify WebClient interactions
+        verify(httpClientMock).post();
+        verify(requestBodyUriSpecMock).uri(eq(ServerUriConstant.APPS + "/{appId}/workflows/publish"), eq(appId));
+        verify(requestBodySpecMock).headers(any());
+        verify(requestBodySpecMock).cookies(any());
+        verify(responseSpecMock).body(eq(Void.class));
+    }
+
+    @Test
     @DisplayName("Test dailyConversations method")
     public void testDailyConversations() {
         // Prepare test data

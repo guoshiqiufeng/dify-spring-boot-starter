@@ -277,7 +277,7 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
     public void workflowsPublish(String appId) {
         executeWithRetry(
                 () -> httpClient.post()
-                        .uri(ServerUriConstant.APPS + "/apps/{appId}/workflows/publish", appId)
+                        .uri(ServerUriConstant.APPS + "/{appId}/workflows/publish", appId)
                         .headers(this::addAuthorizationHeader)
                         .cookies(this::addAuthorizationCookies)
                         .retrieve()
