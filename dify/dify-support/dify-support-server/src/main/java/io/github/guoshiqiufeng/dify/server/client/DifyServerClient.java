@@ -135,6 +135,12 @@ public interface DifyServerClient {
     DifyPageResult<ChatConversationResponse> chatConversations(ChatConversationsRequest request);
 
     /**
+     * workflows publish
+     * @param appId The ID of the application to publish
+     */
+    void workflowsPublish(String appId);
+
+    /**
      * Retrieves daily conversation statistics for a specific application
      *
      * @param appId The ID of the application to get statistics for

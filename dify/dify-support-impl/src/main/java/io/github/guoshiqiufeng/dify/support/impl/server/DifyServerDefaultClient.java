@@ -274,6 +274,19 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
     }
 
     @Override
+    public void workflowsPublish(String appId) {
+        executeWithRetry(
+                () -> httpClient.post()
+                        .uri(ServerUriConstant.APPS + "/apps/{appId}/workflows/publish", appId)
+                        .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
+                        .retrieve()
+                        .onStatus(responseErrorHandler)
+                        .body(Void.class)
+        );
+    }
+
+    @Override
     public List<DailyConversationsResponse> dailyConversations(String appId, java.time.LocalDateTime start, java.time.LocalDateTime end) {
         return executeWithRetry(
                 () -> {

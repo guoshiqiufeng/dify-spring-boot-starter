@@ -292,6 +292,38 @@ public void testDeleteAppApiKey() {
 }
 ```
 
+### 1.7 Publish Workflow
+
+#### Method
+
+```java
+void workflowsPublish(String appId);
+```
+
+#### Request Parameters
+
+| Parameter name | Type   | Required | Description    |
+|----------------|--------|----------|----------------|
+| appId          | String | Yes      | Application ID |
+
+#### Response Parameters
+
+This method does not return a value. 
+
+#### Request Example
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testWorkflowsPublish() {
+    // Publish the specified workflow application
+    difyServer.workflowsPublish("app-123456789");
+}
+```
+
 ## 2. Knowledge Base Management
 
 ### 2.1 Get Knowledge Base API Keys
