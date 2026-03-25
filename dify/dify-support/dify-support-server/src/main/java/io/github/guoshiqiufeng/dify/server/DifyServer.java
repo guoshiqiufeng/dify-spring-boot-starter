@@ -127,6 +127,12 @@ public interface DifyServer {
     DifyPageResult<ChatConversationResponse> chatConversations(ChatConversationsRequest request);
 
     /**
+     * 工作流发布
+     * @param appId 应用的唯一标识符，不能为空
+     */
+    void workflowsPublish(String appId);
+
+    /**
      * 获取应用的每日对话统计(工作流除外)
      *
      * @param appId 应用的唯一标识符，不能为空

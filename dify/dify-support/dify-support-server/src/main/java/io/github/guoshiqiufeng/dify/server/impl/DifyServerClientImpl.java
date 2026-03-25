@@ -93,6 +93,11 @@ public class DifyServerClientImpl implements DifyServer {
     }
 
     @Override
+    public void workflowsPublish(String appId) {
+        difyServerClient.workflowsPublish(appId);
+    }
+
+    @Override
     public List<DailyConversationsResponse> dailyConversations(String appId, LocalDateTime start, LocalDateTime end) {
         return difyServerClient.dailyConversations(appId, start, end);
     }

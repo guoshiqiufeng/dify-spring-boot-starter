@@ -245,6 +245,18 @@ class DifyServerClientImplTest {
     }
 
     @Test
+    void testWorkflowsPublish() {
+        // Arrange
+        String appId = "app-123";
+
+        // Act
+        difyServerClientImpl.workflowsPublish(appId);
+
+        // Assert
+        verify(difyServerClient, times(1)).workflowsPublish(appId);
+    }
+
+    @Test
     void testDailyConversations() {
         // Arrange
         String appId = "app-123";

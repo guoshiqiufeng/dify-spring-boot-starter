@@ -290,6 +290,38 @@ public void testDeleteAppApiKey() {
 }
 ```
 
+### 1.7 发布工作流
+
+#### 方法
+
+```java
+void workflowsPublish(String appId);
+```
+
+#### 请求参数
+
+| 参数名 | 类型     | 是否必须 | 描述    |
+|-----|--------|------|-------|
+| appId | String | 是    | 应用 ID |
+
+#### 响应参数
+
+该方法不返回值。
+
+#### 请求示例
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testWorkflowsPublish() {
+    // 发布指定工作流应用
+    difyServer.workflowsPublish("app-123456789");
+}
+```
+
 ## 2. 知识库管理
 
 ### 2.1 获取知识库API密钥
