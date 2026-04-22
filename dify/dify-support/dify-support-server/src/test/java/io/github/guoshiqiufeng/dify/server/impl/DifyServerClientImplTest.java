@@ -18,6 +18,7 @@ package io.github.guoshiqiufeng.dify.server.impl;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppsCreateRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
@@ -100,6 +101,47 @@ class DifyServerClientImplTest {
         assertEquals(expectedApp.getId(), actualApp.getId());
         assertEquals(expectedApp.getName(), actualApp.getName());
         verify(difyServerClient, times(1)).app(appId);
+    }
+
+    @Test
+    void testCreateApp() {
+        // Arrange
+        AppsCreateRequest request = new AppsCreateRequest();
+        request.setName("aa");
+        request.setIconType("emoji");
+        request.setIcon("smile");
+        request.setIconBackground("#FFEAD5");
+        request.setMode("agent-chat");
+        request.setDescription("aa");
+
+        AppsResponse expectedApp = new AppsResponse();
+        expectedApp.setId("app-new-123");
+        expectedApp.setName("aa");
+        expectedApp.setMode("agent-chat");
+
+        when(difyServerClient.createApp(request)).thenReturn(expectedApp);
+
+        // Act
+        AppsResponse actualApp = difyServerClientImpl.createApp(request);
+
+        // Assert
+        assertNotNull(actualApp);
+        assertEquals(expectedApp.getId(), actualApp.getId());
+        assertEquals(expectedApp.getName(), actualApp.getName());
+        assertEquals(expectedApp.getMode(), actualApp.getMode());
+        verify(difyServerClient, times(1)).createApp(request);
+    }
+
+    @Test
+    void testDeleteApp() {
+        // Arrange
+        String appId = "app-123";
+
+        // Act
+        difyServerClientImpl.deleteApp(appId);
+
+        // Assert
+        verify(difyServerClient, times(1)).deleteApp(appId);
     }
 
     @Test

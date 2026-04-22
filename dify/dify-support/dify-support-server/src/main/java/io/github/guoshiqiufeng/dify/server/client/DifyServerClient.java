@@ -17,6 +17,7 @@ package io.github.guoshiqiufeng.dify.server.client;
 
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppsCreateRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
@@ -63,6 +64,23 @@ public interface DifyServerClient {
      * @return The application response containing detailed information
      */
     AppsResponse app(String appId);
+
+    /**
+     * Creates a new application (agent) with the given configuration
+     *
+     * @param request Application creation request containing name, mode, icon and other metadata
+     * @return The created application response containing detailed information
+     * @since 2.3.0
+     */
+    AppsResponse createApp(AppsCreateRequest request);
+
+    /**
+     * Deletes an application (agent) by its ID
+     *
+     * @param appId The ID of the application to delete
+     * @since 2.3.0
+     */
+    void deleteApp(String appId);
 
     /**
      * Retrieves existing API keys for a specific application

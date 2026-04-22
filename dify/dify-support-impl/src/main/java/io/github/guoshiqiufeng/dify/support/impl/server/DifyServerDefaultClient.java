@@ -31,6 +31,7 @@ import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
 import io.github.guoshiqiufeng.dify.server.client.RequestSupplier;
 import io.github.guoshiqiufeng.dify.server.constant.ServerUriConstant;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppsCreateRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DifyLoginRequest;
@@ -151,6 +152,35 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                         .retrieve()
                         .onStatus(responseErrorHandler)
                         .body(AppsResponse.class)
+        );
+    }
+
+    @Override
+    public AppsResponse createApp(AppsCreateRequest request) {
+        Assert.notNull(request, "The request can not be null.");
+        return executeWithRetry(
+                () -> httpClient.post()
+                        .uri(ServerUriConstant.APPS)
+                        .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
+                        .body(request)
+                        .retrieve()
+                        .onStatus(responseErrorHandler)
+                        .body(AppsResponse.class)
+        );
+    }
+
+    @Override
+    public void deleteApp(String appId) {
+        Assert.notNull(appId, "The appId can not be null.");
+        executeWithRetry(
+                () -> httpClient.delete()
+                        .uri(ServerUriConstant.APPS + "/{appId}", appId)
+                        .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
+                        .retrieve()
+                        .onStatus(responseErrorHandler)
+                        .body(Void.class)
         );
     }
 

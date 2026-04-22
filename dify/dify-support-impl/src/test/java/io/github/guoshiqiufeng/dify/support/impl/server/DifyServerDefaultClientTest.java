@@ -27,6 +27,7 @@ import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
 import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
 import io.github.guoshiqiufeng.dify.server.constant.ServerUriConstant;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppsCreateRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DifyLoginRequest;
@@ -199,6 +200,65 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(httpClientMock).get();
         verify(requestHeadersUriSpecMock).uri(eq(ServerUriConstant.APPS + "/{appId}"), eq(appId));
         verify(responseSpecMock).body(AppsResponse.class);
+    }
+
+    @Test
+    @DisplayName("Test createApp method")
+    public void testCreateApp() {
+        // Prepare test data
+        AppsCreateRequest request = new AppsCreateRequest();
+        request.setName("aa");
+        request.setIconType("emoji");
+        request.setIcon("smile");
+        request.setIconBackground("#FFEAD5");
+        request.setMode("agent-chat");
+        request.setDescription("aa");
+
+        // Create expected response
+        AppsResponse expectedResponse = new AppsResponse();
+        expectedResponse.setId("app-new-123");
+        expectedResponse.setName("aa");
+        expectedResponse.setMode("agent-chat");
+        expectedResponse.setIcon("smile");
+
+        // Set up the response mock to return our expected response
+        when(responseSpecMock.body(AppsResponse.class)).thenReturn(expectedResponse);
+
+        // Execute the method
+        AppsResponse actualResponse = client.createApp(request);
+
+        // Verify the result
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getName(), actualResponse.getName());
+        assertEquals(expectedResponse.getMode(), actualResponse.getMode());
+
+        // Verify WebClient interactions
+        verify(httpClientMock).post();
+        verify(requestBodyUriSpecMock).uri(eq(ServerUriConstant.APPS));
+        verify(requestBodySpecMock).headers(any());
+        verify(requestBodySpecMock).cookies(any());
+        verify(requestBodySpecMock).body(eq(request));
+        verify(responseSpecMock).body(AppsResponse.class);
+    }
+
+    @Test
+    @DisplayName("Test deleteApp method")
+    public void testDeleteApp() {
+        // Prepare test data
+        String appId = "9c9c361d-0854-4f3d-97af-5ccedb03e1d2";
+
+        // Set up the response mock to return void (for delete operation)
+        when(responseSpecMock.body(eq(Void.class))).thenReturn(null);
+
+        // Execute the method
+        client.deleteApp(appId);
+
+        // Verify WebClient interactions
+        verify(httpClientMock).delete();
+        verify(requestHeadersUriSpecMock).uri(eq(ServerUriConstant.APPS + "/{appId}"), eq(appId));
+        verify(requestHeadersSpecMock).headers(any());
+        verify(responseSpecMock).body(eq(Void.class));
     }
 
     @Test

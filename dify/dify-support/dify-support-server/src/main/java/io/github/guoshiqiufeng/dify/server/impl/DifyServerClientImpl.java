@@ -19,6 +19,7 @@ import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppsCreateRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
@@ -55,6 +56,16 @@ public class DifyServerClientImpl implements DifyServer {
     @Override
     public AppsResponse app(String appId) {
         return difyServerClient.app(appId);
+    }
+
+    @Override
+    public AppsResponse createApp(AppsCreateRequest request) {
+        return difyServerClient.createApp(request);
+    }
+
+    @Override
+    public void deleteApp(String appId) {
+        difyServerClient.deleteApp(appId);
     }
 
     @Override

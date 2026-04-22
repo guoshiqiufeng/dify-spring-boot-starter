@@ -17,6 +17,7 @@ package io.github.guoshiqiufeng.dify.server;
 
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppsCreateRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
@@ -63,6 +64,25 @@ public interface DifyServer {
      * @throws NullPointerException 如果 appId 为 null
      */
     AppsResponse app(String appId);
+
+    /**
+     * 创建一个应用（智能体）
+     *
+     * @param request 创建应用的请求参数，包含名称、模式、图标等信息，不能为空
+     * @return 返回创建成功的应用详细信息，封装为 {@link AppsResponse} 对象
+     * @throws NullPointerException 如果 request 为 null
+     * @since 2.3.0
+     */
+    AppsResponse createApp(AppsCreateRequest request);
+
+    /**
+     * 删除指定应用（智能体）
+     *
+     * @param appId 应用的唯一标识符，不能为空
+     * @throws NullPointerException 如果 appId 为 null
+     * @since 2.3.0
+     */
+    void deleteApp(String appId);
 
     /**
      * 根据应用ID获取该应用的所有API Key列表
