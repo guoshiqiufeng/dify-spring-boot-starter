@@ -190,7 +190,135 @@ public void testGetApp() {
 }
 ```
 
-### 1.4 获取应用API密钥
+### 1.4 创建应用
+
+> 自 `2.3.0` 版本起支持
+
+#### 方法
+
+```java
+AppsResponse createApp(AppCreateRequest request);
+```
+
+#### 请求参数
+
+AppCreateRequest
+
+| 参数名            | 类型     | 是否必须 | 描述                                                         |
+|----------------|--------|------|------------------------------------------------------------|
+| name           | String | 是    | 应用名称                                                       |
+| mode           | String | 是    | 应用模式 chat\agent-chat\advanced-chat\workflow\completion      |
+| description    | String | 否    | 应用描述                                                       |
+| iconType       | String | 否    | 图标类型                                                       |
+| icon           | String | 否    | 图标                                                         |
+| iconBackground | String | 否    | 图标背景色                                                      |
+
+#### 响应参数
+
+与 1.1 节中定义的 AppsResponse 结构相同。
+
+#### 请求示例
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testCreateApp() {
+    AppCreateRequest request = new AppCreateRequest();
+    request.setName("My Agent");
+    request.setMode("agent-chat");
+    request.setDescription("智能体应用示例");
+
+    AppsResponse app = difyServer.createApp(request);
+}
+```
+
+### 1.5 更新应用
+
+> 自 `2.3.0` 版本起支持
+
+#### 方法
+
+```java
+AppsResponse updateApp(String appId, AppUpdateRequest request);
+```
+
+#### 请求参数
+
+| 参数名     | 类型               | 是否必须 | 描述     |
+|---------|------------------|------|--------|
+| appId   | String           | 是    | 应用 ID  |
+| request | AppUpdateRequest | 是    | 更新参数   |
+
+AppUpdateRequest
+
+| 参数名                 | 类型      | 是否必须 | 描述           |
+|---------------------|---------|------|--------------|
+| name                | String  | 是    | 应用名称         |
+| description         | String  | 否    | 应用描述         |
+| iconType            | String  | 否    | 图标类型         |
+| icon                | String  | 否    | 图标           |
+| iconBackground      | String  | 否    | 图标背景色        |
+| useIconAsAnswerIcon | Boolean | 否    | 是否使用图标作为回答图标 |
+| maxActiveRequests   | Integer | 否    | 最大活跃请求数      |
+
+#### 响应参数
+
+与 1.1 节中定义的 AppsResponse 结构相同。
+
+#### 请求示例
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testUpdateApp() {
+    AppUpdateRequest request = new AppUpdateRequest();
+    request.setName("Renamed App");
+    request.setDescription("更新后的描述");
+
+    AppsResponse app = difyServer.updateApp("app-123456789", request);
+}
+```
+
+### 1.6 删除应用
+
+> 自 `2.3.0` 版本起支持
+
+#### 方法
+
+```java
+void deleteApp(String appId);
+```
+
+#### 请求参数
+
+| 参数名   | 类型     | 是否必须 | 描述    |
+|-------|--------|------|-------|
+| appId | String | 是    | 应用 ID |
+
+#### 响应参数
+
+该方法不返回值，成功时返回 204 No Content。
+
+#### 请求示例
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testDeleteApp() {
+    difyServer.deleteApp("app-123456789");
+}
+```
+
+### 1.7 获取应用API密钥
 
 #### 方法
 
@@ -226,7 +354,7 @@ public void testGetAppApiKeys() {
 }
 ```
 
-### 1.5 初始化应用API密钥
+### 1.8 初始化应用API密钥
 
 #### 方法
 
@@ -257,7 +385,7 @@ public void testInitAppApiKey() {
 }
 ```
 
-### 1.6 删除应用API密钥
+### 1.9 删除应用API密钥
 
 #### 方法
 
@@ -290,7 +418,7 @@ public void testDeleteAppApiKey() {
 }
 ```
 
-### 1.7 发布工作流
+### 1.10 发布工作流
 
 #### 方法
 
@@ -1150,6 +1278,73 @@ public void testGetDailyMessages() {
         for (DailyMessagesResponse dailyStat : dailyMessagesStats) {
             System.out.println("日期: " + dailyStat.getDate());
             System.out.println("消息数量: " + dailyStat.getMessageCount());
+        }
+    }
+}
+```
+
+## 5. 成员管理
+
+### 5.1 邀请新成员（创建用户）
+
+> 自 `2.3.0` 版本起支持
+>
+> Dify 会根据邮箱自动创建账号，并返回激活链接，需要将链接发送给被邀请成员以完成注册。
+
+#### 方法
+
+```java
+MemberInviteResponse inviteMembers(MemberInviteRequest request);
+```
+
+#### 请求参数
+
+MemberInviteRequest
+
+| 参数名      | 类型             | 是否必须 | 描述                                                            |
+|----------|----------------|------|---------------------------------------------------------------|
+| emails   | `List<String>` | 是    | 被邀请的邮箱列表                                                      |
+| role     | String         | 是    | 成员角色，可选：admin、editor、normal、dataset_operator                  |
+| language | String         | 否    | 邀请邮件/账号默认语言，如 `zh-Hans`、`en-US`                               |
+
+#### 响应参数
+
+MemberInviteResponse
+
+| 参数名               | 类型                       | 描述                     |
+|-------------------|--------------------------|------------------------|
+| result            | String                   | 整体调用结果，通常为 `success`   |
+| invitationResults | `List<InvitationResult>` | 每个邀请邮箱的处理结果            |
+
+InvitationResult
+
+| 参数名     | 类型     | 描述                          |
+|---------|--------|-----------------------------|
+| status  | String | 处理状态：`success` 或 `failed`   |
+| email   | String | 邀请邮箱                        |
+| url     | String | 激活 URL（status=success 时返回）  |
+| message | String | 失败信息（status=failed 时返回）     |
+
+#### 请求示例
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testInviteMembers() {
+    MemberInviteRequest request = new MemberInviteRequest();
+    request.setEmails(List.of("alice@example.com", "bob@example.com"));
+    request.setRole("normal");
+    request.setLanguage("zh-Hans");
+
+    MemberInviteResponse response = difyServer.inviteMembers(request);
+
+    for (MemberInviteResponse.InvitationResult item : response.getInvitationResults()) {
+        System.out.println(item.getEmail() + " -> " + item.getStatus());
+        if ("success".equals(item.getStatus())) {
+            System.out.println("激活链接：" + item.getUrl());
         }
     }
 }

@@ -27,9 +27,12 @@ import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
 import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
 import io.github.guoshiqiufeng.dify.server.constant.ServerUriConstant;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppCreateRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppUpdateRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DifyLoginRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.MemberInviteRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import io.github.guoshiqiufeng.dify.support.impl.BaseClientTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -2169,6 +2172,181 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         } catch (Exception e) {
             fail("Failed to test processLoginResult method with both null: " + e.getMessage());
         }
+    }
+
+    @Test
+    @DisplayName("Test createApp posts request body and returns application details")
+    public void testCreateApp() {
+        AppCreateRequest request = new AppCreateRequest();
+        request.setName("My Agent");
+        request.setMode("agent-chat");
+        request.setDescription("desc");
+        request.setIconType("emoji");
+        request.setIcon("\uD83E\uDD16");
+        request.setIconBackground("#FFEAD5");
+
+        AppsResponse expected = new AppsResponse();
+        expected.setId("app-new");
+        expected.setName("My Agent");
+        expected.setMode("agent-chat");
+
+        when(responseSpecMock.body(AppsResponse.class)).thenReturn(expected);
+
+        AppsResponse actual = client.createApp(request);
+
+        assertNotNull(actual);
+        assertEquals("app-new", actual.getId());
+        assertEquals("My Agent", actual.getName());
+
+        verify(httpClientMock).post();
+        verify(requestBodyUriSpecMock).uri(ServerUriConstant.APPS);
+        verify(requestBodySpecMock).body(request);
+        verify(responseSpecMock).body(AppsResponse.class);
+    }
+
+    @Test
+    @DisplayName("Test createApp validates name and mode arguments")
+    public void testCreateAppValidation() {
+        assertThrows(IllegalArgumentException.class, () -> client.createApp(null));
+
+        AppCreateRequest missingName = new AppCreateRequest();
+        missingName.setMode("chat");
+        assertThrows(IllegalArgumentException.class, () -> client.createApp(missingName));
+
+        AppCreateRequest emptyName = new AppCreateRequest();
+        emptyName.setName("");
+        emptyName.setMode("chat");
+        assertThrows(IllegalArgumentException.class, () -> client.createApp(emptyName));
+
+        AppCreateRequest missingMode = new AppCreateRequest();
+        missingMode.setName("app");
+        assertThrows(IllegalArgumentException.class, () -> client.createApp(missingMode));
+
+        AppCreateRequest emptyMode = new AppCreateRequest();
+        emptyMode.setName("app");
+        emptyMode.setMode("");
+        assertThrows(IllegalArgumentException.class, () -> client.createApp(emptyMode));
+    }
+
+    @Test
+    @DisplayName("Test updateApp issues PUT request with application body")
+    public void testUpdateApp() {
+        String appId = "app-123";
+        AppUpdateRequest request = new AppUpdateRequest();
+        request.setName("Renamed");
+        request.setDescription("desc");
+        request.setIconType("emoji");
+        request.setIcon("\uD83D\uDE80");
+        request.setIconBackground("#ffffff");
+        request.setUseIconAsAnswerIcon(true);
+        request.setMaxActiveRequests(10);
+
+        AppsResponse expected = new AppsResponse();
+        expected.setId(appId);
+        expected.setName("Renamed");
+
+        when(responseSpecMock.body(AppsResponse.class)).thenReturn(expected);
+
+        AppsResponse actual = client.updateApp(appId, request);
+
+        assertNotNull(actual);
+        assertEquals(appId, actual.getId());
+        assertEquals("Renamed", actual.getName());
+
+        verify(httpClientMock).put();
+        verify(requestBodyUriSpecMock).uri(eq(ServerUriConstant.APPS + "/{appId}"), eq(appId));
+        verify(requestBodySpecMock).body(request);
+        verify(responseSpecMock).body(AppsResponse.class);
+    }
+
+    @Test
+    @DisplayName("Test updateApp validates inputs")
+    public void testUpdateAppValidation() {
+        AppUpdateRequest validRequest = new AppUpdateRequest();
+        validRequest.setName("OK");
+
+        assertThrows(IllegalArgumentException.class, () -> client.updateApp(null, validRequest));
+        assertThrows(IllegalArgumentException.class, () -> client.updateApp("app-123", null));
+
+        AppUpdateRequest missingName = new AppUpdateRequest();
+        assertThrows(IllegalArgumentException.class, () -> client.updateApp("app-123", missingName));
+
+        AppUpdateRequest emptyName = new AppUpdateRequest();
+        emptyName.setName("");
+        assertThrows(IllegalArgumentException.class, () -> client.updateApp("app-123", emptyName));
+    }
+
+    @Test
+    @DisplayName("Test deleteApp issues DELETE request")
+    public void testDeleteApp() {
+        String appId = "app-123";
+
+        client.deleteApp(appId);
+
+        verify(httpClientMock).delete();
+        verify(requestHeadersUriSpecMock).uri(eq(ServerUriConstant.APPS + "/{appId}"), eq(appId));
+        verify(responseSpecMock).body(Void.class);
+    }
+
+    @Test
+    @DisplayName("Test deleteApp validates appId")
+    public void testDeleteAppValidation() {
+        assertThrows(IllegalArgumentException.class, () -> client.deleteApp(null));
+    }
+
+    @Test
+    @DisplayName("Test inviteMembers posts invitation payload")
+    public void testInviteMembers() {
+        MemberInviteRequest request = new MemberInviteRequest();
+        request.setEmails(List.of("alice@example.com", "bob@example.com"));
+        request.setRole("normal");
+        request.setLanguage("en-US");
+
+        MemberInviteResponse expected = new MemberInviteResponse();
+        expected.setResult("success");
+        MemberInviteResponse.InvitationResult item = new MemberInviteResponse.InvitationResult();
+        item.setStatus("success");
+        item.setEmail("alice@example.com");
+        item.setUrl("https://dify.example/activate?email=alice&token=abc");
+        expected.setInvitationResults(List.of(item));
+
+        when(responseSpecMock.body(MemberInviteResponse.class)).thenReturn(expected);
+
+        MemberInviteResponse actual = client.inviteMembers(request);
+
+        assertNotNull(actual);
+        assertEquals("success", actual.getResult());
+        assertEquals(1, actual.getInvitationResults().size());
+        assertEquals("alice@example.com", actual.getInvitationResults().get(0).getEmail());
+
+        verify(httpClientMock).post();
+        verify(requestBodyUriSpecMock).uri(ServerUriConstant.WORKSPACE_MEMBERS_INVITE_EMAIL);
+        verify(requestBodySpecMock).body(request);
+        verify(responseSpecMock).body(MemberInviteResponse.class);
+    }
+
+    @Test
+    @DisplayName("Test inviteMembers validates required fields")
+    public void testInviteMembersValidation() {
+        assertThrows(IllegalArgumentException.class, () -> client.inviteMembers(null));
+
+        MemberInviteRequest noEmails = new MemberInviteRequest();
+        noEmails.setRole("normal");
+        assertThrows(IllegalArgumentException.class, () -> client.inviteMembers(noEmails));
+
+        MemberInviteRequest emptyEmails = new MemberInviteRequest();
+        emptyEmails.setEmails(new ArrayList<>());
+        emptyEmails.setRole("normal");
+        assertThrows(IllegalArgumentException.class, () -> client.inviteMembers(emptyEmails));
+
+        MemberInviteRequest noRole = new MemberInviteRequest();
+        noRole.setEmails(List.of("a@b.com"));
+        assertThrows(IllegalArgumentException.class, () -> client.inviteMembers(noRole));
+
+        MemberInviteRequest emptyRole = new MemberInviteRequest();
+        emptyRole.setEmails(List.of("a@b.com"));
+        emptyRole.setRole("");
+        assertThrows(IllegalArgumentException.class, () -> client.inviteMembers(emptyRole));
     }
 
     @Test

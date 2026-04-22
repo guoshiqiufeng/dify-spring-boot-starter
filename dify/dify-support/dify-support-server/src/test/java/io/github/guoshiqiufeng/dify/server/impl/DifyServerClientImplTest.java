@@ -18,9 +18,12 @@ package io.github.guoshiqiufeng.dify.server.impl;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppCreateRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppUpdateRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.MemberInviteRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -100,6 +103,86 @@ class DifyServerClientImplTest {
         assertEquals(expectedApp.getId(), actualApp.getId());
         assertEquals(expectedApp.getName(), actualApp.getName());
         verify(difyServerClient, times(1)).app(appId);
+    }
+
+    @Test
+    void testCreateApp() {
+        AppCreateRequest request = new AppCreateRequest();
+        request.setName("My App");
+        request.setMode("chat");
+
+        AppsResponse expected = new AppsResponse();
+        expected.setId("app-new");
+        expected.setName("My App");
+
+        when(difyServerClient.createApp(request)).thenReturn(expected);
+
+        AppsResponse actual = difyServerClientImpl.createApp(request);
+
+        assertNotNull(actual);
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getName(), actual.getName());
+        verify(difyServerClient, times(1)).createApp(request);
+    }
+
+    @Test
+    void testUpdateApp() {
+        String appId = "app-123";
+        AppUpdateRequest request = new AppUpdateRequest();
+        request.setName("Updated App");
+
+        AppsResponse expected = new AppsResponse();
+        expected.setId(appId);
+        expected.setName("Updated App");
+
+        when(difyServerClient.updateApp(appId, request)).thenReturn(expected);
+
+        AppsResponse actual = difyServerClientImpl.updateApp(appId, request);
+
+        assertNotNull(actual);
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getName(), actual.getName());
+        verify(difyServerClient, times(1)).updateApp(appId, request);
+    }
+
+    @Test
+    void testDeleteApp() {
+        String appId = "app-123";
+
+        difyServerClientImpl.deleteApp(appId);
+
+        verify(difyServerClient, times(1)).deleteApp(appId);
+    }
+
+    @Test
+    void testInviteMembers() {
+        MemberInviteRequest request = new MemberInviteRequest();
+        request.setEmails(Arrays.asList("alice@example.com", "bob@example.com"));
+        request.setRole("normal");
+        request.setLanguage("en-US");
+
+        MemberInviteResponse expected = new MemberInviteResponse();
+        expected.setResult("success");
+        MemberInviteResponse.InvitationResult success = new MemberInviteResponse.InvitationResult();
+        success.setStatus("success");
+        success.setEmail("alice@example.com");
+        success.setUrl("https://dify.example/activate?email=alice&token=abc");
+        MemberInviteResponse.InvitationResult failed = new MemberInviteResponse.InvitationResult();
+        failed.setStatus("failed");
+        failed.setEmail("bob@example.com");
+        failed.setMessage("email invalid");
+        expected.setInvitationResults(Arrays.asList(success, failed));
+
+        when(difyServerClient.inviteMembers(request)).thenReturn(expected);
+
+        MemberInviteResponse actual = difyServerClientImpl.inviteMembers(request);
+
+        assertNotNull(actual);
+        assertEquals("success", actual.getResult());
+        assertEquals(2, actual.getInvitationResults().size());
+        assertEquals("alice@example.com", actual.getInvitationResults().get(0).getEmail());
+        assertEquals("failed", actual.getInvitationResults().get(1).getStatus());
+        verify(difyServerClient, times(1)).inviteMembers(request);
     }
 
     @Test

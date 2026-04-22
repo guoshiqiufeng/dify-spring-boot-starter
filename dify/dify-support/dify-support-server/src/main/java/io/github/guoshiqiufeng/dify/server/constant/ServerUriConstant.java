@@ -59,4 +59,6 @@ public interface ServerUriConstant {
     String TOKEN_COSTS = APPS + "/{appId}/statistics/token-costs";
 
     String DAILY_MESSAGES = APPS + "/{appId}/statistics/daily-messages";
+
+    String WORKSPACE_MEMBERS_INVITE_EMAIL = API + "/workspaces/current/members/invite-email";
 }

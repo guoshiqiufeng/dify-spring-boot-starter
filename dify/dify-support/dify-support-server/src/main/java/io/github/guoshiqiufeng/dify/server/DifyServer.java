@@ -17,9 +17,12 @@ package io.github.guoshiqiufeng.dify.server;
 
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppCreateRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppUpdateRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.MemberInviteRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 
 import java.time.LocalDateTime;
@@ -63,6 +66,49 @@ public interface DifyServer {
      * @throws NullPointerException 如果 appId 为 null
      */
     AppsResponse app(String appId);
+
+    /**
+     * 创建一个新的智能体应用
+     *
+     * @param request 应用创建请求，需包含应用名称和模式（chat、agent-chat、advanced-chat、workflow、completion），不能为 null
+     * @return 返回封装了新建应用详细信息的 {@link AppsResponse} 对象
+     * @throws NullPointerException     如果 request 为 null
+     * @throws IllegalArgumentException 如果 name 或 mode 为空
+     * @since 2.3.0
+     */
+    AppsResponse createApp(AppCreateRequest request);
+
+    /**
+     * 更新指定应用的基础信息（名称、描述、图标等）
+     *
+     * @param appId   应用的唯一标识符，不能为空
+     * @param request 应用更新请求，需包含应用名称，不能为 null
+     * @return 返回封装了更新后应用详细信息的 {@link AppsResponse} 对象
+     * @throws NullPointerException     如果 appId 或 request 为 null
+     * @throws IllegalArgumentException 如果 name 为空
+     * @since 2.3.0
+     */
+    AppsResponse updateApp(String appId, AppUpdateRequest request);
+
+    /**
+     * 删除指定应用
+     *
+     * @param appId 应用的唯一标识符，不能为空
+     * @throws NullPointerException 如果 appId 为 null
+     * @since 2.3.0
+     */
+    void deleteApp(String appId);
+
+    /**
+     * 邀请新成员加入当前工作空间（Dify 会在邀请时自动创建账号，并返回激活链接）
+     *
+     * @param request 邀请请求，需包含邮箱列表和角色，不能为 null
+     * @return 返回封装了邀请结果的 {@link MemberInviteResponse} 对象，包含每个邮箱的激活 URL 或失败原因
+     * @throws NullPointerException     如果 request 为 null
+     * @throws IllegalArgumentException 如果 emails 为空或 role 为空
+     * @since 2.3.0
+     */
+    MemberInviteResponse inviteMembers(MemberInviteRequest request);
 
     /**
      * 根据应用ID获取该应用的所有API Key列表
