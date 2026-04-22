@@ -36,6 +36,7 @@ import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DifyLoginRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.MembersInviteRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import io.github.guoshiqiufeng.dify.support.impl.base.BaseDifyDefaultClient;
 import lombok.extern.slf4j.Slf4j;
@@ -181,6 +182,21 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                         .retrieve()
                         .onStatus(responseErrorHandler)
                         .body(Void.class)
+        );
+    }
+
+    @Override
+    public MembersInviteResponse inviteMembers(MembersInviteRequest request) {
+        Assert.notNull(request, "The request can not be null.");
+        return executeWithRetry(
+                () -> httpClient.post()
+                        .uri(ServerUriConstant.MEMBERS_INVITE_EMAIL)
+                        .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
+                        .body(request)
+                        .retrieve()
+                        .onStatus(responseErrorHandler)
+                        .body(MembersInviteResponse.class)
         );
     }
 

@@ -18,6 +18,7 @@ package io.github.guoshiqiufeng.dify.server.client;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsCreateRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.MembersInviteRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -136,6 +137,28 @@ class DifyServerClientTest {
 
         // Assert
         verify(difyServerClient, times(1)).deleteApp(appId);
+    }
+
+    @Test
+    void testInviteMembers() {
+        // Arrange
+        MembersInviteRequest request = new MembersInviteRequest();
+        request.setEmails(Arrays.asList("test@admin.com"));
+        request.setRole("normal");
+        request.setLanguage("zh-Hans");
+
+        MembersInviteResponse expectedResponse = new MembersInviteResponse();
+        expectedResponse.setResult("success");
+
+        when(difyServerClient.inviteMembers(request)).thenReturn(expectedResponse);
+
+        // Act
+        MembersInviteResponse actualResponse = difyServerClient.inviteMembers(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals("success", actualResponse.getResult());
+        verify(difyServerClient, times(1)).inviteMembers(request);
     }
 
     @Test

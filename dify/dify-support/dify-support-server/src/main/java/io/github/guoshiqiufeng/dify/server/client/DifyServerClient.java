@@ -21,6 +21,7 @@ import io.github.guoshiqiufeng.dify.server.dto.request.AppsCreateRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.MembersInviteRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 
 import java.time.LocalDateTime;
@@ -81,6 +82,15 @@ public interface DifyServerClient {
      * @since 2.3.0
      */
     void deleteApp(String appId);
+
+    /**
+     * Invites members to the current workspace by email
+     *
+     * @param request Invite request containing emails, role (normal/editor/admin) and interface language
+     * @return Invitation response containing per-email invitation results
+     * @since 2.3.0
+     */
+    MembersInviteResponse inviteMembers(MembersInviteRequest request);
 
     /**
      * Retrieves existing API keys for a specific application

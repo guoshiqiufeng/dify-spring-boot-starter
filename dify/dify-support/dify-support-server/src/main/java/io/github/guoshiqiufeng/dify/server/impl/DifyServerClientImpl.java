@@ -23,6 +23,7 @@ import io.github.guoshiqiufeng.dify.server.dto.request.AppsCreateRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.MembersInviteRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -66,6 +67,11 @@ public class DifyServerClientImpl implements DifyServer {
     @Override
     public void deleteApp(String appId) {
         difyServerClient.deleteApp(appId);
+    }
+
+    @Override
+    public MembersInviteResponse inviteMembers(MembersInviteRequest request) {
+        return difyServerClient.inviteMembers(request);
     }
 
     @Override

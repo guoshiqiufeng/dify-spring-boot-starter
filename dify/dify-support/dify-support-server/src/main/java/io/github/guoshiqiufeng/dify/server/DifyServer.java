@@ -21,6 +21,7 @@ import io.github.guoshiqiufeng.dify.server.dto.request.AppsCreateRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.MembersInviteRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 
 import java.time.LocalDateTime;
@@ -83,6 +84,16 @@ public interface DifyServer {
      * @since 2.3.0
      */
     void deleteApp(String appId);
+
+    /**
+     * 向当前工作区邀请成员
+     *
+     * @param request 邀请请求，包含邮箱列表、角色（normal、editor、admin）及界面语言，不能为空
+     * @return 邀请结果，封装为 {@link MembersInviteResponse} 对象
+     * @throws NullPointerException 如果 request 为 null
+     * @since 2.3.0
+     */
+    MembersInviteResponse inviteMembers(MembersInviteRequest request);
 
     /**
      * 根据应用ID获取该应用的所有API Key列表

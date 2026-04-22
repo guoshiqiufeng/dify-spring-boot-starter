@@ -31,6 +31,7 @@ import io.github.guoshiqiufeng.dify.server.dto.request.AppsCreateRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DifyLoginRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.MembersInviteRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import io.github.guoshiqiufeng.dify.support.impl.BaseClientTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -240,6 +241,45 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
         verify(requestBodySpecMock).cookies(any());
         verify(requestBodySpecMock).body(eq(request));
         verify(responseSpecMock).body(AppsResponse.class);
+    }
+
+    @Test
+    @DisplayName("Test inviteMembers method")
+    public void testInviteMembers() {
+        // Prepare test data
+        MembersInviteRequest request = new MembersInviteRequest();
+        request.setEmails(java.util.List.of("test@admin.com"));
+        request.setRole("normal");
+        request.setLanguage("zh-Hans");
+
+        // Create expected response
+        MembersInviteResponse expectedResponse = new MembersInviteResponse();
+        expectedResponse.setResult("success");
+        MembersInviteResponse.InvitationResult invitation = new MembersInviteResponse.InvitationResult();
+        invitation.setStatus("success");
+        invitation.setEmail("test@admin.com");
+        invitation.setUrl("http://example.com/activate?email=test@admin.com&token=abc");
+        expectedResponse.setInvitationResults(java.util.List.of(invitation));
+
+        // Set up the response mock to return our expected response
+        when(responseSpecMock.body(MembersInviteResponse.class)).thenReturn(expectedResponse);
+
+        // Execute the method
+        MembersInviteResponse actualResponse = client.inviteMembers(request);
+
+        // Verify the result
+        assertNotNull(actualResponse);
+        assertEquals("success", actualResponse.getResult());
+        assertEquals(1, actualResponse.getInvitationResults().size());
+        assertEquals("test@admin.com", actualResponse.getInvitationResults().get(0).getEmail());
+
+        // Verify WebClient interactions
+        verify(httpClientMock).post();
+        verify(requestBodyUriSpecMock).uri(eq(ServerUriConstant.MEMBERS_INVITE_EMAIL));
+        verify(requestBodySpecMock).headers(any());
+        verify(requestBodySpecMock).cookies(any());
+        verify(requestBodySpecMock).body(eq(request));
+        verify(responseSpecMock).body(MembersInviteResponse.class);
     }
 
     @Test

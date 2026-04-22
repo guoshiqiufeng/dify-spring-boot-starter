@@ -22,6 +22,7 @@ import io.github.guoshiqiufeng.dify.server.dto.request.AppsCreateRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.MembersInviteRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -142,6 +143,35 @@ class DifyServerClientImplTest {
 
         // Assert
         verify(difyServerClient, times(1)).deleteApp(appId);
+    }
+
+    @Test
+    void testInviteMembers() {
+        // Arrange
+        MembersInviteRequest request = new MembersInviteRequest();
+        request.setEmails(List.of("test@admin.com"));
+        request.setRole("normal");
+        request.setLanguage("zh-Hans");
+
+        MembersInviteResponse expectedResponse = new MembersInviteResponse();
+        expectedResponse.setResult("success");
+        MembersInviteResponse.InvitationResult invitation = new MembersInviteResponse.InvitationResult();
+        invitation.setStatus("success");
+        invitation.setEmail("test@admin.com");
+        invitation.setUrl("http://example.com/activate?email=test@admin.com&token=abc");
+        expectedResponse.setInvitationResults(List.of(invitation));
+
+        when(difyServerClient.inviteMembers(request)).thenReturn(expectedResponse);
+
+        // Act
+        MembersInviteResponse actualResponse = difyServerClientImpl.inviteMembers(request);
+
+        // Assert
+        assertNotNull(actualResponse);
+        assertEquals("success", actualResponse.getResult());
+        assertEquals(1, actualResponse.getInvitationResults().size());
+        assertEquals("test@admin.com", actualResponse.getInvitationResults().get(0).getEmail());
+        verify(difyServerClient, times(1)).inviteMembers(request);
     }
 
     @Test

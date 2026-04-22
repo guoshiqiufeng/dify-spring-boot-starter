@@ -30,6 +30,10 @@ public interface ServerUriConstant {
 
     String APPS = API + "/apps";
 
+    String WORKSPACES_CURRENT = API + "/workspaces/current";
+
+    String MEMBERS_INVITE_EMAIL = WORKSPACES_CURRENT + "/members/invite-email";
+
     String DATASETS = API + "/datasets";
 
     String DATASET_INDEXING_STATUS = DATASETS + "/{datasetId}/indexing-status";
