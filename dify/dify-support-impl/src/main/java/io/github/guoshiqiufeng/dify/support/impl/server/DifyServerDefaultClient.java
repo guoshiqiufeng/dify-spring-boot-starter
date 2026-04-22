@@ -31,10 +31,13 @@ import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
 import io.github.guoshiqiufeng.dify.server.client.RequestSupplier;
 import io.github.guoshiqiufeng.dify.server.constant.ServerUriConstant;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppCreateRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppUpdateRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DifyLoginRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.MemberInviteRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import io.github.guoshiqiufeng.dify.support.impl.base.BaseDifyDefaultClient;
 import lombok.extern.slf4j.Slf4j;
@@ -151,6 +154,76 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                         .retrieve()
                         .onStatus(responseErrorHandler)
                         .body(AppsResponse.class)
+        );
+    }
+
+    @Override
+    public AppsResponse createApp(AppCreateRequest request) {
+        Assert.notNull(request, "request cannot be null");
+        Assert.notNull(request.getName(), "request.name cannot be null");
+        Assert.isTrue(!request.getName().isEmpty(), "request.name cannot be empty");
+        Assert.notNull(request.getMode(), "request.mode cannot be null");
+        Assert.isTrue(!request.getMode().isEmpty(), "request.mode cannot be empty");
+        return executeWithRetry(
+                () -> httpClient.post()
+                        .uri(ServerUriConstant.APPS)
+                        .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
+                        .body(request)
+                        .retrieve()
+                        .onStatus(responseErrorHandler)
+                        .body(AppsResponse.class)
+        );
+    }
+
+    @Override
+    public AppsResponse updateApp(String appId, AppUpdateRequest request) {
+        Assert.notNull(appId, "appId cannot be null");
+        Assert.notNull(request, "request cannot be null");
+        Assert.notNull(request.getName(), "request.name cannot be null");
+        Assert.isTrue(!request.getName().isEmpty(), "request.name cannot be empty");
+        return executeWithRetry(
+                () -> httpClient.put()
+                        .uri(ServerUriConstant.APPS + "/{appId}", appId)
+                        .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
+                        .body(request)
+                        .retrieve()
+                        .onStatus(responseErrorHandler)
+                        .body(AppsResponse.class)
+        );
+    }
+
+    @Override
+    public void deleteApp(String appId) {
+        Assert.notNull(appId, "appId cannot be null");
+        executeWithRetry(
+                () -> httpClient.delete()
+                        .uri(ServerUriConstant.APPS + "/{appId}", appId)
+                        .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
+                        .retrieve()
+                        .onStatus(responseErrorHandler)
+                        .body(Void.class)
+        );
+    }
+
+    @Override
+    public MemberInviteResponse inviteMembers(MemberInviteRequest request) {
+        Assert.notNull(request, "request cannot be null");
+        Assert.notNull(request.getEmails(), "request.emails cannot be null");
+        Assert.isTrue(!request.getEmails().isEmpty(), "request.emails cannot be empty");
+        Assert.notNull(request.getRole(), "request.role cannot be null");
+        Assert.isTrue(!request.getRole().isEmpty(), "request.role cannot be empty");
+        return executeWithRetry(
+                () -> httpClient.post()
+                        .uri(ServerUriConstant.WORKSPACE_MEMBERS_INVITE_EMAIL)
+                        .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
+                        .body(request)
+                        .retrieve()
+                        .onStatus(responseErrorHandler)
+                        .body(MemberInviteResponse.class)
         );
     }
 

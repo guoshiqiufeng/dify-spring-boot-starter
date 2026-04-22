@@ -19,9 +19,12 @@ import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse;
 import io.github.guoshiqiufeng.dify.server.DifyServer;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppCreateRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppUpdateRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.MemberInviteRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,6 +58,26 @@ public class DifyServerClientImpl implements DifyServer {
     @Override
     public AppsResponse app(String appId) {
         return difyServerClient.app(appId);
+    }
+
+    @Override
+    public AppsResponse createApp(AppCreateRequest request) {
+        return difyServerClient.createApp(request);
+    }
+
+    @Override
+    public AppsResponse updateApp(String appId, AppUpdateRequest request) {
+        return difyServerClient.updateApp(appId, request);
+    }
+
+    @Override
+    public void deleteApp(String appId) {
+        difyServerClient.deleteApp(appId);
+    }
+
+    @Override
+    public MemberInviteResponse inviteMembers(MemberInviteRequest request) {
+        return difyServerClient.inviteMembers(request);
     }
 
     @Override

@@ -192,7 +192,135 @@ public void testGetApp() {
 }
 ```
 
-### 1.4 Get Application API Keys
+### 1.4 Create Application
+
+> Available since `2.3.0`
+
+#### Method
+
+```java
+AppsResponse createApp(AppCreateRequest request);
+```
+
+#### Request Parameters
+
+AppCreateRequest
+
+| Parameter      | Type   | Required | Description                                                                  |
+|----------------|--------|----------|------------------------------------------------------------------------------|
+| name           | String | Yes      | Application name                                                             |
+| mode           | String | Yes      | Application mode: chat, agent-chat, advanced-chat, workflow, completion      |
+| description    | String | No       | Application description                                                      |
+| iconType       | String | No       | Icon type                                                                    |
+| icon           | String | No       | Icon content                                                                 |
+| iconBackground | String | No       | Icon background color                                                        |
+
+#### Response Parameters
+
+Same as the `AppsResponse` defined in section 1.1.
+
+#### Request Example
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testCreateApp() {
+    AppCreateRequest request = new AppCreateRequest();
+    request.setName("My Agent");
+    request.setMode("agent-chat");
+    request.setDescription("Agent application sample");
+
+    AppsResponse app = difyServer.createApp(request);
+}
+```
+
+### 1.5 Update Application
+
+> Available since `2.3.0`
+
+#### Method
+
+```java
+AppsResponse updateApp(String appId, AppUpdateRequest request);
+```
+
+#### Request Parameters
+
+| Parameter | Type             | Required | Description                 |
+|-----------|------------------|----------|-----------------------------|
+| appId     | String           | Yes      | Application ID              |
+| request   | AppUpdateRequest | Yes      | Fields to update            |
+
+AppUpdateRequest
+
+| Parameter           | Type    | Required | Description                                 |
+|---------------------|---------|----------|---------------------------------------------|
+| name                | String  | Yes      | Application name                            |
+| description         | String  | No       | Application description                     |
+| iconType            | String  | No       | Icon type                                   |
+| icon                | String  | No       | Icon content                                |
+| iconBackground      | String  | No       | Icon background color                       |
+| useIconAsAnswerIcon | Boolean | No       | Whether to use the icon as the answer icon  |
+| maxActiveRequests   | Integer | No       | Maximum number of active requests           |
+
+#### Response Parameters
+
+Same as the `AppsResponse` defined in section 1.1.
+
+#### Request Example
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testUpdateApp() {
+    AppUpdateRequest request = new AppUpdateRequest();
+    request.setName("Renamed App");
+    request.setDescription("Updated description");
+
+    AppsResponse app = difyServer.updateApp("app-123456789", request);
+}
+```
+
+### 1.6 Delete Application
+
+> Available since `2.3.0`
+
+#### Method
+
+```java
+void deleteApp(String appId);
+```
+
+#### Request Parameters
+
+| Parameter | Type   | Required | Description    |
+|-----------|--------|----------|----------------|
+| appId     | String | Yes      | Application ID |
+
+#### Response Parameters
+
+No return value. Returns 204 No Content on success.
+
+#### Request Example
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testDeleteApp() {
+    difyServer.deleteApp("app-123456789");
+}
+```
+
+### 1.7 Get Application API Keys
 
 #### Method
 
@@ -228,7 +356,7 @@ public void testGetAppApiKeys() {
 }
 ```
 
-### 1.5 Initialize Application API Key
+### 1.8 Initialize Application API Key
 
 #### Method
 
@@ -259,7 +387,7 @@ public void testInitAppApiKey() {
 }
 ```
 
-### 1.6 Delete Application API Key
+### 1.9 Delete Application API Key
 
 #### Method
 
@@ -292,7 +420,7 @@ public void testDeleteAppApiKey() {
 }
 ```
 
-### 1.7 Publish Workflow
+### 1.10 Publish Workflow
 
 #### Method
 
@@ -1153,6 +1281,74 @@ public void testGetDailyMessages() {
         for (DailyMessagesResponse dailyStat : dailyMessagesStats) {
             System.out.println("Date: " + dailyStat.getDate());
             System.out.println("Message count: " + dailyStat.getMessageCount());
+        }
+    }
+}
+```
+
+## 5. Member Management
+
+### 5.1 Invite New Members (Create Users)
+
+> Available since `2.3.0`
+>
+> Dify automatically creates an account for each invited email and returns an
+> activation URL; forward the URL to the invitee to complete registration.
+
+#### Method
+
+```java
+MemberInviteResponse inviteMembers(MemberInviteRequest request);
+```
+
+#### Request Parameters
+
+MemberInviteRequest
+
+| Parameter | Type           | Required | Description                                                                 |
+|-----------|----------------|----------|-----------------------------------------------------------------------------|
+| emails    | `List<String>` | Yes      | Email addresses to invite                                                   |
+| role      | String         | Yes      | Member role. One of: admin, editor, normal, dataset_operator                |
+| language  | String         | No       | Default language for the invitation email/account, e.g. `zh-Hans`, `en-US`  |
+
+#### Response Parameters
+
+MemberInviteResponse
+
+| Parameter         | Type                     | Description                                       |
+|-------------------|--------------------------|---------------------------------------------------|
+| result            | String                   | Overall result, usually `success`                 |
+| invitationResults | `List<InvitationResult>` | Per-email invitation result                        |
+
+InvitationResult
+
+| Parameter | Type   | Description                                       |
+|-----------|--------|---------------------------------------------------|
+| status    | String | `success` or `failed`                             |
+| email     | String | Invited email                                     |
+| url       | String | Activation URL (present when status is `success`) |
+| message   | String | Failure message (present when status is `failed`) |
+
+#### Request Example
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testInviteMembers() {
+    MemberInviteRequest request = new MemberInviteRequest();
+    request.setEmails(List.of("alice@example.com", "bob@example.com"));
+    request.setRole("normal");
+    request.setLanguage("en-US");
+
+    MemberInviteResponse response = difyServer.inviteMembers(request);
+
+    for (MemberInviteResponse.InvitationResult item : response.getInvitationResults()) {
+        System.out.println(item.getEmail() + " -> " + item.getStatus());
+        if ("success".equals(item.getStatus())) {
+            System.out.println("Activation URL: " + item.getUrl());
         }
     }
 }

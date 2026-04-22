@@ -17,9 +17,12 @@ package io.github.guoshiqiufeng.dify.server.client;
 
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppCreateRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppUpdateRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.DocumentRetryRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.MemberInviteRequest;
 import io.github.guoshiqiufeng.dify.server.dto.response.*;
 
 import java.time.LocalDateTime;
@@ -63,6 +66,44 @@ public interface DifyServerClient {
      * @return The application response containing detailed information
      */
     AppsResponse app(String appId);
+
+    /**
+     * Creates a new application
+     *
+     * @param request Application create request containing name, mode and icon information
+     * @return The newly created application details
+     * @since 2.3.0
+     */
+    AppsResponse createApp(AppCreateRequest request);
+
+    /**
+     * Updates basic properties (name, description, icon, etc.) of an application
+     *
+     * @param appId   The ID of the application to update
+     * @param request Application update request containing the fields to modify
+     * @return The updated application details
+     * @since 2.3.0
+     */
+    AppsResponse updateApp(String appId, AppUpdateRequest request);
+
+    /**
+     * Deletes the specified application
+     *
+     * @param appId The ID of the application to delete
+     * @since 2.3.0
+     */
+    void deleteApp(String appId);
+
+    /**
+     * Invites new members to the current workspace.
+     * <p>Dify automatically creates an account for each invited email and returns
+     * an activation URL that can be forwarded to the invitee.
+     *
+     * @param request Member invitation request containing emails, role and language
+     * @return Invitation result containing per-email activation URL or failure message
+     * @since 2.3.0
+     */
+    MemberInviteResponse inviteMembers(MemberInviteRequest request);
 
     /**
      * Retrieves existing API keys for a specific application
