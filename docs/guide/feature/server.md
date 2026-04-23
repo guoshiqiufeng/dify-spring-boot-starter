@@ -262,7 +262,7 @@ AppUpdateRequest
 | icon                | String  | 否    | 图标           |
 | iconBackground      | String  | 否    | 图标背景色        |
 | useIconAsAnswerIcon | Boolean | 否    | 是否使用图标作为回答图标 |
-| maxActiveRequests   | Integer | 否    | 最大活跃请求数      |
+| maxActiveRequests   | Integer | 否    | 最大活跃请求数，`0` 表示不限制 |
 
 #### 响应参数
 
@@ -447,6 +447,117 @@ private DifyServer difyServer;
 public void testWorkflowsPublish() {
     // 发布指定工作流应用
     difyServer.workflowsPublish("app-123456789");
+}
+```
+
+### 1.11 发布应用模型配置
+
+> 自 `2.3.0` 版本起支持
+
+用于 `chat`、`agent-chat`、`completion` 模式应用的 "发布更新" 操作（更新提示词、模型、工具、文件上传等配置）。`advanced-chat`、`workflow` 模式请使用 [1.10 发布工作流](#_1-10-发布工作流)。
+
+#### 方法
+
+```java
+void updateAppModelConfig(String appId, AppModelConfigRequest request);
+```
+
+#### 请求参数
+
+| 参数名     | 类型                    | 是否必须 | 描述     |
+|---------|-----------------------|------|--------|
+| appId   | String                | 是    | 应用 ID  |
+| request | AppModelConfigRequest | 是    | 模型配置参数 |
+
+AppModelConfigRequest
+
+| 参数名                          | 类型                     | 是否必须 | 描述                                          |
+|------------------------------|------------------------|------|---------------------------------------------|
+| prePrompt                    | String                 | 否    | 前置提示词（`prompt_type=simple` 时使用）              |
+| promptType                   | String                 | 否    | 提示词类型，`simple` 或 `advanced`                  |
+| chatPromptConfig             | Map&lt;String, Object> | 否    | 高级对话提示词配置                                   |
+| completionPromptConfig       | Map&lt;String, Object> | 否    | 高级补全提示词配置                                   |
+| userInputForm                | List&lt;Map&lt;String, Object>> | 否 | 用户输入表单定义                                    |
+| datasetQueryVariable         | String                 | 否    | 知识库查询变量                                     |
+| moreLikeThis                 | EnabledConfig          | 否    | "更多类似问题" 功能                                  |
+| openingStatement             | String                 | 否    | 对话开场白                                       |
+| suggestedQuestions           | List&lt;String>        | 否    | 开场白的推荐问题                                    |
+| sensitiveWordAvoidance       | SensitiveWordAvoidance | 否    | 敏感词审查配置                                     |
+| speechToText                 | EnabledConfig          | 否    | 语音转文字配置                                     |
+| textToSpeech                 | TextToSpeech           | 否    | 文字转语音配置                                     |
+| fileUpload                   | FileUpload             | 否    | 文件上传配置                                      |
+| suggestedQuestionsAfterAnswer | EnabledConfig         | 否    | 回答后推荐下一步问题                                  |
+| retrieverResource            | EnabledConfig          | 否    | 是否展示引用来源                                    |
+| agentMode                    | AgentMode              | 否    | Agent 模式配置（策略、工具、最大迭代次数等）                   |
+| model                        | Model                  | 否    | 模型配置（provider、name、mode、completion_params） |
+| datasetConfigs               | DatasetConfigs         | 否    | 知识库检索配置                                     |
+
+AgentMode
+
+| 参数名          | 类型               | 是否必须 | 描述                          |
+|--------------|------------------|------|-----------------------------|
+| enabled      | Boolean          | 否    | 是否启用 Agent 模式                |
+| strategy     | String           | 否    | 策略，如 `function_call`、`react` |
+| maxIteration | Integer          | 否    | 最大迭代次数                      |
+| tools        | List&lt;AgentTool> | 否  | 启用的工具列表                     |
+| prompt       | String           | 否    | 自定义 Agent 提示词                |
+
+AgentTool
+
+| 参数名            | 类型                     | 是否必须 | 描述             |
+|----------------|------------------------|------|----------------|
+| providerId     | String                 | 否    | 工具提供者 ID       |
+| providerType   | String                 | 否    | 提供者类型，如 `builtin` |
+| providerName   | String                 | 否    | 提供者名称          |
+| toolName       | String                 | 否    | 工具名称           |
+| toolLabel      | String                 | 否    | 工具显示名称         |
+| toolParameters | Map&lt;String, Object> | 否    | 工具参数           |
+| enabled        | Boolean                | 否    | 是否启用           |
+| isDeleted      | Boolean                | 否    | 是否已删除          |
+| notAuthor      | Boolean                | 否    | 是否非作者          |
+
+Model
+
+| 参数名              | 类型                     | 是否必须 | 描述                                |
+|------------------|------------------------|------|-----------------------------------|
+| provider         | String                 | 否    | 模型提供者，如 `langgenius/ollama/ollama` |
+| name             | String                 | 否    | 模型名称                              |
+| mode             | String                 | 否    | 模型模式，如 `chat`、`completion`         |
+| completionParams | Map&lt;String, Object> | 否    | 完成参数，如 `stop`、`temperature` 等      |
+
+#### 响应参数
+
+该方法不返回值。
+
+#### 请求示例
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testUpdateAppModelConfig() {
+    AppModelConfigRequest request = new AppModelConfigRequest();
+    request.setPrePrompt("hi2");
+    request.setPromptType("simple");
+    request.setOpeningStatement("你好！有什么问题我可以帮助你解答吗？");
+    request.setSuggestedQuestions(List.of("hi", "hello"));
+
+    AppModelConfigRequest.Model model = new AppModelConfigRequest.Model();
+    model.setProvider("langgenius/ollama/ollama");
+    model.setName("qwen2.5:latest");
+    model.setMode("chat");
+    model.setCompletionParams(Map.of("stop", List.of()));
+    request.setModel(model);
+
+    AppModelConfigRequest.AgentMode agentMode = new AppModelConfigRequest.AgentMode();
+    agentMode.setEnabled(true);
+    agentMode.setMaxIteration(5);
+    agentMode.setStrategy("function_call");
+    request.setAgentMode(agentMode);
+
+    difyServer.updateAppModelConfig("app-123456789", request);
 }
 ```
 
