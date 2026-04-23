@@ -264,7 +264,7 @@ AppUpdateRequest
 | icon                | String  | No       | Icon content                                |
 | iconBackground      | String  | No       | Icon background color                       |
 | useIconAsAnswerIcon | Boolean | No       | Whether to use the icon as the answer icon  |
-| maxActiveRequests   | Integer | No       | Maximum number of active requests           |
+| maxActiveRequests   | Integer | No       | Maximum active requests (`0` means unlimited) |
 
 #### Response Parameters
 
@@ -449,6 +449,117 @@ private DifyServer difyServer;
 public void testWorkflowsPublish() {
     // Publish the specified workflow application
     difyServer.workflowsPublish("app-123456789");
+}
+```
+
+### 1.11 Publish Application Model Configuration
+
+> Available since `2.3.0`
+
+Corresponds to the console "Publish update" action for `chat` / `agent-chat` / `completion` mode apps (prompt, model, tools, file upload, etc.). For `advanced-chat` / `workflow` apps, use [1.10 Publish Workflow](#_1-10-publish-workflow) instead.
+
+#### Method
+
+```java
+void updateAppModelConfig(String appId, AppModelConfigRequest request);
+```
+
+#### Request Parameters
+
+| Parameter | Type                  | Required | Description                    |
+|-----------|-----------------------|----------|--------------------------------|
+| appId     | String                | Yes      | Application ID                 |
+| request   | AppModelConfigRequest | Yes      | Model configuration payload    |
+
+AppModelConfigRequest
+
+| Parameter                     | Type                             | Required | Description                                                    |
+|-------------------------------|----------------------------------|----------|----------------------------------------------------------------|
+| prePrompt                     | String                           | No       | Pre-prompt text (used when `prompt_type=simple`)               |
+| promptType                    | String                           | No       | Prompt type, `simple` or `advanced`                            |
+| chatPromptConfig              | Map&lt;String, Object>           | No       | Advanced chat prompt configuration                             |
+| completionPromptConfig        | Map&lt;String, Object>           | No       | Advanced completion prompt configuration                       |
+| userInputForm                 | List&lt;Map&lt;String, Object>>  | No       | User input form definition                                     |
+| datasetQueryVariable          | String                           | No       | Variable used for dataset queries                              |
+| moreLikeThis                  | EnabledConfig                    | No       | "More like this" feature                                       |
+| openingStatement              | String                           | No       | Conversation opening greeting                                  |
+| suggestedQuestions            | List&lt;String>                  | No       | Suggested questions shown with the opening statement           |
+| sensitiveWordAvoidance        | SensitiveWordAvoidance           | No       | Sensitive word moderation configuration                        |
+| speechToText                  | EnabledConfig                    | No       | Speech-to-text configuration                                   |
+| textToSpeech                  | TextToSpeech                     | No       | Text-to-speech configuration                                   |
+| fileUpload                    | FileUpload                       | No       | File upload configuration                                      |
+| suggestedQuestionsAfterAnswer | EnabledConfig                    | No       | Suggested follow-up questions after each answer                |
+| retrieverResource             | EnabledConfig                    | No       | Whether to expose retrieval sources (citations)                |
+| agentMode                     | AgentMode                        | No       | Agent mode configuration (strategy, tools, max iterations, ...) |
+| model                         | Model                            | No       | Model configuration (provider, name, mode, completion_params)  |
+| datasetConfigs                | DatasetConfigs                   | No       | Dataset retrieval configuration                                |
+
+AgentMode
+
+| Parameter    | Type               | Required | Description                               |
+|--------------|--------------------|----------|-------------------------------------------|
+| enabled      | Boolean            | No       | Whether agent mode is enabled             |
+| strategy     | String             | No       | Strategy, e.g. `function_call`, `react`   |
+| maxIteration | Integer            | No       | Maximum iteration count                   |
+| tools        | List&lt;AgentTool> | No       | Enabled tools                             |
+| prompt       | String             | No       | Custom agent prompt                       |
+
+AgentTool
+
+| Parameter      | Type                   | Required | Description                     |
+|----------------|------------------------|----------|---------------------------------|
+| providerId     | String                 | No       | Tool provider ID                |
+| providerType   | String                 | No       | Provider type, e.g. `builtin`   |
+| providerName   | String                 | No       | Provider name                   |
+| toolName       | String                 | No       | Tool name                       |
+| toolLabel      | String                 | No       | Tool display label              |
+| toolParameters | Map&lt;String, Object> | No       | Tool parameters                 |
+| enabled        | Boolean                | No       | Whether the tool is enabled     |
+| isDeleted      | Boolean                | No       | Whether the tool is deleted     |
+| notAuthor      | Boolean                | No       | Whether caller is not the author |
+
+Model
+
+| Parameter        | Type                   | Required | Description                                      |
+|------------------|------------------------|----------|--------------------------------------------------|
+| provider         | String                 | No       | Model provider, e.g. `langgenius/ollama/ollama`  |
+| name             | String                 | No       | Model name                                       |
+| mode             | String                 | No       | Model mode, e.g. `chat`, `completion`            |
+| completionParams | Map&lt;String, Object> | No       | Completion parameters such as `stop`, `temperature` |
+
+#### Response Parameters
+
+This method does not return a value.
+
+#### Request Example
+
+```java
+
+@Resource
+private DifyServer difyServer;
+
+@Test
+public void testUpdateAppModelConfig() {
+    AppModelConfigRequest request = new AppModelConfigRequest();
+    request.setPrePrompt("hi2");
+    request.setPromptType("simple");
+    request.setOpeningStatement("Hi! How can I help you?");
+    request.setSuggestedQuestions(List.of("hi", "hello"));
+
+    AppModelConfigRequest.Model model = new AppModelConfigRequest.Model();
+    model.setProvider("langgenius/ollama/ollama");
+    model.setName("qwen2.5:latest");
+    model.setMode("chat");
+    model.setCompletionParams(Map.of("stop", List.of()));
+    request.setModel(model);
+
+    AppModelConfigRequest.AgentMode agentMode = new AppModelConfigRequest.AgentMode();
+    agentMode.setEnabled(true);
+    agentMode.setMaxIteration(5);
+    agentMode.setStrategy("function_call");
+    request.setAgentMode(agentMode);
+
+    difyServer.updateAppModelConfig("app-123456789", request);
 }
 ```
 

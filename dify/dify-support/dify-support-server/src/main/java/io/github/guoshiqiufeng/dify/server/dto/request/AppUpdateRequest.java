@@ -70,7 +70,7 @@ public class AppUpdateRequest implements Serializable {
     private Boolean useIconAsAnswerIcon;
 
     /**
-     * 最大活跃请求数，可选
+     * 最大活跃请求数，可选。{@code 0} 表示不限制。
      */
     @JsonProperty("max_active_requests")
     @JsonAlias({"maxActiveRequests"})

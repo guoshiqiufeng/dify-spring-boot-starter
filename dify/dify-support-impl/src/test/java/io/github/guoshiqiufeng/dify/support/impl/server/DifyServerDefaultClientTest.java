@@ -28,6 +28,7 @@ import io.github.guoshiqiufeng.dify.server.client.BaseDifyServerToken;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
 import io.github.guoshiqiufeng.dify.server.constant.ServerUriConstant;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppCreateRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppModelConfigRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppUpdateRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
@@ -2292,6 +2293,47 @@ public class DifyServerDefaultClientTest extends BaseClientTest {
     @DisplayName("Test deleteApp validates appId")
     public void testDeleteAppValidation() {
         assertThrows(IllegalArgumentException.class, () -> client.deleteApp(null));
+    }
+
+    @Test
+    @DisplayName("Test updateAppModelConfig posts model configuration payload")
+    public void testUpdateAppModelConfig() {
+        String appId = "app-123";
+        AppModelConfigRequest request = new AppModelConfigRequest();
+        request.setPrePrompt("hi2");
+        request.setPromptType("simple");
+        request.setOpeningStatement("你好！");
+        request.setSuggestedQuestions(List.of("hi", "hello"));
+
+        AppModelConfigRequest.Model model = new AppModelConfigRequest.Model();
+        model.setProvider("langgenius/ollama/ollama");
+        model.setName("qwen2.5:latest");
+        model.setMode("chat");
+        request.setModel(model);
+
+        AppModelConfigRequest.AgentMode agentMode = new AppModelConfigRequest.AgentMode();
+        agentMode.setEnabled(true);
+        agentMode.setMaxIteration(5);
+        agentMode.setStrategy("function_call");
+        request.setAgentMode(agentMode);
+
+        client.updateAppModelConfig(appId, request);
+
+        verify(httpClientMock).post();
+        verify(requestBodyUriSpecMock).uri(eq(ServerUriConstant.APP_MODEL_CONFIG), eq(appId));
+        verify(requestBodySpecMock).body(request);
+        verify(responseSpecMock).body(Void.class);
+    }
+
+    @Test
+    @DisplayName("Test updateAppModelConfig validates inputs")
+    public void testUpdateAppModelConfigValidation() {
+        AppModelConfigRequest request = new AppModelConfigRequest();
+
+        assertThrows(IllegalArgumentException.class,
+                () -> client.updateAppModelConfig(null, request));
+        assertThrows(IllegalArgumentException.class,
+                () -> client.updateAppModelConfig("app-123", null));
     }
 
     @Test

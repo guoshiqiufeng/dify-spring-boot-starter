@@ -32,6 +32,7 @@ import io.github.guoshiqiufeng.dify.server.client.DifyServerTokenDefault;
 import io.github.guoshiqiufeng.dify.server.client.RequestSupplier;
 import io.github.guoshiqiufeng.dify.server.constant.ServerUriConstant;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppCreateRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppModelConfigRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppUpdateRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
@@ -202,6 +203,22 @@ public class DifyServerDefaultClient extends BaseDifyDefaultClient implements Di
                         .uri(ServerUriConstant.APPS + "/{appId}", appId)
                         .headers(this::addAuthorizationHeader)
                         .cookies(this::addAuthorizationCookies)
+                        .retrieve()
+                        .onStatus(responseErrorHandler)
+                        .body(Void.class)
+        );
+    }
+
+    @Override
+    public void updateAppModelConfig(String appId, AppModelConfigRequest request) {
+        Assert.notNull(appId, "appId cannot be null");
+        Assert.notNull(request, "request cannot be null");
+        executeWithRetry(
+                () -> httpClient.post()
+                        .uri(ServerUriConstant.APP_MODEL_CONFIG, appId)
+                        .headers(this::addAuthorizationHeader)
+                        .cookies(this::addAuthorizationCookies)
+                        .body(request)
                         .retrieve()
                         .onStatus(responseErrorHandler)
                         .body(Void.class)

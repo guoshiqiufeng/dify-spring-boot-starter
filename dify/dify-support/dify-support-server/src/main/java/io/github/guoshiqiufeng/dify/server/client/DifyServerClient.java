@@ -18,6 +18,7 @@ package io.github.guoshiqiufeng.dify.server.client;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppCreateRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppModelConfigRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppUpdateRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
@@ -93,6 +94,17 @@ public interface DifyServerClient {
      * @since 2.3.0
      */
     void deleteApp(String appId);
+
+    /**
+     * Updates (publishes) the model configuration of an application.
+     * <p>Corresponds to Dify console "Publish update" action for chat / agent-chat / completion apps.
+     * For advanced-chat / workflow apps, use {@link #workflowsPublish(String)} instead.
+     *
+     * @param appId   The ID of the application whose model configuration should be updated
+     * @param request Model configuration payload (pre-prompt, model, agent_mode, file_upload, ...)
+     * @since 2.3.0
+     */
+    void updateAppModelConfig(String appId, AppModelConfigRequest request);
 
     /**
      * Invites new members to the current workspace.

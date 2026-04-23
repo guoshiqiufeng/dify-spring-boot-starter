@@ -18,6 +18,7 @@ package io.github.guoshiqiufeng.dify.server;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppCreateRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppModelConfigRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppUpdateRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
@@ -98,6 +99,17 @@ public interface DifyServer {
      * @since 2.3.0
      */
     void deleteApp(String appId);
+
+    /**
+     * 更新（发布）指定应用的模型配置，对应 Dify 控制台 "发布更新" 操作
+     * <p>适用于 chat / agent-chat / completion 模式的应用。advanced-chat、workflow 模式请使用 {@link #workflowsPublish(String)}。
+     *
+     * @param appId   应用的唯一标识符，不能为空
+     * @param request 模型配置请求，包含 pre_prompt、model、agent_mode、file_upload 等字段，不能为 null
+     * @throws NullPointerException 如果 appId 或 request 为 null
+     * @since 2.3.0
+     */
+    void updateAppModelConfig(String appId, AppModelConfigRequest request);
 
     /**
      * 邀请新成员加入当前工作空间（Dify 会在邀请时自动创建账号，并返回激活链接）
