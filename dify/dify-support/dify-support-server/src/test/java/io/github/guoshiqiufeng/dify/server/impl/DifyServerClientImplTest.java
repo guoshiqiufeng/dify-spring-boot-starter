@@ -19,6 +19,7 @@ import io.github.guoshiqiufeng.dify.core.pojo.DifyPageResult;
 import io.github.guoshiqiufeng.dify.dataset.dto.response.DocumentIndexingStatusResponse;
 import io.github.guoshiqiufeng.dify.server.client.DifyServerClient;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppCreateRequest;
+import io.github.guoshiqiufeng.dify.server.dto.request.AppModelConfigRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppUpdateRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.AppsRequest;
 import io.github.guoshiqiufeng.dify.server.dto.request.ChatConversationsRequest;
@@ -152,6 +153,18 @@ class DifyServerClientImplTest {
         difyServerClientImpl.deleteApp(appId);
 
         verify(difyServerClient, times(1)).deleteApp(appId);
+    }
+
+    @Test
+    void testUpdateAppModelConfig() {
+        String appId = "app-123";
+        AppModelConfigRequest request = new AppModelConfigRequest();
+        request.setPrePrompt("hi2");
+        request.setPromptType("simple");
+
+        difyServerClientImpl.updateAppModelConfig(appId, request);
+
+        verify(difyServerClient, times(1)).updateAppModelConfig(appId, request);
     }
 
     @Test

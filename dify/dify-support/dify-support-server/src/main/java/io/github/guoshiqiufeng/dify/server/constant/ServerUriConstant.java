@@ -42,6 +42,8 @@ public interface ServerUriConstant {
 
     String APP_API_KEYS = APPS + "/{appId}/api-keys";
 
+    String APP_MODEL_CONFIG = APPS + "/{appId}/model-config";
+
     String DATASET_API_KEYS = DATASETS + "/api-keys/{apiKeyId}";
 
     String DAILY_CONVERSATIONS = APPS + "/{appId}/statistics/daily-conversations";
