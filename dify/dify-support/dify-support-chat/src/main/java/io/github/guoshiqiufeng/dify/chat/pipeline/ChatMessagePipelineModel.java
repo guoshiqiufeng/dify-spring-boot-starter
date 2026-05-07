@@ -19,6 +19,7 @@ import io.github.guoshiqiufeng.dify.chat.dto.response.ChatMessageSendCompletionR
 import io.github.guoshiqiufeng.dify.core.pipeline.PipelineModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.io.Serializable;
 
@@ -29,5 +30,6 @@ import java.io.Serializable;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class ChatMessagePipelineModel extends ChatMessageSendCompletionResponse implements PipelineModel, Serializable {
 }

@@ -17,6 +17,7 @@ package io.github.guoshiqiufeng.dify.chat.dto.response.message;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * @author yanghq
@@ -25,6 +26,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class ParallelBranchFinishedData extends ParallelBranchStartedData {
 
     private String status;
