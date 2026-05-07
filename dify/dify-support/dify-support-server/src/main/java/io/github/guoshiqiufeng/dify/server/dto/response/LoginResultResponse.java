@@ -19,6 +19,7 @@ package io.github.guoshiqiufeng.dify.server.dto.response;
 import io.github.guoshiqiufeng.dify.core.pojo.DifyResult;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.io.Serializable;
 
@@ -29,5 +30,6 @@ import java.io.Serializable;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class LoginResultResponse extends DifyResult<LoginResponse> implements Serializable {
 }

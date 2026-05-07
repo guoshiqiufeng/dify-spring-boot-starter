@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
@@ -31,6 +32,7 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class SegmentUpdateParam extends SegmentParam implements Serializable {
     private static final long serialVersionUID = 8632921484666324246L;
 

@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import io.github.guoshiqiufeng.dify.chat.dto.response.message.CompletionData;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.List;
@@ -30,6 +31,7 @@ import java.util.Map;
  * @since 2025/3/4 10:29
  */
 @Data
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class ChatMessageSendCompletionResponse extends ChatMessageSendResponse implements Serializable {
 
