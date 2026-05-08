@@ -167,38 +167,61 @@ class WebClientExecutor {
         WebClient.RequestBodySpec requestSpec = buildRequest(method, uri, headers, cookies, queryParams, body);
 
         try {
-            Mono<org.springframework.http.ResponseEntity<byte[]>> responseMono = requestSpec
-                    .retrieve()
-                    .toEntity(byte[].class);
+            // Use exchangeToMono for streaming response to avoid buffer limit
+            Mono<ResponseEntity<T>> responseMono = requestSpec
+                    .exchangeToMono(response -> {
+                        int statusCode = ClientResponseUtils.getStatusCodeValue(response);
+                        org.springframework.http.HttpHeaders responseHeaders = response.headers().asHttpHeaders();
 
-            org.springframework.http.ResponseEntity<byte[]> responseEntity = responseMono.block();
+                        // Stream response body to avoid buffer limit (default 256KB)
+                        return response.bodyToFlux(org.springframework.core.io.buffer.DataBuffer.class)
+                                .map(dataBuffer -> {
+                                    byte[] bytes = new byte[dataBuffer.readableByteCount()];
+                                    dataBuffer.read(bytes);
+                                    org.springframework.core.io.buffer.DataBufferUtils.release(dataBuffer);
+                                    return bytes;
+                                })
+                                .reduce(new byte[0], (acc, bytes) -> {
+                                    byte[] result = new byte[acc.length + bytes.length];
+                                    System.arraycopy(acc, 0, result, 0, acc.length);
+                                    System.arraycopy(bytes, 0, result, acc.length, bytes.length);
+                                    return result;
+                                })
+                                .map(responseBody -> {
+                                    // For success responses (2xx), deserialize normally
+                                    if (HttpStatusValidator.isSuccessful(statusCode)) {
+                                        T deserializedBody = responseConverter.deserialize(responseBody, responseType);
+                                        return ResponseEntity.<T>builder()
+                                                .statusCode(statusCode)
+                                                .headers(HttpHeaderConverter.fromSpringHeaders(responseHeaders))
+                                                .body(deserializedBody)
+                                                .build();
+                                    } else {
+                                        // For error responses, return raw error message as body
+                                        @SuppressWarnings("unchecked")
+                                        T errorBody = (T) (responseBody.length == 0 ? null : new String(responseBody, StandardCharsets.UTF_8));
+                                        return ResponseEntity.<T>builder()
+                                                .statusCode(statusCode)
+                                                .headers(HttpHeaderConverter.fromSpringHeaders(responseHeaders))
+                                                .body(errorBody)
+                                                .build();
+                                    }
+                                });
+                    });
+
+            ResponseEntity<T> responseEntity = responseMono.block();
 
             if (responseEntity == null) {
                 throw new HttpClientException("Response entity is null");
             }
 
-            // For success responses (2xx), deserialize normally
-            int statusCode = responseEntity.getStatusCode().value();
-            if (HttpStatusValidator.isSuccessful(statusCode)) {
-                return responseConverter.convert(responseEntity, responseType);
-            } else {
-                // For error responses, return raw error message as body
-                // The error handler will receive this and can process it
-                byte[] errorBodyBytes = responseEntity.getBody();
-                @SuppressWarnings("unchecked")
-                T errorBody = (T) (errorBodyBytes == null ? null : new String(errorBodyBytes, StandardCharsets.UTF_8));
-                return ResponseEntity.<T>builder()
-                        .statusCode(statusCode)
-                        .headers(HttpHeaderConverter.fromSpringHeaders(responseEntity.getHeaders()))
-                        .body(errorBody)
-                        .build();
-            }
+            return responseEntity;
         } catch (WebClientResponseException e) {
             // Handle HTTP error responses (4xx, 5xx) thrown by WebClient
             int statusCode = e.getStatusCode().value();
             String errorBody = e.getResponseBodyAsString();
 
-            log.debug("WebClient error response: status={}, body={}", statusCode, errorBody);
+            log.error("WebClient error response: status={}, body={}", statusCode, errorBody, e);
 
             // Return error response without throwing exception
             // Let the upper layer handleErrors() process it
@@ -209,6 +232,10 @@ class WebClientExecutor {
                     .headers(HttpHeaderConverter.fromSpringHeaders(e.getHeaders()))
                     .body(typedErrorBody)
                     .build();
+        } catch (Exception e) {
+            // Catch all other exceptions (including DataBufferLimitException)
+            log.error("WebClient request failed: method={}, uri={}", method, uri, e);
+            throw new HttpClientException("Request failed: " + e.getMessage(), e);
         }
     }
 
@@ -231,38 +258,61 @@ class WebClientExecutor {
         WebClient.RequestBodySpec requestSpec = buildRequest(method, uri, headers, cookies, queryParams, body);
 
         try {
-            Mono<org.springframework.http.ResponseEntity<byte[]>> responseMono = requestSpec
-                    .retrieve()
-                    .toEntity(byte[].class);
+            // Use exchangeToMono for streaming response to avoid buffer limit
+            Mono<ResponseEntity<T>> responseMono = requestSpec
+                    .exchangeToMono(response -> {
+                        int statusCode = ClientResponseUtils.getStatusCodeValue(response);
+                        org.springframework.http.HttpHeaders responseHeaders = response.headers().asHttpHeaders();
 
-            org.springframework.http.ResponseEntity<byte[]> responseEntity = responseMono.block();
+                        // Stream response body to avoid buffer limit (default 256KB)
+                        return response.bodyToFlux(org.springframework.core.io.buffer.DataBuffer.class)
+                                .map(dataBuffer -> {
+                                    byte[] bytes = new byte[dataBuffer.readableByteCount()];
+                                    dataBuffer.read(bytes);
+                                    org.springframework.core.io.buffer.DataBufferUtils.release(dataBuffer);
+                                    return bytes;
+                                })
+                                .reduce(new byte[0], (acc, bytes) -> {
+                                    byte[] result = new byte[acc.length + bytes.length];
+                                    System.arraycopy(acc, 0, result, 0, acc.length);
+                                    System.arraycopy(bytes, 0, result, acc.length, bytes.length);
+                                    return result;
+                                })
+                                .map(responseBody -> {
+                                    // For success responses (2xx), deserialize normally
+                                    if (HttpStatusValidator.isSuccessful(statusCode)) {
+                                        T deserializedBody = responseConverter.deserialize(responseBody, typeReference);
+                                        return ResponseEntity.<T>builder()
+                                                .statusCode(statusCode)
+                                                .headers(HttpHeaderConverter.fromSpringHeaders(responseHeaders))
+                                                .body(deserializedBody)
+                                                .build();
+                                    } else {
+                                        // For error responses, return raw error message as body
+                                        @SuppressWarnings("unchecked")
+                                        T errorBody = (T) (responseBody.length == 0 ? null : new String(responseBody, StandardCharsets.UTF_8));
+                                        return ResponseEntity.<T>builder()
+                                                .statusCode(statusCode)
+                                                .headers(HttpHeaderConverter.fromSpringHeaders(responseHeaders))
+                                                .body(errorBody)
+                                                .build();
+                                    }
+                                });
+                    });
+
+            ResponseEntity<T> responseEntity = responseMono.block();
 
             if (responseEntity == null) {
                 throw new HttpClientException("Response entity is null");
             }
 
-            // For success responses (2xx), deserialize normally
-            int statusCode = responseEntity.getStatusCode().value();
-            if (HttpStatusValidator.isSuccessful(statusCode)) {
-                return responseConverter.convert(responseEntity, typeReference);
-            } else {
-                // For error responses, return raw error message as body
-                // The error handler will receive this and can process it
-                byte[] errorBodyBytes = responseEntity.getBody();
-                @SuppressWarnings("unchecked")
-                T errorBody = (T) (errorBodyBytes == null ? null : new String(errorBodyBytes, StandardCharsets.UTF_8));
-                return ResponseEntity.<T>builder()
-                        .statusCode(statusCode)
-                        .headers(HttpHeaderConverter.fromSpringHeaders(responseEntity.getHeaders()))
-                        .body(errorBody)
-                        .build();
-            }
+            return responseEntity;
         } catch (WebClientResponseException e) {
             // Handle HTTP error responses (4xx, 5xx) thrown by WebClient
             int statusCode = e.getStatusCode().value();
             String errorBody = e.getResponseBodyAsString();
 
-            log.debug("WebClient executeForEntity error response: status={}, body={}", statusCode, errorBody);
+            log.error("WebClient executeForEntity error response: status={}, body={}", statusCode, errorBody, e);
 
             // Return error response without throwing exception
             // Let the upper layer handleErrors() process it
@@ -273,6 +323,10 @@ class WebClientExecutor {
                     .headers(HttpHeaderConverter.fromSpringHeaders(e.getHeaders()))
                     .body(typedErrorBody)
                     .build();
+        } catch (Exception e) {
+            // Catch all other exceptions (including DataBufferLimitException)
+            log.error("WebClient request failed: method={}, uri={}", method, uri, e);
+            throw new HttpClientException("Request failed: " + e.getMessage(), e);
         }
     }
 
