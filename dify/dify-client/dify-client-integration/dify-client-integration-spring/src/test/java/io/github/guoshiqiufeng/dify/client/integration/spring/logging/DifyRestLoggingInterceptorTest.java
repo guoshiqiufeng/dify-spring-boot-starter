@@ -748,6 +748,32 @@ class DifyRestLoggingInterceptorTest {
     }
 
     @Test
+    void testInterceptWhenResponseHeadersThrow() throws IOException {
+        // Arrange - Simulate JDK HttpURLConnection-style header read failure on error response
+        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://example.com/api"));
+        byte[] requestBody = new byte[0];
+
+        ClientHttpResponse faultyResponse = new MockClientHttpResponse(
+                "{\"error\":\"bad gateway\"}".getBytes(StandardCharsets.UTF_8),
+                HttpStatus.BAD_GATEWAY
+        ) {
+            @Override
+            public HttpHeaders getHeaders() {
+                throw new RuntimeException("Failed to read headers");
+            }
+        };
+
+        when(execution.execute(any(), any())).thenReturn(faultyResponse);
+
+        // Act
+        ClientHttpResponse response = interceptor.intercept(request, requestBody, execution);
+
+        // Assert - logging failure should not break response flow
+        assertNotNull(response);
+        assertEquals(HttpStatus.BAD_GATEWAY, response.getStatusCode());
+    }
+
+    @Test
     void testInterceptWithImageContentType() throws IOException {
         // Arrange - Test with image content type (binary)
         DifyRestLoggingInterceptor binaryInterceptor = new DifyRestLoggingInterceptor(true, 10240, false);

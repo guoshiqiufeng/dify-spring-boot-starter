@@ -115,7 +115,7 @@ class ResponseConverterTest {
     @Test
     void testDeserializeWithNullBody() {
         // Act
-        TestDto result = responseConverter.deserialize(null, TestDto.class);
+        TestDto result = responseConverter.deserialize((String) null, TestDto.class);
 
         // Assert
         assertNull(result);
@@ -152,6 +152,18 @@ class ResponseConverterTest {
 
         // Assert
         assertArrayEquals(bodyString.getBytes(StandardCharsets.UTF_8), result);
+    }
+
+    @Test
+    void testDeserializeByteArrayTypeFromBinaryBody() {
+        // Arrange
+        byte[] bodyBytes = new byte[]{(byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A};
+
+        // Act
+        byte[] result = responseConverter.deserialize(bodyBytes, byte[].class);
+
+        // Assert
+        assertArrayEquals(bodyBytes, result);
     }
 
     @Test
@@ -211,7 +223,7 @@ class ResponseConverterTest {
         };
 
         // Act
-        Map<String, String> result = responseConverter.deserialize(null, typeRef);
+        Map<String, String> result = responseConverter.deserialize((String) null, typeRef);
 
         // Assert
         assertNull(result);
@@ -256,6 +268,20 @@ class ResponseConverterTest {
 
         // Assert
         assertArrayEquals(bodyString.getBytes(StandardCharsets.UTF_8), result);
+    }
+
+    @Test
+    void testDeserializeWithTypeReferenceByteArrayTypeFromBinaryBody() {
+        // Arrange
+        byte[] bodyBytes = new byte[]{(byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A};
+        TypeReference<byte[]> typeRef = new TypeReference<byte[]>() {
+        };
+
+        // Act
+        byte[] result = responseConverter.deserialize(bodyBytes, typeRef);
+
+        // Assert
+        assertArrayEquals(bodyBytes, result);
     }
 
     @Test
