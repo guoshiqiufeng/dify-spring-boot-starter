@@ -157,12 +157,10 @@ class WebClientExecutorTest {
         // Arrange
         WebClient.RequestBodyUriSpec requestSpec = mock(WebClient.RequestBodyUriSpec.class);
         WebClient.RequestBodySpec bodySpec = mock(WebClient.RequestBodySpec.class);
-        WebClient.ResponseSpec responseSpec = mock(WebClient.ResponseSpec.class);
 
         when(webClient.method(HttpMethod.GET)).thenReturn(requestSpec);
         when(requestSpec.uri(any(Function.class))).thenReturn(bodySpec);
-        when(bodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.toEntity(byte[].class)).thenReturn(Mono.empty());
+        when(bodySpec.exchangeToMono(any(Function.class))).thenReturn(Mono.empty());
 
         // Act & Assert
         HttpClientException exception = assertThrows(
@@ -179,12 +177,10 @@ class WebClientExecutorTest {
         // Arrange
         WebClient.RequestBodyUriSpec requestSpec = mock(WebClient.RequestBodyUriSpec.class);
         WebClient.RequestBodySpec bodySpec = mock(WebClient.RequestBodySpec.class);
-        WebClient.ResponseSpec responseSpec = mock(WebClient.ResponseSpec.class);
 
         when(webClient.method(HttpMethod.GET)).thenReturn(requestSpec);
         when(requestSpec.uri(any(Function.class))).thenReturn(bodySpec);
-        when(bodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.toEntity(byte[].class)).thenReturn(Mono.empty());
+        when(bodySpec.exchangeToMono(any(Function.class))).thenReturn(Mono.empty());
 
         // Act & Assert
         HttpClientException exception = assertThrows(

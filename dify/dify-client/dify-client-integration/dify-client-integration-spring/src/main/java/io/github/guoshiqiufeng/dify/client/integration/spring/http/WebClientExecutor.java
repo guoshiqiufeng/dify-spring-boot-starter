@@ -209,6 +209,10 @@ class WebClientExecutor {
                                 });
                     });
 
+            if (responseMono == null) {
+                throw new HttpClientException("Response mono is null");
+            }
+
             ResponseEntity<T> responseEntity = responseMono.block();
 
             if (responseEntity == null) {
@@ -299,6 +303,10 @@ class WebClientExecutor {
                                     }
                                 });
                     });
+
+            if (responseMono == null) {
+                throw new HttpClientException("Response mono is null");
+            }
 
             ResponseEntity<T> responseEntity = responseMono.block();
 
