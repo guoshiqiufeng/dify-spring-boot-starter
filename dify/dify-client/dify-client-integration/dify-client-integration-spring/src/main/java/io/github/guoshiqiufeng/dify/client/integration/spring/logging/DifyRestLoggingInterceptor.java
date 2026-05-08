@@ -17,6 +17,7 @@ package io.github.guoshiqiufeng.dify.client.integration.spring.logging;
 
 import io.github.guoshiqiufeng.dify.core.utils.LogMaskingUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -32,7 +33,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Collectors;
 
 /**
  * A logging interceptor for RestClient requests and responses.
@@ -105,7 +105,15 @@ public class DifyRestLoggingInterceptor implements ClientHttpRequestInterceptor 
             ClientHttpResponse response = execution.execute(request, body);
 
             // Log response and get cached body (or null for SSE)
-            byte[] cachedBody = logResponse(requestId, response);
+            byte[] cachedBody;
+            try {
+                cachedBody = logResponse(requestId, response);
+            } catch (Exception loggingException) {
+                if (log.isWarnEnabled()) {
+                    log.warn("logResponse failed | requestId: {} | cause: {}", requestId, loggingException.getMessage());
+                }
+                cachedBody = null;
+            }
 
             // If cachedBody is null (SSE case), return original response without wrapping
             if (cachedBody == null) {
@@ -125,12 +133,20 @@ public class DifyRestLoggingInterceptor implements ClientHttpRequestInterceptor 
         if (log.isDebugEnabled()) {
             String bodyContent = "";
             if (body != null && body.length > 0) {
-                // Apply logBodyMaxBytes limit at byte level (already in bytes)
-                if (logBodyMaxBytes > 0 && body.length > logBodyMaxBytes) {
-                    // Truncate at byte boundary
-                    bodyContent = new String(body, 0, logBodyMaxBytes, StandardCharsets.UTF_8) + "... (truncated)";
+                HttpHeaders requestHeaders = request.getHeaders();
+                String contentType = requestHeaders.getContentType() != null ? requestHeaders.getContentType().toString() : "";
+                boolean isBinaryRequest = isBinaryContentType(contentType);
+
+                if (isBinaryRequest && !logBinaryBody) {
+                    bodyContent = String.format("[binary body omitted, contentType=%s, size=%d bytes]", contentType, body.length);
                 } else {
-                    bodyContent = new String(body, StandardCharsets.UTF_8);
+                    // Apply logBodyMaxBytes limit at byte level (already in bytes)
+                    if (logBodyMaxBytes > 0 && body.length > logBodyMaxBytes) {
+                        // Truncate at byte boundary
+                        bodyContent = new String(body, 0, logBodyMaxBytes, StandardCharsets.UTF_8) + "... (truncated)";
+                    } else {
+                        bodyContent = new String(body, StandardCharsets.UTF_8);
+                    }
                 }
             }
 
@@ -160,10 +176,11 @@ public class DifyRestLoggingInterceptor implements ClientHttpRequestInterceptor 
     private byte[] logResponse(String requestId, ClientHttpResponse response) throws IOException {
         // Always remove from cache to prevent memory leak
         Long startTime = REQUEST_TIME_CACHE.remove(requestId);
+        HttpHeaders responseHeaders = safeGetHeaders(response, requestId);
 
         // Check if SSE response first - before any body reading
-        String contentType = response.getHeaders().getContentType() != null
-                ? response.getHeaders().getContentType().toString()
+        String contentType = responseHeaders.getContentType() != null
+                ? responseHeaders.getContentType().toString()
                 : "";
         if (contentType.contains("text/event-stream")) {
             if (log.isDebugEnabled()) {
@@ -190,7 +207,7 @@ public class DifyRestLoggingInterceptor implements ClientHttpRequestInterceptor 
         }
 
         // Check content length and skip buffering if too large or unknown
-        long contentLength = response.getHeaders().getContentLength();
+        long contentLength = responseHeaders.getContentLength();
 
         // Skip buffering if content-length is unknown
         if (contentLength == -1) {
@@ -229,7 +246,7 @@ public class DifyRestLoggingInterceptor implements ClientHttpRequestInterceptor 
             if (maskingEnabled) {
                 // Convert HttpHeaders to Map for masking
                 Map<String, List<String>> headersMap = new HashMap<>();
-                response.getHeaders().forEach(headersMap::put);
+                responseHeaders.forEach(headersMap::put);
 
                 // Mask sensitive headers
                 Map<String, List<String>> maskedHeaders = LogMaskingUtils.maskHeaders(headersMap);
@@ -241,11 +258,23 @@ public class DifyRestLoggingInterceptor implements ClientHttpRequestInterceptor 
                         requestId, statusCode, maskedHeaders, executionTime, maskedBody);
             } else {
                 log.debug("logResponse | requestId: {} | status: {} | headers: {} | executionTime: {}ms | body: {}",
-                        requestId, statusCode, response.getHeaders(), executionTime, bodyContent);
+                        requestId, statusCode, responseHeaders, executionTime, bodyContent);
             }
         }
 
         return body;
+    }
+
+    private HttpHeaders safeGetHeaders(ClientHttpResponse response, String requestId) {
+        try {
+            HttpHeaders headers = response.getHeaders();
+            return headers == null ? HttpHeaders.EMPTY : headers;
+        } catch (Exception e) {
+            if (log.isWarnEnabled()) {
+                log.warn("getHeaders failed | requestId: {} | cause: {}", requestId, e.getMessage());
+            }
+            return HttpHeaders.EMPTY;
+        }
     }
 
     /**

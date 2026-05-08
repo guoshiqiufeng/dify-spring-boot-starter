@@ -162,7 +162,7 @@ class WebClientExecutorTest {
         when(webClient.method(HttpMethod.GET)).thenReturn(requestSpec);
         when(requestSpec.uri(any(Function.class))).thenReturn(bodySpec);
         when(bodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.toEntity(String.class)).thenReturn(Mono.empty());
+        when(responseSpec.toEntity(byte[].class)).thenReturn(Mono.empty());
 
         // Act & Assert
         HttpClientException exception = assertThrows(
@@ -184,7 +184,7 @@ class WebClientExecutorTest {
         when(webClient.method(HttpMethod.GET)).thenReturn(requestSpec);
         when(requestSpec.uri(any(Function.class))).thenReturn(bodySpec);
         when(bodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.toEntity(String.class)).thenReturn(Mono.empty());
+        when(responseSpec.toEntity(byte[].class)).thenReturn(Mono.empty());
 
         // Act & Assert
         HttpClientException exception = assertThrows(

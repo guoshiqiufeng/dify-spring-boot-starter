@@ -29,6 +29,7 @@ import org.springframework.http.HttpMethod;
 
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -80,7 +81,7 @@ class RestClientExecutor {
                   Map<String, String> cookies, Object body, Class<T> responseType) {
         try {
             Object requestSpec = buildRequest(method, uri, headers, cookies, body);
-            String responseBody = retrieveBody(requestSpec);
+            byte[] responseBody = retrieveBody(requestSpec);
             return responseConverter.deserialize(responseBody, responseType);
         } catch (Exception e) {
             throw new HttpClientException("RestClient request failed: " + getExceptionMessage(e), unwrapException(e));
@@ -103,7 +104,7 @@ class RestClientExecutor {
                   Map<String, String> cookies, Object body, TypeReference<T> typeReference) {
         try {
             Object requestSpec = buildRequest(method, uri, headers, cookies, body);
-            String responseBody = retrieveBody(requestSpec);
+            byte[] responseBody = retrieveBody(requestSpec);
             return responseConverter.deserialize(responseBody, typeReference);
         } catch (Exception e) {
             throw new HttpClientException("RestClient request failed: " + getExceptionMessage(e), unwrapException(e));
@@ -126,7 +127,7 @@ class RestClientExecutor {
                                            Map<String, String> cookies, Object body, Class<T> responseType) {
         try {
             Object requestSpec = buildRequest(method, uri, headers, cookies, body);
-            org.springframework.http.ResponseEntity<String> responseEntity = retrieveEntity(requestSpec);
+            org.springframework.http.ResponseEntity<byte[]> responseEntity = retrieveEntity(requestSpec);
 
             // For error responses (non-2xx), don't attempt deserialization
             // Return the raw error message as the body (cast to T)
@@ -139,7 +140,7 @@ class RestClientExecutor {
                 // Error response - return with raw error message as body
                 // The error handler will receive this and can process it
                 @SuppressWarnings("unchecked")
-                T errorBody = (T) responseEntity.getBody();
+                T errorBody = (T) decodeErrorBody(responseEntity.getBody());
                 return ResponseEntity.<T>builder()
                         .statusCode(statusCode)
                         .headers(HttpHeaderConverter.fromSpringHeaders(responseEntity.getHeaders()))
@@ -167,7 +168,7 @@ class RestClientExecutor {
                                            Map<String, String> cookies, Object body, TypeReference<T> typeReference) {
         try {
             Object requestSpec = buildRequest(method, uri, headers, cookies, body);
-            org.springframework.http.ResponseEntity<String> responseEntity = retrieveEntity(requestSpec);
+            org.springframework.http.ResponseEntity<byte[]> responseEntity = retrieveEntity(requestSpec);
 
             // For error responses (non-2xx), don't attempt deserialization
             // Return the raw error message as the body (cast to T)
@@ -180,7 +181,7 @@ class RestClientExecutor {
                 // Error response - return with raw error message as body
                 // The error handler will receive this and can process it
                 @SuppressWarnings("unchecked")
-                T errorBody = (T) responseEntity.getBody();
+                T errorBody = (T) decodeErrorBody(responseEntity.getBody());
                 return ResponseEntity.<T>builder()
                         .statusCode(statusCode)
                         .headers(HttpHeaderConverter.fromSpringHeaders(responseEntity.getHeaders()))
@@ -420,21 +421,21 @@ class RestClientExecutor {
     }
 
     /**
-     * Retrieve response body as String.
+     * Retrieve response body as byte array.
      *
      * @param requestSpec request spec object
-     * @return response body string
+     * @return response body bytes
      * @throws Exception if reflection fails
      */
-    private String retrieveBody(Object requestSpec) throws Exception {
-        // Execute and retrieve response: requestSpec.retrieve().body(String.class)
+    private byte[] retrieveBody(Object requestSpec) throws Exception {
+        // Execute and retrieve response: requestSpec.retrieve().body(byte[].class)
         java.lang.reflect.Method retrieveMethod = findMethod(requestSpec.getClass(), "retrieve");
         retrieveMethod.setAccessible(true);
         Object responseSpec = retrieveMethod.invoke(requestSpec);
 
         java.lang.reflect.Method bodyMethod = findMethod(responseSpec.getClass(), "body", Class.class);
         bodyMethod.setAccessible(true);
-        return (String) bodyMethod.invoke(responseSpec, String.class);
+        return (byte[]) bodyMethod.invoke(responseSpec, byte[].class);
     }
 
     /**
@@ -442,11 +443,11 @@ class RestClientExecutor {
      * Handles HTTP error responses gracefully by catching exceptions and extracting response data.
      *
      * @param requestSpec request spec object
-     * @return ResponseEntity with String body
+     * @return ResponseEntity with byte[] body
      * @throws Exception if reflection fails
      */
-    private org.springframework.http.ResponseEntity<String> retrieveEntity(Object requestSpec) throws Exception {
-        // Execute and retrieve response entity: requestSpec.retrieve().toEntity(String.class)
+    private org.springframework.http.ResponseEntity<byte[]> retrieveEntity(Object requestSpec) throws Exception {
+        // Execute and retrieve response entity: requestSpec.retrieve().toEntity(byte[].class)
         java.lang.reflect.Method retrieveMethod = findMethod(requestSpec.getClass(), "retrieve");
         retrieveMethod.setAccessible(true);
         Object responseSpec = retrieveMethod.invoke(requestSpec);
@@ -455,18 +456,18 @@ class RestClientExecutor {
         toEntityMethod.setAccessible(true);
 
         try {
-            Object result = toEntityMethod.invoke(responseSpec, String.class);
+            Object result = toEntityMethod.invoke(responseSpec, byte[].class);
 
             if (!(result instanceof org.springframework.http.ResponseEntity)) {
                 throw new HttpClientException("Unexpected return type: " + (result != null ? result.getClass() : "null"));
             }
 
-            // Since we called toEntity(String.class), we can safely cast to ResponseEntity<String>
+            // Since we called toEntity(byte[].class), we can safely cast to ResponseEntity<byte[]>
             org.springframework.http.ResponseEntity<?> rawEntity = (org.springframework.http.ResponseEntity<?>) result;
             // Use int status code to avoid Spring version compatibility issues
             return org.springframework.http.ResponseEntity.status(SpringStatusCodeExtractor.getStatusCodeValue(rawEntity))
                     .headers(rawEntity.getHeaders())
-                    .body((String) rawEntity.getBody());
+                    .body((byte[]) rawEntity.getBody());
         } catch (java.lang.reflect.InvocationTargetException e) {
             // Handle HTTP error responses (4xx, 5xx) thrown by Spring RestClient
             Throwable cause = e.getCause();
@@ -474,11 +475,19 @@ class RestClientExecutor {
                 // Try to extract response information from Spring's RestClientResponseException
                 org.springframework.http.ResponseEntity<String> errorResponse = extractErrorResponse(cause);
                 if (errorResponse != null) {
-                    return errorResponse;
+                    String errorBody = errorResponse.getBody();
+                    byte[] errorBytes = errorBody != null ? errorBody.getBytes(StandardCharsets.UTF_8) : null;
+                    return org.springframework.http.ResponseEntity.status(SpringStatusCodeExtractor.getStatusCodeValue(errorResponse))
+                            .headers(errorResponse.getHeaders())
+                            .body(errorBytes);
                 }
             }
             throw e;
         }
+    }
+
+    private String decodeErrorBody(byte[] bodyBytes) {
+        return bodyBytes == null ? null : new String(bodyBytes, StandardCharsets.UTF_8);
     }
 
     /**

@@ -40,6 +40,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -117,7 +118,7 @@ class WebClientExecutor {
 
         return requestSpec
                 .retrieve()
-                .bodyToMono(String.class)
+                .bodyToMono(byte[].class)
                 .map(responseBody -> responseConverter.deserialize(responseBody, responseType))
                 .block();
     }
@@ -142,7 +143,7 @@ class WebClientExecutor {
 
         return requestSpec
                 .retrieve()
-                .bodyToMono(String.class)
+                .bodyToMono(byte[].class)
                 .map(responseBody -> responseConverter.deserialize(responseBody, typeReference))
                 .block();
     }
@@ -166,11 +167,11 @@ class WebClientExecutor {
         WebClient.RequestBodySpec requestSpec = buildRequest(method, uri, headers, cookies, queryParams, body);
 
         try {
-            Mono<org.springframework.http.ResponseEntity<String>> responseMono = requestSpec
+            Mono<org.springframework.http.ResponseEntity<byte[]>> responseMono = requestSpec
                     .retrieve()
-                    .toEntity(String.class);
+                    .toEntity(byte[].class);
 
-            org.springframework.http.ResponseEntity<String> responseEntity = responseMono.block();
+            org.springframework.http.ResponseEntity<byte[]> responseEntity = responseMono.block();
 
             if (responseEntity == null) {
                 throw new HttpClientException("Response entity is null");
@@ -183,8 +184,9 @@ class WebClientExecutor {
             } else {
                 // For error responses, return raw error message as body
                 // The error handler will receive this and can process it
+                byte[] errorBodyBytes = responseEntity.getBody();
                 @SuppressWarnings("unchecked")
-                T errorBody = (T) responseEntity.getBody();
+                T errorBody = (T) (errorBodyBytes == null ? null : new String(errorBodyBytes, StandardCharsets.UTF_8));
                 return ResponseEntity.<T>builder()
                         .statusCode(statusCode)
                         .headers(HttpHeaderConverter.fromSpringHeaders(responseEntity.getHeaders()))
@@ -229,11 +231,11 @@ class WebClientExecutor {
         WebClient.RequestBodySpec requestSpec = buildRequest(method, uri, headers, cookies, queryParams, body);
 
         try {
-            Mono<org.springframework.http.ResponseEntity<String>> responseMono = requestSpec
+            Mono<org.springframework.http.ResponseEntity<byte[]>> responseMono = requestSpec
                     .retrieve()
-                    .toEntity(String.class);
+                    .toEntity(byte[].class);
 
-            org.springframework.http.ResponseEntity<String> responseEntity = responseMono.block();
+            org.springframework.http.ResponseEntity<byte[]> responseEntity = responseMono.block();
 
             if (responseEntity == null) {
                 throw new HttpClientException("Response entity is null");
@@ -246,8 +248,9 @@ class WebClientExecutor {
             } else {
                 // For error responses, return raw error message as body
                 // The error handler will receive this and can process it
+                byte[] errorBodyBytes = responseEntity.getBody();
                 @SuppressWarnings("unchecked")
-                T errorBody = (T) responseEntity.getBody();
+                T errorBody = (T) (errorBodyBytes == null ? null : new String(errorBodyBytes, StandardCharsets.UTF_8));
                 return ResponseEntity.<T>builder()
                         .statusCode(statusCode)
                         .headers(HttpHeaderConverter.fromSpringHeaders(responseEntity.getHeaders()))
