@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.guoshiqiufeng.dify.chat.dto.response;
+package io.github.guoshiqiufeng.dify.dataset.dto.response;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,13 +22,13 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test class for FileUploadResponse
+ * Test class for UploadFileInfoResponse
  *
  * @author yanghq
  * @version 1.0
- * @since 2025/5/2
+ * @since 2025/5/20
  */
-public class FileUploadResponseTest {
+public class UploadFileInfoResponseTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -38,7 +38,7 @@ public class FileUploadResponseTest {
     @Test
     public void testDefaultConstructor() {
         // Act
-        FileUploadResponse response = new FileUploadResponse();
+        UploadFileInfoResponse response = new UploadFileInfoResponse();
 
         // Assert
         assertNotNull(response);
@@ -46,6 +46,8 @@ public class FileUploadResponseTest {
         assertNull(response.getName());
         assertNull(response.getSize());
         assertNull(response.getExtension());
+        assertNull(response.getUrl());
+        assertNull(response.getDownloadUrl());
         assertNull(response.getMimeType());
         assertNull(response.getCreatedBy());
         assertNull(response.getCreatedAt());
@@ -64,11 +66,13 @@ public class FileUploadResponseTest {
     @Test
     public void testGetterAndSetter() {
         // Arrange
-        FileUploadResponse response = new FileUploadResponse();
+        UploadFileInfoResponse response = new UploadFileInfoResponse();
         String id = "file-12345";
         String name = "test-file.pdf";
         Integer size = 12345;
         String extension = "pdf";
+        String url = "https://example.com/file-12345";
+        String downloadUrl = "https://example.com/download/file-12345";
         String mimeType = "application/pdf";
         String createdBy = "user-12345";
         Long createdAt = 1651234567890L;
@@ -85,6 +89,8 @@ public class FileUploadResponseTest {
         response.setName(name);
         response.setSize(size);
         response.setExtension(extension);
+        response.setUrl(url);
+        response.setDownloadUrl(downloadUrl);
         response.setMimeType(mimeType);
         response.setCreatedBy(createdBy);
         response.setCreatedAt(createdAt);
@@ -101,6 +107,8 @@ public class FileUploadResponseTest {
         assertEquals(name, response.getName());
         assertEquals(size, response.getSize());
         assertEquals(extension, response.getExtension());
+        assertEquals(url, response.getUrl());
+        assertEquals(downloadUrl, response.getDownloadUrl());
         assertEquals(mimeType, response.getMimeType());
         assertEquals(createdBy, response.getCreatedBy());
         assertEquals(createdAt, response.getCreatedAt());
@@ -119,11 +127,13 @@ public class FileUploadResponseTest {
     @Test
     public void testJsonSerialization() throws JsonProcessingException {
         // Create an instance with sample data
-        FileUploadResponse response = new FileUploadResponse();
+        UploadFileInfoResponse response = new UploadFileInfoResponse();
         response.setId("file-12345");
         response.setName("test-file.pdf");
         response.setSize(12345);
         response.setExtension("pdf");
+        response.setUrl("https://example.com/file-12345");
+        response.setDownloadUrl("https://example.com/download/file-12345");
         response.setMimeType("application/pdf");
         response.setCreatedBy("user-12345");
         response.setCreatedAt(1651234567890L);
@@ -136,6 +146,8 @@ public class FileUploadResponseTest {
         assertTrue(json.contains("\"name\":"));
         assertTrue(json.contains("\"size\":"));
         assertTrue(json.contains("\"extension\":"));
+        assertTrue(json.contains("\"url\":"));
+        assertTrue(json.contains("\"downloadUrl\":"));
         assertTrue(json.contains("\"mimeType\":"));
         assertTrue(json.contains("\"createdBy\":"));
         assertTrue(json.contains("\"createdAt\":"));
@@ -148,20 +160,22 @@ public class FileUploadResponseTest {
         assertTrue(json.contains("\"fileKey\":"));
 
         // Deserialize back to object
-        FileUploadResponse deserialized = objectMapper.readValue(json, FileUploadResponse.class);
+        UploadFileInfoResponse deserialized = objectMapper.readValue(json, UploadFileInfoResponse.class);
 
         // Verify the deserialized object matches the original
         assertEquals(response.getId(), deserialized.getId());
         assertEquals(response.getName(), deserialized.getName());
         assertEquals(response.getSize(), deserialized.getSize());
         assertEquals(response.getExtension(), deserialized.getExtension());
+        assertEquals(response.getUrl(), deserialized.getUrl());
+        assertEquals(response.getDownloadUrl(), deserialized.getDownloadUrl());
         assertEquals(response.getMimeType(), deserialized.getMimeType());
         assertEquals(response.getCreatedBy(), deserialized.getCreatedBy());
         assertEquals(response.getCreatedAt(), deserialized.getCreatedAt());
     }
 
     /**
-     * Test JSON deserialization with aliases
+     * Test JSON deserialization with aliases (including mime_type bug fix)
      */
     @Test
     public void testJsonDeserialization() throws JsonProcessingException {
@@ -171,6 +185,8 @@ public class FileUploadResponseTest {
                 "  \"name\": \"test-file.pdf\",\n" +
                 "  \"size\": 12345,\n" +
                 "  \"extension\": \"pdf\",\n" +
+                "  \"url\": \"https://example.com/file-12345\",\n" +
+                "  \"download_url\": \"https://example.com/download/file-12345\",\n" +
                 "  \"mime_type\": \"application/pdf\",\n" +
                 "  \"created_by\": \"user-12345\",\n" +
                 "  \"created_at\": 1651234567890,\n" +
@@ -184,13 +200,15 @@ public class FileUploadResponseTest {
                 "}";
 
         // Deserialize with aliases
-        FileUploadResponse deserialized = objectMapper.readValue(jsonWithAliases, FileUploadResponse.class);
+        UploadFileInfoResponse deserialized = objectMapper.readValue(jsonWithAliases, UploadFileInfoResponse.class);
 
         // Verify fields were correctly deserialized
         assertEquals("file-12345", deserialized.getId());
         assertEquals("test-file.pdf", deserialized.getName());
         assertEquals(Integer.valueOf(12345), deserialized.getSize());
         assertEquals("pdf", deserialized.getExtension());
+        assertEquals("https://example.com/file-12345", deserialized.getUrl());
+        assertEquals("https://example.com/download/file-12345", deserialized.getDownloadUrl());
         assertEquals("application/pdf", deserialized.getMimeType());
         assertEquals("user-12345", deserialized.getCreatedBy());
         assertEquals(Long.valueOf(1651234567890L), deserialized.getCreatedAt());
@@ -209,11 +227,13 @@ public class FileUploadResponseTest {
     @Test
     public void testEqualsAndHashCode() {
         // Create two identical objects
-        FileUploadResponse response1 = new FileUploadResponse();
+        UploadFileInfoResponse response1 = new UploadFileInfoResponse();
         response1.setId("file-12345");
         response1.setName("test-file.pdf");
         response1.setSize(12345);
         response1.setExtension("pdf");
+        response1.setUrl("https://example.com/file-12345");
+        response1.setDownloadUrl("https://example.com/download/file-12345");
         response1.setMimeType("application/pdf");
         response1.setCreatedBy("user-12345");
         response1.setCreatedAt(1651234567890L);
@@ -225,11 +245,13 @@ public class FileUploadResponseTest {
         response1.setConversationId("conv-456def");
         response1.setFileKey("uploads/test-file.pdf");
 
-        FileUploadResponse response2 = new FileUploadResponse();
+        UploadFileInfoResponse response2 = new UploadFileInfoResponse();
         response2.setId("file-12345");
         response2.setName("test-file.pdf");
         response2.setSize(12345);
         response2.setExtension("pdf");
+        response2.setUrl("https://example.com/file-12345");
+        response2.setDownloadUrl("https://example.com/download/file-12345");
         response2.setMimeType("application/pdf");
         response2.setCreatedBy("user-12345");
         response2.setCreatedAt(1651234567890L);
@@ -242,11 +264,13 @@ public class FileUploadResponseTest {
         response2.setFileKey("uploads/test-file.pdf");
 
         // Create a different object
-        FileUploadResponse response3 = new FileUploadResponse();
+        UploadFileInfoResponse response3 = new UploadFileInfoResponse();
         response3.setId("file-67890");
         response3.setName("other-file.txt");
         response3.setSize(5678);
         response3.setExtension("txt");
+        response3.setUrl("https://example.com/file-67890");
+        response3.setDownloadUrl("https://example.com/download/file-67890");
         response3.setMimeType("text/plain");
         response3.setCreatedBy("user-67890");
         response3.setCreatedAt(1650123456789L);

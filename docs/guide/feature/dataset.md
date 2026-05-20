@@ -684,17 +684,24 @@ UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, Strin
 
 UploadFileInfoResponse
 
-| 参数名         | 类型      | 描述      |
-|-------------|---------|---------|
-| id          | String  | 文件ID    |
-| name        | String  | 文件名     |
-| size        | Integer | 文件大小    |
-| extension   | String  | 文件扩展名   |
-| url         | String  | 文件访问URL |
-| downloadUrl | String  | 文件下载URL |
-| mimeType    | String  | MIME类型  |
-| createdBy   | String  | 创建人     |
-| createdAt   | Long    | 创建时间戳   |
+| 参数名            | 类型      | 描述         |
+|----------------|---------|------------|
+| id             | String  | 文件ID       |
+| name           | String  | 文件名        |
+| size           | Integer | 文件大小       |
+| extension      | String  | 文件扩展名      |
+| url            | String  | 文件访问URL    |
+| downloadUrl    | String  | 文件下载URL    |
+| mimeType       | String  | MIME类型     |
+| createdBy      | String  | 创建人        |
+| createdAt      | Long    | 创建时间戳      |
+| previewUrl     | String  | 预览 URL     |
+| sourceUrl      | String  | 源 URL      |
+| originalUrl    | String  | 原始 URL     |
+| userId         | String  | 用户 ID      |
+| tenantId       | String  | 租户 ID      |
+| conversationId | String  | 会话 ID      |
+| fileKey        | String  | 文件存储键      |
 
 ### 2.9 更新文档状态
 
