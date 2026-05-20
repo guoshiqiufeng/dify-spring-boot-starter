@@ -687,17 +687,24 @@ UploadFileInfoResponse uploadFileInfo(String datasetId, String documentId, Strin
 
 UploadFileInfoResponse
 
-| Parameter   | Type    | Description        |
-|-------------|---------|--------------------|
-| id          | String  | File ID            |
-| name        | String  | File name          |
-| size        | Integer | File size          |
-| extension   | String  | File extension     |
-| url         | String  | File access URL    |
-| downloadUrl | String  | File download URL  |
-| mimeType    | String  | MIME type          |
-| createdBy   | String  | Created by         |
-| createdAt   | Long    | Creation timestamp |
+| Parameter      | Type    | Description        |
+|----------------|---------|--------------------|
+| id             | String  | File ID            |
+| name           | String  | File name          |
+| size           | Integer | File size          |
+| extension      | String  | File extension     |
+| url            | String  | File access URL    |
+| downloadUrl    | String  | File download URL  |
+| mimeType       | String  | MIME type          |
+| createdBy      | String  | Created by         |
+| createdAt      | Long    | Creation timestamp |
+| previewUrl     | String  | Preview URL        |
+| sourceUrl      | String  | Source URL         |
+| originalUrl    | String  | Original URL       |
+| userId         | String  | User ID            |
+| tenantId       | String  | Tenant ID          |
+| conversationId | String  | Conversation ID    |
+| fileKey        | String  | File storage key   |
 
 ### 2.9 Update Document Status
 

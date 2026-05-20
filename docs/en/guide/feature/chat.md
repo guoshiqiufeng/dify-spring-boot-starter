@@ -621,6 +621,13 @@ FileUploadResponse
 | mimeType       | String  | File MIME type     |
 | createdBy      | String  | Creator            |
 | createdAt      | Long    | Creation timestamp |
+| previewUrl     | String  | Preview URL        |
+| sourceUrl      | String  | Source URL         |
+| originalUrl    | String  | Original URL       |
+| userId         | String  | User ID            |
+| tenantId       | String  | Tenant ID          |
+| conversationId | String  | Conversation ID    |
+| fileKey        | String  | File storage key   |
 
 ### 3.5 Get Application Info
 

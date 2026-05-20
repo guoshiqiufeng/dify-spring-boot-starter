@@ -612,15 +612,22 @@ FileUploadResponse fileUpload(FileUploadRequest request);
 
 FileUploadResponse
 
-| 参数名       | 类型      | 描述       |
-|-----------|---------|----------|
-| id        | String  | 文件 id    |
-| name      | String  | 文件名称     |
-| size      | Integer | 文件大小(字节) |
-| extension | String  | 文件后缀     |
-| mimeType  | String  | 文件MIME类型 |
-| createdBy | String  | 创建人      |
-| createdAt | Long    | 创建时间戳    |
+| 参数名            | 类型      | 描述         |
+|----------------|---------|------------|
+| id             | String  | 文件 id      |
+| name           | String  | 文件名称       |
+| size           | Integer | 文件大小(字节)   |
+| extension      | String  | 文件后缀       |
+| mimeType       | String  | 文件MIME类型   |
+| createdBy      | String  | 创建人        |
+| createdAt      | Long    | 创建时间戳      |
+| previewUrl     | String  | 预览 URL     |
+| sourceUrl      | String  | 源 URL      |
+| originalUrl    | String  | 原始 URL     |
+| userId         | String  | 用户 ID      |
+| tenantId       | String  | 租户 ID      |
+| conversationId | String  | 会话 ID      |
+| fileKey        | String  | 文件存储键      |
 
 ### 3.5 获取应用信息
 

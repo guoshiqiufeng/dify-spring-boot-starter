@@ -27,7 +27,7 @@ import java.io.Serializable;
  */
 @Data
 public class UploadFileInfoResponse implements Serializable {
-    private static final long serialVersionUID = 487590129337348606L;
+    private static final long serialVersionUID = 487590129337348607L;
 
     private String id;
     private String name;
@@ -36,11 +36,53 @@ public class UploadFileInfoResponse implements Serializable {
     private String url;
     @JsonAlias("download_url")
     private String downloadUrl;
-    @JsonAlias("mine_type")
+    @JsonAlias("mime_type")
     private String mimeType;
     @JsonAlias("created_by")
     private String createdBy;
     @JsonAlias("created_at")
     private Long createdAt;
+
+    /**
+     * 预览 URL
+     */
+    @JsonAlias("preview_url")
+    private String previewUrl;
+
+    /**
+     * 源 URL
+     */
+    @JsonAlias("source_url")
+    private String sourceUrl;
+
+    /**
+     * 原始 URL
+     */
+    @JsonAlias("original_url")
+    private String originalUrl;
+
+    /**
+     * 用户 ID
+     */
+    @JsonAlias("user_id")
+    private String userId;
+
+    /**
+     * 租户 ID
+     */
+    @JsonAlias("tenant_id")
+    private String tenantId;
+
+    /**
+     * 会话 ID
+     */
+    @JsonAlias("conversation_id")
+    private String conversationId;
+
+    /**
+     * 文件存储键
+     */
+    @JsonAlias("file_key")
+    private String fileKey;
 
 }
