@@ -62,6 +62,7 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
     @Override
     public ChatMessageSendResponse chat(ChatMessageSendRequest chatRequest) {
         Assert.notNull(chatRequest, REQUEST_BODY_NULL_ERROR);
+        Assert.notEmpty(chatRequest.getContent(), "The request content can not be empty.");
 
         ChatMessageVO chatMessage = builderChatMessage(ResponseModeEnum.blocking, chatRequest);
 
@@ -78,6 +79,7 @@ public class DifyChatDefaultClient extends BaseDifyDefaultClient implements Dify
     @Override
     public Flux<ChatMessageSendCompletionResponse> streamingChat(ChatMessageSendRequest chatRequest) {
         Assert.notNull(chatRequest, REQUEST_BODY_NULL_ERROR);
+        Assert.notEmpty(chatRequest.getContent(), "The request content can not be empty.");
 
         ChatMessageVO chatMessage = builderChatMessage(ResponseModeEnum.streaming, chatRequest);
 
